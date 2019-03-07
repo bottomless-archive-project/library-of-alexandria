@@ -1,0 +1,3 @@
+rootProject.name = 'loa-downloader'
+include 'loa-downloader-application'
+
