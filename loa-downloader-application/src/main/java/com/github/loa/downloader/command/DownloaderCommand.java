@@ -18,10 +18,8 @@ public class DownloaderCommand implements CommandLineRunner {
 
     private final DocumentSourceProvider documentSourceProvider;
     private final DocumentDownloader documentDownloader;
-
-    //TODO: Get these from properties
-    private final ExecutorService executorService = Executors.newFixedThreadPool(100);
-    private final Semaphore semaphore = new Semaphore(1000);
+    private final ExecutorService downloaderExecutor;
+    private final Semaphore downloaderSemaphore;
 
     @Override
     public void run(String... args) {
@@ -31,15 +29,15 @@ public class DownloaderCommand implements CommandLineRunner {
                 .filter(url -> url.getPath().endsWith(".pdf"))
                 .forEach(documentLocation -> {
                     try {
-                        semaphore.acquire();
+                        downloaderSemaphore.acquire();
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
 
-                    executorService.submit(() -> {
+                    downloaderExecutor.submit(() -> {
                         documentDownloader.downloadDocument(documentLocation);
 
-                        semaphore.release();
+                        downloaderSemaphore.release();
                     });
                 });
     }
