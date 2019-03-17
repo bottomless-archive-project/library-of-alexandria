@@ -18,6 +18,9 @@ subprojects {
     }
 
     apply plugin: 'java'
+
+    compileJava.dependsOn(processResources)
+
     apply plugin: 'io.spring.dependency-management'
 
     dependencyManagement {
