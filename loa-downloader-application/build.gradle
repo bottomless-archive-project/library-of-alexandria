@@ -1,7 +1,6 @@
 dependencies {
     compile group: 'org.mybatis.spring.boot', name: 'mybatis-spring-boot-starter', version: '2.0.0'
     compile group: 'mysql', name: 'mysql-connector-java'
-    compile group: 'org.liquibase', name: 'liquibase-core'
 
     compile group: 'commons-codec', name: 'commons-codec', version: '1.11'
     compile group: 'commons-io', name: 'commons-io', version: '2.6'
