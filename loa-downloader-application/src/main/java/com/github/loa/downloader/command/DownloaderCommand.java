@@ -1,6 +1,7 @@
 package com.github.loa.downloader.command;
 
-import com.github.loa.downloader.command.service.DocumentDownloaderProcessor;
+import com.github.loa.downloader.command.service.DocumentSourceProcessor;
+import com.github.loa.downloader.source.service.DocumentSourceProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
@@ -11,10 +12,11 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class DownloaderCommand implements CommandLineRunner {
 
-    private final DocumentDownloaderProcessor documentDownloaderProcessor;
+    private final DocumentSourceProcessor documentSourceProcessor;
+    private final DocumentSourceProvider documentSourceProvider;
 
     @Override
     public void run(String... args) {
-        documentDownloaderProcessor.downloadDocuments();
+        documentSourceProcessor.processDocumentSource(documentSourceProvider);
     }
 }

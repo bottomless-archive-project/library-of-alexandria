@@ -10,18 +10,25 @@ import java.net.URL;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Semaphore;
 
-//TODO: Rename this to something more meaningful!
+/**
+ * This service is the hearth of the downloader application. It's responsible for the processing
+ * (loading and downloading) of document locations.
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class DocumentDownloaderProcessor {
+public class DocumentSourceProcessor {
 
-    private final DocumentSourceProvider documentSourceProvider;
     private final DocumentDownloader documentDownloader;
     private final ExecutorService downloaderExecutor;
     private final Semaphore downloaderSemaphore;
 
-    public void downloadDocuments() {
+    /**
+     * Handles the processing of a document source.
+     *
+     * @param documentSourceProvider provides the source to process
+     */
+    public void processDocumentSource(final DocumentSourceProvider documentSourceProvider) {
         documentSourceProvider.stream()
                 .filter(this::shouldDownload)
                 .forEach(this::processLocation);
