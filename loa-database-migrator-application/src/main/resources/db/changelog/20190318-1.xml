@@ -1,0 +1,26 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
+    <changeSet author="laxika" id="20190318-1">
+        <createTable tableName="document">
+            <column name="id" type="varchar(64)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="url" type="varchar(2048)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="crawled_date" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="crc" type="varchar(64)"/>
+            <column name="file_size" type="bigint"/>
+            <column name="status" type="varchar(64)" defaultValue="UNDER_CRAWL"/>
+            <column name="source" type="varchar(32)" defaultValue="unknown"/>
+        </createTable>
+        <modifySql dbms="mysql">
+            <append value="ENGINE=INNODB CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci"/>
+        </modifySql>
+    </changeSet>
+</databaseChangeLog>

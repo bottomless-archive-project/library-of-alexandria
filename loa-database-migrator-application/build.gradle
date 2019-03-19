@@ -1,0 +1,6 @@
+dependencies {
+    compile group: 'mysql', name: 'mysql-connector-java'
+    compile group: 'org.liquibase', name: 'liquibase-core'
+
+    compile('org.springframework.boot:spring-boot-starter-jdbc')
+}
