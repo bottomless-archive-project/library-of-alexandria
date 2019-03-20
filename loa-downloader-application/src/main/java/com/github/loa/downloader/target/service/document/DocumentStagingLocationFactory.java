@@ -23,6 +23,6 @@ public class DocumentStagingLocationFactory {
      * @return the location created in the staging area
      */
     public File newStagingLocation(final String documentId) {
-        return new File(documentTargetConfiguration.getTemporaryLocation() + documentId + ".pdf");
+        return new File(documentTargetConfiguration.getTemporaryLocation(), documentId + ".pdf");
     }
 }

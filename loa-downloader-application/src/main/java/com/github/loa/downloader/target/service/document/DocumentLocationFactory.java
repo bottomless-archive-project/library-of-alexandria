@@ -16,6 +16,6 @@ public class DocumentLocationFactory {
     private final DocumentTargetConfiguration documentTargetConfiguration;
 
     public File newLocation(final String documentId) {
-        return new File(documentTargetConfiguration.getLocation() + documentId + ".pdf");
+        return new File(documentTargetConfiguration.getLocation(), documentId + ".pdf");
     }
 }

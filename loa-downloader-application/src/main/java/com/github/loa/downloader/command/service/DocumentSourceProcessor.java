@@ -29,7 +29,10 @@ public class DocumentSourceProcessor {
      * @param documentSourceProvider provides the source to process
      */
     public void processDocumentSource(final DocumentSourceProvider documentSourceProvider) {
+        log.info("Starting to process a new document source.");
+
         documentSourceProvider.stream()
+                .sequential()
                 .filter(this::shouldDownload)
                 .forEach(this::processLocation);
     }
@@ -41,6 +44,8 @@ public class DocumentSourceProcessor {
     }
 
     private void processLocation(final URL documentLocation) {
+        log.debug("Starting to process document {}.", documentLocation);
+
         try {
             downloaderSemaphore.acquire();
         } catch (InterruptedException e) {

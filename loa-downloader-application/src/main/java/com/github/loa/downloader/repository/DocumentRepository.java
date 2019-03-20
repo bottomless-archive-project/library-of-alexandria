@@ -14,9 +14,6 @@ public interface DocumentRepository {
     @Select("SELECT * FROM document WHERE id = #{id}")
     DocumentDatabaseEntity findById(@Param("id") String id);
 
-    @Update("UPDATE document SET file_size = #{fileSize}, crc = #{crc} WHERE id = #{id}")
-    void updateFileSizeAndCrc(@Param("id") String id, @Param("fileSize") long fileSize, @Param("crc") String crc);
-
     @Select("SELECT * FROM document WHERE file_size = #{fileSize} AND crc = #{crc}")
     List<DocumentDatabaseEntity> findByCrcAndFileSize(@Param("crc") String crc, @Param("fileSize") long fileSize);
 }

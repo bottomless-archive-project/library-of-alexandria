@@ -1,7 +1,7 @@
 package com.github.loa.downloader.target.service.document;
 
-import com.github.loa.downloader.document.service.entity.factory.DocumentEntityFactory;
 import com.github.loa.downloader.document.service.DocumentIdFactory;
+import com.github.loa.downloader.document.service.entity.factory.DocumentEntityFactory;
 import com.github.loa.downloader.document.service.entity.factory.domain.DocumentCreationContext;
 import com.github.loa.downloader.domain.DocumentStatus;
 import com.github.loa.downloader.target.service.file.FileDownloader;
@@ -9,7 +9,6 @@ import com.github.loa.downloader.target.service.file.domain.FileDownloaderExcept
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.io.FileUtils;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedInputStream;
@@ -35,10 +34,12 @@ public class DocumentDownloader {
     private final DocumentLocationFactory documentLocationFactory;
 
     public void downloadDocument(final URL documentLocation) {
+        log.debug("Starting to download document {}.", documentLocation);
+
         final String documentId = documentIdFactory.newDocumentId(documentLocation);
 
         if (!shouldDownload(documentId)) {
-            log.debug("Document location already visited: " + documentLocation);
+            log.debug("Document location already visited: {}.", documentLocation);
 
             return;
         }

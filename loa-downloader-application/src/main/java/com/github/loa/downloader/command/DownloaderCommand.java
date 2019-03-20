@@ -16,7 +16,9 @@ public class DownloaderCommand implements CommandLineRunner {
     private final DocumentSourceProvider documentSourceProvider;
 
     @Override
-    public void run(String... args) {
+    public void run(final String... args) {
+        log.info("Initializing document processing.");
+
         documentSourceProcessor.processDocumentSource(documentSourceProvider);
     }
 }
