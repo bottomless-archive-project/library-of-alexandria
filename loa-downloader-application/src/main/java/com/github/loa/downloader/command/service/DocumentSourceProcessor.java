@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import java.net.URL;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 
 /**
  * This service is the hearth of the downloader application. It's responsible for the processing
@@ -35,10 +36,11 @@ public class DocumentSourceProcessor {
                 .sequential()
                 .filter(this::shouldDownload)
                 .forEach(this::processLocation);
+
+        shutdownGracefully();
     }
 
     private boolean shouldDownload(final URL documentLocation) {
-        //TODO: We should support other file types than pdf as well!
         //Using getPath() to be able to crawl urls like: /example/examplefile.pdf?queryparam=value
         return documentLocation.getPath().endsWith(".pdf");
     }
@@ -57,5 +59,18 @@ public class DocumentSourceProcessor {
 
             downloaderSemaphore.release();
         });
+    }
+
+    private void shutdownGracefully() {
+        log.info("Shutdown initialized for the downloader threads.");
+
+        try {
+            downloaderExecutor.shutdown();
+            downloaderExecutor.awaitTermination(30, TimeUnit.MINUTES);
+        } catch (InterruptedException e) {
+            log.error("Error occurred while shutting down the downloader threads.");
+        }
+
+        log.info("Shutdown finished for the downloader threads.");
     }
 }

@@ -68,9 +68,9 @@ public class DocumentEntityFactory {
         documentDatabaseEntity.setCrc(documentCreationContext.getCrc());
         documentDatabaseEntity.setFileSize(documentCreationContext.getFileSize());
 
-        //TODO: Real version & batch
+        //TODO: Real version & source
         documentDatabaseEntity.setDownloaderVersion(1);
-        documentDatabaseEntity.setBatch("test");
+        documentDatabaseEntity.setSource("test");
 
         documentRepository.insertDocument(documentDatabaseEntity);
     }

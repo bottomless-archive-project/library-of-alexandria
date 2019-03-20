@@ -8,7 +8,7 @@ import java.util.List;
 @Mapper
 public interface DocumentRepository {
 
-    @Insert("INSERT INTO document SET id = #{id}, url = #{url}, crawled_date = NOW(), crc = #{crc}, file_size = #{fileSize}, `status` = #{status}, crawler_version = #{crawlerVersion}")
+    @Insert("INSERT INTO document SET id = #{id}, url = #{url}, crawled_date = NOW(), crc = #{crc}, file_size = #{fileSize}, `status` = #{status}, source = #{source}")
     void insertDocument(DocumentDatabaseEntity tomeDatabaseEntity);
 
     @Select("SELECT * FROM document WHERE id = #{id}")

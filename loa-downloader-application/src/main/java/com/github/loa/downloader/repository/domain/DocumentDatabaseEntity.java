@@ -11,7 +11,7 @@ public class DocumentDatabaseEntity {
     private String id;
     private String url;
     private String crc;
-    private String batch;
+    private String source;
     private long fileSize;
     private Instant downloadDate;
     private int downloaderVersion;
