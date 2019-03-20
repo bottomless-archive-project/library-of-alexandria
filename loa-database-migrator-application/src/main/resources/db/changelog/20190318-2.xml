@@ -1,0 +1,12 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
+    <changeSet author="laxika" id="20190318-2">
+        <createIndex indexName="crc_check" tableName="document">
+            <column name="crc"/>
+            <column name="file_size"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>
