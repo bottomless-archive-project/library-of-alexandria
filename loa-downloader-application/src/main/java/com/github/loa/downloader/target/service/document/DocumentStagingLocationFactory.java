@@ -1,4 +1,4 @@
-package com.github.loa.downloader.target.service;
+package com.github.loa.downloader.target.service.document;
 
 import com.github.loa.downloader.target.configuration.DocumentTargetConfiguration;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +12,7 @@ import java.io.File;
  */
 @Service
 @RequiredArgsConstructor
-public class StagingLocationFactory {
+public class DocumentStagingLocationFactory {
 
     private final DocumentTargetConfiguration documentTargetConfiguration;
 

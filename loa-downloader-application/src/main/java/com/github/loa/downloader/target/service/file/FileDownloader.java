@@ -1,5 +1,6 @@
-package com.github.loa.downloader.target.service;
+package com.github.loa.downloader.target.service.file;
 
+import com.github.loa.downloader.target.service.file.domain.FileDownloaderException;
 import org.apache.commons.io.IOUtils;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +23,8 @@ public class FileDownloader {
      * @param resultLocation the location to download the file to
      * @param timeout        the timeout in case if the server did not respond
      */
-    public void downloadFile(final URL downloadTarget, final File resultLocation, final int timeout) {
+    public void downloadFile(final URL downloadTarget, final File resultLocation, final int timeout)
+            throws FileDownloaderException {
         try {
             final URLConnection urlConnection = downloadTarget.openConnection();
             urlConnection.setConnectTimeout(timeout);
@@ -34,7 +36,7 @@ public class FileDownloader {
                 }
             }
         } catch (Exception e) {
-            throw new RuntimeException("Error occurred while downloading file!", e);
+            throw new FileDownloaderException("Error occurred while downloading file!", e);
         }
     }
 }
