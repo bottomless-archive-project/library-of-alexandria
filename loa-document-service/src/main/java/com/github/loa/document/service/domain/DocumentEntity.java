@@ -1,6 +1,5 @@
-package com.github.loa.downloader.document.domain;
+package com.github.loa.document.service.domain;
 
-import com.github.loa.downloader.domain.DocumentStatus;
 import lombok.Builder;
 import lombok.Getter;
 

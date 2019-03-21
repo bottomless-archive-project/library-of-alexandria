@@ -1,6 +1,5 @@
-package com.github.loa.downloader.repository.domain;
+package com.github.loa.document.repository.domain;
 
-import com.github.loa.downloader.domain.DocumentStatus;
 import lombok.Data;
 
 import java.time.Instant;
@@ -15,5 +14,5 @@ public class DocumentDatabaseEntity {
     private long fileSize;
     private Instant downloadDate;
     private int downloaderVersion;
-    private DocumentStatus status;
+    private String status;
 }

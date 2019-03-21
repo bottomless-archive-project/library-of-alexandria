@@ -1,4 +1,4 @@
-package com.github.loa.downloader.document.service;
+package com.github.loa.document.service;
 
 import java.net.URL;
 

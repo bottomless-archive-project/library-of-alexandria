@@ -1,6 +1,6 @@
-package com.github.loa.downloader.repository;
+package com.github.loa.document.repository;
 
-import com.github.loa.downloader.repository.domain.DocumentDatabaseEntity;
+import com.github.loa.document.repository.domain.DocumentDatabaseEntity;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;

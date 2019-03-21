@@ -1,6 +1,6 @@
-package com.github.loa.downloader.document.service.entity.factory.domain;
+package com.github.loa.document.service.entity.factory.domain;
 
-import com.github.loa.downloader.domain.DocumentStatus;
+import com.github.loa.document.service.domain.DocumentStatus;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -15,4 +15,6 @@ public class DocumentCreationContext {
     private final String crc;
     private final long fileSize;
     private final DocumentStatus status;
+    private final int versionNumber;
+    private final String source;
 }

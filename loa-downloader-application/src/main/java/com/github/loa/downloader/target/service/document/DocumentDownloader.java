@@ -1,9 +1,11 @@
 package com.github.loa.downloader.target.service.document;
 
-import com.github.loa.downloader.document.service.DocumentIdFactory;
-import com.github.loa.downloader.document.service.entity.factory.DocumentEntityFactory;
-import com.github.loa.downloader.document.service.entity.factory.domain.DocumentCreationContext;
-import com.github.loa.downloader.domain.DocumentStatus;
+import com.github.loa.document.service.DocumentIdFactory;
+import com.github.loa.downloader.command.configuration.DownloaderConfiguration;
+import com.github.loa.document.service.entity.factory.DocumentEntityFactory;
+import com.github.loa.document.service.entity.factory.domain.DocumentCreationContext;
+import com.github.loa.document.service.domain.DocumentStatus;
+import com.github.loa.downloader.source.configuration.DocumentSourceConfiguration;
 import com.github.loa.downloader.target.service.file.FileDownloader;
 import com.github.loa.downloader.target.service.file.domain.FileDownloaderException;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +34,8 @@ public class DocumentDownloader {
     private final DocumentIdFactory documentIdFactory;
     private final DocumentStagingLocationFactory documentStagingLocationFactory;
     private final DocumentLocationFactory documentLocationFactory;
+    private final DocumentSourceConfiguration documentSourceConfiguration;
+    private final DownloaderConfiguration downloaderConfiguration;
 
     public void downloadDocument(final URL documentLocation) {
         log.debug("Starting to download document {}.", documentLocation);
@@ -55,6 +59,8 @@ public class DocumentDownloader {
                             .id(documentId)
                             .location(documentLocation)
                             .status(DocumentStatus.FAILED)
+                            .versionNumber(downloaderConfiguration.getVersionNumber())
+                            .source(documentSourceConfiguration.getName())
                             .build()
             );
         }
@@ -73,6 +79,8 @@ public class DocumentDownloader {
                             .crc(crc)
                             .fileSize(fileSize)
                             .status(DocumentStatus.DUPLICATE)
+                            .versionNumber(downloaderConfiguration.getVersionNumber())
+                            .source(documentSourceConfiguration.getName())
                             .build()
             );
 
@@ -90,6 +98,8 @@ public class DocumentDownloader {
                             .crc(crc)
                             .fileSize(fileSize)
                             .status(DocumentStatus.INVALID)
+                            .versionNumber(downloaderConfiguration.getVersionNumber())
+                            .source(documentSourceConfiguration.getName())
                             .build()
             );
 
@@ -111,6 +121,8 @@ public class DocumentDownloader {
                         .crc(crc)
                         .fileSize(fileSize)
                         .status(DocumentStatus.DOWNLOADED)
+                        .versionNumber(downloaderConfiguration.getVersionNumber())
+                        .source(documentSourceConfiguration.getName())
                         .build()
         );
     }

@@ -1,4 +1,4 @@
-package com.github.loa.downloader.domain;
+package com.github.loa.document.service.domain;
 
 public enum DocumentStatus {
 

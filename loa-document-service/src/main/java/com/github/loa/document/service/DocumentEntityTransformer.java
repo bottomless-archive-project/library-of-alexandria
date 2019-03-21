@@ -1,7 +1,8 @@
-package com.github.loa.downloader.document.service;
+package com.github.loa.document.service;
 
-import com.github.loa.downloader.document.domain.DocumentEntity;
-import com.github.loa.downloader.repository.domain.DocumentDatabaseEntity;
+import com.github.loa.document.service.domain.DocumentEntity;
+import com.github.loa.document.repository.domain.DocumentDatabaseEntity;
+import com.github.loa.document.service.domain.DocumentStatus;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -11,7 +12,7 @@ public class DocumentEntityTransformer {
         return DocumentEntity.builder()
                 .id(tomeDatabaseEntity.getId())
                 .url(tomeDatabaseEntity.getUrl())
-                .status(tomeDatabaseEntity.getStatus())
+                .status(DocumentStatus.valueOf(tomeDatabaseEntity.getStatus()))
                 .crc(tomeDatabaseEntity.getCrc())
                 .fileSize(tomeDatabaseEntity.getFileSize())
                 .downloadDate(tomeDatabaseEntity.getDownloadDate())
