@@ -8,6 +8,7 @@ import com.github.loa.document.service.domain.DocumentStatus;
 import com.github.loa.downloader.source.configuration.DocumentSourceConfiguration;
 import com.github.loa.downloader.target.service.file.FileDownloader;
 import com.github.loa.downloader.target.service.file.domain.FileDownloaderException;
+import com.github.loa.vault.service.DocumentLocationFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -27,6 +28,7 @@ import java.nio.file.StandardCopyOption;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+//TODO: Move some of the logic to the stage module
 public class DocumentDownloader {
 
     private final DocumentEntityFactory documentEntityFactory;

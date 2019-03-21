@@ -1,8 +1,8 @@
 dependencies {
-    compile group: 'org.mybatis.spring.boot', name: 'mybatis-spring-boot-starter', version: '2.0.0'
     compile group: 'mysql', name: 'mysql-connector-java'
 
     compile project(':loa-document-service')
+    compile project(':loa-vault-service')
 
     compile group: 'commons-io', name: 'commons-io', version: '2.6'
 }

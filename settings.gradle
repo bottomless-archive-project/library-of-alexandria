@@ -3,4 +3,5 @@ include 'loa-downloader-application'
 include 'loa-database-application'
 include 'loa-document-service'
 include 'loa-document-repository'
+include 'loa-vault-service'
 
