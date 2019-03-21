@@ -8,7 +8,8 @@ import com.github.loa.document.service.domain.DocumentStatus;
 import com.github.loa.downloader.source.configuration.DocumentSourceConfiguration;
 import com.github.loa.downloader.target.service.file.FileDownloader;
 import com.github.loa.downloader.target.service.file.domain.FileDownloaderException;
-import com.github.loa.vault.service.DocumentLocationFactory;
+import com.github.loa.stage.service.StageLocationFactory;
+import com.github.loa.vault.service.VaultLocationFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -34,8 +35,8 @@ public class DocumentDownloader {
     private final DocumentEntityFactory documentEntityFactory;
     private final FileDownloader fileDownloader;
     private final DocumentIdFactory documentIdFactory;
-    private final DocumentStagingLocationFactory documentStagingLocationFactory;
-    private final DocumentLocationFactory documentLocationFactory;
+    private final StageLocationFactory stageLocationFactory;
+    private final VaultLocationFactory vaultLocationFactory;
     private final DocumentSourceConfiguration documentSourceConfiguration;
     private final DownloaderConfiguration downloaderConfiguration;
 
@@ -50,7 +51,7 @@ public class DocumentDownloader {
             return;
         }
 
-        final File temporaryFile = documentStagingLocationFactory.newStagingLocation(documentId);
+        final File temporaryFile = stageLocationFactory.newLocation(documentId);
 
         try {
             fileDownloader.downloadFile(documentLocation, temporaryFile, 30000);
@@ -109,7 +110,7 @@ public class DocumentDownloader {
         }
 
         try {
-            Files.move(temporaryFile.toPath(), documentLocationFactory.newLocation(documentId).toPath(),
+            Files.move(temporaryFile.toPath(), vaultLocationFactory.newLocation(documentId).toPath(),
                     StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             //TODO: Handle this better!

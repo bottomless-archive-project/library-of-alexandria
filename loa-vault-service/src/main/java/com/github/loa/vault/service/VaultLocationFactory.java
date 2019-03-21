@@ -11,7 +11,7 @@ import java.io.File;
  */
 @Service
 @RequiredArgsConstructor
-public class DocumentLocationFactory {
+public class VaultLocationFactory {
 
     private final VaultConfiguration vaultConfiguration;
 
