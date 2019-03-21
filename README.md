@@ -1,4 +1,4 @@
-# LoA Downloader application
+# Library of Alexandria
 
 ## Domain language
 
