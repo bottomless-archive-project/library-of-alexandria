@@ -1,4 +1,4 @@
 rootProject.name = 'loa-downloader'
 include 'loa-downloader-application'
-include 'loa-database-migrator-application'
+include 'loa-database-application'
 
