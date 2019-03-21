@@ -10,5 +10,6 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties("loa.downloader.source")
 public class DocumentSourceConfiguration {
 
+    private String name;
     private DocumentSourceType type;
 }

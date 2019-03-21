@@ -1,10 +1,12 @@
 package com.github.loa.downloader.document.service.entity.factory;
 
+import com.github.loa.downloader.command.configuration.DownloaderConfiguration;
 import com.github.loa.downloader.document.domain.DocumentEntity;
 import com.github.loa.downloader.document.service.DocumentEntityTransformer;
 import com.github.loa.downloader.document.service.entity.factory.domain.DocumentCreationContext;
 import com.github.loa.downloader.repository.DocumentRepository;
 import com.github.loa.downloader.repository.domain.DocumentDatabaseEntity;
+import com.github.loa.downloader.source.configuration.DocumentSourceConfiguration;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +19,8 @@ public class DocumentEntityFactory {
 
     private final DocumentRepository documentRepository;
     private final DocumentEntityTransformer documentEntityTransformer;
+    private final DocumentSourceConfiguration documentSourceConfiguration;
+    private final DownloaderConfiguration downloaderConfiguration;
 
     /**
      * Check if a document exists based on the provided document id.
@@ -67,10 +71,8 @@ public class DocumentEntityFactory {
         documentDatabaseEntity.setStatus(documentCreationContext.getStatus());
         documentDatabaseEntity.setCrc(documentCreationContext.getCrc());
         documentDatabaseEntity.setFileSize(documentCreationContext.getFileSize());
-
-        //TODO: Real version & source
-        documentDatabaseEntity.setDownloaderVersion(1);
-        documentDatabaseEntity.setSource("test");
+        documentDatabaseEntity.setDownloaderVersion(downloaderConfiguration.getVersionNumber());
+        documentDatabaseEntity.setSource(documentSourceConfiguration.getName());
 
         documentRepository.insertDocument(documentDatabaseEntity);
     }
