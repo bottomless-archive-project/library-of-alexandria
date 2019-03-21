@@ -1,6 +1,6 @@
-package com.github.loa.downloader.target.service.file;
+package com.github.loa.downloader.download.service.file;
 
-import com.github.loa.downloader.target.service.file.domain.FileDownloaderException;
+import com.github.loa.downloader.download.service.file.domain.FileDownloaderException;
 import org.apache.commons.io.IOUtils;
 import org.springframework.stereotype.Service;
 

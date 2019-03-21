@@ -15,7 +15,11 @@ public enum DocumentStatus {
      */
     INVALID,
     /**
-     * The document was successfuly downloaded and moved to the target area.
+     * The document was successfully downloaded and moved to the target area.
      */
-    DOWNLOADED
+    DOWNLOADED,
+    /**
+     * Failed while processing the downloaded material.
+     */
+    PROCESSING_FAILURE
 }

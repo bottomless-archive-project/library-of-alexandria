@@ -1,4 +1,4 @@
-package com.github.loa.downloader.target.service.file.domain;
+package com.github.loa.downloader.download.service.file.domain;
 
 public class FileDownloaderException extends Exception {
 

@@ -1,4 +1,4 @@
-package com.github.loa.downloader.target.service.document;
+package com.github.loa.downloader.download.service.document;
 
 import com.github.loa.document.service.DocumentIdFactory;
 import com.github.loa.downloader.command.configuration.DownloaderConfiguration;
@@ -6,8 +6,8 @@ import com.github.loa.document.service.entity.factory.DocumentEntityFactory;
 import com.github.loa.document.service.entity.factory.domain.DocumentCreationContext;
 import com.github.loa.document.service.domain.DocumentStatus;
 import com.github.loa.source.configuration.DocumentSourceConfiguration;
-import com.github.loa.downloader.target.service.file.FileDownloader;
-import com.github.loa.downloader.target.service.file.domain.FileDownloaderException;
+import com.github.loa.downloader.download.service.file.FileDownloader;
+import com.github.loa.downloader.download.service.file.domain.FileDownloaderException;
 import com.github.loa.stage.service.StageLocationFactory;
 import com.github.loa.vault.service.VaultLocationFactory;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +29,6 @@ import java.nio.file.StandardCopyOption;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-//TODO: Move some of the logic to the stage module
 public class DocumentDownloader {
 
     private final DocumentEntityFactory documentEntityFactory;
@@ -113,8 +112,21 @@ public class DocumentDownloader {
             Files.move(temporaryFile.toPath(), vaultLocationFactory.newLocation(documentId).toPath(),
                     StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
-            //TODO: Handle this better!
-            e.printStackTrace();
+            log.error("Failed while processing the downloaded document.", e);
+
+            documentEntityFactory.newDocumentEntity(
+                    DocumentCreationContext.builder()
+                            .id(documentId)
+                            .location(documentLocation)
+                            .crc(crc)
+                            .fileSize(fileSize)
+                            .status(DocumentStatus.PROCESSING_FAILURE)
+                            .versionNumber(downloaderConfiguration.getVersionNumber())
+                            .source(documentSourceConfiguration.getName())
+                            .build()
+            );
+
+            return;
         }
 
         documentEntityFactory.newDocumentEntity(

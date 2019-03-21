@@ -1,6 +1,6 @@
 package com.github.loa.downloader.command.service;
 
-import com.github.loa.downloader.target.service.document.DocumentDownloader;
+import com.github.loa.downloader.download.service.document.DocumentDownloader;
 import com.github.loa.source.service.DocumentSourceProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

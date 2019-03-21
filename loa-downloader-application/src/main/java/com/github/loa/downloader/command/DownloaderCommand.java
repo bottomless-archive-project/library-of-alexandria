@@ -1,7 +1,7 @@
 package com.github.loa.downloader.command;
 
 import com.github.loa.downloader.command.service.DocumentSourceProcessor;
-import com.github.loa.downloader.source.service.DocumentSourceProvider;
+import com.github.loa.source.service.DocumentSourceProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
