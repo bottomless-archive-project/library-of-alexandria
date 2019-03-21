@@ -5,7 +5,7 @@ import com.github.loa.downloader.command.configuration.DownloaderConfiguration;
 import com.github.loa.document.service.entity.factory.DocumentEntityFactory;
 import com.github.loa.document.service.entity.factory.domain.DocumentCreationContext;
 import com.github.loa.document.service.domain.DocumentStatus;
-import com.github.loa.downloader.source.configuration.DocumentSourceConfiguration;
+import com.github.loa.source.configuration.DocumentSourceConfiguration;
 import com.github.loa.downloader.target.service.file.FileDownloader;
 import com.github.loa.downloader.target.service.file.domain.FileDownloaderException;
 import com.github.loa.stage.service.StageLocationFactory;

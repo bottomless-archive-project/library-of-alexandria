@@ -1,14 +1,13 @@
-package com.github.loa.downloader.source.configuration;
+package com.github.loa.source.configuration;
 
-import com.github.loa.downloader.source.domain.file.FileEncodingType;
+import com.github.loa.source.service.file.domain.FileEncodingType;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
 @Data
 @Component
-@ConfigurationProperties("loa.downloader.source.file")
+@ConfigurationProperties("loa.source.file")
 public class FileDocumentSourceConfiguration {
 
     private String location;

@@ -1,4 +1,4 @@
-package com.github.loa.downloader.source.service;
+package com.github.loa.source.service;
 
 import java.net.URL;
 import java.util.stream.Stream;

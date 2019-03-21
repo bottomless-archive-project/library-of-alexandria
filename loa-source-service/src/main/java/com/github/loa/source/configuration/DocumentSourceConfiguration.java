@@ -1,13 +1,13 @@
-package com.github.loa.downloader.source.configuration;
+package com.github.loa.source.configuration;
 
-import com.github.loa.downloader.source.domain.DocumentSourceType;
+import com.github.loa.source.domain.DocumentSourceType;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 @Data
 @Component
-@ConfigurationProperties("loa.downloader.source")
+@ConfigurationProperties("loa.source")
 public class DocumentSourceConfiguration {
 
     private String name;

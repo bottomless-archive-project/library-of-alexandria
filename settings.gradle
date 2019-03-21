@@ -5,4 +5,5 @@ include 'loa-document-service'
 include 'loa-document-repository'
 include 'loa-vault-service'
 include 'loa-stage-service'
+include 'loa-source-service'
 
