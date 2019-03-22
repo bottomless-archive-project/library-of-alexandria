@@ -16,7 +16,13 @@ The list of required software to start archiving:
 
 ## Installation
 
-...
+WIP!!!!
+
+Installing the apps and the prerequisite software is quite straightforward. We provide a guide for the Windows based installations. Installing LoA to Linux systems are supported as well but requires more technical knowledge. An ideal deployment is running the LoA apps in separate VMs or Docker containers but for the sake of simplicity we are not doing that in this guide. In the future we will create a more advanced guide.
+
+### Installing Java
+
+First you need to download...
 
 ## Applications
 
@@ -28,7 +34,7 @@ The LoA project stores it's crawl related data in a MySQL database. Occasionally
 
 ## Domain language
 
-WIP...
+WIP!!!
 
 1. **Vault**: The location where the collected documents are saved.
 2. **Document**: A document collected from the internet.
