@@ -1,0 +1,14 @@
+repositories {
+    mavenCentral()
+    maven {
+        url 'https://jitpack.io'
+    }
+}
+
+dependencies {
+    compile 'com.github.laxika:java-warc:e9a1493f60'
+
+    compile group: 'com.github.davidmoten', name: 'io-extras', version: '0.1'
+
+    compile group: 'org.jsoup', name: 'jsoup', version: '1.11.3'
+}

@@ -1,4 +1,4 @@
-package com.github.loa.source.configuration;
+package com.github.loa.source.configuration.file;
 
 import com.github.loa.source.service.file.domain.FileEncodingType;
 import lombok.Data;
