@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -39,6 +40,7 @@ public class DocumentDownloader {
     private final DocumentSourceConfiguration documentSourceConfiguration;
     private final DownloaderConfiguration downloaderConfiguration;
 
+    @Transactional
     public void downloadDocument(final URL documentLocation) {
         log.debug("Starting to download document {}.", documentLocation);
 
