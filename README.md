@@ -8,6 +8,14 @@ This project aims to support this noble goal in a scalable way. We want to make 
 
 ## Prerequisites
 
+We tried to keep the prerequisites of the project on the minimum because one of the goals of the project is to make it easy to start archiving even with a limited technical knowledge.
+
+The list of required software to start archiving:
+- [Java 11](https://www.oracle.com/technetwork/java/javase/downloads/jdk11-downloads-5066655.html)
+- [MySQL 5.7](https://dev.mysql.com/downloads/mysql/5.7.html)
+
+## Installation
+
 ...
 
 ## Applications
@@ -20,6 +28,9 @@ The LoA project stores it's crawl related data in a MySQL database. Occasionally
 
 ## Domain language
 
+WIP...
+
 1. **Vault**: The location where the collected documents are saved.
 2. **Document**: A document collected from the internet.
 3. **Staging area**: A temporary location where the collected documents placed for post processing before going to the archive.
+4. **Source**: ...
