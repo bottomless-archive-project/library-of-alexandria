@@ -69,7 +69,7 @@ public class CommonCrawlDocumentSourceProvider implements DocumentSourceProvider
     }
 
     private Stream<URL> handleWarcFile(final String warcLocation) throws IOException {
-        return WarcRecordStreamFactory.streamOf(new URL(warcLocation))
+        return WarcRecordStreamFactory.streamOf(new URL("https://commoncrawl.s3.amazonaws.com/" + warcLocation))
                 .filter(WarcRecord::isResponse)
                 .map(warcRecord -> {
                     final String warcRecordUrl = warcRecord.getHeader("WARC-Target-URI");
@@ -81,6 +81,10 @@ public class CommonCrawlDocumentSourceProvider implements DocumentSourceProvider
                             .map(element -> element.attr("abs:href"))
                             .map(url -> {
                                 log.debug("Parsed url from war file: {}.", url);
+
+                                if (url.isEmpty()) {
+                                    return Optional.<URL>empty();
+                                }
 
                                 try {
                                     return Optional.of(new URL(url));
