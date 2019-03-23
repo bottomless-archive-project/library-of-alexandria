@@ -16,11 +16,11 @@ The list of required software to start archiving:
 
 ## Installation
 
-WIP!!!!
-
-Installing the apps and the prerequisite software is quite straightforward. We provide a guide for the Windows based installations. Installing LoA to Linux systems are supported as well but requires more technical knowledge. An ideal deployment is running the LoA apps in separate VMs or Docker containers but for the sake of simplicity we are not doing that in this guide. In the future we will create a more advanced guide.
+Installing the apps and the prerequisite software is quite straightforward. At this time we provide a guide to the Windows based systems. Installing LoA on Linux systems are supported as well but requires more technical knowledge. An ideal deployment is running the apps in separate VMs or Docker containers but for the sake of simplicity we are not doing that in this guide. In the future we will create a more advanced guide.
 
 ### Installing Java
+
+WIP!!!!
 
 First you need to download...
 
