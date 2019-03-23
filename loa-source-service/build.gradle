@@ -1,5 +1,5 @@
 dependencies {
-    compile group: 'com.github.laxika', name: 'java-warc', version: 'e9a1493f60'
+    compile group: 'com.github.laxika', name: 'java-warc', version: 'f7f74e0584'
 
     compile group: 'com.github.davidmoten', name: 'io-extras', version: '0.1'
 

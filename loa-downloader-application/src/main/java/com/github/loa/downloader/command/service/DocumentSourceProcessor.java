@@ -55,7 +55,11 @@ public class DocumentSourceProcessor {
         }
 
         downloaderExecutor.submit(() -> {
-            documentDownloader.downloadDocument(documentLocation);
+            try {
+                documentDownloader.downloadDocument(documentLocation);
+            } catch (Exception e) {
+                log.debug("Failed to download document!", e);
+            }
 
             downloaderSemaphore.release();
         });
