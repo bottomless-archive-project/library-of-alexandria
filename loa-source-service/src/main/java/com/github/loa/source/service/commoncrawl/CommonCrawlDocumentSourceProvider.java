@@ -62,7 +62,8 @@ public class CommonCrawlDocumentSourceProvider implements DocumentSourceProvider
     }
 
     private BufferedReader downloadPaths(final String pathsLocation) throws IOException {
-        final InputStream unzippedPaths = IOUtil.gunzip(new URL(pathsLocation).openStream());
+        final InputStream unzippedPaths = IOUtil.gunzip(new URL("https://commoncrawl.s3.amazonaws.com/crawl-data/"
+                + pathsLocation + "/warc.paths.gz").openStream());
 
         return new BufferedReader(new InputStreamReader(unzippedPaths, StandardCharsets.UTF_8));
     }
