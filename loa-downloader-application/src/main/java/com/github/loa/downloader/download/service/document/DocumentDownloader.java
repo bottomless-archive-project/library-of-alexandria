@@ -41,7 +41,6 @@ public class DocumentDownloader {
     private final DocumentSourceConfiguration documentSourceConfiguration;
     private final DownloaderConfiguration downloaderConfiguration;
 
-    @Transactional(isolation = Isolation.SERIALIZABLE)
     public void downloadDocument(final URL documentLocation) {
         log.debug("Starting to download document {}.", documentLocation);
 
