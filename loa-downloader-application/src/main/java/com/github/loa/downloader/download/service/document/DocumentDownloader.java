@@ -1,13 +1,14 @@
 package com.github.loa.downloader.download.service.document;
 
-import com.github.loa.document.service.DocumentEntityManipulator;
 import com.github.loa.document.service.DocumentIdFactory;
-import com.github.loa.document.service.domain.DocumentStatus;
+import com.github.loa.document.service.DocumentManipulator;
 import com.github.loa.document.service.entity.factory.DocumentEntityFactory;
+import com.github.loa.downloader.download.service.file.DocumentFileManipulator;
+import com.github.loa.downloader.download.service.file.DocumentFileValidator;
 import com.github.loa.downloader.download.service.file.FileDownloader;
 import com.github.loa.downloader.download.service.file.domain.FileDownloaderException;
+import com.github.loa.downloader.download.service.file.domain.FileManipulatingException;
 import com.github.loa.stage.service.StageLocationFactory;
-import com.github.loa.vault.service.VaultLocationFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -18,8 +19,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 
 /**
  * This service is responsible for downloading documents.
@@ -33,68 +32,65 @@ public class DocumentDownloader {
     private final FileDownloader fileDownloader;
     private final DocumentIdFactory documentIdFactory;
     private final StageLocationFactory stageLocationFactory;
-    private final VaultLocationFactory vaultLocationFactory;
-    private final DownloadEvaluator downloadEvaluator;
-    private final DocumentEntityManipulator documentEntityManipulator;
+    private final DocumentFileValidator documentFileValidator;
+    private final DocumentDownloadEvaluator documentDownloadEvaluator;
+    private final DocumentManipulator documentManipulator;
+    private final DocumentFileManipulator documentFileManipulator;
 
     public void downloadDocument(final URL documentLocation) {
         log.debug("Starting to download document {}.", documentLocation);
 
-        final String documentId = documentIdFactory.newDocumentId(documentLocation);
-
-        if (!downloadEvaluator.evaluateDocument(documentId, documentLocation)) {
+        if (!documentDownloadEvaluator.evaluateDocumentLocation(documentLocation)) {
             return;
         }
 
-        final File temporaryFile = stageLocationFactory.newLocation(documentId);
+        final String documentId = documentIdFactory.newDocumentId(documentLocation);
+        final File stageFileLocation = stageLocationFactory.newLocation(documentId);
 
         try {
-            fileDownloader.downloadFile(documentLocation, temporaryFile, 30000);
+            fileDownloader.downloadFile(documentLocation, stageFileLocation, 30000);
         } catch (FileDownloaderException e) {
             log.info("Failed to download document!", e);
 
-            documentEntityManipulator.updateStatus(documentId, DocumentStatus.FAILED);
-        }
-
-        //TODO: If filesize is 0 mark it as failed not duplicate!
-        final String crc = calculateHash(temporaryFile);
-        final long fileSize = temporaryFile.length();
-
-        // Validate if the file already exists or not
-        if (documentEntityFactory.isDocumentExists(crc, fileSize)) {
-            temporaryFile.delete();
-
-            documentEntityManipulator.updateFileSizeAndCrc(documentId, fileSize, crc);
-            documentEntityManipulator.updateStatus(documentId, DocumentStatus.DUPLICATE);
+            documentManipulator.markFailed(documentId);
 
             return;
         }
 
-        documentEntityManipulator.updateFileSizeAndCrc(documentId, fileSize, crc);
+        final String crc = calculateHash(stageFileLocation);
+        final long fileSize = stageFileLocation.length();
 
-        // The file is not a valid pdf
-        if (fileSize <= 1024) {
-            temporaryFile.delete();
+        // The ordering like this is for a reason! We don't want to set the file size and crc values of invalid files!
+        if (!documentFileValidator.isValidDocument(documentId)) {
+            documentFileManipulator.cleanup(documentId);
+            documentManipulator.markInvalid(documentId);
 
-            documentEntityManipulator.updateStatus(documentId, DocumentStatus.INVALID);
+            return;
+        }
+
+        // Validate if the file already exists or not. Set the file size and crc afterwards, even if the file is a
+        // duplicate. We can't set it previously because then it will be always found as a "duplicate".
+        if (documentEntityFactory.isDocumentExists(crc, fileSize)) {
+            documentFileManipulator.cleanup(documentId);
+            documentManipulator.markDuplicate(documentId, fileSize, crc);
 
             return;
         }
 
         try {
-            Files.move(temporaryFile.toPath(), vaultLocationFactory.newLocation(documentId).toPath(),
-                    StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException e) {
+            documentFileManipulator.moveToVault(documentId);
+        } catch (FileManipulatingException e) {
             log.error("Failed while processing the downloaded document.", e);
 
-            documentEntityManipulator.updateStatus(documentId, DocumentStatus.PROCESSING_FAILURE);
+            documentManipulator.markProcessFailure(documentId);
 
             return;
         }
 
-        documentEntityManipulator.updateStatus(documentId, DocumentStatus.DOWNLOADED);
+        documentManipulator.markDownloaded(documentId, fileSize, crc);
     }
 
+    //TODO: Move this to it's own class/service
     private String calculateHash(final File documentDownloadingLocation) {
         try {
             try (final BufferedInputStream documentInputStream =

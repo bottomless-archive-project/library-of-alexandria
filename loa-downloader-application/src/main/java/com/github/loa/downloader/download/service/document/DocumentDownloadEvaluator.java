@@ -1,5 +1,6 @@
 package com.github.loa.downloader.download.service.document;
 
+import com.github.loa.document.service.DocumentIdFactory;
 import com.github.loa.document.service.domain.DocumentStatus;
 import com.github.loa.document.service.entity.factory.DocumentEntityFactory;
 import com.github.loa.document.service.entity.factory.domain.DocumentCreationContext;
@@ -13,17 +14,30 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.net.URL;
 
+/**
+ * This service is responsible for evaluating if a document's download is necessary.
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class DownloadEvaluator {
+public class DocumentDownloadEvaluator {
 
     private final DocumentEntityFactory documentEntityFactory;
     private final DocumentSourceConfiguration documentSourceConfiguration;
     private final DownloaderConfiguration downloaderConfiguration;
+    private final DocumentIdFactory documentIdFactory;
 
-    //@Transactional(isolation = Isolation.SERIALIZABLE)
-    public boolean evaluateDocument(final String documentId, final URL documentLocation) {
+    /**
+     * Evaluates if a download of a document on the provided location is necessary. If it is then it will be added to
+     * the database with the status of {@link DocumentStatus#UNDER_CRAWL}.
+     *
+     * @param documentLocation the location of the document
+     * @return true if the document should be downloaded and processed
+     */
+    @Transactional(isolation = Isolation.SERIALIZABLE)
+    public boolean evaluateDocumentLocation(final URL documentLocation) {
+        final String documentId = documentIdFactory.newDocumentId(documentLocation);
+
         if (!shouldDownload(documentId)) {
             log.debug("Document location already visited: {}.", documentLocation);
 

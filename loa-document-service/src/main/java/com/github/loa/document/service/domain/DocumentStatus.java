@@ -25,5 +25,5 @@ public enum DocumentStatus {
     /**
      * Failed while processing the downloaded material.
      */
-    PROCESSING_FAILURE
+    PROCESS_FAILURE
 }
