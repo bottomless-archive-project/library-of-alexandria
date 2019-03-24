@@ -6,4 +6,5 @@ include 'loa-document-repository'
 include 'loa-vault-service'
 include 'loa-stage-service'
 include 'loa-source-service'
+include 'loa-checksum-service'
 

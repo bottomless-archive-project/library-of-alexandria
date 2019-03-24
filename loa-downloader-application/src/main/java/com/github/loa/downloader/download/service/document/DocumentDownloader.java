@@ -1,5 +1,6 @@
 package com.github.loa.downloader.download.service.document;
 
+import com.github.loa.checksum.service.ChecksumProvider;
 import com.github.loa.document.service.DocumentIdFactory;
 import com.github.loa.document.service.DocumentManipulator;
 import com.github.loa.document.service.entity.factory.DocumentEntityFactory;
@@ -11,13 +12,9 @@ import com.github.loa.downloader.download.service.file.domain.FileManipulatingEx
 import com.github.loa.stage.service.StageLocationFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.net.URL;
 
 /**
@@ -36,6 +33,7 @@ public class DocumentDownloader {
     private final DocumentDownloadEvaluator documentDownloadEvaluator;
     private final DocumentManipulator documentManipulator;
     private final DocumentFileManipulator documentFileManipulator;
+    private final ChecksumProvider checksumProvider;
 
     public void downloadDocument(final URL documentLocation) {
         log.debug("Starting to download document {}.", documentLocation);
@@ -57,7 +55,7 @@ public class DocumentDownloader {
             return;
         }
 
-        final String checksum = calculateHash(stageFileLocation);
+        final String checksum = checksumProvider.checksum(documentId);
         final long fileSize = stageFileLocation.length();
 
         // The ordering like this is for a reason! We don't want to set the file size and checksum values of invalid
@@ -89,17 +87,5 @@ public class DocumentDownloader {
         }
 
         documentManipulator.markDownloaded(documentId, fileSize, checksum);
-    }
-
-    //TODO: Move this to it's own class/service
-    private String calculateHash(final File documentDownloadingLocation) {
-        try {
-            try (final BufferedInputStream documentInputStream =
-                         new BufferedInputStream(new FileInputStream(documentDownloadingLocation))) {
-                return DigestUtils.sha256Hex(documentInputStream);
-            }
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to calculate file hash!", e);
-        }
     }
 }

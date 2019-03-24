@@ -17,7 +17,7 @@ import java.util.stream.Stream;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@ConditionalOnProperty(name = "loa.downloader.source.type", havingValue = "file")
+@ConditionalOnProperty(name = "loa.source.type", havingValue = "file")
 public class FileDocumentSourceProvider implements DocumentSourceProvider {
 
     private final FileDocumentSourceConfiguration fileDocumentSourceConfiguration;

@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.davidmoten.io.extras.IOUtil;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -27,6 +28,7 @@ import java.util.stream.Stream;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "loa.source.type", havingValue = "common-crawl")
 public class CommonCrawlDocumentSourceProvider implements DocumentSourceProvider {
 
     private final CommonCrawlDocumentSourceConfiguration commonCrawlDocumentSourceConfiguration;

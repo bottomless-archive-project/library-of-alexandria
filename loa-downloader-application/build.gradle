@@ -5,6 +5,7 @@ dependencies {
     compile project(':loa-source-service')
     compile project(':loa-stage-service')
     compile project(':loa-vault-service')
+    compile project(':loa-checksum-service')
 
     compile group: 'commons-io', name: 'commons-io', version: '2.6'
 
