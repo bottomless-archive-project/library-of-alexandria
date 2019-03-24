@@ -20,9 +20,23 @@ Installing the apps and the prerequisite software is quite straightforward. At t
 
 ### Installing Java
 
-WIP!!!!
+First you need to download the Java 11 Runtime Environment. It's available [here](https://www.oracle.com/technetwork/java/javase/downloads/jdk11-downloads-5066655.html). After the download is complete you should run the installer and follow the directions it provides until the installation is complete.
 
-First you need to download...
+Once it's done, if you open a command line (write cmd to the Start menu's search bar) you will be able to use the java command. Try to write `java -version`. You should get something similar:
+
+```
+java version "11" 2018-09-25
+Java(TM) SE Runtime Environment 18.9 (build 11+28)
+Java HotSpot(TM) 64-Bit Server VM 18.9 (build 11+28, mixed mode)
+```
+
+### Installing MySQL
+
+Download MySQL 5.7 from [here](https://www.oracle.com/technetwork/java/javase/downloads/jdk11-downloads-5066655.html). After the download is complete run the installer and follow the directions it provides. If it's possible install the MySQL Workbench tool as well because you will need it later for administrative tasks.
+
+### Running the crawler
+
+WIP!!!
 
 ## Applications
 
