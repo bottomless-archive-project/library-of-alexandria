@@ -13,7 +13,7 @@ public class DocumentEntityTransformer {
                 .id(tomeDatabaseEntity.getId())
                 .url(tomeDatabaseEntity.getUrl())
                 .status(DocumentStatus.valueOf(tomeDatabaseEntity.getStatus()))
-                .crc(tomeDatabaseEntity.getCrc())
+                .checksum(tomeDatabaseEntity.getChecksum())
                 .fileSize(tomeDatabaseEntity.getFileSize())
                 .downloadDate(tomeDatabaseEntity.getDownloadDate())
                 .downloaderVersion(tomeDatabaseEntity.getDownloaderVersion())

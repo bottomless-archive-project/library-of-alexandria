@@ -29,25 +29,26 @@ public class DocumentEntityFactory {
     }
 
     /**
-     * Return true if any document exists with the provided crc and file size.
+     * Return true if any document exists with the provided checksum and file size.
      *
-     * @param crc      the crc to use for the checking
+     * @param checksum      the checksum to use for the checking
      * @param fileSize the file size used for the checking
      * @return return true if a document exist with the provided parameters or false otherwise
      */
-    public boolean isDocumentExists(final String crc, final long fileSize) {
-        return !documentRepository.findByCrcAndFileSize(crc, fileSize).isEmpty();
+    public boolean isDocumentExists(final String checksum, final long fileSize) {
+        return !documentRepository.findByChecksumAndFileSize(checksum, fileSize).isEmpty();
     }
 
     /**
-     * Return the document entities belonging to the provided crc and file size values.
+     * Return the document entities belonging to the provided checksum and file size values.
      *
-     * @param crc      the crc value of the document
+     * @param checksum the checksum value of the document
      * @param fileSize the file size value of the document
      * @return the list of documents with the provided values
      */
-    public List<DocumentEntity> getDocumentEntity(final String crc, final long fileSize) {
-        final List<DocumentDatabaseEntity> tomeDatabaseEntity = documentRepository.findByCrcAndFileSize(crc, fileSize);
+    public List<DocumentEntity> getDocumentEntity(final String checksum, final long fileSize) {
+        final List<DocumentDatabaseEntity> tomeDatabaseEntity =
+                documentRepository.findByChecksumAndFileSize(checksum, fileSize);
 
         return tomeDatabaseEntity.stream()
                 .map(documentEntityTransformer::transform)
@@ -65,7 +66,7 @@ public class DocumentEntityFactory {
         documentDatabaseEntity.setId(documentCreationContext.getId());
         documentDatabaseEntity.setUrl(documentCreationContext.getLocation().toString());
         documentDatabaseEntity.setStatus(documentCreationContext.getStatus().toString());
-        documentDatabaseEntity.setCrc(documentCreationContext.getCrc());
+        documentDatabaseEntity.setChecksum(documentCreationContext.getChecksum());
         documentDatabaseEntity.setFileSize(documentCreationContext.getFileSize());
         documentDatabaseEntity.setDownloaderVersion(documentCreationContext.getVersionNumber());
         documentDatabaseEntity.setSource(documentCreationContext.getSource());

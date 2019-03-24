@@ -57,10 +57,11 @@ public class DocumentDownloader {
             return;
         }
 
-        final String crc = calculateHash(stageFileLocation);
+        final String checksum = calculateHash(stageFileLocation);
         final long fileSize = stageFileLocation.length();
 
-        // The ordering like this is for a reason! We don't want to set the file size and crc values of invalid files!
+        // The ordering like this is for a reason! We don't want to set the file size and checksum values of invalid
+        // files!
         if (!documentFileValidator.isValidDocument(documentId)) {
             documentFileManipulator.cleanup(documentId);
             documentManipulator.markInvalid(documentId);
@@ -68,11 +69,11 @@ public class DocumentDownloader {
             return;
         }
 
-        // Validate if the file already exists or not. Set the file size and crc afterwards, even if the file is a
+        // Validate if the file already exists or not. Set the file size and checksum afterwards, even if the file is a
         // duplicate. We can't set it previously because then it will be always found as a "duplicate".
-        if (documentEntityFactory.isDocumentExists(crc, fileSize)) {
+        if (documentEntityFactory.isDocumentExists(checksum, fileSize)) {
             documentFileManipulator.cleanup(documentId);
-            documentManipulator.markDuplicate(documentId, fileSize, crc);
+            documentManipulator.markDuplicate(documentId, fileSize, checksum);
 
             return;
         }
@@ -87,7 +88,7 @@ public class DocumentDownloader {
             return;
         }
 
-        documentManipulator.markDownloaded(documentId, fileSize, crc);
+        documentManipulator.markDownloaded(documentId, fileSize, checksum);
     }
 
     //TODO: Move this to it's own class/service

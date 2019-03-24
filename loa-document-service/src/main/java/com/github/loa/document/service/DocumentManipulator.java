@@ -37,10 +37,10 @@ public class DocumentManipulator {
      *
      * @param documentId the id of the document to mark
      * @param fileSize   the file size of the document
-     * @param crc        the crc of the document
+     * @param checksum   the checksum of the document
      */
-    public void markDuplicate(final String documentId, final long fileSize, final String crc) {
-        updateFileSizeAndCrc(documentId, fileSize, crc);
+    public void markDuplicate(final String documentId, final long fileSize, final String checksum) {
+        updateFileSizeAndChecksum(documentId, fileSize, checksum);
         updateStatus(documentId, DocumentStatus.DUPLICATE);
     }
 
@@ -49,10 +49,10 @@ public class DocumentManipulator {
      *
      * @param documentId the id of the document to mark
      * @param fileSize   the file size of the document
-     * @param crc        the crc of the document
+     * @param checksum   the checksum of the document
      */
-    public void markDownloaded(final String documentId, final long fileSize, final String crc) {
-        updateFileSizeAndCrc(documentId, fileSize, crc);
+    public void markDownloaded(final String documentId, final long fileSize, final String checksum) {
+        updateFileSizeAndChecksum(documentId, fileSize, checksum);
         updateStatus(documentId, DocumentStatus.DOWNLOADED);
     }
 
@@ -76,13 +76,13 @@ public class DocumentManipulator {
     }
 
     /**
-     * Update the file size and crc values of a document.
+     * Update the file size and checksum values of a document.
      *
      * @param documentId the document to update the values for
      * @param fileSize   the new file size value
-     * @param crc        the new crc value
+     * @param checksum   the new checksum value
      */
-    public void updateFileSizeAndCrc(final String documentId, final long fileSize, final String crc) {
-        documentRepository.updateFileSizeAndCrc(documentId, fileSize, crc);
+    public void updateFileSizeAndChecksum(final String documentId, final long fileSize, final String checksum) {
+        documentRepository.updateFileSizeAndChecksum(documentId, fileSize, checksum);
     }
 }

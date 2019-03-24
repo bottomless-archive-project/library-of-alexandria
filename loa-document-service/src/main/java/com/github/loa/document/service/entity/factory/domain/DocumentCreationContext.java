@@ -12,7 +12,7 @@ public class DocumentCreationContext {
 
     private final String id;
     private final URL location;
-    private final String crc;
+    private final String checksum;
     private final long fileSize;
     private final DocumentStatus status;
     private final int versionNumber;
