@@ -3,6 +3,10 @@ package com.github.loa.document.service.domain;
 public enum DocumentStatus {
 
     /**
+     * A document is under crawl, just initialized.
+     */
+    UNDER_CRAWL,
+    /**
      * The download was failed.
      */
     FAILED,

@@ -1,11 +1,9 @@
 package com.github.loa.downloader.download.service.document;
 
+import com.github.loa.document.service.DocumentEntityManipulator;
 import com.github.loa.document.service.DocumentIdFactory;
-import com.github.loa.downloader.command.configuration.DownloaderConfiguration;
-import com.github.loa.document.service.entity.factory.DocumentEntityFactory;
-import com.github.loa.document.service.entity.factory.domain.DocumentCreationContext;
 import com.github.loa.document.service.domain.DocumentStatus;
-import com.github.loa.source.configuration.DocumentSourceConfiguration;
+import com.github.loa.document.service.entity.factory.DocumentEntityFactory;
 import com.github.loa.downloader.download.service.file.FileDownloader;
 import com.github.loa.downloader.download.service.file.domain.FileDownloaderException;
 import com.github.loa.stage.service.StageLocationFactory;
@@ -14,8 +12,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -38,17 +34,15 @@ public class DocumentDownloader {
     private final DocumentIdFactory documentIdFactory;
     private final StageLocationFactory stageLocationFactory;
     private final VaultLocationFactory vaultLocationFactory;
-    private final DocumentSourceConfiguration documentSourceConfiguration;
-    private final DownloaderConfiguration downloaderConfiguration;
+    private final DownloadEvaluator downloadEvaluator;
+    private final DocumentEntityManipulator documentEntityManipulator;
 
     public void downloadDocument(final URL documentLocation) {
         log.debug("Starting to download document {}.", documentLocation);
 
         final String documentId = documentIdFactory.newDocumentId(documentLocation);
 
-        if (!shouldDownload(documentId)) {
-            log.debug("Document location already visited: {}.", documentLocation);
-
+        if (!downloadEvaluator.evaluateDocument(documentId, documentLocation)) {
             return;
         }
 
@@ -57,18 +51,12 @@ public class DocumentDownloader {
         try {
             fileDownloader.downloadFile(documentLocation, temporaryFile, 30000);
         } catch (FileDownloaderException e) {
+            log.info("Failed to download document!", e);
 
-            documentEntityFactory.newDocumentEntity(
-                    DocumentCreationContext.builder()
-                            .id(documentId)
-                            .location(documentLocation)
-                            .status(DocumentStatus.FAILED)
-                            .versionNumber(downloaderConfiguration.getVersionNumber())
-                            .source(documentSourceConfiguration.getName())
-                            .build()
-            );
+            documentEntityManipulator.updateStatus(documentId, DocumentStatus.FAILED);
         }
 
+        //TODO: If filesize is 0 mark it as failed not duplicate!
         final String crc = calculateHash(temporaryFile);
         final long fileSize = temporaryFile.length();
 
@@ -76,36 +64,19 @@ public class DocumentDownloader {
         if (documentEntityFactory.isDocumentExists(crc, fileSize)) {
             temporaryFile.delete();
 
-            documentEntityFactory.newDocumentEntity(
-                    DocumentCreationContext.builder()
-                            .id(documentId)
-                            .location(documentLocation)
-                            .crc(crc)
-                            .fileSize(fileSize)
-                            .status(DocumentStatus.DUPLICATE)
-                            .versionNumber(downloaderConfiguration.getVersionNumber())
-                            .source(documentSourceConfiguration.getName())
-                            .build()
-            );
+            documentEntityManipulator.updateFileSizeAndCrc(documentId, fileSize, crc);
+            documentEntityManipulator.updateStatus(documentId, DocumentStatus.DUPLICATE);
 
             return;
         }
+
+        documentEntityManipulator.updateFileSizeAndCrc(documentId, fileSize, crc);
 
         // The file is not a valid pdf
         if (fileSize <= 1024) {
             temporaryFile.delete();
 
-            documentEntityFactory.newDocumentEntity(
-                    DocumentCreationContext.builder()
-                            .id(documentId)
-                            .location(documentLocation)
-                            .crc(crc)
-                            .fileSize(fileSize)
-                            .status(DocumentStatus.INVALID)
-                            .versionNumber(downloaderConfiguration.getVersionNumber())
-                            .source(documentSourceConfiguration.getName())
-                            .build()
-            );
+            documentEntityManipulator.updateStatus(documentId, DocumentStatus.INVALID);
 
             return;
         }
@@ -116,36 +87,12 @@ public class DocumentDownloader {
         } catch (IOException e) {
             log.error("Failed while processing the downloaded document.", e);
 
-            documentEntityFactory.newDocumentEntity(
-                    DocumentCreationContext.builder()
-                            .id(documentId)
-                            .location(documentLocation)
-                            .crc(crc)
-                            .fileSize(fileSize)
-                            .status(DocumentStatus.PROCESSING_FAILURE)
-                            .versionNumber(downloaderConfiguration.getVersionNumber())
-                            .source(documentSourceConfiguration.getName())
-                            .build()
-            );
+            documentEntityManipulator.updateStatus(documentId, DocumentStatus.PROCESSING_FAILURE);
 
             return;
         }
 
-        documentEntityFactory.newDocumentEntity(
-                DocumentCreationContext.builder()
-                        .id(documentId)
-                        .location(documentLocation)
-                        .crc(crc)
-                        .fileSize(fileSize)
-                        .status(DocumentStatus.DOWNLOADED)
-                        .versionNumber(downloaderConfiguration.getVersionNumber())
-                        .source(documentSourceConfiguration.getName())
-                        .build()
-        );
-    }
-
-    private boolean shouldDownload(final String documentId) {
-        return !documentEntityFactory.isDocumentExists(documentId);
+        documentEntityManipulator.updateStatus(documentId, DocumentStatus.DOWNLOADED);
     }
 
     private String calculateHash(final File documentDownloadingLocation) {
