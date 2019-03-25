@@ -11,8 +11,8 @@ This project aims to support this noble goal in a scalable way. We want to make 
 We tried to keep the prerequisites of the project on the minimum because one of the goals of the project is to make it easy to start archiving even with a limited technical knowledge.
 
 The list of required software to start archiving:
-- [Java 11](https://www.oracle.com/technetwork/java/javase/downloads/jdk11-downloads-5066655.html)
-- [MySQL 5.7](https://dev.mysql.com/downloads/mysql/5.7.html)
+- [Java 11](https://www.oracle.com/technetwork/java/javase/downloads/jdk11-downloads-5066655.html) or greater
+- [MySQL 8.15](https://dev.mysql.com/downloads/mysql/8.html) or greater
 
 ## Installation
 
@@ -32,7 +32,7 @@ Java HotSpot(TM) 64-Bit Server VM 18.9 (build 11+28, mixed mode)
 
 ### Installing MySQL
 
-Download MySQL 5.7 from [here](https://www.oracle.com/technetwork/java/javase/downloads/jdk11-downloads-5066655.html). After the download is complete run the installer and follow the directions it provides. If it's possible install the MySQL Workbench tool as well because you will need it later for administrative tasks.
+Download MySQL 8.15 from [here](https://dev.mysql.com/downloads/mysql/8.html). After the download is complete run the installer and follow the directions it provides. If it's possible install the MySQL Workbench tool as well because you will need it later for administrative tasks.
 
 ### Running the crawler
 

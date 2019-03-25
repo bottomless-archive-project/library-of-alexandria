@@ -25,5 +25,9 @@ public enum DocumentStatus {
     /**
      * Failed while processing the downloaded material.
      */
-    PROCESS_FAILURE
+    PROCESS_FAILURE,
+    /**
+     * The document is indexed to the search engine.
+     */
+    INDEXED
 }
