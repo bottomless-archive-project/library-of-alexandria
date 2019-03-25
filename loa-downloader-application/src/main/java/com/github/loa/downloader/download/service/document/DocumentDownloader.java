@@ -10,6 +10,7 @@ import com.github.loa.downloader.download.service.file.FileDownloader;
 import com.github.loa.downloader.download.service.file.domain.FileDownloaderException;
 import com.github.loa.downloader.download.service.file.domain.FileManipulatingException;
 import com.github.loa.stage.service.StageLocationFactory;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -34,8 +35,11 @@ public class DocumentDownloader {
     private final DocumentManipulator documentManipulator;
     private final DocumentFileManipulator documentFileManipulator;
     private final ChecksumProvider checksumProvider;
+    private final MeterRegistry meterRegistry;
 
     public void downloadDocument(final URL documentLocation) {
+        meterRegistry.counter("statistics.document-processed").increment();
+
         log.debug("Starting to download document {}.", documentLocation);
 
         if (!documentDownloadEvaluator.evaluateDocumentLocation(documentLocation)) {

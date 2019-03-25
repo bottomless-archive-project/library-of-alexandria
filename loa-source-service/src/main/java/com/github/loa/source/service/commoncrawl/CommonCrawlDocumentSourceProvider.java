@@ -5,6 +5,7 @@ import com.github.loa.source.service.DocumentSourceProvider;
 import com.morethanheroic.warc.service.WarcRecordStreamFactory;
 import com.morethanheroic.warc.service.content.response.domain.ResponseContentBlock;
 import com.morethanheroic.warc.service.record.domain.WarcRecord;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.davidmoten.io.extras.IOUtil;
@@ -32,6 +33,7 @@ import java.util.stream.Stream;
 public class CommonCrawlDocumentSourceProvider implements DocumentSourceProvider {
 
     private final CommonCrawlDocumentSourceConfiguration commonCrawlDocumentSourceConfiguration;
+    private final MeterRegistry meterRegistry;
 
     @Override
     public Stream<URL> stream() {
@@ -99,6 +101,7 @@ public class CommonCrawlDocumentSourceProvider implements DocumentSourceProvider
                 })
                 .flatMap(Function.identity())
                 .filter(Optional::isPresent)
-                .map(Optional::get);
+                .map(Optional::get)
+                .peek(url -> meterRegistry.counter("statistics.document-produced-by-source").increment());
     }
 }
