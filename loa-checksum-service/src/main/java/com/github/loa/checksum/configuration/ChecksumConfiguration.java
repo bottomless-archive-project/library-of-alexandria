@@ -9,5 +9,5 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties("loa.checksum")
 public class ChecksumConfiguration {
 
-    private final String type;
+    private String type;
 }
