@@ -48,7 +48,7 @@ public class DocumentDownloader {
         try {
             fileDownloader.downloadFile(documentLocation, stageFileLocation, 30000);
         } catch (FileDownloaderException e) {
-            log.info("Failed to download document!", e);
+            log.debug("Failed to download document!", e);
 
             documentManipulator.markFailed(documentId);
 
