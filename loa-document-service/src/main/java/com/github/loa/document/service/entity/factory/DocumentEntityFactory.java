@@ -3,13 +3,13 @@ package com.github.loa.document.service.entity.factory;
 import com.github.loa.document.repository.DocumentRepository;
 import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.document.service.DocumentEntityTransformer;
+import com.github.loa.document.service.domain.DocumentStatus;
 import com.github.loa.document.service.entity.factory.domain.DocumentCreationContext;
 import com.github.loa.document.repository.domain.DocumentDatabaseEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -31,12 +31,25 @@ public class DocumentEntityFactory {
     /**
      * Return true if any document exists with the provided checksum and file size.
      *
-     * @param checksum      the checksum to use for the checking
+     * @param checksum the checksum to use for the checking
      * @param fileSize the file size used for the checking
      * @return return true if a document exist with the provided parameters or false otherwise
      */
     public boolean isDocumentExists(final String checksum, final long fileSize) {
         return !documentRepository.findByChecksumAndFileSize(checksum, fileSize).isEmpty();
+    }
+
+    /**
+     * Return the document entities belonging to the provided status. The returned list size is limited ti 100.
+     *
+     * @param documentStatus the status to query for
+     * @return the list of documents with the provided values
+     */
+    public List<DocumentEntity> getDocumentEntity(final DocumentStatus documentStatus) {
+        final List<DocumentDatabaseEntity> documentDatabaseEntities =
+                documentRepository.findByStatus(documentStatus.toString());
+
+        return documentEntityTransformer.transform(documentDatabaseEntities);
     }
 
     /**
@@ -47,12 +60,10 @@ public class DocumentEntityFactory {
      * @return the list of documents with the provided values
      */
     public List<DocumentEntity> getDocumentEntity(final String checksum, final long fileSize) {
-        final List<DocumentDatabaseEntity> tomeDatabaseEntity =
+        final List<DocumentDatabaseEntity> documentDatabaseEntities =
                 documentRepository.findByChecksumAndFileSize(checksum, fileSize);
 
-        return tomeDatabaseEntity.stream()
-                .map(documentEntityTransformer::transform)
-                .collect(Collectors.toList());
+        return documentEntityTransformer.transform(documentDatabaseEntities);
     }
 
     /**

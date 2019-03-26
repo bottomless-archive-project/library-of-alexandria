@@ -1,7 +1,7 @@
 package com.github.loa.downloader.download.service.document;
 
 import com.github.loa.checksum.service.ChecksumProvider;
-import com.github.loa.document.service.DocumentIdFactory;
+import com.github.loa.document.service.id.factory.DocumentIdFactory;
 import com.github.loa.document.service.DocumentManipulator;
 import com.github.loa.document.service.entity.factory.DocumentEntityFactory;
 import com.github.loa.downloader.download.service.file.DocumentFileManipulator;
