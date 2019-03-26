@@ -2,6 +2,7 @@ package com.github.loa.source.service.file;
 
 import com.github.loa.source.configuration.file.FileDocumentSourceConfiguration;
 import com.github.loa.source.service.DocumentSourceProvider;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -22,6 +23,7 @@ public class FileDocumentSourceProvider implements DocumentSourceProvider {
 
     private final FileDocumentSourceConfiguration fileDocumentSourceConfiguration;
     private final FileSourceFactory fileSourceFactory;
+    private final MeterRegistry meterRegistry;
 
     @Override
     public Stream<URL> stream() {
@@ -31,6 +33,8 @@ public class FileDocumentSourceProvider implements DocumentSourceProvider {
         return reader.lines()
                 .map(location -> {
                     try {
+                        meterRegistry.counter("statistics.document-produced-by-source").increment();
+
                         return new URL(location);
                     } catch (MalformedURLException e) {
                         log.warn("Unable to parse url with location: " + location, e);
