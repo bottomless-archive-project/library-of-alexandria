@@ -1,0 +1,12 @@
+apply plugin: 'org.springframework.boot'
+
+dependencies {
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-webflux'
+
+    compile group: 'mysql', name: 'mysql-connector-java'
+    compile group: 'org.elasticsearch.client', name: 'elasticsearch-rest-high-level-client', version: '6.5.4'
+    compile group: 'org.elasticsearch', name: 'elasticsearch', version: '6.5.4'
+
+    compile project(':loa-document-service')
+}

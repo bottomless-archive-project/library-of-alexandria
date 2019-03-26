@@ -7,4 +7,5 @@ include 'loa-vault-service'
 include 'loa-stage-service'
 include 'loa-source-service'
 include 'loa-checksum-service'
+include 'loa-indexer-application'
 
