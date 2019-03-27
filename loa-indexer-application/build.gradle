@@ -6,7 +6,7 @@ dependencies {
 
     compile group: 'mysql', name: 'mysql-connector-java'
     compile group: 'org.elasticsearch.client', name: 'elasticsearch-rest-high-level-client', version: '6.5.4'
-    compile group: 'org.elasticsearch', name: 'elasticsearch', version: '6.5.4'
+    compile group: 'org.elasticsearch', name: 'elasticsearch', version: '6.6.2'
 
     compile project(':loa-document-service')
     compile project(':loa-vault-service')

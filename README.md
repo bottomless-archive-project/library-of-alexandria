@@ -14,6 +14,9 @@ The list of required software to start archiving:
 - [Java 11](https://www.oracle.com/technetwork/java/javase/downloads/jdk11-downloads-5066655.html) or greater
 - [MySQL 8.15](https://dev.mysql.com/downloads/mysql/8.html) or greater
 
+The list of required software to be able to search documents:
+- [Elasticsearch 6.6](https://www.elastic.co/downloads/past-releases/elasticsearch-6-6-2)
+
 ## Installation
 
 Installing the apps and the prerequisite software is quite straightforward. At this time we provide a guide to the Windows based systems. Installing LoA on Linux systems are supported as well but requires more technical knowledge. An ideal deployment is running the apps in separate VMs or Docker containers but for the sake of simplicity we are not doing that in this guide. In the future we will create a more advanced guide.
