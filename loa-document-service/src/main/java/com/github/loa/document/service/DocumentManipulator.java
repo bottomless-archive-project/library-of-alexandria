@@ -66,6 +66,15 @@ public class DocumentManipulator {
     }
 
     /**
+     * Mark a document's status as {@link DocumentStatus#INDEXED proccess failure}.
+     *
+     * @param documentId the id of the document to mark
+     */
+    public void markIndexed(final String documentId) {
+        updateStatus(documentId, DocumentStatus.INDEXED);
+    }
+
+    /**
      * Update the status of a document.
      *
      * @param documentId     the id of the document to update the status for

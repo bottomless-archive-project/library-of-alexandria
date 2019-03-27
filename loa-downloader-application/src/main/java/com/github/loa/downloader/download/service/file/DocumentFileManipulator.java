@@ -31,7 +31,7 @@ public class DocumentFileManipulator {
         final File stageFileLocation = stageLocationFactory.newLocation(documentId);
 
         try {
-            Files.move(stageFileLocation.toPath(), vaultLocationFactory.newLocation(documentId).toPath(),
+            Files.move(stageFileLocation.toPath(), vaultLocationFactory.getLocation(documentId).toPath(),
                     StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             throw new FileManipulatingException("Unable to move file for document: " + documentId + " to the vault.", e);

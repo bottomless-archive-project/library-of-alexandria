@@ -2,7 +2,7 @@ package com.github.loa.document.service.entity.factory;
 
 import com.github.loa.document.repository.DocumentRepository;
 import com.github.loa.document.service.domain.DocumentEntity;
-import com.github.loa.document.service.DocumentEntityTransformer;
+import com.github.loa.document.service.entity.transformer.DocumentEntityTransformer;
 import com.github.loa.document.service.domain.DocumentStatus;
 import com.github.loa.document.service.entity.factory.domain.DocumentCreationContext;
 import com.github.loa.document.repository.domain.DocumentDatabaseEntity;

@@ -1,4 +1,4 @@
-package com.github.loa.document.service;
+package com.github.loa.document.service.entity.transformer;
 
 import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.document.repository.domain.DocumentDatabaseEntity;

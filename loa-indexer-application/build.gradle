@@ -9,4 +9,5 @@ dependencies {
     compile group: 'org.elasticsearch', name: 'elasticsearch', version: '6.5.4'
 
     compile project(':loa-document-service')
+    compile project(':loa-vault-service')
 }
