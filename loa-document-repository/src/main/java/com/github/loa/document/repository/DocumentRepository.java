@@ -17,7 +17,7 @@ public interface DocumentRepository {
     @Select("SELECT * FROM document WHERE id = #{id}")
     DocumentDatabaseEntity findById(@Param("id") String id);
 
-    @Select("SELECT * FROM document WHERE `status` = #{status} LIMIT BY 100")
+    @Select("SELECT * FROM document WHERE `status` = #{status} LIMIT 100")
     List<DocumentDatabaseEntity> findByStatus(@Param("status") String status);
 
     @Update("UPDATE document SET checksum = #{checksum}, file_size = #{fileSize} WHERE id = #{id}")
