@@ -21,7 +21,7 @@ public class IndexRequestFactory {
         final Map<String, Object> source = new HashMap<>();
         source.put("data", documentBase64String);
 
-        return new IndexRequest("pdf_search", "pdfs", documentEntity.getId())
+        return new IndexRequest("vault_search", "document", documentEntity.getId())
                 .source(source)
                 .setPipeline("attachment");
     }
