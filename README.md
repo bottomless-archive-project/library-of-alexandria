@@ -49,6 +49,33 @@ The Library of Alexandria project consist of more than one (usually) scalable ap
 
 The LoA project stores it's crawl related data in a MySQL database. Occasionally between releases a database migration is necessary. This application's goal is to streamline this process. Also in the future it will provide basic database administrator tasks (query statistics, initiate the re-crawling of failed tasks etc).
 
+### Downloader Application
+
+This application is responsible for downloading the document files.
+
+#### Parameters
+
+| Parameter                            | Description   |
+| ------------------------------------ |:-------------:|
+| loa.downloader.version-number        | WIP           |
+| loa.downloader.executor.thread-count | WIP           |
+| loa.downloader.executor.queue-length | WIP           |
+| loa.source.name                      | WIP           |
+| loa.source.type                      | WIP           |
+| loa.source.file.location             | WIP           |
+| loa.source.file.encoding             | WIP           |
+| loa.vault.location                   | WIP           |
+| loa.stage.location                   | WIP           |
+| loa.checksum.type                    | WIP           |
+| spring.datasource.driver-class-name  | WIP           |
+| spring.datasource.url                | WIP           |
+| spring.datasource.username           | WIP           |
+| spring.datasource.password           | WIP           |
+
+#### Profiles
+
+WIP
+
 ## Domain language
 
 WIP!!!
