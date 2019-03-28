@@ -57,8 +57,8 @@ This application is responsible for downloading the document files.
 
 | Parameter                            | Description   |
 | ------------------------------------ |:-------------:|
-| loa.downloader.version-number        | WIP           |
-| loa.downloader.executor.thread-count | WIP           |
+| loa.downloader.version-number        | This version number will be saved to the database for every document that has been crawled by this crawler. Later on, if it will be necessary to run cleanup or fixing database tasks that are specific to a given version will be checked by the value of this version number. This way it will be easier to fix bugs or database inconsistencies introduced by a specific crawler version. Please do not change this otherwise the official migration/fixer utilities are not going to be usable. |
+| loa.downloader.executor.thread-count | How many download should run simultaneously. Usually this number should be set according to your network or storage device (HDD/SSD) speed. If you want to tune the collecting speed of documents then increase this as long as one of them is fully saturated. Be careful however, if you have a subpar router or networking infrastructure then many simultaneous requests could cause timeouts, overheating on routers and thus making the tuning of this parameter counter intuitive. *(Default value: 100)*           |
 | loa.downloader.executor.queue-length | WIP           |
 | loa.source.name                      | WIP           |
 | loa.source.type                      | WIP           |
