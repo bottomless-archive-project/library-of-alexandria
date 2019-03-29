@@ -4,7 +4,7 @@ import com.github.loa.document.service.id.factory.DocumentIdFactory;
 import com.github.loa.document.service.domain.DocumentStatus;
 import com.github.loa.document.service.entity.factory.DocumentEntityFactory;
 import com.github.loa.document.service.entity.factory.domain.DocumentCreationContext;
-import com.github.loa.downloader.command.configuration.DownloaderConfiguration;
+import com.github.loa.downloader.command.configuration.DownloaderConfigurationProperties;
 import com.github.loa.source.configuration.DocumentSourceConfiguration;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +24,7 @@ public class DocumentDownloadEvaluator {
 
     private final DocumentEntityFactory documentEntityFactory;
     private final DocumentSourceConfiguration documentSourceConfiguration;
-    private final DownloaderConfiguration downloaderConfiguration;
+    private final DownloaderConfigurationProperties downloaderConfigurationProperties;
     private final DocumentIdFactory documentIdFactory;
 
     /**
@@ -49,7 +49,7 @@ public class DocumentDownloadEvaluator {
                         .id(documentId)
                         .location(documentLocation)
                         .status(DocumentStatus.UNDER_CRAWL)
-                        .versionNumber(downloaderConfiguration.getVersionNumber())
+                        .versionNumber(downloaderConfigurationProperties.getVersionNumber())
                         .source(documentSourceConfiguration.getName())
                         .build()
         );
