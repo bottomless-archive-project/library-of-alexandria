@@ -1,15 +1,12 @@
 package com.github.loa.downloader.download.service.file;
 
-import com.github.loa.downloader.download.service.file.domain.FileManipulatingException;
 import com.github.loa.stage.service.StageLocationFactory;
 import com.github.loa.vault.service.VaultLocationFactory;
+import com.github.loa.vault.service.location.domain.VaultLocation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 
 /**
  * This service is responsible for the manipulating of document files. For example moving them to the vault or removing
@@ -28,14 +25,9 @@ public class DocumentFileManipulator {
      * @param documentId the document's id that we want to move to the vault
      */
     public void moveToVault(final String documentId) {
-        final File stageFileLocation = stageLocationFactory.newLocation(documentId);
+        final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentId);
 
-        try {
-            Files.move(stageFileLocation.toPath(), vaultLocationFactory.getLocation(documentId).toPath(),
-                    StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException e) {
-            throw new FileManipulatingException("Unable to move file for document: " + documentId + " to the vault.", e);
-        }
+        vaultLocation.move(stageLocationFactory.getLocation(documentId));
     }
 
     /**
@@ -44,7 +36,7 @@ public class DocumentFileManipulator {
      * @param documentId the document to clean up after
      */
     public void cleanup(final String documentId) {
-        final File stageFileLocation = stageLocationFactory.newLocation(documentId);
+        final File stageFileLocation = stageLocationFactory.getLocation(documentId);
 
         stageFileLocation.delete();
     }

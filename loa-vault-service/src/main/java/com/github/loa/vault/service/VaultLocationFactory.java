@@ -1,38 +1,26 @@
 package com.github.loa.vault.service;
 
 import com.github.loa.document.service.domain.DocumentEntity;
-import com.github.loa.vault.configuration.VaultConfiguration;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
-import java.io.File;
+import com.github.loa.vault.service.location.domain.VaultLocation;
 
 /**
- * A factory that create a {@link java.io.File} location for the document.
+ * A factory that creates {@link VaultLocation} instances for documents.
  */
-@Service
-@RequiredArgsConstructor
-public class VaultLocationFactory {
-
-    private final VaultConfiguration vaultConfiguration;
+public interface VaultLocationFactory {
 
     /**
-     * Create the location for a given {@link DocumentEntity}.
+     * Return a vault location for a document based on the provided document Id.
      *
-     * @param documentEntity the entity to create the location for
-     * @return the location of the document
+     * @param documentId the id of the document to return the location for
+     * @return the vault location belonging to the document
      */
-    public File getLocation(final DocumentEntity documentEntity) {
-        return getLocation(documentEntity.getId());
-    }
+    VaultLocation getLocation(final String documentId);
 
     /**
-     * Create the location for a given document id.
+     * Return a vault location for a document.
      *
-     * @param documentId the id of the entity to create the location for
-     * @return the location of the document
+     * @param documentEntity the entity of the document to return the location for
+     * @return the vault location belonging to the document
      */
-    public File getLocation(final String documentId) {
-        return new File(vaultConfiguration.getLocation(), documentId + ".pdf");
-    }
+    VaultLocation getLocation(final DocumentEntity documentEntity);
 }

@@ -20,7 +20,7 @@ public class Sha256ChecksumProvider implements ChecksumProvider {
 
     @Override
     public String checksum(String documentId) {
-        final File stageFileLocation = stageLocationFactory.newLocation(documentId);
+        final File stageFileLocation = stageLocationFactory.getLocation(documentId);
 
         try {
             try (final BufferedInputStream documentInputStream =

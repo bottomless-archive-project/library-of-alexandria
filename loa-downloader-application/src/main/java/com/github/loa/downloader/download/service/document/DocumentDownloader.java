@@ -47,7 +47,7 @@ public class DocumentDownloader {
         }
 
         final String documentId = documentIdFactory.newDocumentId(documentLocation);
-        final File stageFileLocation = stageLocationFactory.newLocation(documentId);
+        final File stageFileLocation = stageLocationFactory.getLocation(documentId);
 
         try {
             fileDownloader.downloadFile(documentLocation, stageFileLocation, 30000);

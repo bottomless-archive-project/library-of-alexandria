@@ -22,7 +22,7 @@ public class StageLocationFactory {
      * @param documentId the document's id that we need to create the location for
      * @return the location created in the staging area
      */
-    public File newLocation(final String documentId) {
+    public File getLocation(final String documentId) {
         return new File(stageConfiguration.getLocation(), documentId + ".pdf");
     }
 }

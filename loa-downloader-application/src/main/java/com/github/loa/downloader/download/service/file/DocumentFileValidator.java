@@ -21,7 +21,7 @@ public class DocumentFileValidator {
      * @param documentId the id of the document to validate
      */
     public boolean isValidDocument(final String documentId) {
-        final File stageFileLocation = stageLocationFactory.newLocation(documentId);
+        final File stageFileLocation = stageLocationFactory.getLocation(documentId);
 
         // Anything under 1024 bytes is likely to be some bit garbage.
         return stageFileLocation.length() > 1024;
