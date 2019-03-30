@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 @Data
 @Component
 @ConfigurationProperties("loa.downloader")
-public class DownloaderConfiguration {
+public class DownloaderConfigurationProperties {
 
     private int versionNumber;
 }

@@ -12,15 +12,15 @@ import java.util.concurrent.Semaphore;
 @RequiredArgsConstructor
 public class ExecutorConfiguration {
 
-    private final DownloaderExecutorConfiguration downloaderExecutorConfiguration;
+    private final DownloaderExecutorConfigurationProperties downloaderExecutorConfigurationProperties;
 
     @Bean
     public ExecutorService downloaderExecutor() {
-        return Executors.newFixedThreadPool(downloaderExecutorConfiguration.getThreadCount());
+        return Executors.newFixedThreadPool(downloaderExecutorConfigurationProperties.getThreadCount());
     }
 
     @Bean
     public Semaphore downloaderSemaphore() {
-        return new Semaphore(downloaderExecutorConfiguration.getQueueLength());
+        return new Semaphore(downloaderExecutorConfigurationProperties.getQueueLength());
     }
 }

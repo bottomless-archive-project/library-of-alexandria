@@ -31,17 +31,23 @@ public class FileDocumentSourceProvider implements DocumentSourceProvider {
                 fileSourceFactory.newInputStream(fileDocumentSourceConfiguration.getLocation())));
 
         return reader.lines()
-                .map(location -> {
-                    try {
-                        meterRegistry.counter("statistics.document-produced-by-source").increment();
-
-                        return new URL(location);
-                    } catch (MalformedURLException e) {
-                        log.warn("Unable to parse url with location: " + location, e);
-
-                        return null;
-                    }
-                })
+                .peek(this::updateStatistics)
+                .map(this::buildUrl)
                 .filter(Objects::nonNull);
+    }
+
+    private void updateStatistics(final String line) {
+        meterRegistry.counter("statistics.document-produced-by-source").increment();
+    }
+
+    //Not using optional for performance reasons
+    private URL buildUrl(final String location) {
+        try {
+            return new URL(location);
+        } catch (MalformedURLException e) {
+            log.warn("Unable to parse url with location: " + location, e);
+
+            return null;
+        }
     }
 }
