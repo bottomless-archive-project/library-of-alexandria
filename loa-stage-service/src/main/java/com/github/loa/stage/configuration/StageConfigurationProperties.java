@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 @Data
 @Component
 @ConfigurationProperties("loa.stage")
-public class StageConfiguration {
+public class StageConfigurationProperties {
 
   private String location;
 }

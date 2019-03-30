@@ -1,6 +1,6 @@
 package com.github.loa.stage.service;
 
-import com.github.loa.stage.configuration.StageConfiguration;
+import com.github.loa.stage.configuration.StageConfigurationProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +14,7 @@ import java.io.File;
 @RequiredArgsConstructor
 public class StageLocationFactory {
 
-    private final StageConfiguration stageConfiguration;
+    private final StageConfigurationProperties stageConfigurationProperties;
 
     /**
      * Return a file in the staging area that's uniquely generated for the provided document id.
@@ -23,6 +23,6 @@ public class StageLocationFactory {
      * @return the location created in the staging area
      */
     public File getLocation(final String documentId) {
-        return new File(stageConfiguration.getLocation(), documentId + ".pdf");
+        return new File(stageConfigurationProperties.getLocation(), documentId + ".pdf");
     }
 }
