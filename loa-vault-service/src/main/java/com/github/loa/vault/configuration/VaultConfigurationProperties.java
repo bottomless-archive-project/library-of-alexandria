@@ -10,16 +10,11 @@ import org.springframework.stereotype.Component;
  */
 @Data
 @Component
-@ConfigurationProperties("loa.vault")
+@ConfigurationProperties("loa.vault.location")
 public class VaultConfigurationProperties {
 
     /**
      * The type of the vault.
      */
     private VaultType type;
-
-    /**
-     * The location of the vault.
-     */
-    private String location;
 }

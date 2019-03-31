@@ -64,7 +64,14 @@ This application is responsible for downloading the document files.
 | loa.source.type                      | WIP           |
 | loa.source.file.location             | WIP           |
 | loa.source.file.encoding             | WIP           |
-| loa.vault.location                   | WIP           |
+| loa.vault.location.type              | WIP           |
+| loa.vault.location.file.path         | WIP           |
+| loa.vault.location.smb.server-name   | WIP           |
+| loa.vault.location.smb.share-name    | WIP           |
+| loa.vault.location.smb.share-path    | WIP           |
+| loa.vault.location.smb.username      | WIP           |
+| loa.vault.location.smb.password      | WIP           |
+| loa.vault.location.smb.domain        | WIP           |
 | loa.stage.location                   | WIP           |
 | loa.checksum.type                    | WIP           |
 | spring.datasource.driver-class-name  | WIP           |

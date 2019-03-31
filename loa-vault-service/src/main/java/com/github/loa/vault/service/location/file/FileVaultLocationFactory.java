@@ -2,6 +2,7 @@ package com.github.loa.vault.service.location.file;
 
 import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.vault.configuration.VaultConfigurationProperties;
+import com.github.loa.vault.configuration.location.file.FileConfigurationProperties;
 import com.github.loa.vault.service.VaultLocationFactory;
 import com.github.loa.vault.service.location.domain.VaultLocation;
 import com.github.loa.vault.service.location.file.domain.FileVaultLocation;
@@ -18,6 +19,7 @@ import java.io.File;
 public class FileVaultLocationFactory implements VaultLocationFactory {
 
     private final VaultConfigurationProperties vaultConfigurationProperties;
+    private final FileConfigurationProperties fileConfigurationProperties;
 
     /**
      * Create the location for a given document id.
@@ -27,7 +29,7 @@ public class FileVaultLocationFactory implements VaultLocationFactory {
      */
     public VaultLocation getLocation(final String documentId) {
         return new FileVaultLocation(
-                new File(vaultConfigurationProperties.getLocation(), documentId + ".pdf")
+                new File(fileConfigurationProperties.getPath(), documentId + ".pdf")
         );
     }
 
