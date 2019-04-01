@@ -66,7 +66,7 @@ This application is responsible for downloading the document files.
 | loa.source.commoncrawl.warc-id       | Used only when `loa.source.type` is set to `commoncrawl`. Every month's Common Crawl crawling sentence is built from multiple [WARC](https://en.wikipedia.org/wiki/Web_ARChive) files (mostly around 64000). This is the id of the WARC file that the parsing should start from. When you first start crawling a month's crawl sequence this should be 1. When the downloader opens a new WARC file it will print it's id to the console. If you need to stop the crawler and want to re-start it from where it stopped then write down the last crawled WARC id and set this parameter to it. |
 | loa.source.file.location             | Used only when `loa.source.type` is set to `file`. The location of the source file on the disk. It's not a problem if it contains non-pdf files. |
 | loa.source.file.encoding             | Used only when `loa.source.type` is set to `file`. It can be set to `none` or gzip. If it's set to `none` then the file will be read as a non-compressed file. If it's set to `gzip` then it will be red as a gzipped file, being unzipped on the fly. |
-| loa.vault.location.type              | Describes the type of the vault's location. Could be either `disc` or `smb`. |
+| loa.vault.location.type              | Describes the type of the vault's location. Could be either `file` or `smb`. |
 | loa.vault.location.file.path         | WIP           |
 | loa.vault.location.smb.server-name   | WIP           |
 | loa.vault.location.smb.share-name    | WIP           |

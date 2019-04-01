@@ -12,6 +12,7 @@ import com.hierynomus.smbj.connection.Connection;
 import com.hierynomus.smbj.session.Session;
 import com.hierynomus.smbj.share.DiskShare;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -21,6 +22,7 @@ import java.util.EnumSet;
 
 @Service
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "loa.vault.location.type", havingValue = "smb")
 public class SMBFileManipulator {
 
     //TODO: Add configuration
