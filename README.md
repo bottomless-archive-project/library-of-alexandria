@@ -55,31 +55,31 @@ This application is responsible for downloading the document files.
 
 #### Parameters
 
-| Parameter                            | Description   |
-| ------------------------------------ |:------------- |
-| loa.downloader.version-number        | This version number will be saved to the database for every document that has been crawled. Later on, if it will be necessary to run cleanup or fixing database tasks that are specific to a given version will be checked by the value of this version number. This way it will be easier to fix bugs or database inconsistencies introduced by a specific crawler version. Please do not change this otherwise the official migration/fixer utilities are not going to be usable. |
-| loa.downloader.executor.thread-count | How many download should run simultaneously. Usually this number should be set according to your network or storage device (HDD/SSD) speed. If you want to tune the collecting speed of documents then increase this as long as one of them is fully saturated. Be careful however, if you have a subpar router or networking infrastructure then many simultaneous requests could cause timeouts, overheating on routers and thus making the tuning of this parameter counter intuitive. *(Default value: 100)* |
-| loa.downloader.executor.queue-length | How many locations do we want to pre-calculate. This queue are fed by the source subsystem with URL locations to crawl and is being consumed by the downloader subsystem. If you set this parameter too high it could cause out of memory errors while if it is set to too low then most of the download threads could idle. The suggested value is between 1000 - 50000 depending on the available memory. *(Default value: 1000)* |
-| loa.source.name                      | The name of the source location. This name will be saved to the database for every crawled document. It could be helpful for statistics collection or in identifying bugs and errors with specific sources. *(Default value: unknown)* |
-| loa.source.type                      | Describes the type of the source. Could be either `file` or `commoncrawl`. If the value is file then the location data will be loaded from a local file. If it is commoncrawl then the parser will start loading and parsing urls from the [Common Crawl](http://commoncrawl.org/) corpus. |
-| loa.source.commoncrawl.crawl-id      | Used only when `loa.source.type` is set to `commoncrawl`. The id of the Common Crawl crawling sentence. For example the [2019 January](http://commoncrawl.org/2019/01/january-2019-crawl-archive-now-available/)'s id is CC-MAIN-2019-04. You can acquire the crawl id for each month's corpus [here](http://commoncrawl.org/the-data/get-started/). |
-| loa.source.commoncrawl.warc-id       | Used only when `loa.source.type` is set to `commoncrawl`. Every month's Common Crawl crawling sentence is built from multiple [WARC](https://en.wikipedia.org/wiki/Web_ARChive) files (mostly around 64000). This is the id of the WARC file that the parsing should start from. When you first start crawling a month's crawl sequence this should be 1. When the downloader opens a new WARC file it will print it's id to the console. If you need to stop the crawler and want to re-start it from where it stopped then write down the last crawled WARC id and set this parameter to it. |
-| loa.source.file.location             | Used only when `loa.source.type` is set to `file`. The location of the source file on the disk. It's not a problem if it contains non-pdf files. |
-| **loa.source.file.encoding**         | Used only when `loa.source.type` is set to `file`. It can be set to `none` or gzip. If it's set to `none` then the file will be read as a non-compressed file. If it's set to `gzip` then it will be red as a gzipped file, being unzipped on the fly. *(Default value: none)* |
-| loa.vault.location.type              | Describes the type of the vault's location. Could be either `file` or `smb`. *(Default value: file)* |
-| loa.vault.location.file.path         | WIP           |
-| loa.vault.location.smb.server-name   | WIP           |
-| loa.vault.location.smb.share-name    | WIP           |
-| loa.vault.location.smb.share-path    | WIP           |
-| loa.vault.location.smb.username      | WIP           |
-| loa.vault.location.smb.password      | WIP           |
-| loa.vault.location.smb.domain        | WIP           |
-| loa.stage.location                   | WIP           |
-| loa.checksum.type                    | WIP           |
-| spring.datasource.driver-class-name  | WIP           |
-| spring.datasource.url                | WIP           |
-| spring.datasource.username           | WIP           |
-| spring.datasource.password           | WIP           |
+| Parameter                                | Description   |
+| ---------------------------------------- |:------------- |
+| **loa.downloader.version-number**        | This version number will be saved to the database for every document that has been crawled. Later on, if it will be necessary to run cleanup or fixing database tasks that are specific to a given version will be checked by the value of this version number. This way it will be easier to fix bugs or database inconsistencies introduced by a specific crawler version. Please do not change this otherwise the official migration/fixer utilities are not going to be usable. |
+| **loa.downloader.executor.thread-count** | How many download should run simultaneously. Usually this number should be set according to your network or storage device (HDD/SSD) speed. If you want to tune the collecting speed of documents then increase this as long as one of them is fully saturated. Be careful however, if you have a subpar router or networking infrastructure then many simultaneous requests could cause timeouts, overheating on routers and thus making the tuning of this parameter counter intuitive. *(Default value: 100)* |
+| **loa.downloader.executor.queue-length** | How many locations do we want to pre-calculate. This queue are fed by the source subsystem with URL locations to crawl and is being consumed by the downloader subsystem. If you set this parameter too high it could cause out of memory errors while if it is set to too low then most of the download threads could idle. The suggested value is between 1000 - 50000 depending on the available memory. *(Default value: 1000)* |
+| **loa.source.name**                      | The name of the source location. This name will be saved to the database for every crawled document. It could be helpful for statistics collection or in identifying bugs and errors with specific sources. *(Default value: unknown)* |
+| **loa.source.type**                      | Describes the type of the source. Could be either `file` or `commoncrawl`. If the value is file then the location data will be loaded from a local file. If it is commoncrawl then the parser will start loading and parsing urls from the [Common Crawl](http://commoncrawl.org/) corpus. |
+| **loa.source.commoncrawl.crawl-id**      | Used only when `loa.source.type` is set to `commoncrawl`. The id of the Common Crawl crawling sentence. For example the [2019 January](http://commoncrawl.org/2019/01/january-2019-crawl-archive-now-available/)'s id is CC-MAIN-2019-04. You can acquire the crawl id for each month's corpus [here](http://commoncrawl.org/the-data/get-started/). |
+| **loa.source.commoncrawl.warc-id**       | Used only when `loa.source.type` is set to `commoncrawl`. Every month's Common Crawl crawling sentence is built from multiple [WARC](https://en.wikipedia.org/wiki/Web_ARChive) files (mostly around 64000). This is the id of the WARC file that the parsing should start from. When you first start crawling a month's crawl sequence this should be 1. When the downloader opens a new WARC file it will print it's id to the console. If you need to stop the crawler and want to re-start it from where it stopped then write down the last crawled WARC id and set this parameter to it. |
+| **loa.source.file.location**             | Used only when `loa.source.type` is set to `file`. The location of the source file on the disk. It's not a problem if it contains non-pdf files. |
+| **loa.source.file.encoding**             | Used only when `loa.source.type` is set to `file`. It can be set to `none` or gzip. If it's set to `none` then the file will be read as a non-compressed file. If it's set to `gzip` then it will be red as a gzipped file, being unzipped on the fly. *(Default value: none)* |
+| **loa.vault.location.type**              | Describes the type of the vault's location. Could be either `file` or `smb`. *(Default value: file)* |
+| **loa.vault.location.file.path**         | WIP           |
+| **loa.vault.location.smb.server-name**   | WIP           |
+| **loa.vault.location.smb.share-name**    | WIP           |
+| **loa.vault.location.smb.share-path**    | WIP           |
+| **loa.vault.location.smb.username**      | WIP           |
+| **loa.vault.location.smb.password**      | WIP           |
+| **loa.vault.location.smb.domain**        | WIP           |
+| **loa.stage.location**                   | WIP           |
+| **loa.checksum.type**                    | WIP           |
+| **spring.datasource.driver-class-name**  | WIP           |
+| **spring.datasource.url**                | WIP           |
+| **spring.datasource.username**           | WIP           |
+| **spring.datasource.password**           | WIP           |
 
 #### Profiles
 
