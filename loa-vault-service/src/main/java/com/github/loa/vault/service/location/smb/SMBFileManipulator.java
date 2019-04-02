@@ -1,5 +1,6 @@
 package com.github.loa.vault.service.location.smb;
 
+import com.github.loa.vault.configuration.location.smb.SMBConfigurationProperties;
 import com.github.loa.vault.domain.exception.VaultAccessException;
 import com.hierynomus.msdtyp.AccessMask;
 import com.hierynomus.msfscc.FileAttributes;
@@ -27,14 +28,22 @@ public class SMBFileManipulator {
 
     //TODO: Add configuration
     private final SMBClient smbClient;
+    private final SMBConfigurationProperties smbConfigurationProperties;
 
     public void writeFile(final String location, final File file) {
-        try (Connection connection = smbClient.connect("SERVERNAME")) {
-            final AuthenticationContext ac = new AuthenticationContext("USERNAME", "PASSWORD".toCharArray(), "DOMAIN");
+        //TODO: Add hostname correctly! Don't just use domain!
+        try (Connection connection = smbClient.connect(smbConfigurationProperties.getDomain())) {
+            //TODO: Pls a factory or smthing!
+            final String username = smbConfigurationProperties.getUsername() == null ? ""
+                    : smbConfigurationProperties.getUsername();
+            final char[] password = smbConfigurationProperties.getPassword() == null ? new char[]{}
+                    : smbConfigurationProperties.getPassword().toCharArray();
+            final AuthenticationContext ac = new AuthenticationContext(username,
+                    password, smbConfigurationProperties.getDomain());
             final Session session = connection.authenticate(ac);
 
             // Connect to Share
-            try (DiskShare share = (DiskShare) session.connectShare("SHARENAME")) {
+            try (DiskShare share = (DiskShare) session.connectShare(smbConfigurationProperties.getShareName())) {
                 final com.hierynomus.smbj.share.File openFile = share.openFile(location,
                         EnumSet.of(AccessMask.GENERIC_WRITE),
                         EnumSet.of(FileAttributes.FILE_ATTRIBUTE_NORMAL),
@@ -53,17 +62,24 @@ public class SMBFileManipulator {
     }
 
     public byte[] readFile(final String location) {
-        try (Connection connection = smbClient.connect("SERVERNAME")) {
-            final AuthenticationContext ac = new AuthenticationContext("USERNAME", "PASSWORD".toCharArray(), "DOMAIN");
+        //TODO: Add hostname correctly! Don't just use domain!
+        try (Connection connection = smbClient.connect(smbConfigurationProperties.getDomain())) {
+            //TODO: Pls a factory or smthing!
+            final String username = smbConfigurationProperties.getUsername() == null ? ""
+                    : smbConfigurationProperties.getUsername();
+            final char[] password = smbConfigurationProperties.getPassword() == null ? new char[]{}
+                    : smbConfigurationProperties.getPassword().toCharArray();
+            final AuthenticationContext ac = new AuthenticationContext(username,
+                    password, smbConfigurationProperties.getDomain());
             final Session session = connection.authenticate(ac);
 
             // Connect to Share
-            try (DiskShare share = (DiskShare) session.connectShare("SHARENAME")) {
+            try (DiskShare share = (DiskShare) session.connectShare(smbConfigurationProperties.getShareName())) {
                 try (final com.hierynomus.smbj.share.File openFile = share.openFile(location,
-                        EnumSet.of(AccessMask.GENERIC_WRITE),
+                        EnumSet.of(AccessMask.GENERIC_READ),
                         EnumSet.of(FileAttributes.FILE_ATTRIBUTE_NORMAL),
-                        EnumSet.of(SMB2ShareAccess.FILE_SHARE_WRITE),
-                        SMB2CreateDisposition.FILE_CREATE,
+                        EnumSet.of(SMB2ShareAccess.FILE_SHARE_READ),
+                        SMB2CreateDisposition.FILE_OPEN,
                         EnumSet.noneOf(SMB2CreateOptions.class))) {
                     return openFile.getInputStream().readAllBytes();
                 }
