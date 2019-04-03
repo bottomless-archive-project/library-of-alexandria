@@ -68,7 +68,7 @@ This application is responsible for downloading the document files.
 | **loa.source.file.encoding**             | Used only when `loa.source.type` is set to `file`. It can be set to `none` or gzip. If it's set to `none` then the file will be read as a non-compressed file. If it's set to `gzip` then it will be red as a gzipped file, being unzipped on the fly. *(Default value: none)* |
 | **loa.vault.location.type**              | Describes the type of the vault's location. Could be either `file` or `smb`. *(Default value: file)* |
 | **loa.vault.location.file.path**         | WIP           |
-| **loa.vault.location.smb.server-name**   | WIP           |
+| **loa.vault.location.smb.host**   | WIP           |
 | **loa.vault.location.smb.share-name**    | WIP           |
 | **loa.vault.location.smb.share-path**    | WIP           |
 | **loa.vault.location.smb.username**      | WIP           |

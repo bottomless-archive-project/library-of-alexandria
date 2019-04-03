@@ -21,26 +21,29 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.EnumSet;
 
+/**
+ * This service is responsible for connecting to an SMB share and manipulating files there. The connection is based on
+ * the provided connection properties.
+ */
 @Service
 @RequiredArgsConstructor
 @ConditionalOnProperty(name = "loa.vault.location.type", havingValue = "smb")
 public class SMBFileManipulator {
 
-    //TODO: Add configuration
     private final SMBClient smbClient;
     private final SMBConfigurationProperties smbConfigurationProperties;
+    private final SMBAuthenticationContextFactory smbAuthenticationContextFactory;
 
+    /**
+     * Write a file to the SMB share.
+     *
+     * @param location the file location to write on the share
+     * @param file     the file to write
+     */
     public void writeFile(final String location, final File file) {
-        //TODO: Add hostname correctly! Don't just use domain!
-        try (Connection connection = smbClient.connect(smbConfigurationProperties.getDomain())) {
-            //TODO: Pls a factory or smthing!
-            final String username = smbConfigurationProperties.getUsername() == null ? ""
-                    : smbConfigurationProperties.getUsername();
-            final char[] password = smbConfigurationProperties.getPassword() == null ? new char[]{}
-                    : smbConfigurationProperties.getPassword().toCharArray();
-            final AuthenticationContext ac = new AuthenticationContext(username,
-                    password, smbConfigurationProperties.getDomain());
-            final Session session = connection.authenticate(ac);
+        try (Connection connection = smbClient.connect(smbConfigurationProperties.getHost())) {
+            final AuthenticationContext authenticationContext = smbAuthenticationContextFactory.newContext();
+            final Session session = connection.authenticate(authenticationContext);
 
             // Connect to Share
             try (DiskShare share = (DiskShare) session.connectShare(smbConfigurationProperties.getShareName())) {
@@ -61,17 +64,16 @@ public class SMBFileManipulator {
         }
     }
 
+    /**
+     * Read a file on the SMB share.
+     *
+     * @param location the location of the file
+     * @return the content of the file
+     */
     public byte[] readFile(final String location) {
-        //TODO: Add hostname correctly! Don't just use domain!
-        try (Connection connection = smbClient.connect(smbConfigurationProperties.getDomain())) {
-            //TODO: Pls a factory or smthing!
-            final String username = smbConfigurationProperties.getUsername() == null ? ""
-                    : smbConfigurationProperties.getUsername();
-            final char[] password = smbConfigurationProperties.getPassword() == null ? new char[]{}
-                    : smbConfigurationProperties.getPassword().toCharArray();
-            final AuthenticationContext ac = new AuthenticationContext(username,
-                    password, smbConfigurationProperties.getDomain());
-            final Session session = connection.authenticate(ac);
+        try (Connection connection = smbClient.connect(smbConfigurationProperties.getHost())) {
+            final AuthenticationContext authenticationContext = smbAuthenticationContextFactory.newContext();
+            final Session session = connection.authenticate(authenticationContext);
 
             // Connect to Share
             try (DiskShare share = (DiskShare) session.connectShare(smbConfigurationProperties.getShareName())) {

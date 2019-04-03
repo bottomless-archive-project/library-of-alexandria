@@ -16,7 +16,7 @@ public class SMBConfigurationProperties {
     /**
      * The name of the SMB server. Used to log in.
      */
-    private String serverName;
+    private String host;
 
     /**
      * The share name that used as the vault on the server.
