@@ -10,6 +10,7 @@ import java.net.URL;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 
 /**
  * This service is the hearth of the downloader application. It's responsible for the processing
@@ -27,12 +28,12 @@ public class DocumentSourceProcessor {
     /**
      * Handles the processing of a document source.
      *
-     * @param documentSourceProvider provides the source to process
+     * @param documentSource the access to the source as an URL stream
      */
-    public void processDocumentSource(final DocumentSourceProvider documentSourceProvider) {
+    public void processDocumentSource(final Stream<URL> documentSource) {
         log.info("Starting to process a new document source.");
 
-        documentSourceProvider.stream()
+        documentSource
                 .sequential()
                 .filter(this::shouldDownload)
                 .forEach(this::processLocation);
