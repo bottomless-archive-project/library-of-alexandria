@@ -1,6 +1,6 @@
 package com.github.loa.source.service;
 
-import com.github.loa.source.service.util.UrlEncoder;
+import com.github.loa.url.service.UrlEncoder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

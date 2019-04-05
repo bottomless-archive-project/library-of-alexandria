@@ -1,4 +1,4 @@
-package com.github.loa.source.service.util;
+package com.github.loa.url.service;
 
 import org.springframework.stereotype.Service;
 

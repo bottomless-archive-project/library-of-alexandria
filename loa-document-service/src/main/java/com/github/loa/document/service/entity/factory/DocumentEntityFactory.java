@@ -7,9 +7,12 @@ import com.github.loa.document.service.domain.DocumentStatus;
 import com.github.loa.document.service.entity.factory.domain.DocumentCreationContext;
 import com.github.loa.document.repository.domain.DocumentDatabaseEntity;
 import lombok.RequiredArgsConstructor;
+import org.apache.ibatis.cursor.Cursor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 @Service
 @RequiredArgsConstructor
@@ -64,6 +67,13 @@ public class DocumentEntityFactory {
                 documentRepository.findByChecksumAndFileSize(checksum, fileSize);
 
         return documentEntityTransformer.transform(documentDatabaseEntities);
+    }
+
+    public Stream<DocumentEntity> getDocumentEntities() {
+        final Cursor<DocumentDatabaseEntity> documentDatabaseEntities = documentRepository.findAll();
+
+        return StreamSupport.stream(documentDatabaseEntities.spliterator(), false)
+                .map(documentEntityTransformer::transform);
     }
 
     /**
