@@ -16,7 +16,12 @@ public class DocumentSourceProviderFactory {
 
     public Stream<URL> openSource() {
         return documentSourceProvider.stream()
-                //TODO: Move the filtering logic (is a pdf etc) here with any kind of validation
+                .filter(this::shouldDownload)
                 .map(urlEncoder::encode);
+    }
+
+    private boolean shouldDownload(final URL documentLocation) {
+        //Using getPath() to be able to crawl urls like: /example/examplefile.pdf?queryparam=value
+        return documentLocation.getPath().endsWith(".pdf");
     }
 }
