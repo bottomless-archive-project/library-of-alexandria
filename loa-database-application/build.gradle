@@ -1,10 +1,6 @@
 apply plugin: 'org.springframework.boot'
 
 dependencies {
-    compile project(':loa-document-service')
-    compile project(':loa-url-service')
-    compile project(':loa-vault-service')
-
     compile group: 'mysql', name: 'mysql-connector-java'
     compile group: 'org.liquibase', name: 'liquibase-core'
 
