@@ -85,9 +85,27 @@ Java HotSpot(TM) 64-Bit Server VM 18.9 (build 11+28, mixed mode)
 
 Download MySQL 8.15 from [here](https://dev.mysql.com/downloads/mysql/8.html). After the download is complete run the installer and follow the directions it provides. If it's possible install the MySQL Workbench tool as well because you will need it later for administrative tasks.
 
-### Running the crawler
+### Running the database application
 
-WIP!!!
+WIP...
+
+### Running the crawler application
+
+You can download the crawler application files at our [release](https://github.com/bottomless-archive-project/library-of-alexandria/releases) page. Please take care to choose a non "pre-release" version!
+
+After the download is complete run the application via the following command:
+
+```
+java -jar loa-downloader-application-{release-number}.jar ...
+```
+
+In the place of the ... you should write the various parameters. For the available parameters check the parameter list under the downloader application.
+
+For example:
+
+```
+java -jar loa-downloader-application-1.0.0-milestone.1.jar --loa.source.name=test --loa.source.file.location=C:\loa\source.txt --loa.vault.location.file.path=C:\loa\vault\ --loa.stage.location=C:\loa\stage\ --spring.datasource.url=jdbc:mysql://localhost/loa?useSSL=false&useUnicode=yes&characterEncoding=utf8&serverTimezone=UTC --spring.datasource.username=root --spring.datasource.password=root
+```
 
 ### Installing Elasticsearch
 
