@@ -17,9 +17,37 @@ The list of required software to start archiving:
 The list of required software to be able to search documents:
 - [Elasticsearch 6.6](https://www.elastic.co/downloads/past-releases/elasticsearch-6-6-2)
 
+## System Requirements
+
+It's important to mention the hardware requirements of collecting and handling documents. If you only want to gather a few million of documents then that could be done on a home PC. However, if you want to collect & store a massive amounts then purpose built hardware is necessary. This hardware is not necessarily expensive however. Also if you want to collect 24/7 then having a machine that doesn't consume a lot of wattage is recommended where electricity prices are high.
+
+Collecting and indexing have quite a different requirements as well.
+
+The requirements mentioned here could be built from used commodity hardware if necessary.
+
+### Collecting
+
+Collecting is easier and cheaper than indexing the documents but doesn't provide the search capacity.
+
+Memory requirements for collecting varies on your failure rate. If you have a lots of URLs that fail to download then storing those failures in the SQL database will require quite a lot of RAM. However if you have small failure rate then storing even 5-10 million of rows in SQL could be done from 8-10 GB of ram.
+
+#### Collecting small amounts (1 - 5 million)
+
+* **CPU**: Intel [G4400](https://ark.intel.com/content/www/us/en/ark/products/88179/intel-pentium-processor-g4400-3m-cache-3-30-ghz.html) or similar
+* **Memory**: 16-24 GB DDR3/DDR4 (depending on download failure rate)
+* **Disc space**: ~20 TB
+
+#### Collecting medium amounts (5 - 25 million)
+
+WIP...
+
+#### Collecting massive amounts (25-100+ million)
+
+WIP...
+
 ## Installation
 
-Installing the apps and the prerequisite software is quite straightforward. At this time we provide a guide to the Windows based systems. Installing LoA on Linux systems are supported as well but requires more technical knowledge. An ideal deployment is running the apps in separate VMs or Docker containers but for the sake of simplicity we are not doing that in this guide. In the future we will create a more advanced guide.
+Installing the applications and the prerequisite software is quite straightforward. At this time we provide a guide to the Windows based systems. Installing LoA on Linux systems are supported as well but requires more technical knowledge. An ideal deployment is running the apps in separate VMs or Docker containers but for the sake of simplicity we are not doing that in this guide. In the future we will create a more advanced guide.
 
 ### Installing Java
 
@@ -98,3 +126,4 @@ WIP!!!
 3. **Document content**: ...
 3. **Staging area**: A temporary location where the collected documents placed for post processing before going to the archive.
 4. **Source**: ...
+5. **Failure rate**: How many documents fail to download compared to the successfully downloaded ones.
