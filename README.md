@@ -27,7 +27,7 @@ The requirements mentioned here could be built from used commodity hardware if n
 
 ### Collecting
 
-Collecting is easier and cheaper than indexing the documents but doesn't provide the search capacity.
+Collecting is easier and cheaper than indexing the documents but doesn't provide any search capability.
 
 Memory requirements for collecting varies on your failure rate. If you have a lots of URLs that fail to download then storing those failures in the SQL database will require quite a lot of RAM. However if you have small failure rate then storing even 5-10 million of rows in SQL could be done from 8-10 GB of ram.
 
