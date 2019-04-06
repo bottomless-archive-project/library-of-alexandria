@@ -33,7 +33,7 @@ Memory requirements for collecting varies on your failure rate. If you have a lo
 
 #### Collecting small amounts (1 - 5 million)
 
-* **CPU**: Intel [G4400](https://ark.intel.com/content/www/us/en/ark/products/88179/intel-pentium-processor-g4400-3m-cache-3-30-ghz.html) or similar
+* **CPU**: [Intel Pentium G4400](https://ark.intel.com/content/www/us/en/ark/products/88179/intel-pentium-processor-g4400-3m-cache-3-30-ghz.html) or similar
 * **Memory**: 16-24 GB DDR3/DDR4 (depending on download failure rate)
 * **Disc space**: ~20 TB
 
@@ -53,7 +53,7 @@ You can do the indexing on any machine that have the sufficient memory requireme
 
 #### Indexing small amounts (1 - 5 million)
 
-* **CPU**: Intel i7-3770 or similar
+* **CPU**: [Intel Core i5-7700](https://ark.intel.com/content/www/us/en/ark/products/97128/intel-core-i7-7700-processor-8m-cache-up-to-4-20-ghz.html) or similar
 * **Memory**: 24 GB
 * **Disc space**: 250 GB
 
