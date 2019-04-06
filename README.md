@@ -45,6 +45,26 @@ WIP...
 
 WIP...
 
+### Indexing
+
+Indexing is much more CPU and memory intensive than collecting but requires a lot less disk space. Indexing should either be run on a different machine than collecting or the memory and disc requirements should be added together.
+
+You can do the indexing on any machine that have the sufficient memory requirements, but without a proper CPU your indexing speed could be very slow.
+
+#### Indexing small amounts (1 - 5 million)
+
+* **CPU**: Intel i7-3770 or similar
+* **Memory**: 24 GB
+* **Disc space**: 250 GB
+
+#### Indexing medium amounts (5 - 25 million)
+
+WIP...
+
+#### Indexing massive amounts (25-100+ million)
+
+WIP...
+
 ## Installation
 
 Installing the applications and the prerequisite software is quite straightforward. At this time we provide a guide to the Windows based systems. Installing LoA on Linux systems are supported as well but requires more technical knowledge. An ideal deployment is running the apps in separate VMs or Docker containers but for the sake of simplicity we are not doing that in this guide. In the future we will create a more advanced guide.
