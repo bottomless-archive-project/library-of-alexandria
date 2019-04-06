@@ -11,8 +11,6 @@ public interface VaultLocation {
      */
     void move(final File file);
 
-    void move(final VaultLocation newLocation);
-
     /**
      * Get the content of the location as a byte array.
      *

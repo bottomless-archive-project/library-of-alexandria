@@ -19,6 +19,10 @@ public class SMBVaultLocation implements VaultLocation {
         file.delete();
     }
 
+    public void move(final VaultLocation vaultLocation) {
+        
+    }
+
     @Override
     public byte[] getContent() {
         return smbFileManipulator.readFile(location);
