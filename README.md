@@ -87,7 +87,21 @@ Download MySQL 8.15 from [here](https://dev.mysql.com/downloads/mysql/8.html). A
 
 ### Running the database application
 
-WIP...
+You can download the database application files at our [release](https://github.com/bottomless-archive-project/library-of-alexandria/releases) page. Please take care to choose a non "pre-release" version!
+
+After the download is complete run the application via the following command:
+
+```
+java -jar loa-database-application-{release-number}.jar ...
+```
+
+In the place of the ... you should write the various parameters. For the available parameters check the parameter list under the downloader application.
+
+For example:
+
+```
+java -jar loa-database-application-1.0.0-milestone.1.jar --spring.datasource.url=jdbc:mysql://localhost/loa?useSSL=false&useUnicode=yes&characterEncoding=utf8&serverTimezone=UTC --spring.datasource.username=root --spring.datasource.password=root
+```
 
 ### Running the crawler application
 
