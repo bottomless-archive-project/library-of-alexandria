@@ -94,15 +94,4 @@ public class DocumentManipulator {
     public void updateFileSizeAndChecksum(final String documentId, final long fileSize, final String checksum) {
         documentRepository.updateFileSizeAndChecksum(documentId, fileSize, checksum);
     }
-
-    /**
-     * Update the url and the id of a document.
-     *
-     * @param originalId       the original id of the document to update
-     * @param newId            the new id of the url
-     * @param documentLocation the location of the document to update
-     */
-    public void refreshDocument(final String originalId, final String newId, final String documentLocation) {
-        //TODO: Do this!
-    }
 }
