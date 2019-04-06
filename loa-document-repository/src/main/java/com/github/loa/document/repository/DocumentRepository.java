@@ -2,6 +2,7 @@ package com.github.loa.document.repository;
 
 import com.github.loa.document.repository.domain.DocumentDatabaseEntity;
 import org.apache.ibatis.annotations.*;
+import org.apache.ibatis.cursor.Cursor;
 
 import java.util.List;
 
@@ -25,4 +26,7 @@ public interface DocumentRepository {
 
     @Select("SELECT * FROM document WHERE file_size = #{fileSize} AND checksum = #{checksum}")
     List<DocumentDatabaseEntity> findByChecksumAndFileSize(@Param("checksum") String checksum, @Param("fileSize") long fileSize);
+
+    @Select("SELECT * FROM document")
+    Cursor<DocumentDatabaseEntity> findAll();
 }

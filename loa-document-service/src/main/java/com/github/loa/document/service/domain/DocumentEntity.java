@@ -3,6 +3,7 @@ package com.github.loa.document.service.domain;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.net.URL;
 import java.time.Instant;
 
 @Getter
@@ -10,10 +11,19 @@ import java.time.Instant;
 public class DocumentEntity {
 
     private final String id;
-    private final String url;
+    private final URL url;
     private final DocumentStatus status;
     private final Instant downloadDate;
     private final String checksum;
     private final long fileSize;
     private final int downloaderVersion;
+
+    /**
+     * Returns true if the document is saved to the vault.
+     *
+     * @return true if the document is available in the vault, false otherwise
+     */
+    public boolean isInVault() {
+        return status == DocumentStatus.DOWNLOADED || status == DocumentStatus.INDEXED;
+    }
 }

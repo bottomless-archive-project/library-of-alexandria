@@ -5,6 +5,8 @@ import com.github.loa.document.repository.domain.DocumentDatabaseEntity;
 import com.github.loa.document.service.domain.DocumentStatus;
 import org.springframework.stereotype.Service;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,14 +20,19 @@ public class DocumentEntityTransformer {
     }
 
     public DocumentEntity transform(final DocumentDatabaseEntity documentDatabaseEntity) {
-        return DocumentEntity.builder()
-                .id(documentDatabaseEntity.getId())
-                .url(documentDatabaseEntity.getUrl())
-                .status(DocumentStatus.valueOf(documentDatabaseEntity.getStatus()))
-                .checksum(documentDatabaseEntity.getChecksum())
-                .fileSize(documentDatabaseEntity.getFileSize())
-                .downloadDate(documentDatabaseEntity.getDownloadDate())
-                .downloaderVersion(documentDatabaseEntity.getDownloaderVersion())
-                .build();
+        try {
+            return DocumentEntity.builder()
+                    .id(documentDatabaseEntity.getId())
+                    .url(new URL(documentDatabaseEntity.getUrl()))
+                    .status(DocumentStatus.valueOf(documentDatabaseEntity.getStatus()))
+                    .checksum(documentDatabaseEntity.getChecksum())
+                    .fileSize(documentDatabaseEntity.getFileSize())
+                    .downloadDate(documentDatabaseEntity.getDownloadDate())
+                    .downloaderVersion(documentDatabaseEntity.getDownloaderVersion())
+                    .build();
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("Unable to transform entity because of a bad URL: "
+                    + documentDatabaseEntity.getUrl() + "!", e);
+        }
     }
 }

@@ -1,7 +1,6 @@
 package com.github.loa.downloader.command.service;
 
 import com.github.loa.downloader.download.service.document.DocumentDownloader;
-import com.github.loa.source.service.DocumentSourceProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -10,6 +9,7 @@ import java.net.URL;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 
 /**
  * This service is the hearth of the downloader application. It's responsible for the processing
@@ -27,22 +27,16 @@ public class DocumentSourceProcessor {
     /**
      * Handles the processing of a document source.
      *
-     * @param documentSourceProvider provides the source to process
+     * @param documentSource the access to the source as an URL stream
      */
-    public void processDocumentSource(final DocumentSourceProvider documentSourceProvider) {
+    public void processDocumentSource(final Stream<URL> documentSource) {
         log.info("Starting to process a new document source.");
 
-        documentSourceProvider.stream()
+        documentSource
                 .sequential()
-                .filter(this::shouldDownload)
                 .forEach(this::processLocation);
 
         shutdownGracefully();
-    }
-
-    private boolean shouldDownload(final URL documentLocation) {
-        //Using getPath() to be able to crawl urls like: /example/examplefile.pdf?queryparam=value
-        return documentLocation.getPath().endsWith(".pdf");
     }
 
     private void processLocation(final URL documentLocation) {
