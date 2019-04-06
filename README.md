@@ -103,7 +103,7 @@ For example:
 java -jar loa-database-application-1.0.0-milestone.1.jar --spring.datasource.url=jdbc:mysql://localhost/loa?useSSL=false&useUnicode=yes&characterEncoding=utf8&serverTimezone=UTC --spring.datasource.username=root --spring.datasource.password=root
 ```
 
-Running the database application is necessary after every release to update the database. However, once it's finished running it will shut down and not needed to be run again until a new LoA update.
+Running the database application is necessary after every release to update the database schema. However, once it's finished running it will shut down and not needed to be run again until a new LoA update.
 
 ### Running the crawler application
 
