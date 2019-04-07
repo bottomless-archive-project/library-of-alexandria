@@ -6,9 +6,13 @@ buildscript {
     }
     repositories {
         mavenCentral()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+        classpath "com.adarshr:gradle-test-logger-plugin:1.6.0"
     }
 }
 
@@ -23,6 +27,12 @@ subprojects {
     apply plugin: 'java'
 
     compileJava.dependsOn(processResources)
+    compileJava {
+        options.encoding = "UTF-8"
+    }
+    compileTestJava {
+        options.encoding = "UTF-8"
+    }
 
     apply plugin: 'io.spring.dependency-management'
 
@@ -31,6 +41,14 @@ subprojects {
             mavenBom SpringBootPlugin.BOM_COORDINATES
         }
     }
+
+    test {
+        useJUnitPlatform {
+            includeEngines 'junit-jupiter'
+        }
+    }
+
+    apply plugin: "com.adarshr.test-logger"
 
     dependencies {
         // Spring starters
@@ -44,5 +62,12 @@ subprojects {
         // Lombok
         compileOnly('org.projectlombok:lombok:1.18.4')
         annotationProcessor('org.projectlombok:lombok:1.18.4')
+
+        // Test
+        //compile('org.springframework.boot:spring-boot-starter-test')
+
+        testImplementation "org.junit.jupiter:junit-jupiter-api"
+        testImplementation "org.junit.jupiter:junit-jupiter-params"
+        testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine"
     }
 }
