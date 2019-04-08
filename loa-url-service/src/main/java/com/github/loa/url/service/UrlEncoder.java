@@ -29,6 +29,8 @@ public class UrlEncoder {
 
             return new URL(uri.toASCIIString());
         } catch (URISyntaxException | MalformedURLException e) {
+
+            //Shouldn't ever be thrown because the passed URL is already correct.
             throw new RuntimeException("Failed to encode url: " + url + "!", e);
         }
     }

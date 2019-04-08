@@ -1,6 +1,7 @@
 package com.github.loa.url.service;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
@@ -26,7 +27,7 @@ class UrlEncoderTest {
                     "http://www.example.com/?test=random word £500 bank $,http://www.example.com/?test=random%20word%20%C2%A3500%20bank%20$"
             }
     )
-    void encode(final String urlToEncode, final String expected) throws MalformedURLException {
+    void testEncodeWhenUsingValidUrls(final String urlToEncode, final String expected) throws MalformedURLException {
         final URL encoded = urlEncoder.encode(new URL(urlToEncode));
 
         assertEquals(expected, encoded.toString());
