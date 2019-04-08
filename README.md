@@ -6,6 +6,6 @@ In our modern age new text documents are born in a blink of an eye then (often j
 
 This project aims to support this noble goal in a scalable way. We want to make the archival activity streamlined and easy to do even in a huge (Terabyte / Petabyte) scale. This way we hope that more and more people can start their own collection helping the archiving effort.
 
-### Documentation
+## Documentation
 
 The documentation for the Application is available in our [wiki page](https://github.com/bottomless-archive-project/library-of-alexandria/wiki)!
