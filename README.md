@@ -125,7 +125,45 @@ java -jar loa-downloader-application-1.0.0-milestone.1.jar --loa.source.name=tes
 
 ### Installing Elasticsearch
 
-WIP!!!
+Elasticsearch is only necessary for indexing! If you only want to collect the PDF documents then it's unnecessary for you!
+
+You can download Elasticsearch 6.6.2 [here](https://www.elastic.co/downloads/past-releases/elasticsearch-6-6-2).
+
+After the download complete unzip it. Open a command line client in the elasticsearch folder and run the following command:
+
+```
+bin/elasticsearch-plugin install ingest-attachment
+```
+
+This will install the [Ingest attachment](https://www.elastic.co/guide/en/elasticsearch/plugins/current/ingest-attachment.html) plugin.
+
+You also need to do some slight adjustments to the default configuration.
+
+Go to the elasticsearch/config folder. Open the jvm.options file in the text editor and edit the following parameters to adjust the memory. We suggest to set at least 12 GB of memory for Elasticsearch. Even if you don't have a lot of files.
+
+```
+-Xms1g
+-Xmx1g
+```
+
+For example:
+
+```
+-Xms12g
+-Xmx12g
+```
+
+If you want to change the data directory then open the config/elasticsearch.yml file, uncomment the `path.data` and write the expected data path to it.
+
+For example:
+
+```
+path.data: C:\loa\indexer\data
+```
+
+**WIP: Add the default setup on the attachment endpoints. Probably this should be added to the migrator app!**
+
+After this is done you are ready to run Elasticsearch by going into the elasticsearch/bin folder and writing `elasticsearch` to the console.
 
 ## Applications
 
