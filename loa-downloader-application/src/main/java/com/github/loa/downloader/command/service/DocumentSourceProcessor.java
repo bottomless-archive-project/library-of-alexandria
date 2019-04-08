@@ -3,6 +3,8 @@ package com.github.loa.downloader.command.service;
 import com.github.loa.downloader.download.service.document.DocumentDownloader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.SpringApplication;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import java.net.URL;
@@ -23,6 +25,7 @@ public class DocumentSourceProcessor {
     private final DocumentDownloader documentDownloader;
     private final ExecutorService downloaderExecutor;
     private final Semaphore downloaderSemaphore;
+    private final ApplicationContext context;
 
     /**
      * Handles the processing of a document source.
@@ -66,9 +69,11 @@ public class DocumentSourceProcessor {
             downloaderExecutor.shutdown();
             downloaderExecutor.awaitTermination(30, TimeUnit.MINUTES);
         } catch (InterruptedException e) {
-            log.error("Error occurred while shutting down the downloader threads.");
+            log.error("Error occurred while shutting down the downloader threads.", e);
         }
 
-        log.info("Shutdown finished for the downloader threads.");
+        log.info("Shutting down the application.");
+
+        SpringApplication.exit(context);
     }
 }
