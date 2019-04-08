@@ -8,4 +8,4 @@ This project aims to support this noble goal in a scalable way. We want to make 
 
 ## Documentation
 
-The documentation for the Application is available in our [wiki page](https://github.com/bottomless-archive-project/library-of-alexandria/wiki)!
+We have an extensive documentation for the applications! It is available in our [wiki page](https://github.com/bottomless-archive-project/library-of-alexandria/wiki)!
