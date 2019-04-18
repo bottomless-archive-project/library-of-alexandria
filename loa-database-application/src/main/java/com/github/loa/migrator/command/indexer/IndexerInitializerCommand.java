@@ -1,10 +1,12 @@
 package com.github.loa.migrator.command.indexer;
 
 import lombok.RequiredArgsConstructor;
+import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.ingest.PutPipelineRequest;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.bytes.BytesArray;
+import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -23,6 +25,7 @@ public class IndexerInitializerCommand implements CommandLineRunner {
     @Override
     public void run(final String... args) throws IOException {
         initializeAttachmentPipeline();
+        initializeIndex();
     }
 
     private void initializeAttachmentPipeline() throws IOException {
@@ -34,5 +37,21 @@ public class IndexerInitializerCommand implements CommandLineRunner {
         );
 
         restHighLevelClient.ingest().putPipeline(request, RequestOptions.DEFAULT);
+    }
+
+    private void initializeIndex() throws IOException {
+        final CreateIndexRequest createIndexRequest = new CreateIndexRequest("vault_documents");
+
+        createIndexRequest
+                .settings(
+                        Settings.builder()
+                                .put("index.number_of_shards", 3)
+                                .put("index.codec", "best_compression")
+                )
+                .mapping("{\"properties\": {\"_source\": {\"excludes\": [\"attachment.content\" ]}}",
+                        XContentType.JSON
+                );
+
+        restHighLevelClient.indices().create(createIndexRequest, RequestOptions.DEFAULT);
     }
 }
