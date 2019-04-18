@@ -10,4 +10,5 @@ include 'loa-checksum-service'
 include 'loa-indexer-application'
 include 'loa-url-service'
 include 'loa-backend-application'
+include 'loa-indexer-service'
 

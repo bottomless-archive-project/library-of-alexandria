@@ -1,4 +1,4 @@
-package com.github.loa.indexer.configuration;
+package com.github.loa.indexer.service.configuration;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

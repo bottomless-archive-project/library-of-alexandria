@@ -5,4 +5,6 @@ dependencies {
     compile group: 'org.liquibase', name: 'liquibase-core'
 
     compile('org.springframework.boot:spring-boot-starter-jdbc')
+
+    compile project(':loa-indexer-service')
 }

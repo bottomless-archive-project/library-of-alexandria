@@ -18,11 +18,9 @@ public class IndexRequestFactory {
     public IndexRequest newIndexRequest(final DocumentEntity documentEntity) {
         final String documentBase64String = documentBase64Encoder.encodeDocument(documentEntity);
 
-        final Map<String, Object> source = new HashMap<>();
-        source.put("data", documentBase64String);
-
-        return new IndexRequest("vault_search", "document", documentEntity.getId())
-                .source(source)
+        return new IndexRequest("vault_documents")
+                .id(documentEntity.getId())
+                .source(Map.of("content", documentBase64String))
                 .setPipeline("attachment");
     }
 }
