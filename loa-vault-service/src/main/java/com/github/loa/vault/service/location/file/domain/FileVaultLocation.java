@@ -5,7 +5,6 @@ import com.github.loa.vault.service.location.domain.VaultLocation;
 import lombok.RequiredArgsConstructor;
 
 import java.io.*;
-import java.nio.file.Files;
 
 @RequiredArgsConstructor
 public class FileVaultLocation implements VaultLocation {
@@ -34,11 +33,11 @@ public class FileVaultLocation implements VaultLocation {
      * @return the content of the file
      */
     @Override
-    public byte[] getContent() {
+    public InputStream content() {
         try {
-            return Files.readAllBytes(vaultLocation.toPath());
+            return new FileInputStream(vaultLocation);
         } catch (IOException e) {
-            throw new VaultAccessException("Unable to get getContent of vault location!", e);
+            throw new VaultAccessException("Unable to get the content of a vault location!", e);
         }
     }
 

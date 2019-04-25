@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.EnumSet;
 
 /**
@@ -67,7 +68,7 @@ public class SMBFileManipulator {
      * @param location the location of the file
      * @return the content of the file
      */
-    public byte[] readFile(final String location) {
+    public InputStream readFile(final String location) {
         try (Connection connection = smbClient.connect(smbConfigurationProperties.getHost())) {
             final AuthenticationContext authenticationContext = smbAuthenticationContextFactory.newContext();
             final Session session = connection.authenticate(authenticationContext);
@@ -80,7 +81,7 @@ public class SMBFileManipulator {
                         EnumSet.of(SMB2ShareAccess.FILE_SHARE_READ),
                         SMB2CreateDisposition.FILE_OPEN,
                         EnumSet.noneOf(SMB2CreateOptions.class))) {
-                    return openFile.getInputStream().readAllBytes();
+                    return openFile.getInputStream();
                 }
             }
         } catch (IOException e) {

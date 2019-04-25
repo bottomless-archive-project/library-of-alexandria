@@ -1,8 +1,7 @@
 package com.github.loa.indexer.service.base64;
 
 import com.github.loa.document.service.domain.DocumentEntity;
-import com.github.loa.vault.service.VaultLocationFactory;
-import com.github.loa.vault.service.location.domain.VaultLocation;
+import com.github.loa.vault.service.VaultDocumentManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +14,7 @@ import java.util.Base64;
 @RequiredArgsConstructor
 public class DocumentBase64Encoder {
 
-    private final VaultLocationFactory vaultLocationFactory;
+    private final VaultDocumentManager vaultDocumentManager;
 
     /**
      * Encode a document's content to a base64 string.
@@ -24,8 +23,6 @@ public class DocumentBase64Encoder {
      * @return the encoded string
      */
     public String encodeDocument(final DocumentEntity documentEntity) {
-        final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentEntity);
-
-        return Base64.getEncoder().encodeToString(vaultLocation.getContent());
+        return Base64.getEncoder().encodeToString(vaultDocumentManager.readDocument(documentEntity));
     }
 }

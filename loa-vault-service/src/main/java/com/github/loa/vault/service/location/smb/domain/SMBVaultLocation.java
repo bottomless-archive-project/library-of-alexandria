@@ -5,6 +5,7 @@ import com.github.loa.vault.service.location.smb.SMBFileManipulator;
 import lombok.RequiredArgsConstructor;
 
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.io.OutputStream;
 
 @RequiredArgsConstructor
@@ -20,7 +21,7 @@ public class SMBVaultLocation implements VaultLocation {
     }
 
     @Override
-    public byte[] getContent() {
+    public InputStream content() {
         return smbFileManipulator.readFile(location);
     }
 

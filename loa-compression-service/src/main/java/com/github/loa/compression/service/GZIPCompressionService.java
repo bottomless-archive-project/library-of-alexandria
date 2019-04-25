@@ -1,6 +1,5 @@
 package com.github.loa.compression.service;
 
-import com.github.loa.compression.domain.DocumentCompression;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream;
 import org.apache.commons.compress.utils.IOUtils;

@@ -1,6 +1,7 @@
 package com.github.loa.vault.service.location.domain;
 
 import java.io.Closeable;
+import java.io.InputStream;
 import java.io.OutputStream;
 
 public interface VaultLocation extends Closeable {
@@ -14,9 +15,9 @@ public interface VaultLocation extends Closeable {
     OutputStream destination();
 
     /**
-     * Get the content of the location as a byte array.
+     * Get the content of the location as an input stream.
      *
      * @return the content of the location
      */
-    byte[] getContent();
+    InputStream content();
 }
