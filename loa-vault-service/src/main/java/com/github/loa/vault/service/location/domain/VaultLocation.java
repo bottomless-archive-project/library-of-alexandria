@@ -1,15 +1,17 @@
 package com.github.loa.vault.service.location.domain;
 
-import java.io.File;
+import java.io.Closeable;
+import java.io.OutputStream;
 
-public interface VaultLocation {
+public interface VaultLocation extends Closeable {
 
     /**
-     * Moves a file to the location. This is a move command so the original file instance will be deleted.
+     * Return an output stream that points to the space where the document's content are archived. Should be used if
+     * you want to modify the content of the document.
      *
-     * @param file the file to move
+     * @return the location for the document's content
      */
-    void move(final File file);
+    OutputStream destination();
 
     /**
      * Get the content of the location as a byte array.

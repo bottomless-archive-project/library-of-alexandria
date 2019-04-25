@@ -16,9 +16,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.EnumSet;
 
 /**
@@ -37,10 +36,10 @@ public class SMBFileManipulator {
     /**
      * Write a file to the SMB share.
      *
-     * @param location the file location to write on the share
-     * @param file     the file to write
+     * @param location         the file location to write on the share
+     * @param documentContents the content to write
      */
-    public void writeFile(final String location, final File file) {
+    public void writeFile(final String location, final ByteArrayOutputStream documentContents) {
         try (Connection connection = smbClient.connect(smbConfigurationProperties.getHost())) {
             final AuthenticationContext authenticationContext = smbAuthenticationContextFactory.newContext();
             final Session session = connection.authenticate(authenticationContext);
@@ -55,10 +54,8 @@ public class SMBFileManipulator {
                         EnumSet.noneOf(SMB2CreateOptions.class)
                 );
 
-                openFile.write(Files.readAllBytes(file.toPath()), 0);
+                openFile.write(documentContents.toByteArray(), 0);
             }
-
-            file.delete();
         } catch (IOException e) {
             throw new VaultAccessException("Unable to move file to vault!", e);
         }

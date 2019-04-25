@@ -1,12 +1,13 @@
 package com.github.loa.downloader.download.service.file;
 
 import com.github.loa.stage.service.StageLocationFactory;
-import com.github.loa.vault.service.VaultLocationFactory;
-import com.github.loa.vault.service.location.domain.VaultLocation;
+import com.github.loa.vault.service.VaultDocumentManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 
 /**
  * This service is responsible for the manipulating of document files. For example moving them to the vault or removing
@@ -17,7 +18,7 @@ import java.io.File;
 public class DocumentFileManipulator {
 
     private final StageLocationFactory stageLocationFactory;
-    private final VaultLocationFactory vaultLocationFactory;
+    private final VaultDocumentManager vaultDocumentManager;
 
     /**
      * Move a document's file from the staging area to the vault. The document's metadata is not updated by this method!
@@ -25,9 +26,13 @@ public class DocumentFileManipulator {
      * @param documentId the document's id that we want to move to the vault
      */
     public void moveToVault(final String documentId) {
-        final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentId);
+        try {
+            vaultDocumentManager.archiveDocument(documentId, new FileInputStream(stageLocationFactory.getLocation(documentId)));
 
-        vaultLocation.move(stageLocationFactory.getLocation(documentId));
+            cleanup(documentId);
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException("Unable to move document to vault!", e);
+        }
     }
 
     /**

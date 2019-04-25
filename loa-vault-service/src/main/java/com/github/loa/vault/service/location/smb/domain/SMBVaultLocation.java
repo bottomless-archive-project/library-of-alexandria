@@ -4,23 +4,28 @@ import com.github.loa.vault.service.location.domain.VaultLocation;
 import com.github.loa.vault.service.location.smb.SMBFileManipulator;
 import lombok.RequiredArgsConstructor;
 
-import java.io.File;
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
 
 @RequiredArgsConstructor
 public class SMBVaultLocation implements VaultLocation {
 
     private final String location;
     private final SMBFileManipulator smbFileManipulator;
+    private final ByteArrayOutputStream destination = new ByteArrayOutputStream();
 
     @Override
-    public void move(final File file) {
-        smbFileManipulator.writeFile(location, file);
-
-        file.delete();
+    public OutputStream destination() {
+        return destination;
     }
 
     @Override
     public byte[] getContent() {
         return smbFileManipulator.readFile(location);
+    }
+
+    @Override
+    public void close() {
+        smbFileManipulator.writeFile(location, destination);
     }
 }

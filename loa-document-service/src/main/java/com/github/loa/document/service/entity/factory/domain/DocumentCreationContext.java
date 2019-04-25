@@ -1,6 +1,6 @@
 package com.github.loa.document.service.entity.factory.domain;
 
-import com.github.loa.document.service.domain.DocumentCompression;
+import com.github.loa.compression.domain.DocumentCompression;
 import com.github.loa.document.service.domain.DocumentStatus;
 import lombok.Builder;
 import lombok.Getter;

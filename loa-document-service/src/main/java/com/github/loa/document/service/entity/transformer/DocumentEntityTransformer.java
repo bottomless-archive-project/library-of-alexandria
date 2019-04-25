@@ -1,6 +1,6 @@
 package com.github.loa.document.service.entity.transformer;
 
-import com.github.loa.document.service.domain.DocumentCompression;
+import com.github.loa.compression.domain.DocumentCompression;
 import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.document.repository.domain.DocumentDatabaseEntity;
 import com.github.loa.document.service.domain.DocumentStatus;

@@ -4,10 +4,8 @@ import com.github.loa.vault.domain.exception.VaultAccessException;
 import com.github.loa.vault.service.location.domain.VaultLocation;
 import lombok.RequiredArgsConstructor;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 
 @RequiredArgsConstructor
 public class FileVaultLocation implements VaultLocation {
@@ -15,17 +13,18 @@ public class FileVaultLocation implements VaultLocation {
     private final File vaultLocation;
 
     /**
-     * Moves a file to the location. This is a move command so the original file instance will be deleted.
+     * Return an output stream that points to the space where the document's content are archived. Should be used if
+     * you want to modify the content of the document.
      *
-     * @param file the file to move
-     * @throws VaultAccessException when unable to move the file
+     * @return the location for the document's content
+     * @throws VaultAccessException when unable to create the destination file
      */
     @Override
-    public void move(final File file) {
+    public OutputStream destination() {
         try {
-            Files.move(file.toPath(), vaultLocation.toPath(), StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException e) {
-            throw new VaultAccessException("Unable to move file to vault!", e);
+            return new FileOutputStream(vaultLocation);
+        } catch (FileNotFoundException e) {
+            throw new VaultAccessException("Unable to create file in vault!", e);
         }
     }
 
@@ -41,5 +40,9 @@ public class FileVaultLocation implements VaultLocation {
         } catch (IOException e) {
             throw new VaultAccessException("Unable to get getContent of vault location!", e);
         }
+    }
+
+    @Override
+    public void close() {
     }
 }
