@@ -5,7 +5,7 @@
                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
     <changeSet author="laxika" id="20190425-1">
         <addColumn tableName="document">
-            <column name="compression" type="enum('NONE')" defaultValue="NONE">
+            <column name="compression" type="enum('NONE', 'GZIP', 'LZMA')" defaultValue="NONE">
                 <constraints nullable="false"/>
             </column>
         </addColumn>
