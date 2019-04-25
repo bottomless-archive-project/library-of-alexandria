@@ -17,6 +17,7 @@ public class DocumentEntity {
     private final String checksum;
     private final long fileSize;
     private final int downloaderVersion;
+    private final DocumentCompression compression;
 
     /**
      * Returns true if the document is saved to the vault.

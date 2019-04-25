@@ -91,6 +91,7 @@ public class DocumentEntityFactory {
         documentDatabaseEntity.setFileSize(documentCreationContext.getFileSize());
         documentDatabaseEntity.setDownloaderVersion(documentCreationContext.getVersionNumber());
         documentDatabaseEntity.setSource(documentCreationContext.getSource());
+        documentDatabaseEntity.setCompression(documentCreationContext.getCompression().name());
 
         documentRepository.insertDocument(documentDatabaseEntity);
     }

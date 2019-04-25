@@ -1,5 +1,6 @@
 package com.github.loa.document.service.entity.factory.domain;
 
+import com.github.loa.document.service.domain.DocumentCompression;
 import com.github.loa.document.service.domain.DocumentStatus;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,6 +16,7 @@ public class DocumentCreationContext {
     private final String checksum;
     private final long fileSize;
     private final DocumentStatus status;
+    private final DocumentCompression compression;
     private final int versionNumber;
     private final String source;
 }

@@ -15,4 +15,5 @@ public class DocumentDatabaseEntity {
     private Instant downloadDate;
     private int downloaderVersion;
     private String status;
+    private String compression;
 }

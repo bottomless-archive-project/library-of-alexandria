@@ -1,5 +1,6 @@
 package com.github.loa.downloader.download.service.document;
 
+import com.github.loa.document.service.domain.DocumentCompression;
 import com.github.loa.document.service.id.factory.DocumentIdFactory;
 import com.github.loa.document.service.domain.DocumentStatus;
 import com.github.loa.document.service.entity.factory.DocumentEntityFactory;
@@ -51,6 +52,7 @@ public class DocumentDownloadEvaluator {
                         .status(DocumentStatus.UNDER_CRAWL)
                         .versionNumber(downloaderConfigurationProperties.getVersionNumber())
                         .source(documentSourceConfiguration.getName())
+                        .compression(DocumentCompression.NONE)
                         .build()
         );
 

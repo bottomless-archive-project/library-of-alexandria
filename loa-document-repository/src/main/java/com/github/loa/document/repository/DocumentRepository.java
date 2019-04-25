@@ -9,7 +9,7 @@ import java.util.List;
 @Mapper
 public interface DocumentRepository {
 
-    @Insert("INSERT INTO document SET id = #{id}, url = #{url}, crawled_date = NOW(), checksum = #{checksum}, file_size = #{fileSize}, `status` = #{status}, source = #{source}, downloader_version = #{downloaderVersion}")
+    @Insert("INSERT INTO document SET id = #{id}, url = #{url}, crawled_date = NOW(), checksum = #{checksum}, file_size = #{fileSize}, `status` = #{status}, source = #{source}, downloader_version = #{downloaderVersion}, compression = #{compression}")
     void insertDocument(DocumentDatabaseEntity tomeDatabaseEntity);
 
     @Update("UPDATE document SET `status` = #{status} WHERE id = #{id}")
