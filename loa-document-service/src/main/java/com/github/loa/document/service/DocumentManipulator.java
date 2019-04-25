@@ -1,6 +1,6 @@
 package com.github.loa.document.service;
 
-import com.github.loa.compression.configuration.DocumentCompressionConfigurationProperties;
+import com.github.loa.compression.configuration.CompressionConfigurationProperties;
 import com.github.loa.compression.domain.DocumentCompression;
 import com.github.loa.document.repository.DocumentRepository;
 import com.github.loa.document.service.domain.DocumentStatus;
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 public class DocumentManipulator {
 
     private final DocumentRepository documentRepository;
-    private final DocumentCompressionConfigurationProperties documentCompressionConfigurationProperties;
+    private final CompressionConfigurationProperties compressionConfigurationProperties;
 
     /**
      * Mark a document's status as {@link DocumentStatus#FAILED failed}.
@@ -57,7 +57,7 @@ public class DocumentManipulator {
     public void markDownloaded(final String documentId, final long fileSize, final String checksum) {
         updateFileSizeAndChecksum(documentId, fileSize, checksum);
         updateStatus(documentId, DocumentStatus.DOWNLOADED);
-        updateCompression(documentId, documentCompressionConfigurationProperties.getAlgorithm());
+        updateCompression(documentId, compressionConfigurationProperties.getAlgorithm());
     }
 
     /**

@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 @Data
 @Component
 @ConfigurationProperties("loa.compression")
-public class DocumentCompressionConfigurationProperties {
+public class CompressionConfigurationProperties {
 
     private DocumentCompression algorithm;
 }
