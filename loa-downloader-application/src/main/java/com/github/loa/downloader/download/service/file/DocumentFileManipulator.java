@@ -5,9 +5,7 @@ import com.github.loa.vault.service.VaultDocumentManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.*;
 
 /**
  * This service is responsible for the manipulating of document files. For example moving them to the vault or removing
@@ -26,13 +24,13 @@ public class DocumentFileManipulator {
      * @param documentId the document's id that we want to move to the vault
      */
     public void moveToVault(final String documentId) {
-        try {
-            vaultDocumentManager.archiveDocument(documentId, new FileInputStream(stageLocationFactory.getLocation(documentId)));
-
-            cleanup(documentId);
-        } catch (FileNotFoundException e) {
+        try (final InputStream documentContents = new FileInputStream(stageLocationFactory.getLocation(documentId))) {
+            vaultDocumentManager.archiveDocument(documentId, documentContents);
+        } catch (IOException e) {
             throw new RuntimeException("Unable to move document to vault!", e);
         }
+
+        cleanup(documentId);
     }
 
     /**
