@@ -20,7 +20,7 @@ public class SMBVaultLocationFactory implements VaultLocationFactory {
     @Override
     public VaultLocation getLocation(String documentId) {
         return new SMBVaultLocation(documentId + "."
-                + compressionConfigurationProperties.getAlgorithm().getExtension(), smbFileManipulator);
+                + compressionConfigurationProperties.getAlgorithm().getFileExtension(), smbFileManipulator);
     }
 
     @Override
