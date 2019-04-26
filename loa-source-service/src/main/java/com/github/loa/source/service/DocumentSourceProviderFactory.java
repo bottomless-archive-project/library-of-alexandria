@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.net.URL;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 @Service
@@ -17,7 +18,8 @@ public class DocumentSourceProviderFactory {
     public Stream<URL> openSource() {
         return documentSourceProvider.stream()
                 .filter(this::shouldDownload)
-                .map(urlEncoder::encode);
+                .map(urlEncoder::encode)
+                .flatMap(Optional::stream);
     }
 
     private boolean shouldDownload(final URL documentLocation) {

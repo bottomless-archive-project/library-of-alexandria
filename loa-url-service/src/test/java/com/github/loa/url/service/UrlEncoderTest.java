@@ -6,8 +6,9 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 class UrlEncoderTest {
 
@@ -27,8 +28,21 @@ class UrlEncoderTest {
             }
     )
     void testEncodeWhenUsingValidUrls(final String urlToEncode, final String expected) throws MalformedURLException {
-        final URL encoded = urlEncoder.encode(new URL(urlToEncode));
+        final Optional<URL> encoded = urlEncoder.encode(new URL(urlToEncode));
 
-        assertEquals(expected, encoded.toString());
+        assertTrue(encoded.isPresent());
+        assertEquals(expected, encoded.get().toString());
+    }
+
+    @ParameterizedTest
+    @CsvSource(
+            value = {
+                    "http://промкаталог.рф/PublicDocuments/05-0211-00.pdf"
+            }
+    )
+    void testEncodeWhenUsingInvalidUrls(final String urlToEncode) throws MalformedURLException {
+        final Optional<URL> encoded = urlEncoder.encode(new URL(urlToEncode));
+
+        assertFalse(encoded.isPresent());
     }
 }
