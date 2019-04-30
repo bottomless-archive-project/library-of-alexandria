@@ -1,5 +1,6 @@
 package com.github.loa.document.service.entity.factory;
 
+import com.github.loa.compression.domain.DocumentCompression;
 import com.github.loa.document.repository.DocumentRepository;
 import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.document.service.entity.transformer.DocumentEntityTransformer;
@@ -51,6 +52,13 @@ public class DocumentEntityFactory {
     public List<DocumentEntity> getDocumentEntity(final DocumentStatus documentStatus) {
         final List<DocumentDatabaseEntity> documentDatabaseEntities =
                 documentRepository.findByStatus(documentStatus.toString());
+
+        return documentEntityTransformer.transform(documentDatabaseEntities);
+    }
+
+    public List<DocumentEntity> getDocumentEntity(final DocumentCompression compression) {
+        final List<DocumentDatabaseEntity> documentDatabaseEntities =
+                documentRepository.findByCompression(compression.toString());
 
         return documentEntityTransformer.transform(documentDatabaseEntities);
     }

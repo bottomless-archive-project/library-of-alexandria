@@ -7,4 +7,6 @@ dependencies {
     compile('org.springframework.boot:spring-boot-starter-jdbc')
 
     compile project(':loa-indexer-service')
+    compile project(':loa-document-service')
+    compile project(':loa-vault-service')
 }

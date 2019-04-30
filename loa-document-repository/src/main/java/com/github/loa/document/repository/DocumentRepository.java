@@ -18,6 +18,9 @@ public interface DocumentRepository {
     @Select("SELECT * FROM document WHERE `status` = #{status} LIMIT 100")
     List<DocumentDatabaseEntity> findByStatus(@Param("status") String status);
 
+    @Select("SELECT * FROM document WHERE compression = #{compression}")
+    List<DocumentDatabaseEntity> findByCompression(@Param("compression") String compression);
+
     @Update("UPDATE document SET `status` = #{status} WHERE id = #{id}")
     void updateStatus(@Param("id") String id, @Param("status") String status);
 
