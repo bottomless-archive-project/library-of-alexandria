@@ -1,6 +1,7 @@
 package com.github.loa.vault.service.location.file;
 
 import com.github.loa.compression.configuration.CompressionConfigurationProperties;
+import com.github.loa.compression.domain.DocumentCompression;
 import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.vault.configuration.location.file.FileConfigurationProperties;
 import com.github.loa.vault.service.VaultLocationFactory;
@@ -30,7 +31,7 @@ public class FileVaultLocationFactory implements VaultLocationFactory {
      * @return the location of the document
      */
     public VaultLocation getLocation(final DocumentEntity documentEntity) {
-        return getLocation(documentEntity.getId());
+        return getLocation(documentEntity, compressionConfigurationProperties.getAlgorithm());
     }
 
     /**
@@ -40,7 +41,15 @@ public class FileVaultLocationFactory implements VaultLocationFactory {
      * @return the location of the document
      */
     public VaultLocation getLocation(final String documentId) {
+        return getLocation(documentId, compressionConfigurationProperties.getAlgorithm());
+    }
+
+    public VaultLocation getLocation(final DocumentEntity documentEntity, final DocumentCompression compression) {
+        return getLocation(documentEntity.getId(), compression);
+    }
+
+    public VaultLocation getLocation(final String documentId, final DocumentCompression compression) {
         return new FileVaultLocation(new File(fileConfigurationProperties.getPath(), documentId + "."
-                + compressionConfigurationProperties.getAlgorithm().getFileExtension()));
+                + compression.getFileExtension()));
     }
 }

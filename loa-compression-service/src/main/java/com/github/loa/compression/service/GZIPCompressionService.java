@@ -11,7 +11,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 @Service
-@ConditionalOnProperty(value = "loa.compression.algorithm", havingValue = "gzip")
 public class GZIPCompressionService implements CompressionService {
 
     @Override

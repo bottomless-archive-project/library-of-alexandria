@@ -1,6 +1,7 @@
 package com.github.loa.vault.service.location.smb;
 
 import com.github.loa.compression.configuration.CompressionConfigurationProperties;
+import com.github.loa.compression.domain.DocumentCompression;
 import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.vault.service.VaultLocationFactory;
 import com.github.loa.vault.service.location.domain.VaultLocation;
@@ -18,13 +19,22 @@ public class SMBVaultLocationFactory implements VaultLocationFactory {
     private final CompressionConfigurationProperties compressionConfigurationProperties;
 
     @Override
-    public VaultLocation getLocation(String documentId) {
-        return new SMBVaultLocation(documentId + "."
-                + compressionConfigurationProperties.getAlgorithm().getFileExtension(), smbFileManipulator);
+    public VaultLocation getLocation(final String documentId) {
+        return getLocation(documentId, compressionConfigurationProperties.getAlgorithm());
     }
 
     @Override
-    public VaultLocation getLocation(DocumentEntity documentEntity) {
-        return getLocation(documentEntity.getId());
+    public VaultLocation getLocation(final DocumentEntity documentEntity) {
+        return getLocation(documentEntity, compressionConfigurationProperties.getAlgorithm());
+    }
+
+    @Override
+    public VaultLocation getLocation(final DocumentEntity documentEntity, final DocumentCompression compression) {
+        return getLocation(documentEntity.getId(), compression);
+    }
+
+    @Override
+    public VaultLocation getLocation(final String documentId, final DocumentCompression compression) {
+        return new SMBVaultLocation(documentId + "." + compression.getFileExtension(), smbFileManipulator);
     }
 }

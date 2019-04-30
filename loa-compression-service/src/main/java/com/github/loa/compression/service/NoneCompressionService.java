@@ -9,7 +9,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 @Service
-@ConditionalOnProperty(value = "loa.compression.algorithm", havingValue = "none")
 public class NoneCompressionService implements CompressionService {
 
     @Override

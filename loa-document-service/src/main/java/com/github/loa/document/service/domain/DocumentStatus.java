@@ -19,7 +19,7 @@ public enum DocumentStatus {
      */
     INVALID,
     /**
-     * The document was successfully downloaded and moved to the target area.
+     * The document was successfully downloaded and moved to the vault.
      */
     DOWNLOADED,
     /**

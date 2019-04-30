@@ -39,7 +39,7 @@ public class VaultDocumentManager {
     }
 
     public byte[] readDocument(final String documentId, final DocumentCompression compression) {
-        try (final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentId)) {
+        try (final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentId, compression)) {
             final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
             compressionServiceProvider.getCompressionService(compression)
