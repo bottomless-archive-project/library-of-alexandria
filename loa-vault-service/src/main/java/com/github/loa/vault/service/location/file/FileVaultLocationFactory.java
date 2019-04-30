@@ -41,6 +41,6 @@ public class FileVaultLocationFactory implements VaultLocationFactory {
      */
     public VaultLocation getLocation(final String documentId) {
         return new FileVaultLocation(new File(fileConfigurationProperties.getPath(), documentId + "."
-                + compressionConfigurationProperties.getAlgorithm().getExtension()));
+                + compressionConfigurationProperties.getAlgorithm().getFileExtension()));
     }
 }
