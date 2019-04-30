@@ -45,7 +45,6 @@ public class SMBFileManipulator {
             final AuthenticationContext authenticationContext = smbAuthenticationContextFactory.newContext();
             final Session session = connection.authenticate(authenticationContext);
 
-            // Connect to Share
             try (DiskShare share = (DiskShare) session.connectShare(smbConfigurationProperties.getShareName())) {
                 final com.hierynomus.smbj.share.File openFile = share.openFile(location,
                         EnumSet.of(AccessMask.GENERIC_WRITE),
@@ -73,7 +72,6 @@ public class SMBFileManipulator {
             final AuthenticationContext authenticationContext = smbAuthenticationContextFactory.newContext();
             final Session session = connection.authenticate(authenticationContext);
 
-            // Connect to Share
             try (DiskShare share = (DiskShare) session.connectShare(smbConfigurationProperties.getShareName())) {
                 try (final com.hierynomus.smbj.share.File openFile = share.openFile(location,
                         EnumSet.of(AccessMask.GENERIC_READ),
@@ -86,6 +84,19 @@ public class SMBFileManipulator {
             }
         } catch (IOException e) {
             throw new VaultAccessException("Unable to move file to vault!", e);
+        }
+    }
+
+    public void removeFile(final String location) {
+        try (Connection connection = smbClient.connect(smbConfigurationProperties.getHost())) {
+            final AuthenticationContext authenticationContext = smbAuthenticationContextFactory.newContext();
+            final Session session = connection.authenticate(authenticationContext);
+
+            try (DiskShare share = (DiskShare) session.connectShare(smbConfigurationProperties.getShareName())) {
+                share.rm(location);
+            }
+        } catch (IOException e) {
+            throw new VaultAccessException("Unable to remove file from vault!", e);
         }
     }
 }

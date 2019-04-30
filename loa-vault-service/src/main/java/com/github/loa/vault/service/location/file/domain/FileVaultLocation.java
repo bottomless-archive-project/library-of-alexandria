@@ -42,6 +42,15 @@ public class FileVaultLocation implements VaultLocation {
     }
 
     @Override
+    public void clear() {
+        vaultLocation.delete();
+    }
+
+    /**
+     * Closes the vault location, free up every resource that was used to access it.
+     */
+    @Override
     public void close() {
+        // Nothing to close in the file based vault.
     }
 }

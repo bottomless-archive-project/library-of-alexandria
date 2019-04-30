@@ -20,4 +20,9 @@ public interface VaultLocation extends Closeable {
      * @return the content of the location
      */
     InputStream content();
+
+    /**
+     * Removes any previously stored data from the location.
+     */
+    void clear();
 }
