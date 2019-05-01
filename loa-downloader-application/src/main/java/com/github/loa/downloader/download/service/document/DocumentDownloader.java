@@ -8,7 +8,7 @@ import com.github.loa.downloader.download.service.file.DocumentFileManipulator;
 import com.github.loa.downloader.download.service.file.DocumentFileValidator;
 import com.github.loa.downloader.download.service.file.FileDownloader;
 import com.github.loa.downloader.download.service.file.domain.FileDownloaderException;
-import com.github.loa.downloader.download.service.file.domain.FileManipulatingException;
+import com.github.loa.downloader.download.service.file.domain.FailedToArchiveException;
 import com.github.loa.stage.service.StageLocationFactory;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.RequiredArgsConstructor;
@@ -82,7 +82,7 @@ public class DocumentDownloader {
 
         try {
             documentFileManipulator.moveToVault(documentId);
-        } catch (FileManipulatingException e) {
+        } catch (FailedToArchiveException e) {
             log.error("Failed while processing the downloaded document.", e);
 
             documentManipulator.markProcessFailure(documentId);

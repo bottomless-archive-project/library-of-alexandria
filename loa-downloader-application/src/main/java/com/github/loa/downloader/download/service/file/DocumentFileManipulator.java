@@ -1,11 +1,14 @@
 package com.github.loa.downloader.download.service.file;
 
+import com.github.loa.downloader.download.service.file.domain.FailedToArchiveException;
 import com.github.loa.stage.service.StageLocationFactory;
 import com.github.loa.vault.service.VaultDocumentManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 
 /**
  * This service is responsible for the manipulating of document files. For example moving them to the vault or removing
@@ -26,8 +29,8 @@ public class DocumentFileManipulator {
     public void moveToVault(final String documentId) {
         try (final InputStream documentContents = new FileInputStream(stageLocationFactory.getLocation(documentId))) {
             vaultDocumentManager.archiveDocument(documentId, documentContents);
-        } catch (IOException e) {
-            throw new RuntimeException("Unable to move document to vault!", e);
+        } catch (Exception e) {
+            throw new FailedToArchiveException("Unable to move document to vault!", e);
         }
 
         cleanup(documentId);

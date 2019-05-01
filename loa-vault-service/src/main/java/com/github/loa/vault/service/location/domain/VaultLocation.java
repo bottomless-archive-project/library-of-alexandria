@@ -15,7 +15,8 @@ public interface VaultLocation extends Closeable {
     OutputStream destination();
 
     /**
-     * Get the content of the location as an input stream.
+     * Get the content of the location as an input stream. The caller of this method is responsible for closing the
+     * returned stream.
      *
      * @return the content of the location
      */

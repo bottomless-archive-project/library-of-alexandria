@@ -42,8 +42,10 @@ public class VaultDocumentManager {
         try (final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentId, compression)) {
             final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
-            compressionServiceProvider.getCompressionService(compression)
-                    .decompress(vaultLocation.content(), outputStream);
+            try (final InputStream vaultLocationContent = vaultLocation.content()) {
+                compressionServiceProvider.getCompressionService(compression)
+                        .decompress(vaultLocationContent, outputStream);
+            }
 
             return outputStream.toByteArray();
         } catch (IOException e) {
@@ -52,7 +54,8 @@ public class VaultDocumentManager {
     }
 
     public void removeDocument(final DocumentEntity documentEntity) {
-        final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentEntity);
+        final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentEntity,
+                documentEntity.getCompression());
 
         vaultLocation.clear();
     }
