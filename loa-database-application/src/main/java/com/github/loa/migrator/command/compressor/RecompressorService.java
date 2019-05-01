@@ -6,6 +6,7 @@ import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.vault.service.VaultDocumentManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +16,7 @@ import java.io.ByteArrayInputStream;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@ConditionalOnProperty("silent-compressor")
 public class RecompressorService {
 
     private final VaultDocumentManager vaultDocumentManager;
