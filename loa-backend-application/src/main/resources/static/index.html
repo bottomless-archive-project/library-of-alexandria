@@ -1,11 +1,12 @@
 <html lang="en">
 <head>
     <title>Pdf Crawler UI</title>
+    <link rel="icon" href="./images/sphinx.svg" type="image/svg+xml">
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.5/angular.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/1.0.16/angular-ui-router.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.8/angular.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/1.0.22/angular-ui-router.js"></script>
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.2.1/css/bootstrap.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.css"/>
     <link rel="stylesheet" href="./style/index.css"/>
 
     <script>
@@ -126,19 +127,17 @@
             }])
     </script>
 </head>
-<body ng-app="library-of-alexandria"
-      style="    background-image: url(./images/background.png);
-    background-size: cover;">
-<div class="container pb-1" style="background: rgba(256,256,256,0.9); box-shadow: 0 0 8px 0 #fff;">
+<body ng-app="library-of-alexandria">
+<div class="main-container container pb-1">
     <div class="row text-center pt-3 pb-3">
-        <div class="col"><img class="img-fluid" style="height: 200px; transform: scale(-1, 1);"
-                              src="https://i.kisscc0.com/20180813/vze/kisscc0-great-sphinx-of-giza-ancient-egypt-egyptian-pyrami-sphinx-5b71239bb82c66.5816763115341413397544.png">
+        <div class="col">
+            <img class="img-fluid left-sphinx" src="./images/sphinx.svg" alt="Sphinx logo">
         </div>
         <div class="col">
             <h2 class="display-4 mt-4" style="font-size: 4.1rem;">Library of Alexandria</h2>
         </div>
-        <div class="col"><img class="img-fluid" style="height: 200px;"
-                              src="https://i.kisscc0.com/20180813/vze/kisscc0-great-sphinx-of-giza-ancient-egypt-egyptian-pyrami-sphinx-5b71239bb82c66.5816763115341413397544.png">
+        <div class="col">
+            <img class="img-fluid right-sphinx" src="./images/sphinx.svg" alt="Sphinx logo">
         </div>
     </div>
     <div ui-view></div>

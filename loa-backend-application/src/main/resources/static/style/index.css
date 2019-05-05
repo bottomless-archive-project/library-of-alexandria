@@ -1,3 +1,22 @@
+body {
+    background-image: url(../images/background.png);
+    background-size: cover;
+}
+
+.main-container {
+    background: rgba(256, 256, 256, 0.9);
+    box-shadow: 0 0 8px 0 #fff;
+}
+
+.left-sphinx {
+    height: 200px;
+    transform: scale(-1, 1);
+}
+
+.right-sphinx {
+    height: 200px;
+}
+
 .search-hit em {
     font-weight: 700;
 }
