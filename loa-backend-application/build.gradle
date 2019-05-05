@@ -7,4 +7,5 @@ dependencies {
 
     compile project(':loa-document-service')
     compile project(':loa-indexer-service')
+    compile project(':loa-vault-service')
 }
