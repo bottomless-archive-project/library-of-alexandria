@@ -1,6 +1,8 @@
 apply plugin: 'org.springframework.boot'
 
 dependencies {
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-web'
+
     compile group: 'mysql', name: 'mysql-connector-java'
 
     compile project(':loa-document-service')

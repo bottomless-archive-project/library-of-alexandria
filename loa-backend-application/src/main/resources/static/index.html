@@ -1,0 +1,147 @@
+<html lang="en">
+<head>
+    <title>Pdf Crawler UI</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.5/angular.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/1.0.16/angular-ui-router.js"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.2.1/css/bootstrap.css"/>
+    <link rel="stylesheet" href="./style/index.css"/>
+
+    <script>
+        angular.module('library-of-alexandria', ['ui.router'])
+            .config(['$stateProvider', '$urlRouterProvider', '$httpProvider', '$sceProvider', function ($stateProvider, $urlRouterProvider, $httpProvider, $sceProvider) {
+                $sceProvider.enabled(false);
+
+                $httpProvider.defaults.withCredentials = true;
+
+                $urlRouterProvider.otherwise('/');
+
+                $stateProvider
+                    .state({
+                        name: 'home',
+                        url: '/',
+                        templateUrl: './home/home.html',
+                        controller: function ($scope, $http) {
+                            $scope.searchText = '';
+                            $scope.hits = [];
+                            $scope.openPdfs = [];
+                            $scope.page = 0;
+                            $scope.totalPages = 0;
+
+                            $scope.searchTextChanged = function () {
+                                $scope.page = 0;
+                                $scope.totalPages = 0;
+
+                                $scope.refreshHits();
+                            };
+
+                            $scope.jumpToPage = function (page) {
+                                $scope.page = page;
+
+                                $scope.refreshHits();
+                            };
+
+                            $scope.getPageCountToDisplayOnLeftSide = function () {
+                                if ($scope.page - 5 > 0) {
+                                    return [$scope.page - 5, $scope.page - 4, $scope.page - 3, $scope.page - 2, $scope.page - 1];
+                                } else {
+                                    var result = [];
+                                    for (var i = 0; i < $scope.page; i++) {
+                                        result.push($scope.page - i - 1);
+                                    }
+                                    result.reverse();
+
+                                    return result;
+                                }
+                            };
+
+                            $scope.getPageCountToDisplayOnRightSide = function () {
+                                if ($scope.totalPages > $scope.page + 5) {
+                                    return [$scope.page + 1, $scope.page + 2, $scope.page + 3, $scope.page + 4, $scope.page + 5];
+                                } else {
+                                    var result = [];
+                                    for (var i = 0; i < $scope.totalPages - $scope.page - 1; i++) {
+                                        result.push($scope.page + i + 1);
+                                    }
+
+                                    return result;
+                                }
+                            };
+
+                            $scope.refreshHits = function () {
+                                if ($scope.searchText.startsWith("\"") && $scope.searchText.endsWith("\"")) {
+                                    console.log("Doing exact search!");
+
+                                    var payload = JSON.stringify({
+                                        query: {
+                                            match_phrase: {
+                                                "attachment.content": $scope.searchText
+                                            }
+                                        },
+                                        highlight: {
+                                            fields: {
+                                                "attachment.content": {
+                                                    fragment_size: 500,
+                                                    number_of_fragments: 1,
+                                                    order: "score"
+                                                }
+                                            }
+                                        }
+                                    });
+                                } else {
+                                    var payload = JSON.stringify({
+                                        query: {
+                                            match: {
+                                                "attachment.content": $scope.searchText
+                                            }
+                                        },
+                                        highlight: {
+                                            fields: {
+                                                "attachment.content": {
+                                                    fragment_size: 500,
+                                                    number_of_fragments: 1,
+                                                    order: "score"
+                                                }
+                                            }
+                                        }
+                                    });
+                                }
+
+                                $http.post('http://localhost:9200/pdf_search/pdfs/_search?from=' + $scope.page * 10, payload)
+                                    .then(function (response) {
+                                        console.log(response.data.hits.hits);
+
+                                        $scope.totalPages = Math.ceil(response.data.hits.total / 10);
+                                        $scope.hitCount = response.data.hits.total;
+                                        $scope.hits = response.data.hits.hits;
+                                    });
+                            };
+
+                            $scope.openPdf = function (pdfId) {
+                                $scope.openPdfs[pdfId] = !$scope.openPdfs[pdfId];
+                            }
+                        }
+                    });
+            }])
+    </script>
+</head>
+<body ng-app="library-of-alexandria"
+      style="    background-image: url(./images/background.png);
+    background-size: cover;">
+<div class="container pb-1" style="background: rgba(256,256,256,0.9); box-shadow: 0 0 8px 0 #fff;">
+    <div class="row text-center pt-3 pb-3">
+        <div class="col"><img class="img-fluid" style="height: 200px; transform: scale(-1, 1);"
+                              src="https://i.kisscc0.com/20180813/vze/kisscc0-great-sphinx-of-giza-ancient-egypt-egyptian-pyrami-sphinx-5b71239bb82c66.5816763115341413397544.png">
+        </div>
+        <div class="col">
+            <h2 class="display-4 mt-4" style="font-size: 4.1rem;">Library of Alexandria</h2>
+        </div>
+        <div class="col"><img class="img-fluid" style="height: 200px;"
+                              src="https://i.kisscc0.com/20180813/vze/kisscc0-great-sphinx-of-giza-ancient-egypt-egyptian-pyrami-sphinx-5b71239bb82c66.5816763115341413397544.png">
+        </div>
+    </div>
+    <div ui-view></div>
+</div>
+</body>
+</html>

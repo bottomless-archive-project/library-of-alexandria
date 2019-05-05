@@ -1,0 +1,84 @@
+<div class="form-group">
+    <input ng-model="searchText" ng-change="searchTextChanged()" ng-model-options='{ debounce: 1000 }'
+           class="form-control" placeholder="Search for something">
+</div>
+<div class="text-center" style="user-select: none;" ng-if="hits.length > 0">
+    <nav aria-label="Page navigation example">
+        <ul class="pagination justify-content-center">
+            <li class="page-item">
+                <a class="page-link" ng-click="jumpToPage(page-1)" ng-if="page != 0">Prev</a>
+                <a class="page-link disabled" ng-if="page == 0">Prev</a>
+            </li>
+            <li ng-repeat="x in getPageCountToDisplayOnLeftSide() track by $index" class="page-item">
+                <a class="page-link" ng-bind="x + 1" ng-click="jumpToPage(x)"></a>
+            </li>
+            <li class="page-item active">
+                <a class="page-link disabled" ng-bind="page + 1"></a>
+            </li>
+            <li ng-repeat="x in getPageCountToDisplayOnRightSide() track by $index" class="page-item">
+                <a class="page-link" ng-bind="x+1" ng-click="jumpToPage(x)"></a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" ng-click="jumpToPage(page+1)" ng-if="page != totalPages -1">Next</a>
+                <a class="page-link disabled" ng-if="page == totalPages -1">Next</a>
+            </li>
+        </ul>
+    </nav>
+</div>
+<div class="row mb-3 text-center" ng-if="hits.length > 0">
+    <div class="col">
+        <p class="mb-0">
+            <small style="font-weight: bold;">Found {{hitCount}} documents.</small>
+        </p>
+    </div>
+</div>
+<div class="row mb-3 text-center" ng-if="hits.length == 0">
+    <div class="col">
+        <p class="mb-0"><b>Nothing to display (yet)!</b></p>
+    </div>
+</div>
+<div class="row mb-3 search-hit" ng-repeat="hit in hits" ng-if="hits.length > 0">
+    <div class="col">
+        <div class="card">
+            <div class="card-body">
+                <img ng-src="{{'./images/flags/'+hit._source.attachment.language+'.png'}}"
+                     style="float: right; margin-left: 12px;">
+                <h5 class="card-title" ng-bind="hit._source.attachment.title" ng-if="hit._source.attachment.title"></h5>
+                <h6 class="card-subtitle mb-2 text-muted" ng-bind="hit._source.attachment.author"
+                    ng-if="hit._source.attachment.title && hit._source.attachment.author"></h6>
+                <p class="card-text" style="text-align: justify; word-break: break-all;"
+                   ng-bind-html="hit.highlight['attachment.content'][0]"></p>
+                <div style="float: right;">
+                    <button ng-if="openPdfs[hit._id]" class="btn btn-primary" ng-click="openPdf(hit._id)">Close</button>
+                    <button ng-if="!openPdfs[hit._id]" class="btn btn-primary" ng-click="openPdf(hit._id)">Open</button>
+                </div>
+
+                <iframe ng-if="openPdfs[hit._id]" ng-src="{{'http://127.0.0.1:9001/'+hit._id+'.pdf'}}"
+                        style="width: 100%; height: 600px;" frameborder="0" class="mt-3"></iframe>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="text-center" style="user-select: none;" ng-if="hits.length > 0">
+    <nav aria-label="Page navigation example">
+        <ul class="pagination justify-content-center">
+            <li class="page-item">
+                <a class="page-link" ng-click="jumpToPage(page-1)" ng-if="page != 0">Prev</a>
+                <a class="page-link disabled" ng-if="page == 0">Prev</a>
+            </li>
+            <li ng-repeat="x in getPageCountToDisplayOnLeftSide() track by $index" class="page-item">
+                <a class="page-link" ng-bind="x + 1" ng-click="jumpToPage(x)"></a>
+            </li>
+            <li class="page-item active">
+                <a class="page-link disabled" ng-bind="page + 1"></a>
+            </li>
+            <li ng-repeat="x in getPageCountToDisplayOnRightSide() track by $index" class="page-item">
+                <a class="page-link" ng-bind="x+1" ng-click="jumpToPage(x)"></a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" ng-click="jumpToPage(page+1)" ng-if="page != totalPages -1">Next</a>
+                <a class="page-link disabled" ng-if="page == totalPages -1">Next</a>
+            </li>
+        </ul>
+    </nav>
+</div>
