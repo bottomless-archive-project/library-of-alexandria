@@ -48,9 +48,7 @@ public class IndexerInitializerCommand implements CommandLineRunner {
                                 .put("index.number_of_shards", 3)
                                 .put("index.codec", "best_compression")
                 )
-                .mapping("{\"properties\": {\"_source\": {\"excludes\": [\"attachment.content\" ]}}",
-                        XContentType.JSON
-                );
+                .mapping("_source", "{\"excludes\": [\"attachment.content\"]}", XContentType.JSON);
 
         restHighLevelClient.indices().create(createIndexRequest, RequestOptions.DEFAULT);
     }
