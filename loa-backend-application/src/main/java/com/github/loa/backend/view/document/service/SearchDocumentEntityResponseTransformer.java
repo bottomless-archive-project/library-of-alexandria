@@ -26,8 +26,7 @@ public class SearchDocumentEntityResponseTransformer {
                 .description(searchDocumentEntity.getDescription())
                 .language(searchDocumentEntity.getLanguage())
                 .title(searchDocumentEntity.getTitle())
-                .documentEntityResponse(documentEntityResponseTransformer.transform(
-                        searchDocumentEntity.getDocumentEntity()))
+                .document(documentEntityResponseTransformer.transform(searchDocumentEntity.getDocumentEntity()))
                 .build();
     }
 }

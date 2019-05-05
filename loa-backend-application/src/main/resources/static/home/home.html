@@ -41,19 +41,19 @@
     <div class="col">
         <div class="card">
             <div class="card-body">
-                <img ng-src="{{'./images/flags/'+hit._source.attachment.language+'.png'}}"
+                <img ng-src="{{'./images/flags/'+hit.language+'.png'}}"
                      style="float: right; margin-left: 12px;">
-                <h5 class="card-title" ng-bind="hit._source.attachment.title" ng-if="hit._source.attachment.title"></h5>
-                <h6 class="card-subtitle mb-2 text-muted" ng-bind="hit._source.attachment.author"
-                    ng-if="hit._source.attachment.title && hit._source.attachment.author"></h6>
+                <h5 class="card-title" ng-bind="hit.title" ng-if="hit.title"></h5>
+                <h6 class="card-subtitle mb-2 text-muted" ng-bind="hit.author"
+                    ng-if="hit.title && hit.author"></h6>
                 <p class="card-text" style="text-align: justify; word-break: break-all;"
-                   ng-bind-html="hit.highlight['attachment.content'][0]"></p>
+                   ng-bind-html="hit.description"></p>
                 <div style="float: right;">
-                    <button ng-if="openPdfs[hit._id]" class="btn btn-primary" ng-click="openPdf(hit._id)">Close</button>
-                    <button ng-if="!openPdfs[hit._id]" class="btn btn-primary" ng-click="openPdf(hit._id)">Open</button>
+                    <button ng-if="openPdfs[hit.document.id]" class="btn btn-primary" ng-click="openPdf(hit.document.id)">Close</button>
+                    <button ng-if="!openPdfs[hit.document.id]" class="btn btn-primary" ng-click="openPdf(hit.document.id)">Open</button>
                 </div>
 
-                <iframe ng-if="openPdfs[hit._id]" ng-src="{{'http://127.0.0.1:9001/'+hit._id+'.pdf'}}"
+                <iframe ng-if="openPdfs[hit.document.id]" ng-src="{{'./document/'+hit.document.id}}"
                         style="width: 100%; height: 600px;" frameborder="0" class="mt-3"></iframe>
             </div>
         </div>

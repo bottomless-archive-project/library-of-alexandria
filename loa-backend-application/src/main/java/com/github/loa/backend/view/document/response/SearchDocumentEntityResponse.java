@@ -11,5 +11,5 @@ public class SearchDocumentEntityResponse {
     private final String author;
     private final String description;
     private final String language;
-    private final DocumentEntityResponse documentEntityResponse;
+    private final DocumentEntityResponse document;
 }
