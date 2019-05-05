@@ -2,15 +2,14 @@ package com.github.loa.document.service.entity.factory;
 
 import com.github.loa.compression.domain.DocumentCompression;
 import com.github.loa.document.repository.DocumentRepository;
+import com.github.loa.document.repository.domain.DocumentDatabaseEntity;
 import com.github.loa.document.service.domain.DocumentEntity;
-import com.github.loa.document.service.entity.transformer.DocumentEntityTransformer;
 import com.github.loa.document.service.domain.DocumentStatus;
 import com.github.loa.document.service.entity.factory.domain.DocumentCreationContext;
-import com.github.loa.document.repository.domain.DocumentDatabaseEntity;
+import com.github.loa.document.service.entity.transformer.DocumentEntityTransformer;
 import lombok.RequiredArgsConstructor;
 import org.apache.ibatis.cursor.Cursor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -42,6 +41,12 @@ public class DocumentEntityFactory {
      */
     public boolean isDocumentExists(final String checksum, final long fileSize) {
         return !documentRepository.findByChecksumAndFileSize(checksum, fileSize).isEmpty();
+    }
+
+    public DocumentEntity getDocumentEntity(final String documentId) {
+        final DocumentDatabaseEntity documentDatabaseEntities = documentRepository.findById(documentId);
+
+        return documentEntityTransformer.transform(documentDatabaseEntities);
     }
 
     /**

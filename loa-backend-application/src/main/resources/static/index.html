@@ -109,13 +109,15 @@
                                     });
                                 }
 
-                                $http.post('http://localhost:9200/pdf_search/pdfs/_search?from=' + $scope.page * 10, payload)
+                                //TODO: Total pages, hitCounts & paging!
+                                //$http.post('http://localhost:9200/pdf_search/pdfs/_search?from=' + $scope.page * 10, payload)
+                                $http.get('http://localhost/document/find-by/keyword/' + $scope.searchText)
                                     .then(function (response) {
-                                        console.log(response.data.hits.hits);
+                                        console.log(response.data);
 
-                                        $scope.totalPages = Math.ceil(response.data.hits.total / 10);
-                                        $scope.hitCount = response.data.hits.total;
-                                        $scope.hits = response.data.hits.hits;
+                                        //$scope.totalPages = Math.ceil(response.data.hits.total / 10);
+                                        //$scope.hitCount = response.data.hits.total;
+                                        //$scope.hits = response.data.hits.hits;
                                     });
                             };
 

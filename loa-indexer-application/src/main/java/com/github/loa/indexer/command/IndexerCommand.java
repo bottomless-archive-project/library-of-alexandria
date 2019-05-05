@@ -42,6 +42,7 @@ public class IndexerCommand implements CommandLineRunner {
                     Thread.sleep(indexerConfigurationProperties.getSleepTime());
                 } else {
                     documentEntities.forEach(documentEntity -> {
+                        //TODO: Move this logic to the indexer service!
                         final IndexRequest indexRequest = indexRequestFactory.newIndexRequest(documentEntity);
 
                         restHighLevelClient.indexAsync(indexRequest, RequestOptions.DEFAULT,
