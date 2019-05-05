@@ -1,10 +1,10 @@
 package com.github.loa.migrator.command.indexer;
 
 import lombok.RequiredArgsConstructor;
-import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.ingest.PutPipelineRequest;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.client.indices.CreateIndexRequest;
 import org.elasticsearch.common.bytes.BytesArray;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.xcontent.XContentType;
@@ -40,15 +40,13 @@ public class IndexerInitializerCommand implements CommandLineRunner {
     }
 
     private void initializeIndex() throws IOException {
-        final CreateIndexRequest createIndexRequest = new CreateIndexRequest("vault_documents");
-
-        createIndexRequest
+        final CreateIndexRequest createIndexRequest = new CreateIndexRequest("vault_documents")
                 .settings(
                         Settings.builder()
                                 .put("index.number_of_shards", 3)
                                 .put("index.codec", "best_compression")
                 )
-                .mapping("_source", "{\"excludes\": [\"attachment.content\"]}", XContentType.JSON);
+                .mapping("{ \"_source\": { \"excludes\": [ \"attachment.content\" ] } } ", XContentType.JSON);
 
         restHighLevelClient.indices().create(createIndexRequest, RequestOptions.DEFAULT);
     }
