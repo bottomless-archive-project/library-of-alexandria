@@ -19,8 +19,8 @@ public class DocumentSearchService {
     private final SearchRequestFactory searchRequestFactory;
     private final SearchDocumentEntityTransformer searchDocumentEntityTransformer;
 
-    public DocumentSearchResult searchDocuments(final String keyword) {
-        final SearchRequest searchRequest = searchRequestFactory.newKeywordSearchRequest(keyword);
+    public DocumentSearchResult searchDocuments(final String keyword, final int pageNumber) {
+        final SearchRequest searchRequest = searchRequestFactory.newKeywordSearchRequest(keyword, pageNumber);
 
         try {
             final SearchResponse searchResponse = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);

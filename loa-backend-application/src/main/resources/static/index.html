@@ -109,9 +109,7 @@
                                     });
                                 }
 
-                                //TODO: Total pages, hitCounts & paging!
-                                //$http.post('http://localhost:9200/pdf_search/pdfs/_search?from=' + $scope.page * 10, payload)
-                                $http.get('http://localhost/document/find-by/keyword/' + $scope.searchText)
+                                $http.get('http://localhost/document/find-by/keyword/' + $scope.searchText + '/?pageNumber=' + $scope.page * 10)
                                     .then(function (response) {
                                         $scope.hits = response.data.searchHits;
                                         $scope.hitCount = response.data.totalHitCount;

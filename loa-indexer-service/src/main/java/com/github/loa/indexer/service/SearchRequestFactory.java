@@ -12,12 +12,13 @@ public class SearchRequestFactory {
 
     private static final String[] INDICES = new String[]{"vault_documents"};
 
-    public SearchRequest newKeywordSearchRequest(final String keyword) {
-        return new SearchRequest(INDICES, newDocumentContentQuery(keyword));
+    public SearchRequest newKeywordSearchRequest(final String keyword, final int pageNumber) {
+        return new SearchRequest(INDICES, newDocumentContentQuery(keyword, pageNumber));
     }
 
-    private SearchSourceBuilder newDocumentContentQuery(final String keyword) {
+    private SearchSourceBuilder newDocumentContentQuery(final String keyword, final int pageNumber) {
         return new SearchSourceBuilder()
+                .from(pageNumber)
                 .query(newQueryBuilder(keyword))
                 .highlighter(newHighlightBuilder());
     }
