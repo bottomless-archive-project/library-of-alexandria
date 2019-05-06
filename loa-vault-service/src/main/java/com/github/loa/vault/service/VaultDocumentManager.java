@@ -2,7 +2,7 @@ package com.github.loa.vault.service;
 
 import com.github.loa.compression.configuration.CompressionConfigurationProperties;
 import com.github.loa.compression.domain.DocumentCompression;
-import com.github.loa.compression.service.CompressionServiceProvider;
+import com.github.loa.compression.service.provider.CompressionServiceProvider;
 import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.vault.domain.exception.VaultAccessException;
 import com.github.loa.vault.service.location.domain.VaultLocation;
