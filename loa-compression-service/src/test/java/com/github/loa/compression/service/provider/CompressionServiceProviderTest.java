@@ -20,7 +20,7 @@ class CompressionServiceProviderTest {
     private CompressionServiceProvider underTest;
 
     @BeforeEach
-    public void setup() {
+    private void setup() {
         noneCompressionService = mock(NoneCompressionService.class);
         gzipCompressionService = mock(GZIPCompressionService.class);
         lzmaCompressionService = mock(LZMACompressionService.class);
