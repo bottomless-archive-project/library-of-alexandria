@@ -1,7 +1,6 @@
 package com.github.loa.vault.service;
 
 import com.github.loa.compression.configuration.CompressionConfigurationProperties;
-import com.github.loa.compression.domain.DocumentCompression;
 import com.github.loa.compression.service.CompressionServiceProvider;
 import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.vault.domain.exception.VaultAccessException;
@@ -13,6 +12,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+/**
+ * Provide access to the content of the documents in the vault.
+ */
 @Service
 @RequiredArgsConstructor
 public class VaultDocumentManager {
@@ -21,6 +23,12 @@ public class VaultDocumentManager {
     private final CompressionServiceProvider compressionServiceProvider;
     private final CompressionConfigurationProperties compressionConfigurationProperties;
 
+    /**
+     * Archive the content of an input stream as the content of the provided document in the vault.
+     *
+     * @param documentEntity   the document to save the content for
+     * @param documentContents the content to archive for the document
+     */
     public void archiveDocument(final DocumentEntity documentEntity, final InputStream documentContents) {
         archiveDocument(documentEntity.getId(), documentContents);
     }
@@ -35,21 +43,18 @@ public class VaultDocumentManager {
     }
 
     public byte[] readDocument(final DocumentEntity documentEntity) {
-        return readDocument(documentEntity.getId(), documentEntity.getCompression());
-    }
-
-    public byte[] readDocument(final String documentId, final DocumentCompression compression) {
-        try (final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentId, compression)) {
+        try (final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentEntity.getId(),
+                documentEntity.getCompression())) {
             final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
             try (final InputStream vaultLocationContent = vaultLocation.content()) {
-                compressionServiceProvider.getCompressionService(compression)
+                compressionServiceProvider.getCompressionService(documentEntity.getCompression())
                         .decompress(vaultLocationContent, outputStream);
             }
 
             return outputStream.toByteArray();
         } catch (IOException e) {
-            throw new VaultAccessException("Unable to read document with id " + documentId + " from the vault!", e);
+            throw new VaultAccessException("Unable to read document with id " + documentEntity.getId() + " from the vault!", e);
         }
     }
 
