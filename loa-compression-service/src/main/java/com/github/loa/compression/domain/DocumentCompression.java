@@ -3,6 +3,9 @@ package com.github.loa.compression.domain;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * Describes what kind of compression is used to store a document.
+ */
 @Getter
 @RequiredArgsConstructor
 public enum DocumentCompression {
