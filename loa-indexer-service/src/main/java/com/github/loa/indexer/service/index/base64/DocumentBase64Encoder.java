@@ -1,4 +1,4 @@
-package com.github.loa.indexer.service.base64;
+package com.github.loa.indexer.service.index.base64;
 
 import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.vault.service.VaultDocumentManager;

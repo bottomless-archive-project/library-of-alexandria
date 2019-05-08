@@ -1,12 +1,11 @@
-package com.github.loa.indexer.service;
+package com.github.loa.indexer.service.index;
 
 import com.github.loa.document.service.domain.DocumentEntity;
-import com.github.loa.indexer.service.base64.DocumentBase64Encoder;
 import lombok.RequiredArgsConstructor;
 import org.elasticsearch.action.index.IndexRequest;
 import org.springframework.stereotype.Service;
+import com.github.loa.indexer.service.index.base64.DocumentBase64Encoder;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @Service

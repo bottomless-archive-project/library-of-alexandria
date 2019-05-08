@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class SearchDocumentEntity {
+public class DocumentSearchEntity {
 
     private final String title;
     private final String author;

@@ -3,7 +3,7 @@ package com.github.loa.backend.view.document.controller;
 import com.github.loa.backend.view.document.response.DocumentSearchResponse;
 import com.github.loa.backend.view.document.service.SearchDocumentEntityResponseTransformer;
 import com.github.loa.indexer.domain.DocumentSearchResult;
-import com.github.loa.indexer.service.DocumentSearchService;
+import com.github.loa.indexer.service.search.DocumentSearchService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

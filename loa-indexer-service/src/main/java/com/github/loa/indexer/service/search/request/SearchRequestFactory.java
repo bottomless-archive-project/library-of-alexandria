@@ -1,4 +1,4 @@
-package com.github.loa.indexer.service;
+package com.github.loa.indexer.service.search.request;
 
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.index.query.QueryBuilder;

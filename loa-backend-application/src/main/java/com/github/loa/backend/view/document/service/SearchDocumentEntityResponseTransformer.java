@@ -1,7 +1,7 @@
 package com.github.loa.backend.view.document.service;
 
 import com.github.loa.backend.view.document.response.SearchDocumentEntityResponse;
-import com.github.loa.indexer.domain.SearchDocumentEntity;
+import com.github.loa.indexer.domain.DocumentSearchEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,19 +14,19 @@ public class SearchDocumentEntityResponseTransformer {
 
     private final DocumentEntityResponseTransformer documentEntityResponseTransformer;
 
-    public List<SearchDocumentEntityResponse> transform(final List<SearchDocumentEntity> searchDocumentEntity) {
-        return searchDocumentEntity.stream()
+    public List<SearchDocumentEntityResponse> transform(final List<DocumentSearchEntity> documentSearchEntity) {
+        return documentSearchEntity.stream()
                 .map(this::transform)
                 .collect(Collectors.toList());
     }
 
-    public SearchDocumentEntityResponse transform(final SearchDocumentEntity searchDocumentEntity) {
+    public SearchDocumentEntityResponse transform(final DocumentSearchEntity documentSearchEntity) {
         return SearchDocumentEntityResponse.builder()
-                .author(searchDocumentEntity.getAuthor())
-                .description(searchDocumentEntity.getDescription())
-                .language(searchDocumentEntity.getLanguage())
-                .title(searchDocumentEntity.getTitle())
-                .document(documentEntityResponseTransformer.transform(searchDocumentEntity.getDocumentEntity()))
+                .author(documentSearchEntity.getAuthor())
+                .description(documentSearchEntity.getDescription())
+                .language(documentSearchEntity.getLanguage())
+                .title(documentSearchEntity.getTitle())
+                .document(documentEntityResponseTransformer.transform(documentSearchEntity.getDocumentEntity()))
                 .build();
     }
 }

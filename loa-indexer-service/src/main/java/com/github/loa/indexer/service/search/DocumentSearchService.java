@@ -1,7 +1,9 @@
-package com.github.loa.indexer.service;
+package com.github.loa.indexer.service.search;
 
 import com.github.loa.indexer.domain.DocumentSearchResult;
 import com.github.loa.indexer.domain.IndexerAccessException;
+import com.github.loa.indexer.service.search.request.SearchRequestFactory;
+import com.github.loa.indexer.service.search.transformer.DocumentSearchEntityTransformer;
 import lombok.RequiredArgsConstructor;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
@@ -17,7 +19,7 @@ public class DocumentSearchService {
 
     private final RestHighLevelClient restHighLevelClient;
     private final SearchRequestFactory searchRequestFactory;
-    private final SearchDocumentEntityTransformer searchDocumentEntityTransformer;
+    private final DocumentSearchEntityTransformer documentSearchEntityTransformer;
 
     public DocumentSearchResult searchDocuments(final String keyword, final int pageNumber) {
         final SearchRequest searchRequest = searchRequestFactory.newKeywordSearchRequest(keyword, pageNumber);
@@ -26,7 +28,7 @@ public class DocumentSearchService {
             final SearchResponse searchResponse = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
 
             return DocumentSearchResult.builder()
-                    .searchHits(searchDocumentEntityTransformer.transform(searchResponse.getHits()))
+                    .searchHits(documentSearchEntityTransformer.transform(searchResponse.getHits()))
                     .totalHitCount(searchResponse.getHits().getTotalHits().value)
                     .build();
         } catch (IOException e) {

@@ -1,4 +1,4 @@
-package com.github.loa.indexer.service.response.domain;
+package com.github.loa.indexer.service.index.response.domain;
 
 import com.github.loa.document.service.DocumentManipulator;
 import lombok.RequiredArgsConstructor;

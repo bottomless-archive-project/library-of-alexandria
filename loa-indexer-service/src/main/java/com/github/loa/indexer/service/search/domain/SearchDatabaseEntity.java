@@ -1,4 +1,4 @@
-package com.github.loa.indexer.service.repository;
+package com.github.loa.indexer.service.search.domain;
 
 import lombok.Data;
 

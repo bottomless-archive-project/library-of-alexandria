@@ -6,4 +6,5 @@ dependencies {
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations'
 
     compile project(':loa-document-service')
+    compile project(':loa-vault-service')
 }
