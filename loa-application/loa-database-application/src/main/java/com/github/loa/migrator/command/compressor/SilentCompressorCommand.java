@@ -19,9 +19,6 @@ public class SilentCompressorCommand implements CommandLineRunner {
     private final CompressionConfigurationProperties compressionConfigurationProperties;
     private final RecompressorService recompressorService;
 
-    /*
-     * Going @Transactional here is required for the getDocumentEntities()'s Cursor.
-     */
     @Override
     public void run(final String... args) {
         documentEntityFactory.getDocumentEntities()
