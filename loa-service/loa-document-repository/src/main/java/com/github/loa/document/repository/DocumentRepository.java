@@ -1,38 +1,98 @@
 package com.github.loa.document.repository;
 
 import com.github.loa.document.repository.domain.DocumentDatabaseEntity;
-import org.apache.ibatis.annotations.*;
-import org.apache.ibatis.cursor.Cursor;
+import dev.morphia.Datastore;
+import dev.morphia.query.FindOptions;
+import dev.morphia.query.Query;
+import dev.morphia.query.UpdateOperations;
+import dev.morphia.query.internal.MorphiaCursor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-@Mapper
-public interface DocumentRepository {
+@Component
+@RequiredArgsConstructor
+public class DocumentRepository {
 
-    @Insert("INSERT INTO document SET id = #{id}, url = #{url}, crawled_date = NOW(), checksum = #{checksum}, file_size = #{fileSize}, `status` = #{status}, source = #{source}, downloader_version = #{downloaderVersion}, compression = #{compression}")
-    void insertDocument(DocumentDatabaseEntity tomeDatabaseEntity);
+    private final Datastore datastore;
 
-    @Select("SELECT * FROM document WHERE id = #{id}")
-    DocumentDatabaseEntity findById(@Param("id") String id);
+    public void insertDocument(final DocumentDatabaseEntity tomeDatabaseEntity) {
+        datastore.save(tomeDatabaseEntity);
+    }
 
-    @Select("SELECT * FROM document WHERE `status` = #{status} LIMIT 100")
-    List<DocumentDatabaseEntity> findByStatus(@Param("status") String status);
+    public DocumentDatabaseEntity findById(final String id) {
+        return datastore.createQuery(DocumentDatabaseEntity.class)
+                .field("_id").equal(id)
+                .first();
+    }
 
-    @Select("SELECT * FROM document WHERE compression = #{compression}")
-    List<DocumentDatabaseEntity> findByCompression(@Param("compression") String compression);
+    public List<DocumentDatabaseEntity> findByStatus(final String status) {
+        return datastore.createQuery(DocumentDatabaseEntity.class)
+                .field("status").equal(status)
+                .find(
+                        new FindOptions()
+                                .limit(100)
+                )
+                .toList();
+    }
 
-    @Update("UPDATE document SET `status` = #{status} WHERE id = #{id}")
-    void updateStatus(@Param("id") String id, @Param("status") String status);
+    public List<DocumentDatabaseEntity> findByCompression(final String compression) {
+        return datastore.createQuery(DocumentDatabaseEntity.class)
+                .field("compression").equal(compression)
+                .find(
+                        new FindOptions()
+                                .limit(100)
+                )
+                .toList();
+    }
 
-    @Update("UPDATE document SET compression = #{compression} WHERE id = #{id}")
-    void updateCompression(@Param("id") String id, @Param("compression") String compression);
+    public void updateStatus(final String id, final String status) {
+        final Query<DocumentDatabaseEntity> query = datastore.createQuery(DocumentDatabaseEntity.class)
+                .filter("id", id);
 
-    @Update("UPDATE document SET checksum = #{checksum}, file_size = #{fileSize} WHERE id = #{id}")
-    void updateFileSizeAndChecksum(@Param("id") String id, @Param("fileSize") long fileSize, @Param("checksum") String checksum);
+        final UpdateOperations<DocumentDatabaseEntity> updateOperations = datastore
+                .createUpdateOperations(DocumentDatabaseEntity.class)
+                .set("status", status);
 
-    @Select("SELECT * FROM document WHERE file_size = #{fileSize} AND checksum = #{checksum}")
-    List<DocumentDatabaseEntity> findByChecksumAndFileSize(@Param("checksum") String checksum, @Param("fileSize") long fileSize);
+        datastore.update(query, updateOperations);
+    }
 
-    @Select("SELECT * FROM document")
-    Cursor<DocumentDatabaseEntity> findAll();
+    public void updateCompression(final String id, final String compression) {
+        final Query<DocumentDatabaseEntity> query = datastore.createQuery(DocumentDatabaseEntity.class)
+                .filter("id", id);
+
+        final UpdateOperations<DocumentDatabaseEntity> updateOperations = datastore
+                .createUpdateOperations(DocumentDatabaseEntity.class)
+                .set("compression", compression);
+
+        datastore.update(query, updateOperations);
+    }
+
+    public void updateFileSizeAndChecksum(final String id, final long fileSize, final String checksum) {
+        final Query<DocumentDatabaseEntity> query = datastore.createQuery(DocumentDatabaseEntity.class)
+                .filter("id", id);
+
+        final UpdateOperations<DocumentDatabaseEntity> updateOperations = datastore
+                .createUpdateOperations(DocumentDatabaseEntity.class)
+                .set("fileSize", fileSize)
+                .set("checksum", checksum);
+
+        datastore.update(query, updateOperations);
+    }
+
+    public List<DocumentDatabaseEntity> findByChecksumAndFileSize(final String checksum, final long fileSize) {
+        return datastore.createQuery(DocumentDatabaseEntity.class)
+                .field("checksum").equal(checksum)
+                .field("fileSize").equal(fileSize)
+                .find(
+                        new FindOptions()
+                                .limit(100)
+                )
+                .toList();
+    }
+
+    public MorphiaCursor<DocumentDatabaseEntity> findAll() {
+        return datastore.createQuery(DocumentDatabaseEntity.class).find();
+    }
 }

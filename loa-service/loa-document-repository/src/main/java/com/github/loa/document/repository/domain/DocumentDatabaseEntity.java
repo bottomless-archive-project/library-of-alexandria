@@ -1,17 +1,25 @@
 package com.github.loa.document.repository.domain;
 
-import lombok.Data;
+import dev.morphia.annotations.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.Instant;
 
-@Data
+@Getter
+@Setter
+@Entity("document")
+@Indexes(
+        @Index(fields = {@Field("checksum"), @Field("fileSize")})
+)
 public class DocumentDatabaseEntity {
 
+    @Id
     private String id;
     private String url;
     private String checksum;
-    private String source;
     private long fileSize;
+    private String source;
     private Instant downloadDate;
     private int downloaderVersion;
     private String status;

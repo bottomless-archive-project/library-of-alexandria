@@ -7,11 +7,13 @@ import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.document.service.domain.DocumentStatus;
 import com.github.loa.document.service.entity.factory.domain.DocumentCreationContext;
 import com.github.loa.document.service.entity.transformer.DocumentEntityTransformer;
+import dev.morphia.query.internal.MorphiaCursor;
 import lombok.RequiredArgsConstructor;
-import org.apache.ibatis.cursor.Cursor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -84,9 +86,10 @@ public class DocumentEntityFactory {
     }
 
     public Stream<DocumentEntity> getDocumentEntities() {
-        final Cursor<DocumentDatabaseEntity> documentDatabaseEntities = documentRepository.findAll();
+        final MorphiaCursor<DocumentDatabaseEntity> documentDatabaseEntities = documentRepository.findAll();
 
-        return StreamSupport.stream(documentDatabaseEntities.spliterator(), false)
+        return StreamSupport.stream(
+                Spliterators.spliteratorUnknownSize(documentDatabaseEntities, Spliterator.ORDERED), false)
                 .map(documentEntityTransformer::transform);
     }
 

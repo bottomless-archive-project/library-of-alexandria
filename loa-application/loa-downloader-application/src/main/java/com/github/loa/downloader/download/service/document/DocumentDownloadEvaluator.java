@@ -10,8 +10,6 @@ import com.github.loa.source.configuration.DocumentSourceConfiguration;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.net.URL;
 
@@ -35,7 +33,6 @@ public class DocumentDownloadEvaluator {
      * @param documentLocation the location of the document
      * @return true if the document should be downloaded and processed
      */
-    @Transactional(isolation = Isolation.SERIALIZABLE)
     public boolean evaluateDocumentLocation(final URL documentLocation) {
         final String documentId = documentIdFactory.newDocumentId(documentLocation);
 
