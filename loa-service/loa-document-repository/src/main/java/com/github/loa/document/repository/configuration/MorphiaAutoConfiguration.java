@@ -8,9 +8,9 @@ import com.mongodb.ServerAddress;
 import dev.morphia.Datastore;
 import dev.morphia.Morphia;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.util.StringUtils;
 
 @Configuration
 @RequiredArgsConstructor
@@ -35,12 +35,15 @@ public class MorphiaAutoConfiguration {
     }
 
     @Bean
+    @ConditionalOnProperty("!loa.database.username")
+    public MongoClient mongoClient(final ServerAddress serverAddress) {
+        return new MongoClient(serverAddress);
+    }
+
+    @Bean
+    @ConditionalOnProperty("loa.database.username")
     public MongoClient mongoClient(final ServerAddress serverAddress, final MongoCredential mongoCredential) {
-        if (StringUtils.isEmpty(databaseConfigurationProperties.getUsername())) {
-            return new MongoClient(serverAddress);
-        } else {
-            return new MongoClient(serverAddress, mongoCredential, MongoClientOptions.builder().build());
-        }
+        return new MongoClient(serverAddress, mongoCredential, MongoClientOptions.builder().build());
     }
 
     @Bean
@@ -50,6 +53,7 @@ public class MorphiaAutoConfiguration {
     }
 
     @Bean
+    @ConditionalOnProperty("loa.database.username")
     protected MongoCredential mongoCredential() {
         return MongoCredential.createCredential(databaseConfigurationProperties.getUsername(), LOA_DATABASE_NAME,
                 databaseConfigurationProperties.getPassword().toCharArray());

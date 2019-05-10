@@ -1,9 +1,0 @@
-<databaseChangeLog
-        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
-                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
-    <changeSet author="laxika" id="20190324-1">
-        <renameColumn tableName="document" oldColumnName="crc" newColumnName="checksum" columnDataType="varchar(255)"/>
-    </changeSet>
-</databaseChangeLog>
