@@ -17,8 +17,8 @@ public class DocumentRepository {
 
     private final Datastore datastore;
 
-    public void insertDocument(final DocumentDatabaseEntity tomeDatabaseEntity) {
-        datastore.save(tomeDatabaseEntity);
+    public void insertDocument(final DocumentDatabaseEntity documentDatabaseEntity) {
+        datastore.save(documentDatabaseEntity);
     }
 
     public DocumentDatabaseEntity findById(final String id) {

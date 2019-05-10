@@ -1,4 +1,4 @@
-package com.github.loa.document.service.id.factory;
+package com.github.loa.document.service.location.id.factory;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.stereotype.Service;
@@ -6,10 +6,10 @@ import org.springframework.stereotype.Service;
 import java.net.URL;
 
 /**
- * An SHA-256 based implementation for the {@link DocumentIdFactory}.
+ * An SHA-256 based implementation for the {@link DocumentLocationIdFactory}.
  */
 @Service
-public class Sha256DocumentIdFactory implements DocumentIdFactory {
+public class Sha256DocumentLocationIdFactory implements DocumentLocationIdFactory {
 
     /**
      * Create an semi-unique document id based on the SHA-256 hash of the document's location.

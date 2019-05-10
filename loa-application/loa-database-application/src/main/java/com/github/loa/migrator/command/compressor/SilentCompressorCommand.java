@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Component
@@ -24,7 +23,6 @@ public class SilentCompressorCommand implements CommandLineRunner {
      * Going @Transactional here is required for the getDocumentEntities()'s Cursor.
      */
     @Override
-    @Transactional
     public void run(final String... args) {
         documentEntityFactory.getDocumentEntities()
                 .filter(DocumentEntity::isInVault)

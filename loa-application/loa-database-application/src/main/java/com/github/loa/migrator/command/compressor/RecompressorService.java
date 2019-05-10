@@ -8,9 +8,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.io.ByteArrayInputStream;
 
 @Slf4j
@@ -23,11 +20,6 @@ public class RecompressorService {
     private final DocumentManipulator documentManipulator;
     private final CompressionConfigurationProperties compressionConfigurationProperties;
 
-    /*
-     * Creating a new @Transactional here so things get updated even if the original transactional is not fully
-     *  finished because the command is stopped mid-run.
-     */
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void recompress(final DocumentEntity documentEntity) {
         log.info("Migrating archived document " + documentEntity.getId() + " from "
                 + documentEntity.getCompression() + " compression to "

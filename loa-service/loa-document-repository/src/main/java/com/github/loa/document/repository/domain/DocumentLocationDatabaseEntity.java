@@ -7,10 +7,12 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@Entity("documentLocation")
+@Entity(value = "documentLocation", noClassnameStored = true)
 public class DocumentLocationDatabaseEntity {
 
     @Id
     private String id;
     private String url;
+    private String source;
+    private int downloaderVersion;
 }

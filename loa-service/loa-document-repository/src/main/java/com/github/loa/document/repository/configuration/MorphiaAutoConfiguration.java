@@ -1,6 +1,7 @@
 package com.github.loa.document.repository.configuration;
 
 import com.github.loa.document.repository.domain.DocumentDatabaseEntity;
+import com.github.loa.document.repository.domain.DocumentLocationDatabaseEntity;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientOptions;
 import com.mongodb.MongoCredential;
@@ -22,7 +23,11 @@ public class MorphiaAutoConfiguration {
 
     @Bean
     public Datastore datastore(final Morphia morphia, final MongoClient mongoClient) {
-        return morphia.createDatastore(mongoClient, LOA_DATABASE_NAME);
+        final Datastore datastore = morphia.createDatastore(mongoClient, LOA_DATABASE_NAME);
+
+        datastore.ensureIndexes();
+
+        return datastore;
     }
 
     @Bean
@@ -30,6 +35,7 @@ public class MorphiaAutoConfiguration {
         final Morphia morphia = new Morphia();
 
         morphia.map(DocumentDatabaseEntity.class);
+        morphia.map(DocumentLocationDatabaseEntity.class);
 
         return morphia;
     }
@@ -43,7 +49,12 @@ public class MorphiaAutoConfiguration {
     @Bean
     @ConditionalOnProperty("loa.database.username")
     public MongoClient mongoClient(final ServerAddress serverAddress, final MongoCredential mongoCredential) {
-        return new MongoClient(serverAddress, mongoCredential, MongoClientOptions.builder().build());
+        return new MongoClient(serverAddress, mongoCredential,
+                MongoClientOptions.builder()
+                        .connectionsPerHost(20)
+                        .minConnectionsPerHost(20)
+                        .build()
+        );
     }
 
     @Bean

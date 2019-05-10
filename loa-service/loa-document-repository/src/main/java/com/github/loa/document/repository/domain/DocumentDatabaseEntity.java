@@ -8,7 +8,7 @@ import java.time.Instant;
 
 @Getter
 @Setter
-@Entity("document")
+@Entity(value = "document", noClassnameStored = true)
 @Indexes(
         @Index(fields = {@Field("checksum"), @Field("fileSize")})
 )
@@ -16,12 +16,10 @@ public class DocumentDatabaseEntity {
 
     @Id
     private String id;
-    private String url;
-    private String checksum;
-    private long fileSize;
-    private String source;
-    private Instant downloadDate;
-    private int downloaderVersion;
     private String status;
     private String compression;
+    private String checksum;
+    private long fileSize;
+    private Instant downloadDate;
+    private int downloaderVersion;
 }

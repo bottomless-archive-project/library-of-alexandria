@@ -18,5 +18,4 @@ public class DocumentCreationContext {
     private final DocumentStatus status;
     private final DocumentCompression compression;
     private final int versionNumber;
-    private final String source;
 }

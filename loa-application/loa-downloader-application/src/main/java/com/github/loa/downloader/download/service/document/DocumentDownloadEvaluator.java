@@ -1,10 +1,8 @@
 package com.github.loa.downloader.download.service.document;
 
-import com.github.loa.compression.domain.DocumentCompression;
-import com.github.loa.document.service.id.factory.DocumentIdFactory;
 import com.github.loa.document.service.domain.DocumentStatus;
-import com.github.loa.document.service.entity.factory.DocumentEntityFactory;
-import com.github.loa.document.service.entity.factory.domain.DocumentCreationContext;
+import com.github.loa.document.service.location.factory.DocumentLocationEntityFactory;
+import com.github.loa.document.service.location.id.factory.DocumentLocationIdFactory;
 import com.github.loa.downloader.command.configuration.DownloaderConfigurationProperties;
 import com.github.loa.source.configuration.DocumentSourceConfiguration;
 import lombok.RequiredArgsConstructor;
@@ -21,10 +19,10 @@ import java.net.URL;
 @RequiredArgsConstructor
 public class DocumentDownloadEvaluator {
 
-    private final DocumentEntityFactory documentEntityFactory;
     private final DocumentSourceConfiguration documentSourceConfiguration;
     private final DownloaderConfigurationProperties downloaderConfigurationProperties;
-    private final DocumentIdFactory documentIdFactory;
+    private final DocumentLocationIdFactory documentLocationIdFactory;
+    private final DocumentLocationEntityFactory documentLocationEntityFactory;
 
     /**
      * Evaluates if a download of a document on the provided location is necessary. If it is then it will be added to
@@ -34,29 +32,21 @@ public class DocumentDownloadEvaluator {
      * @return true if the document should be downloaded and processed
      */
     public boolean evaluateDocumentLocation(final URL documentLocation) {
-        final String documentId = documentIdFactory.newDocumentId(documentLocation);
+        final String documentLocationId = documentLocationIdFactory.newDocumentId(documentLocation);
 
-        if (!shouldDownload(documentId)) {
+        if (!shouldDownload(documentLocationId)) {
             log.debug("Document location already visited: {}.", documentLocation);
 
             return false;
         }
 
-        documentEntityFactory.newDocumentEntity(
-                DocumentCreationContext.builder()
-                        .id(documentId)
-                        .location(documentLocation)
-                        .status(DocumentStatus.UNDER_CRAWL)
-                        .versionNumber(downloaderConfigurationProperties.getVersionNumber())
-                        .source(documentSourceConfiguration.getName())
-                        .compression(DocumentCompression.NONE)
-                        .build()
-        );
+        documentLocationEntityFactory.newDocumentLocationEntity(documentLocationId, documentLocation,
+                downloaderConfigurationProperties.getVersionNumber(), documentSourceConfiguration.getName());
 
         return true;
     }
 
     private boolean shouldDownload(final String documentId) {
-        return !documentEntityFactory.isDocumentExists(documentId);
+        return !documentLocationEntityFactory.isDocumentLocationExists(documentId);
     }
 }

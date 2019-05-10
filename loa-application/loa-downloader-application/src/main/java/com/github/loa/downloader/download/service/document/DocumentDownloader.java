@@ -1,9 +1,13 @@
 package com.github.loa.downloader.download.service.document;
 
 import com.github.loa.checksum.service.ChecksumProvider;
-import com.github.loa.document.service.id.factory.DocumentIdFactory;
+import com.github.loa.compression.domain.DocumentCompression;
+import com.github.loa.document.service.domain.DocumentStatus;
+import com.github.loa.document.service.entity.factory.domain.DocumentCreationContext;
+import com.github.loa.document.service.location.id.factory.DocumentLocationIdFactory;
 import com.github.loa.document.service.DocumentManipulator;
 import com.github.loa.document.service.entity.factory.DocumentEntityFactory;
+import com.github.loa.downloader.command.configuration.DownloaderConfigurationProperties;
 import com.github.loa.downloader.download.service.file.DocumentFileManipulator;
 import com.github.loa.downloader.download.service.file.DocumentFileValidator;
 import com.github.loa.downloader.download.service.file.FileDownloader;
@@ -28,14 +32,14 @@ public class DocumentDownloader {
 
     private final DocumentEntityFactory documentEntityFactory;
     private final FileDownloader fileDownloader;
-    private final DocumentIdFactory documentIdFactory;
+    private final DocumentLocationIdFactory documentLocationIdFactory;
     private final StageLocationFactory stageLocationFactory;
     private final DocumentFileValidator documentFileValidator;
     private final DocumentDownloadEvaluator documentDownloadEvaluator;
-    private final DocumentManipulator documentManipulator;
     private final DocumentFileManipulator documentFileManipulator;
     private final ChecksumProvider checksumProvider;
     private final MeterRegistry meterRegistry;
+    private final DownloaderConfigurationProperties downloaderConfigurationProperties;
 
     public void downloadDocument(final URL documentLocation) {
         meterRegistry.counter("statistics.document-processed").increment();
@@ -46,15 +50,16 @@ public class DocumentDownloader {
             return;
         }
 
-        final String documentId = documentIdFactory.newDocumentId(documentLocation);
+        final String documentId = documentLocationIdFactory.newDocumentId(documentLocation);
         final File stageFileLocation = stageLocationFactory.getLocation(documentId);
 
         try {
             fileDownloader.downloadFile(documentLocation, stageFileLocation, 30000);
         } catch (FileDownloaderException e) {
+            //TODO: Do we even want to know if it is failed?
             log.debug("Failed to download document!", e);
 
-            documentManipulator.markFailed(documentId);
+            //documentManipulator.markFailed(documentId);
 
             return;
         }
@@ -66,7 +71,9 @@ public class DocumentDownloader {
         // files!
         if (!documentFileValidator.isValidDocument(documentId)) {
             documentFileManipulator.cleanup(documentId);
-            documentManipulator.markInvalid(documentId);
+
+            //TODO: Do we want to save invalid??
+            //documentManipulator.markInvalid(documentId);
 
             return;
         }
@@ -75,21 +82,35 @@ public class DocumentDownloader {
         // duplicate. We can't set it previously because then it will be always found as a "duplicate".
         if (documentEntityFactory.isDocumentExists(checksum, fileSize)) {
             documentFileManipulator.cleanup(documentId);
-            documentManipulator.markDuplicate(documentId, fileSize, checksum);
+            //TODO: Do we want to save duplicated?
+            //documentManipulator.markDuplicate(documentId, fileSize, checksum);
 
             return;
         }
 
         try {
+            documentEntityFactory.newDocumentEntity(
+                    DocumentCreationContext.builder()
+                            .id(documentId)
+                            .location(documentLocation)
+                            .status(DocumentStatus.DOWNLOADED)
+                            .versionNumber(downloaderConfigurationProperties.getVersionNumber())
+                            .compression(DocumentCompression.NONE)
+                            .checksum(checksum)
+                            .fileSize(fileSize)
+                            .build()
+            );
+
             documentFileManipulator.moveToVault(documentId);
         } catch (FailedToArchiveException e) {
             log.error("Failed while processing the downloaded document.", e);
 
-            documentManipulator.markProcessFailure(documentId);
-
-            return;
+            //TODO: Do we want to save proc failures?
+            //documentManipulator.markProcessFailure(documentId);
+            //return;
         }
 
-        documentManipulator.markDownloaded(documentId, fileSize, checksum);
+        //TODO: This is unnecessary most likely!
+        //documentManipulator.markDownloaded(documentId, fileSize, checksum);
     }
 }

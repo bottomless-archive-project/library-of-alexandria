@@ -102,12 +102,10 @@ public class DocumentEntityFactory {
         final DocumentDatabaseEntity documentDatabaseEntity = new DocumentDatabaseEntity();
 
         documentDatabaseEntity.setId(documentCreationContext.getId());
-        documentDatabaseEntity.setUrl(documentCreationContext.getLocation().toString());
         documentDatabaseEntity.setStatus(documentCreationContext.getStatus().toString());
         documentDatabaseEntity.setChecksum(documentCreationContext.getChecksum());
         documentDatabaseEntity.setFileSize(documentCreationContext.getFileSize());
         documentDatabaseEntity.setDownloaderVersion(documentCreationContext.getVersionNumber());
-        documentDatabaseEntity.setSource(documentCreationContext.getSource());
         documentDatabaseEntity.setCompression(documentCreationContext.getCompression().name());
 
         documentRepository.insertDocument(documentDatabaseEntity);
