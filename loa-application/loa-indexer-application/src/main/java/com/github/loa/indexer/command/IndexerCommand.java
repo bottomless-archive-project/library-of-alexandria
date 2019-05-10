@@ -4,13 +4,9 @@ import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.document.service.domain.DocumentStatus;
 import com.github.loa.document.service.entity.factory.DocumentEntityFactory;
 import com.github.loa.indexer.configuration.IndexerConfigurationProperties;
-import com.github.loa.indexer.service.index.IndexRequestFactory;
-import com.github.loa.indexer.service.index.response.IndexResponseActionListenerFactory;
+import com.github.loa.indexer.service.index.IndexerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.client.RequestOptions;
-import org.elasticsearch.client.RestHighLevelClient;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -22,10 +18,8 @@ import java.util.List;
 public class IndexerCommand implements CommandLineRunner {
 
     private final DocumentEntityFactory documentEntityFactory;
-    private final IndexRequestFactory indexRequestFactory;
-    private final IndexResponseActionListenerFactory indexResponseActionListenerFactory;
     private final IndexerConfigurationProperties indexerConfigurationProperties;
-    private final RestHighLevelClient restHighLevelClient;
+    private final IndexerService indexerService;
 
     @Override
     public void run(final String... args) {
@@ -41,14 +35,7 @@ public class IndexerCommand implements CommandLineRunner {
 
                     Thread.sleep(indexerConfigurationProperties.getSleepTime());
                 } else {
-                    documentEntities.forEach(documentEntity -> {
-                        //TODO: Move this logic to the indexer service!
-                        final IndexRequest indexRequest = indexRequestFactory.newIndexRequest(documentEntity);
-
-                        restHighLevelClient.indexAsync(indexRequest, RequestOptions.DEFAULT,
-                                indexResponseActionListenerFactory.newListener());
-
-                    });
+                    documentEntities.forEach(indexerService::indexDocument);
                 }
             }
         } catch (InterruptedException e) {
