@@ -6,7 +6,7 @@ dependencies {
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-webflux'
 
-    compile project(':loa-document-service')
-    compile project(':loa-indexer-service')
-    compile project(':loa-vault-service')
+    compile project(':loa-service:loa-document-service')
+    compile project(':loa-service:loa-indexer-service')
+    compile project(':loa-service:loa-vault-service')
 }

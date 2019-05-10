@@ -5,6 +5,6 @@ dependencies {
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind'
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations'
 
-    compile project(':loa-document-service')
-    compile project(':loa-vault-service')
+    compile project(':loa-service:loa-document-service')
+    compile project(':loa-service:loa-vault-service')
 }

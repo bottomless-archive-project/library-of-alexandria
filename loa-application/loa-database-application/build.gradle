@@ -4,7 +4,7 @@ dependencies {
     compile group: 'mysql', name: 'mysql-connector-java'
     compile group: 'org.liquibase', name: 'liquibase-core'
 
-    compile project(':loa-indexer-service')
-    compile project(':loa-document-service')
-    compile project(':loa-vault-service')
+    compile project(':loa-service:loa-indexer-service')
+    compile project(':loa-service:loa-document-service')
+    compile project(':loa-service:loa-vault-service')
 }
