@@ -56,10 +56,7 @@ public class DocumentDownloader {
         try {
             fileDownloader.downloadFile(documentLocation, stageFileLocation, 30000);
         } catch (FileDownloaderException e) {
-            //TODO: Do we even want to know if it is failed?
             log.debug("Failed to download document!", e);
-
-            //documentManipulator.markFailed(documentId);
 
             return;
         }
@@ -67,23 +64,14 @@ public class DocumentDownloader {
         final String checksum = checksumProvider.checksum(documentId);
         final long fileSize = stageFileLocation.length();
 
-        // The ordering like this is for a reason! We don't want to set the file size and checksum values of invalid
-        // files!
         if (!documentFileValidator.isValidDocument(documentId)) {
             documentFileManipulator.cleanup(documentId);
-
-            //TODO: Do we want to save invalid??
-            //documentManipulator.markInvalid(documentId);
 
             return;
         }
 
-        // Validate if the file already exists or not. Set the file size and checksum afterwards, even if the file is a
-        // duplicate. We can't set it previously because then it will be always found as a "duplicate".
         if (documentEntityFactory.isDocumentExists(checksum, fileSize)) {
             documentFileManipulator.cleanup(documentId);
-            //TODO: Do we want to save duplicated?
-            //documentManipulator.markDuplicate(documentId, fileSize, checksum);
 
             return;
         }
@@ -104,13 +92,6 @@ public class DocumentDownloader {
             documentFileManipulator.moveToVault(documentId);
         } catch (FailedToArchiveException e) {
             log.error("Failed while processing the downloaded document.", e);
-
-            //TODO: Do we want to save proc failures?
-            //documentManipulator.markProcessFailure(documentId);
-            //return;
         }
-
-        //TODO: This is unnecessary most likely!
-        //documentManipulator.markDownloaded(documentId, fileSize, checksum);
     }
 }
