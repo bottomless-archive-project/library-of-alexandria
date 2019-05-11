@@ -13,7 +13,7 @@ public enum DocumentCompression {
     /**
      * No compression used.
      */
-    NONE("pdf"),
+    NONE(""),
 
     /**
      * Using the <a href="https://en.wikipedia.org/wiki/Gzip">GZIP</a> compression algorithm. It is quite quick but less

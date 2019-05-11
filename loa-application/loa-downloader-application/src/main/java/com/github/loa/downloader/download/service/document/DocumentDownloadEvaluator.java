@@ -26,7 +26,7 @@ public class DocumentDownloadEvaluator {
 
     /**
      * Evaluates if a download of a document on the provided location is necessary. If it is then it will be added to
-     * the database with the status of {@link DocumentStatus#UNDER_CRAWL}.
+     * the document location database.
      *
      * @param documentLocation the location of the document
      * @return true if the document should be downloaded and processed

@@ -14,6 +14,7 @@ public class DocumentEntity {
     private final String id;
     private final URL url;
     private final DocumentStatus status;
+    private final DocumentType type;
     private final Instant downloadDate;
     private final String checksum;
     private final long fileSize;

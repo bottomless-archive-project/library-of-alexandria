@@ -97,11 +97,13 @@ public class DocumentEntityFactory {
      * Creates a new document. The document is persisted to the database.
      *
      * @param documentCreationContext the parameters of the document to create
+     * @return the freshly created document
      */
-    public void newDocumentEntity(final DocumentCreationContext documentCreationContext) {
+    public DocumentEntity newDocumentEntity(final DocumentCreationContext documentCreationContext) {
         final DocumentDatabaseEntity documentDatabaseEntity = new DocumentDatabaseEntity();
 
         documentDatabaseEntity.setId(documentCreationContext.getId());
+        documentDatabaseEntity.setType(documentCreationContext.getType().toString());
         documentDatabaseEntity.setStatus(documentCreationContext.getStatus().toString());
         documentDatabaseEntity.setChecksum(documentCreationContext.getChecksum());
         documentDatabaseEntity.setFileSize(documentCreationContext.getFileSize());
@@ -109,5 +111,7 @@ public class DocumentEntityFactory {
         documentDatabaseEntity.setCompression(documentCreationContext.getCompression().name());
 
         documentRepository.insertDocument(documentDatabaseEntity);
+
+        return getDocumentEntity(documentCreationContext.getId());
     }
 }

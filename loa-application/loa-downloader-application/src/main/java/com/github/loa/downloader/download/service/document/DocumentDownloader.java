@@ -2,7 +2,9 @@ package com.github.loa.downloader.download.service.document;
 
 import com.github.loa.checksum.service.ChecksumProvider;
 import com.github.loa.compression.domain.DocumentCompression;
+import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.document.service.domain.DocumentStatus;
+import com.github.loa.document.service.domain.DocumentType;
 import com.github.loa.document.service.entity.factory.domain.DocumentCreationContext;
 import com.github.loa.document.service.location.id.factory.DocumentLocationIdFactory;
 import com.github.loa.document.service.DocumentManipulator;
@@ -21,6 +23,8 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.Optional;
 
 /**
  * This service is responsible for downloading documents.
@@ -51,7 +55,14 @@ public class DocumentDownloader {
         }
 
         final String documentId = documentLocationIdFactory.newDocumentId(documentLocation);
-        final File stageFileLocation = stageLocationFactory.getLocation(documentId);
+
+        final DocumentType documentType = Arrays.stream(DocumentType.values())
+                .filter(type -> documentLocation.getPath().endsWith("." + type.getFileExtension()))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Unable to find valid document type for document: "
+                        + documentLocation));
+
+        final File stageFileLocation = stageLocationFactory.getLocation(documentId, documentType);
 
         try {
             fileDownloader.downloadFile(documentLocation, stageFileLocation, 30000);
@@ -61,25 +72,26 @@ public class DocumentDownloader {
             return;
         }
 
-        final String checksum = checksumProvider.checksum(documentId);
+        final String checksum = checksumProvider.checksum(documentId, documentType);
         final long fileSize = stageFileLocation.length();
 
-        if (!documentFileValidator.isValidDocument(documentId)) {
-            documentFileManipulator.cleanup(documentId);
+        if (!documentFileValidator.isValidDocument(documentId, documentType)) {
+            documentFileManipulator.cleanup(documentId, documentType);
 
             return;
         }
 
         if (documentEntityFactory.isDocumentExists(checksum, fileSize)) {
-            documentFileManipulator.cleanup(documentId);
+            documentFileManipulator.cleanup(documentId, documentType);
 
             return;
         }
 
         try {
-            documentEntityFactory.newDocumentEntity(
+            final DocumentEntity documentEntity = documentEntityFactory.newDocumentEntity(
                     DocumentCreationContext.builder()
                             .id(documentId)
+                            .type(documentType)
                             .location(documentLocation)
                             .status(DocumentStatus.DOWNLOADED)
                             .versionNumber(downloaderConfigurationProperties.getVersionNumber())
@@ -89,7 +101,7 @@ public class DocumentDownloader {
                             .build()
             );
 
-            documentFileManipulator.moveToVault(documentId);
+            documentFileManipulator.moveToVault(documentEntity);
         } catch (FailedToArchiveException e) {
             log.error("Failed while processing the downloaded document.", e);
         }

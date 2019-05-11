@@ -30,21 +30,17 @@ public class VaultDocumentManager {
      * @param documentContents the content to archive for the document
      */
     public void archiveDocument(final DocumentEntity documentEntity, final InputStream documentContents) {
-        archiveDocument(documentEntity.getId(), documentContents);
-    }
-
-    public void archiveDocument(final String documentId, final InputStream documentContents) {
-        try (final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentId)) {
+        try (final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentEntity)) {
             compressionServiceProvider.getCompressionService(compressionConfigurationProperties.getAlgorithm())
                     .compress(documentContents, vaultLocation.destination());
         } catch (IOException e) {
-            throw new VaultAccessException("Unable to move document with id " + documentId + " to the vault!", e);
+            throw new VaultAccessException("Unable to move document with id " + documentEntity.getId()
+                    + " to the vault!", e);
         }
     }
 
     public byte[] readDocument(final DocumentEntity documentEntity) {
-        try (final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentEntity.getId(),
-                documentEntity.getCompression())) {
+        try (final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentEntity)) {
             final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
             try (final InputStream vaultLocationContent = vaultLocation.content()) {

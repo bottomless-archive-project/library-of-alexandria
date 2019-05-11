@@ -34,22 +34,8 @@ public class FileVaultLocationFactory implements VaultLocationFactory {
         return getLocation(documentEntity, compressionConfigurationProperties.getAlgorithm());
     }
 
-    /**
-     * Create the location for a given document id.
-     *
-     * @param documentId the id of the entity to create the location for
-     * @return the location of the document
-     */
-    public VaultLocation getLocation(final String documentId) {
-        return getLocation(documentId, compressionConfigurationProperties.getAlgorithm());
-    }
-
     public VaultLocation getLocation(final DocumentEntity documentEntity, final DocumentCompression compression) {
-        return getLocation(documentEntity.getId(), compression);
-    }
-
-    public VaultLocation getLocation(final String documentId, final DocumentCompression compression) {
-        return new FileVaultLocation(new File(fileConfigurationProperties.getPath(), documentId + "."
-                + compression.getFileExtension()));
+        return new FileVaultLocation(new File(fileConfigurationProperties.getPath(), documentEntity.getId() + "."
+                + documentEntity.getType().getFileExtension() + "." + compression.getFileExtension()));
     }
 }

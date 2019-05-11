@@ -1,6 +1,7 @@
 dependencies {
     compile project(':loa-service:loa-url-service')
-    
+    compile project(':loa-service:loa-document-service')
+
     compile group: 'com.github.laxika', name: 'java-warc', version: '47c81f03e6'
 
     compile group: 'com.github.davidmoten', name: 'io-extras', version: '0.1'

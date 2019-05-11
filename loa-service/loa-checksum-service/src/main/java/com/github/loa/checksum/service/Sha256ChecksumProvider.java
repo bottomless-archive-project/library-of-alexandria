@@ -1,5 +1,6 @@
 package com.github.loa.checksum.service;
 
+import com.github.loa.document.service.domain.DocumentType;
 import com.github.loa.stage.service.StageLocationFactory;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -19,8 +20,8 @@ public class Sha256ChecksumProvider implements ChecksumProvider {
     private final StageLocationFactory stageLocationFactory;
 
     @Override
-    public String checksum(String documentId) {
-        final File stageFileLocation = stageLocationFactory.getLocation(documentId);
+    public String checksum(final String documentId, final DocumentType documentType) {
+        final File stageFileLocation = stageLocationFactory.getLocation(documentId, documentType);
 
         try {
             try (final BufferedInputStream documentInputStream =

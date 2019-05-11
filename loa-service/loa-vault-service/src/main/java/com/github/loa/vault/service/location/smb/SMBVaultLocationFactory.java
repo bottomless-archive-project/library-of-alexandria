@@ -19,22 +19,13 @@ public class SMBVaultLocationFactory implements VaultLocationFactory {
     private final CompressionConfigurationProperties compressionConfigurationProperties;
 
     @Override
-    public VaultLocation getLocation(final String documentId) {
-        return getLocation(documentId, compressionConfigurationProperties.getAlgorithm());
-    }
-
-    @Override
     public VaultLocation getLocation(final DocumentEntity documentEntity) {
         return getLocation(documentEntity, compressionConfigurationProperties.getAlgorithm());
     }
 
     @Override
     public VaultLocation getLocation(final DocumentEntity documentEntity, final DocumentCompression compression) {
-        return getLocation(documentEntity.getId(), compression);
-    }
-
-    @Override
-    public VaultLocation getLocation(final String documentId, final DocumentCompression compression) {
-        return new SMBVaultLocation(documentId + "." + compression.getFileExtension(), smbFileManipulator);
+        return new SMBVaultLocation(documentEntity.getId() + "." + documentEntity.getType().getFileExtension()
+                + "." + compression.getFileExtension(), smbFileManipulator);
     }
 }

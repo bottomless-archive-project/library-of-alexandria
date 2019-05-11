@@ -1,5 +1,6 @@
 package com.github.loa.downloader.download.service.file;
 
+import com.github.loa.document.service.domain.DocumentType;
 import com.github.loa.stage.service.StageLocationFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,10 +19,11 @@ public class DocumentFileValidator {
     /**
      * Evaluates a document's validity based on the document's file in the staging area.
      *
-     * @param documentId the id of the document to validate
+     * @param documentId   the id of the document to validate
+     * @param documentType the type of the document to validate
      */
-    public boolean isValidDocument(final String documentId) {
-        final File stageFileLocation = stageLocationFactory.getLocation(documentId);
+    public boolean isValidDocument(final String documentId, final DocumentType documentType) {
+        final File stageFileLocation = stageLocationFactory.getLocation(documentId, documentType);
 
         // Anything under 1024 bytes is likely to be some bit garbage.
         return stageFileLocation.length() > 1024;

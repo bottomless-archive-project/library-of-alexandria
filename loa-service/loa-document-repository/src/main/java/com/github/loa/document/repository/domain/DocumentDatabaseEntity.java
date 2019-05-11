@@ -16,6 +16,7 @@ public class DocumentDatabaseEntity {
 
     @Id
     private String id;
+    private String type;
     private String status;
     private String compression;
     private String checksum;
