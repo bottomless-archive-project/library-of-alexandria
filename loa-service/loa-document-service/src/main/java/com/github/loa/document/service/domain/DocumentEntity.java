@@ -12,7 +12,6 @@ import java.time.Instant;
 public class DocumentEntity {
 
     private final String id;
-    private final URL url;
     private final DocumentStatus status;
     private final DocumentType type;
     private final Instant downloadDate;

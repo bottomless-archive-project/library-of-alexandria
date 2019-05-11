@@ -1,5 +1,7 @@
 package com.github.loa.backend.view.document.controller;
 
+import com.github.loa.document.service.domain.DocumentEntity;
+import com.github.loa.document.service.domain.DocumentType;
 import com.github.loa.document.service.entity.factory.DocumentEntityFactory;
 import com.github.loa.vault.service.VaultDocumentManager;
 import lombok.RequiredArgsConstructor;
@@ -26,11 +28,16 @@ public class DocumentQueryController {
      */
     @GetMapping("/document/{documentId}")
     public ResponseEntity<byte[]> queryDocument(@PathVariable final String documentId) {
-        final byte[] documentContent = vaultDocumentManager.readDocument(
-                documentEntityFactory.getDocumentEntity(documentId));
+        final DocumentEntity documentEntity = documentEntityFactory.getDocumentEntity(documentId);
+        final byte[] documentContent = vaultDocumentManager.readDocument(documentEntity);
 
         final HttpHeaders responseHeaders = new HttpHeaders();
-        responseHeaders.setContentType(MediaType.APPLICATION_PDF);
+        //TODO: Create a service that's able to figure the MediaType out for a DocumentType. Add other types.
+        if (documentEntity.getType() == DocumentType.PDF) {
+            responseHeaders.setContentType(MediaType.APPLICATION_PDF);
+        } else if (documentEntity.getType() == DocumentType.DOC) {
+            responseHeaders.setContentType(MediaType.valueOf("application/msword"));
+        }
         responseHeaders.setCacheControl(CacheControl.noCache());
 
         return new ResponseEntity<>(documentContent, responseHeaders, HttpStatus.OK);

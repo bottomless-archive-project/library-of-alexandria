@@ -19,7 +19,7 @@ public class DocumentEntityResponseTransformer {
     public DocumentEntityResponse transform(final DocumentEntity documentEntity) {
         return DocumentEntityResponse.builder()
                 .id(documentEntity.getId())
-                .url(documentEntity.getUrl())
+                .type(documentEntity.getType())
                 .status(documentEntity.getStatus())
                 .downloadDate(documentEntity.getDownloadDate())
                 .build();
