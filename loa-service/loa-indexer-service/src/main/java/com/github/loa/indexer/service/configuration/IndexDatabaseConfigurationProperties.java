@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 @Data
 @Component
 @ConfigurationProperties("loa.indexer.database")
-public class DatabaseConfigurationProperties {
+public class IndexDatabaseConfigurationProperties {
 
     private String host;
     private int port;

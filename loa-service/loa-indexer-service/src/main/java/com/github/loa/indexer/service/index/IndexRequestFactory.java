@@ -20,6 +20,6 @@ public class IndexRequestFactory {
         return new IndexRequest("vault_documents")
                 .id(documentEntity.getId())
                 .source(Map.of("content", documentBase64String))
-                .setPipeline("attachment");
+                .setPipeline("vault-document-pipeline");
     }
 }

@@ -11,13 +11,13 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @RequiredArgsConstructor
 @ConditionalOnProperty(name = "loa.indexer.database")
-public class DatabaseConfiguration {
+public class IndexDatabaseConfiguration {
 
-    private final DatabaseConfigurationProperties databaseConfigurationProperties;
+    private final IndexDatabaseConfigurationProperties indexDatabaseConfigurationProperties;
 
     @Bean
     public HttpHost httpHost() {
-        return new HttpHost(databaseConfigurationProperties.getHost(), databaseConfigurationProperties.getPort(), "http");
+        return new HttpHost(indexDatabaseConfigurationProperties.getHost(), indexDatabaseConfigurationProperties.getPort(), "http");
     }
 
     @Bean
