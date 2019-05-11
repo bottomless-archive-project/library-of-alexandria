@@ -2,7 +2,7 @@
 
 ![LoA Logo](https://i.imgur.com/xJLWPpf.png)
 
-Library of Alexandria (LoA in short) is a project that aims to collect and archive PDF documents from the internet.
+Library of Alexandria (LoA in short) is a project that aims to collect and archive documents from the internet.
 
 In our modern age new text documents are born in a blink of an eye then (often just as quickly) disappear from the internet. We find it a noble task to save these documents for future generations.
 
