@@ -1,7 +1,7 @@
 rootProject.name = 'loa-downloader'
 include 'loa-application:loa-downloader-application'
 include 'loa-application:loa-backend-application'
-include 'loa-application:loa-database-application'
+include 'loa-application:loa-administrator-application'
 include 'loa-application:loa-indexer-application'
 include 'loa-service:loa-document-service'
 include 'loa-service:loa-document-repository'
