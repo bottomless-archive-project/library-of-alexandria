@@ -1,6 +1,6 @@
-package com.github.loa.backend.view.document.service;
+package com.github.loa.web.view.document.service;
 
-import com.github.loa.backend.view.document.response.SearchDocumentEntityResponse;
+import com.github.loa.web.view.document.response.SearchDocumentEntityResponse;
 import com.github.loa.indexer.domain.DocumentSearchEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

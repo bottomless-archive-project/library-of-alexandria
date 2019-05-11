@@ -1,4 +1,4 @@
-package com.github.loa.backend.view.document.response;
+package com.github.loa.web.view.document.response;
 
 import lombok.Builder;
 import lombok.Getter;

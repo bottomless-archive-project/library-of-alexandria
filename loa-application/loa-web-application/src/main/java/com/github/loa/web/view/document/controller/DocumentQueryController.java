@@ -1,4 +1,4 @@
-package com.github.loa.backend.view.document.controller;
+package com.github.loa.web.view.document.controller;
 
 import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.document.service.domain.DocumentType;

@@ -1,6 +1,6 @@
-package com.github.loa.backend.view.document.service;
+package com.github.loa.web.view.document.service;
 
-import com.github.loa.backend.view.document.response.DocumentEntityResponse;
+import com.github.loa.web.view.document.response.DocumentEntityResponse;
 import com.github.loa.document.service.domain.DocumentEntity;
 import org.springframework.stereotype.Service;
 

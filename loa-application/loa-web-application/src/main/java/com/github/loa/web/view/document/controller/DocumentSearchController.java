@@ -1,7 +1,7 @@
-package com.github.loa.backend.view.document.controller;
+package com.github.loa.web.view.document.controller;
 
-import com.github.loa.backend.view.document.response.DocumentSearchResponse;
-import com.github.loa.backend.view.document.service.SearchDocumentEntityResponseTransformer;
+import com.github.loa.web.view.document.response.DocumentSearchResponse;
+import com.github.loa.web.view.document.service.SearchDocumentEntityResponseTransformer;
 import com.github.loa.indexer.domain.DocumentSearchResult;
 import com.github.loa.indexer.service.search.DocumentSearchService;
 import lombok.RequiredArgsConstructor;

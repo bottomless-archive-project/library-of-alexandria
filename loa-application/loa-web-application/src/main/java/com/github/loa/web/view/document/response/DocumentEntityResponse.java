@@ -1,11 +1,10 @@
-package com.github.loa.backend.view.document.response;
+package com.github.loa.web.view.document.response;
 
 import com.github.loa.document.service.domain.DocumentStatus;
 import com.github.loa.document.service.domain.DocumentType;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.net.URL;
 import java.time.Instant;
 
 @Getter
