@@ -11,6 +11,7 @@ import dev.morphia.query.internal.MorphiaCursor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Spliterator;
 import java.util.Spliterators;
@@ -109,6 +110,7 @@ public class DocumentEntityFactory {
         documentDatabaseEntity.setFileSize(documentCreationContext.getFileSize());
         documentDatabaseEntity.setDownloaderVersion(documentCreationContext.getVersionNumber());
         documentDatabaseEntity.setCompression(documentCreationContext.getCompression().name());
+        documentDatabaseEntity.setDownloadDate(Instant.now());
 
         documentRepository.insertDocument(documentDatabaseEntity);
 
