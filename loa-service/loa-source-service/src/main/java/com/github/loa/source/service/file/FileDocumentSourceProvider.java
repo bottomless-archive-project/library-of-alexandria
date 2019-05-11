@@ -38,6 +38,16 @@ public class FileDocumentSourceProvider implements DocumentSourceProvider {
 
     private void updateStatistics(final String line) {
         meterRegistry.counter("statistics.document-produced-by-source").increment();
+
+        logStatistics();
+    }
+
+    private void logStatistics() {
+        final double totalCount = meterRegistry.counter("statistics.document-produced-by-source").count();
+
+        if (totalCount > 0 && totalCount % 1000000 == 0) {
+            log.info("Processed " + totalCount + " urls!");
+        }
     }
 
     //Not using optional for performance reasons
