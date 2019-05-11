@@ -1,4 +1,4 @@
-package com.github.loa.migrator.command.compressor;
+package com.github.loa.administrator.command.compressor;
 
 import com.github.loa.compression.configuration.CompressionConfigurationProperties;
 import com.github.loa.document.service.domain.DocumentEntity;

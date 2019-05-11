@@ -1,4 +1,4 @@
-package com.github.loa.migrator.command.indexer;
+package com.github.loa.administrator.command.indexer;
 
 import lombok.RequiredArgsConstructor;
 import org.elasticsearch.action.ingest.PutPipelineRequest;

@@ -1,4 +1,4 @@
-package com.github.loa.migrator.command.compressor;
+package com.github.loa.administrator.command.compressor;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.ComponentScan;
