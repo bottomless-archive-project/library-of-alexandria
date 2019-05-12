@@ -20,6 +20,6 @@ public class IndexerService {
         final IndexRequest indexRequest = indexRequestFactory.newIndexRequest(documentEntity);
 
         restHighLevelClient.indexAsync(indexRequest, RequestOptions.DEFAULT,
-                indexResponseActionListenerFactory.newListener());
+                indexResponseActionListenerFactory.newListener(documentEntity));
     }
 }

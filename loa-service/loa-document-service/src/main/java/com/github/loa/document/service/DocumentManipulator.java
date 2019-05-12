@@ -24,6 +24,10 @@ public class DocumentManipulator {
         updateStatus(documentId, DocumentStatus.INDEXED);
     }
 
+    public void markIndexFailure(final String documentId) {
+        updateStatus(documentId, DocumentStatus.INDEXING_FAILURE);
+    }
+
     /**
      * Update the status of a document.
      *
