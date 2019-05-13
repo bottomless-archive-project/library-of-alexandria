@@ -5,14 +5,19 @@ import io.micrometer.core.instrument.logging.LoggingMeterRegistry;
 import io.micrometer.core.instrument.logging.LoggingRegistryConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfiguration;
+import org.springframework.boot.autoconfigure.data.mongo.MongoRepositoriesAutoConfiguration;
+import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 
 /**
  * The runner class of the downloader application.
  */
 @Slf4j
-@SpringBootApplication(scanBasePackages = "com.github.loa")
+@SpringBootApplication(scanBasePackages = "com.github.loa", exclude = {MongoAutoConfiguration.class,
+        MongoRepositoriesAutoConfiguration.class, MongoDataAutoConfiguration.class})
 public class LibraryDownloaderApplication {
 
     public static void main(final String[] args) {

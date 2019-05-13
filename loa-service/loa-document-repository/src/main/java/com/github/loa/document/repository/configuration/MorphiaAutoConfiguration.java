@@ -9,10 +9,12 @@ import com.mongodb.ServerAddress;
 import dev.morphia.Datastore;
 import dev.morphia.Morphia;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+@Slf4j
 @Configuration
 @RequiredArgsConstructor
 public class MorphiaAutoConfiguration {
@@ -41,7 +43,7 @@ public class MorphiaAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnProperty("!loa.database.username")
+    @ConditionalOnProperty(value = "loa.database.username", matchIfMissing = true)
     public MongoClient mongoClient(final ServerAddress serverAddress) {
         return new MongoClient(serverAddress);
     }
@@ -59,6 +61,9 @@ public class MorphiaAutoConfiguration {
 
     @Bean
     public ServerAddress serverAddress() {
+        log.info("Setting up mongodb connection to " + databaseConfigurationProperties.getHost() + " on port "
+                + databaseConfigurationProperties.getPort() + ".");
+
         return new ServerAddress(databaseConfigurationProperties.getHost(),
                 databaseConfigurationProperties.getPort());
     }
