@@ -1,11 +1,14 @@
 package com.github.loa.web.view.document.controller;
 
 import com.github.loa.document.service.domain.DocumentEntity;
-import com.github.loa.document.service.domain.DocumentType;
 import com.github.loa.document.service.entity.factory.DocumentEntityFactory;
 import com.github.loa.vault.service.VaultDocumentManager;
+import com.github.loa.web.view.document.service.MediaTypeCalculator;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.*;
+import org.springframework.http.CacheControl;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,6 +22,7 @@ public class DocumentQueryController {
 
     private final DocumentEntityFactory documentEntityFactory;
     private final VaultDocumentManager vaultDocumentManager;
+    private final MediaTypeCalculator mediaTypeCalculator;
 
     /**
      * Return a document's content from the vault, based on the provided document id.
@@ -32,12 +36,7 @@ public class DocumentQueryController {
         final byte[] documentContent = vaultDocumentManager.readDocument(documentEntity);
 
         final HttpHeaders responseHeaders = new HttpHeaders();
-        //TODO: Create a service that's able to figure the MediaType out for a DocumentType. Add other types.
-        if (documentEntity.getType() == DocumentType.PDF) {
-            responseHeaders.setContentType(MediaType.APPLICATION_PDF);
-        } else if (documentEntity.getType() == DocumentType.DOC) {
-            responseHeaders.setContentType(MediaType.valueOf("application/msword"));
-        }
+        responseHeaders.setContentType(mediaTypeCalculator.calculateMediaType(documentEntity.getType()));
         responseHeaders.setCacheControl(CacheControl.noCache());
 
         return new ResponseEntity<>(documentContent, responseHeaders, HttpStatus.OK);
