@@ -6,12 +6,15 @@ import com.github.loa.vault.service.VaultDocumentManager;
 import com.github.loa.vault.service.VaultLocationFactory;
 import com.github.loa.vault.service.location.domain.VaultLocation;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.*;
+import org.apache.commons.io.IOUtils;
+import org.springframework.http.CacheControl;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 @RestController
@@ -29,16 +32,22 @@ public class VaultController {
      * @return the returned document's content
      */
     @GetMapping("/document/{documentId}")
-    public ResponseEntity<InputStreamResource> queryDocument(@PathVariable final String documentId) {
+    public ResponseEntity<byte[]> queryDocument(@PathVariable final String documentId) throws IOException {
         final DocumentEntity documentEntity = documentEntityFactory.getDocumentEntity(documentId);
-        final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentEntity);
+        final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentEntity,
+                documentEntity.getCompression());
 
-        final InputStream documentContent = vaultDocumentManager.readDocument(documentEntity, vaultLocation);
+        // Can't work with pure InputStream here because we will need the decompressed file length for the response
+        try (InputStream streamingContent = vaultDocumentManager.readDocument(documentEntity, vaultLocation)) {
+            final byte[] documentContent = IOUtils.toByteArray(streamingContent);
 
-        return ResponseEntity.ok()
-                .contentLength(vaultLocation.length())
-                .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .cacheControl(CacheControl.noCache())
-                .body(new InputStreamResource(documentContent));
+            return ResponseEntity.ok()
+                    .contentLength(documentContent.length)
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .header("Content-Disposition", "attachment; filename=" + documentId + "."
+                            + documentEntity.getType().getFileExtension())
+                    .cacheControl(CacheControl.noCache())
+                    .body(documentContent);
+        }
     }
 }
