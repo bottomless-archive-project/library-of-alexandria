@@ -1,11 +1,10 @@
-package com.github.loa.web.view.document.controller;
+package com.github.loa.vault.view.controller;
 
 import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.document.service.entity.factory.DocumentEntityFactory;
 import com.github.loa.vault.service.VaultDocumentManager;
 import com.github.loa.vault.service.VaultLocationFactory;
 import com.github.loa.vault.service.location.domain.VaultLocation;
-import com.github.loa.web.view.document.service.MediaTypeCalculator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.*;
@@ -15,17 +14,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.InputStream;
 
-/**
- * A controller that provides access to the documents available in the vault.
- */
 @RestController
 @RequiredArgsConstructor
-public class DocumentQueryController {
+public class VaultController {
 
     private final DocumentEntityFactory documentEntityFactory;
     private final VaultDocumentManager vaultDocumentManager;
     private final VaultLocationFactory vaultLocationFactory;
-    private final MediaTypeCalculator mediaTypeCalculator;
 
     /**
      * Return a document's content from the vault, based on the provided document id.
@@ -42,7 +37,7 @@ public class DocumentQueryController {
 
         return ResponseEntity.ok()
                 .contentLength(vaultLocation.length())
-                .contentType(mediaTypeCalculator.calculateMediaType(documentEntity.getType()))
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .cacheControl(CacheControl.noCache())
                 .body(new InputStreamResource(documentContent));
     }

@@ -42,6 +42,11 @@ public class FileVaultLocation implements VaultLocation {
     }
 
     @Override
+    public long length() {
+        return vaultLocation.length();
+    }
+
+    @Override
     public void clear() {
         vaultLocation.delete();
     }

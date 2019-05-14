@@ -26,6 +26,11 @@ public class SMBVaultLocation implements VaultLocation {
     }
 
     @Override
+    public long length() {
+        return smbFileManipulator.length(location);
+    }
+
+    @Override
     public void clear() {
         smbFileManipulator.removeFile(location);
     }

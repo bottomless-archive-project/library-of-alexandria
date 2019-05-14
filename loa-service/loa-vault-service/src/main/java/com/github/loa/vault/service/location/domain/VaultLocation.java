@@ -22,6 +22,8 @@ public interface VaultLocation extends Closeable {
      */
     InputStream content();
 
+    long length();
+
     /**
      * Removes any previously stored data from the location.
      */

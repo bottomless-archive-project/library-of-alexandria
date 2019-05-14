@@ -14,18 +14,18 @@ import java.io.OutputStream;
 public class LZMACompressionService implements CompressionService {
 
     @Override
-    public void compress(InputStream documentContent, OutputStream compressedDocumentContent) {
-        try (LZMACompressorOutputStream out = new LZMACompressorOutputStream(compressedDocumentContent)) {
-            IOUtils.copy(documentContent, out);
+    public OutputStream compress(OutputStream compressedDocumentContent) {
+        try {
+            return new LZMACompressorOutputStream(compressedDocumentContent);
         } catch (IOException e) {
             throw new RuntimeException("Error while compressing document!", e);
         }
     }
 
     @Override
-    public void decompress(InputStream compressedDocumentContent, OutputStream decompressedDocumentContent) {
-        try (LZMACompressorInputStream in = new LZMACompressorInputStream(compressedDocumentContent)) {
-            IOUtils.copy(in, decompressedDocumentContent);
+    public InputStream decompress(final InputStream compressedDocumentContent) {
+        try {
+            return new LZMACompressorInputStream(compressedDocumentContent);
         } catch (IOException e) {
             throw new RuntimeException("Error while decompressing document!", e);
         }
