@@ -1,20 +1,17 @@
 package com.github.loa.web.view.document.controller;
 
 import com.github.loa.document.service.domain.DocumentEntity;
+import com.github.loa.document.service.domain.DocumentType;
 import com.github.loa.document.service.entity.factory.DocumentEntityFactory;
-import com.github.loa.vault.service.VaultDocumentManager;
-import com.github.loa.vault.service.VaultLocationFactory;
-import com.github.loa.vault.service.location.domain.VaultLocation;
+import com.github.loa.vault.client.service.VaultClientService;
 import com.github.loa.web.view.document.service.MediaTypeCalculator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.CacheControl;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.IOException;
 import java.io.InputStream;
 
 /**
@@ -25,8 +22,7 @@ import java.io.InputStream;
 public class DocumentQueryController {
 
     private final DocumentEntityFactory documentEntityFactory;
-    private final VaultDocumentManager vaultDocumentManager;
-    private final VaultLocationFactory vaultLocationFactory;
+    private final VaultClientService vaultClientService;
     private final MediaTypeCalculator mediaTypeCalculator;
 
     /**
@@ -38,14 +34,21 @@ public class DocumentQueryController {
     @GetMapping("/document/{documentId}")
     public ResponseEntity<InputStreamResource> queryDocument(@PathVariable final String documentId) {
         final DocumentEntity documentEntity = documentEntityFactory.getDocumentEntity(documentId);
-        final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentEntity);
+        final InputStream streamingContent = vaultClientService.getVaultContent(documentEntity);
 
-        final InputStream streamingContent = vaultDocumentManager.readDocument(documentEntity, vaultLocation);
+        final HttpHeaders httpHeaders = new HttpHeaders();
+
+        if (documentEntity.getType() != DocumentType.PDF) {
+            httpHeaders.setContentDisposition(
+                    ContentDisposition.builder("attachment")
+                            .filename(documentId + "." + documentEntity.getType().getFileExtension())
+                            .build()
+            );
+        }
 
         return ResponseEntity.ok()
+                .headers(httpHeaders)
                 .contentType(mediaTypeCalculator.calculateMediaType(documentEntity.getType()))
-                .header("Content-Disposition", "attachment; filename=" + documentId + "."
-                        + documentEntity.getType().getFileExtension())
                 .cacheControl(CacheControl.noCache())
                 .body(new InputStreamResource(streamingContent));
     }

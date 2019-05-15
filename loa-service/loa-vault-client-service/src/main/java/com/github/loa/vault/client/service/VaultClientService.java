@@ -3,13 +3,10 @@ package com.github.loa.vault.client.service;
 import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.vault.client.configuration.VaultClientConfigurationProperties;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 
 @Service
