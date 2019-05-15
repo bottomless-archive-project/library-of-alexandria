@@ -34,7 +34,7 @@ public class DocumentQueryController {
     @GetMapping("/document/{documentId}")
     public ResponseEntity<InputStreamResource> queryDocument(@PathVariable final String documentId) {
         final DocumentEntity documentEntity = documentEntityFactory.getDocumentEntity(documentId);
-        final InputStream streamingContent = vaultClientService.getVaultContent(documentEntity);
+        final InputStream streamingContent = vaultClientService.queryDocument(documentEntity);
 
         final HttpHeaders httpHeaders = new HttpHeaders();
 

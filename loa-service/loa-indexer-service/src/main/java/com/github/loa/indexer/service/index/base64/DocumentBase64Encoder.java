@@ -26,7 +26,7 @@ public class DocumentBase64Encoder {
      * @return the encoded string
      */
     public String encodeDocument(final DocumentEntity documentEntity) {
-        final InputStream inputStream = vaultClientService.getVaultContent(documentEntity);
+        final InputStream inputStream = vaultClientService.queryDocument(documentEntity);
 
         try {
             //TODO: Still not satisfied that we need to read the data to memory
