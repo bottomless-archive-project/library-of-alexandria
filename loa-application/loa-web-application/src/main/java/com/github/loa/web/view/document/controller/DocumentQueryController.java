@@ -36,17 +36,17 @@ public class DocumentQueryController {
      * @return the returned document's content
      */
     @GetMapping("/document/{documentId}")
-    public ResponseEntity<InputStreamResource> queryDocument(@PathVariable final String documentId) throws IOException {
+    public ResponseEntity<InputStreamResource> queryDocument(@PathVariable final String documentId) {
         final DocumentEntity documentEntity = documentEntityFactory.getDocumentEntity(documentId);
         final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentEntity);
 
-        try (InputStream streamingContent = vaultDocumentManager.readDocument(documentEntity, vaultLocation)) {
-            return ResponseEntity.ok()
-                    .contentType(mediaTypeCalculator.calculateMediaType(documentEntity.getType()))
-                    .header("Content-Disposition", "attachment; filename=" + documentId + "."
-                            + documentEntity.getType().getFileExtension())
-                    .cacheControl(CacheControl.noCache())
-                    .body(new InputStreamResource(streamingContent));
-        }
+        final InputStream streamingContent = vaultDocumentManager.readDocument(documentEntity, vaultLocation);
+
+        return ResponseEntity.ok()
+                .contentType(mediaTypeCalculator.calculateMediaType(documentEntity.getType()))
+                .header("Content-Disposition", "attachment; filename=" + documentId + "."
+                        + documentEntity.getType().getFileExtension())
+                .cacheControl(CacheControl.noCache())
+                .body(new InputStreamResource(streamingContent));
     }
 }

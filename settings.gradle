@@ -13,4 +13,5 @@ include 'loa-service:loa-checksum-service'
 include 'loa-service:loa-url-service'
 include 'loa-service:loa-indexer-service'
 include 'loa-service:loa-compression-service'
+include 'loa-service:loa-vault-client-service'
 

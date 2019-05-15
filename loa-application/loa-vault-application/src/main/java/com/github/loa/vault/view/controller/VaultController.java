@@ -5,10 +5,10 @@ import com.github.loa.document.service.entity.factory.DocumentEntityFactory;
 import com.github.loa.vault.service.VaultDocumentManager;
 import com.github.loa.vault.service.VaultLocationFactory;
 import com.github.loa.vault.service.location.domain.VaultLocation;
+import com.github.loa.vault.view.service.MediaTypeCalculator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.CacheControl;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,6 +24,7 @@ public class VaultController {
     private final DocumentEntityFactory documentEntityFactory;
     private final VaultDocumentManager vaultDocumentManager;
     private final VaultLocationFactory vaultLocationFactory;
+    private final MediaTypeCalculator mediaTypeCalculator;
 
     /**
      * Return a document's content from the vault, based on the provided document id.
@@ -37,13 +38,13 @@ public class VaultController {
         final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentEntity,
                 documentEntity.getCompression());
 
-        try (InputStream streamingContent = vaultDocumentManager.readDocument(documentEntity, vaultLocation)) {
-            return ResponseEntity.ok()
-                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                    .header("Content-Disposition", "attachment; filename=" + documentId + "."
-                            + documentEntity.getType().getFileExtension())
-                    .cacheControl(CacheControl.noCache())
-                    .body(new InputStreamResource(streamingContent));
-        }
+        final InputStream streamingContent = vaultDocumentManager.readDocument(documentEntity, vaultLocation);
+
+        return ResponseEntity.ok()
+                .contentType(mediaTypeCalculator.calculateMediaType(documentEntity.getType()))
+                .header("Content-Disposition", "attachment; filename=" + documentId + "."
+                        + documentEntity.getType().getFileExtension())
+                .cacheControl(CacheControl.noCache())
+                .body(new InputStreamResource(streamingContent));
     }
 }
