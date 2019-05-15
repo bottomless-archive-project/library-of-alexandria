@@ -7,9 +7,9 @@ import com.github.loa.vault.service.VaultLocationFactory;
 import com.github.loa.vault.service.location.domain.VaultLocation;
 import com.github.loa.web.view.document.service.MediaTypeCalculator;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.io.IOUtils;
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.*;
+import org.springframework.http.CacheControl;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -36,21 +36,17 @@ public class DocumentQueryController {
      * @return the returned document's content
      */
     @GetMapping("/document/{documentId}")
-    public ResponseEntity<byte[]> queryDocument(@PathVariable final String documentId) throws IOException {
+    public ResponseEntity<InputStreamResource> queryDocument(@PathVariable final String documentId) throws IOException {
         final DocumentEntity documentEntity = documentEntityFactory.getDocumentEntity(documentId);
         final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentEntity);
 
-        // Can't work with pure InputStream here because we will need the decompressed file length for the response
         try (InputStream streamingContent = vaultDocumentManager.readDocument(documentEntity, vaultLocation)) {
-            final byte[] documentContent = IOUtils.toByteArray(streamingContent);
-
             return ResponseEntity.ok()
-                    .contentLength(documentContent.length)
                     .contentType(mediaTypeCalculator.calculateMediaType(documentEntity.getType()))
                     .header("Content-Disposition", "attachment; filename=" + documentId + "."
                             + documentEntity.getType().getFileExtension())
                     .cacheControl(CacheControl.noCache())
-                    .body(documentContent);
+                    .body(new InputStreamResource(streamingContent));
         }
     }
 }
