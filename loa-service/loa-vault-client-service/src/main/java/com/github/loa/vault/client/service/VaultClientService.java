@@ -7,30 +7,24 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.net.URL;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpRequest.BodyPublishers;
-import java.net.http.HttpResponse;
-import java.net.http.HttpResponse.BodyHandlers;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class VaultClientService {
 
     private final VaultClientConfigurationProperties vaultClientConfigurationProperties;
-    private final HttpClient httpClient;
 
     public void createDocument(final DocumentEntity documentEntity, final InputStream documentContent)
-            throws IOException, InterruptedException {
-        final HttpRequest mainRequest = HttpRequest.newBuilder()
-                .uri(URI.create("http://" + vaultClientConfigurationProperties.getHost() + ":"
-                        + vaultClientConfigurationProperties.getPort() + "/document/" + documentEntity.getId()))
-                .POST(BodyPublishers.ofInputStream(() -> documentContent))
-                .build();
+            throws IOException {
+        final MultipartUtility multipartUtility = new MultipartUtility("http://" + vaultClientConfigurationProperties.getHost() + ":"
+                + vaultClientConfigurationProperties.getPort() + "/document/" + documentEntity.getId(), "UTF-8");
 
-        httpClient.send(mainRequest, BodyHandlers.discarding());
+        multipartUtility.addFilePart("content", documentContent);
+
+        List<String> response = multipartUtility.finish();
+        System.out.println(response);
     }
 
     public InputStream queryDocument(final DocumentEntity documentEntity) {
