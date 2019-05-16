@@ -18,13 +18,18 @@ public class VaultClientService {
 
     public void createDocument(final DocumentEntity documentEntity, final InputStream documentContent)
             throws IOException {
-        final MultipartUtility multipartUtility = new MultipartUtility("http://" + vaultClientConfigurationProperties.getHost() + ":"
-                + vaultClientConfigurationProperties.getPort() + "/document/" + documentEntity.getId(), "UTF-8");
+        final MultipartRequest multipartRequest = new MultipartRequest("http://"
+                + vaultClientConfigurationProperties.getHost() + ":" + vaultClientConfigurationProperties.getPort()
+                + "/document/" + documentEntity.getId());
 
-        multipartUtility.addFilePart("content", documentContent);
+        multipartRequest.addFilePart("content", documentContent);
 
-        List<String> response = multipartUtility.finish();
-        System.out.println(response);
+        int response = multipartRequest.execute();
+
+        if (response != 200) {
+            throw new RuntimeException("Unable to index document " + documentEntity.getId()
+                    + "! Returned status code: " + response + ",");
+        }
     }
 
     public InputStream queryDocument(final DocumentEntity documentEntity) {
