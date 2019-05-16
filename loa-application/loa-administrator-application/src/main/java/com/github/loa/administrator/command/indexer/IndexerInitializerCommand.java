@@ -30,7 +30,8 @@ public class IndexerInitializerCommand implements CommandLineRunner {
 
     private void initializeAttachmentPipeline() throws IOException {
         final String source = "{\"description\":\"Processors for the Library of Alexandria project.\", " +
-                "\"processors\":[{\"attachment\":{\"field\":\"content\", \"indexed_chars\" : -1}}]}";
+                "\"processors\":[{\"attachment\":{\"field\":\"content\", \"indexed_chars\" : -1}, \"remove\": {" +
+                "\"field\": \"content\"}}]}";
 
         final PutPipelineRequest request = new PutPipelineRequest("vault-document-pipeline",
                 new BytesArray(source.getBytes(StandardCharsets.UTF_8)), XContentType.JSON

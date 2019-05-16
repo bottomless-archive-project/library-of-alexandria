@@ -14,18 +14,18 @@ import java.io.OutputStream;
 public class GZIPCompressionService implements CompressionService {
 
     @Override
-    public void compress(final InputStream documentContent, final OutputStream compressedDocumentContent) {
-        try (GzipCompressorOutputStream out = new GzipCompressorOutputStream(compressedDocumentContent)) {
-            IOUtils.copy(documentContent, out);
+    public OutputStream compress(final OutputStream compressedDocumentContent) {
+        try {
+            return new GzipCompressorOutputStream(compressedDocumentContent);
         } catch (IOException e) {
             throw new RuntimeException("Error while compressing document!", e);
         }
     }
 
     @Override
-    public void decompress(final InputStream compressedDocumentContent, OutputStream decompressedDocumentContent) {
-        try (GzipCompressorInputStream in = new GzipCompressorInputStream(compressedDocumentContent)) {
-            IOUtils.copy(in, decompressedDocumentContent);
+    public InputStream decompress(final InputStream compressedDocumentContent) {
+        try {
+            return new GzipCompressorInputStream(compressedDocumentContent);
         } catch (IOException e) {
             throw new RuntimeException("Error while decompressing document!", e);
         }

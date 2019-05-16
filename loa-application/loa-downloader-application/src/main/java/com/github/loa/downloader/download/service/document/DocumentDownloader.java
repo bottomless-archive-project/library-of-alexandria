@@ -1,6 +1,7 @@
 package com.github.loa.downloader.download.service.document;
 
 import com.github.loa.checksum.service.ChecksumProvider;
+import com.github.loa.compression.configuration.CompressionConfigurationProperties;
 import com.github.loa.compression.domain.DocumentCompression;
 import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.document.service.domain.DocumentStatus;
@@ -44,6 +45,7 @@ public class DocumentDownloader {
     private final ChecksumProvider checksumProvider;
     private final MeterRegistry meterRegistry;
     private final DownloaderConfigurationProperties downloaderConfigurationProperties;
+    private final CompressionConfigurationProperties compressionConfigurationProperties;
 
     public void downloadDocument(final URL documentLocation) {
         meterRegistry.counter("statistics.document-processed").increment();
@@ -95,7 +97,7 @@ public class DocumentDownloader {
                             .location(documentLocation)
                             .status(DocumentStatus.DOWNLOADED)
                             .versionNumber(downloaderConfigurationProperties.getVersionNumber())
-                            .compression(DocumentCompression.NONE)
+                            .compression(compressionConfigurationProperties.getAlgorithm())
                             .checksum(checksum)
                             .fileSize(fileSize)
                             .build()

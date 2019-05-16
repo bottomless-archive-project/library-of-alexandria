@@ -99,4 +99,17 @@ public class SMBFileManipulator {
             throw new VaultAccessException("Unable to remove file from vault!", e);
         }
     }
+
+    public long length(final String location) {
+        try (Connection connection = smbClient.connect(smbConfigurationProperties.getHost())) {
+            final AuthenticationContext authenticationContext = smbAuthenticationContextFactory.newContext();
+            final Session session = connection.authenticate(authenticationContext);
+
+            try (DiskShare share = (DiskShare) session.connectShare(smbConfigurationProperties.getShareName())) {
+                return share.getFileInformation(location).getStandardInformation().getAllocationSize();
+            }
+        } catch (IOException e) {
+            throw new VaultAccessException("Unable to remove file from vault!", e);
+        }
+    }
 }

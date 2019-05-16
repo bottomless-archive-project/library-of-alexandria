@@ -1,10 +1,7 @@
 package com.github.loa.compression.service;
 
-import org.apache.commons.compress.utils.IOUtils;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -12,20 +9,12 @@ import java.io.OutputStream;
 public class NoneCompressionService implements CompressionService {
 
     @Override
-    public void compress(InputStream documentContent, OutputStream compressedDocumentContent) {
-        try {
-            IOUtils.copy(documentContent, compressedDocumentContent);
-        } catch (IOException e) {
-            throw new RuntimeException("Error while compressing document!", e);
-        }
+    public OutputStream compress(OutputStream compressedDocumentContent) {
+        return compressedDocumentContent;
     }
 
     @Override
-    public void decompress(InputStream compressedDocumentContent, OutputStream decompressedDocumentContent) {
-        try {
-            IOUtils.copy(compressedDocumentContent, decompressedDocumentContent);
-        } catch (IOException e) {
-            throw new RuntimeException("Error while decompressing document!", e);
-        }
+    public InputStream decompress(final InputStream compressedDocumentContent) {
+        return compressedDocumentContent;
     }
 }

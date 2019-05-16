@@ -11,16 +11,14 @@ public interface CompressionService {
     /**
      * Compress the data provided on the input stream and write it to the provided output stream.
      *
-     * @param uncompressedData the input stream to compress
-     * @param compressedData   the output stream to write the compressed data to
+     * @param compressedData the output stream to write the compressed data to
      */
-    void compress(InputStream uncompressedData, OutputStream compressedData);
+    OutputStream compress(OutputStream compressedData);
 
     /**
      * Decompress the data provided on the input stream and write it to the provided output stream.
      *
-     * @param compressedData   the input stream to decompress
-     * @param uncompressedData the output stream to write the decompressed data to
+     * @param compressedData the input stream to decompress
      */
-    void decompress(InputStream compressedData, OutputStream uncompressedData);
+    InputStream decompress(InputStream compressedData);
 }
