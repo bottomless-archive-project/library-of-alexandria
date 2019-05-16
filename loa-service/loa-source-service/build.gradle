@@ -6,5 +6,5 @@ dependencies {
 
     compile group: 'com.github.davidmoten', name: 'io-extras', version: '0.1'
 
-    compile group: 'org.jsoup', name: 'jsoup', version: '1.11.3'
+    compile group: 'org.jsoup', name: 'jsoup', version: '1.12.1'
 }
