@@ -23,11 +23,9 @@ public class Sha256ChecksumProvider implements ChecksumProvider {
     public String checksum(final String documentId, final DocumentType documentType) {
         final File stageFileLocation = stageLocationFactory.getLocation(documentId, documentType);
 
-        try {
-            try (final BufferedInputStream documentInputStream =
-                         new BufferedInputStream(new FileInputStream(stageFileLocation))) {
-                return DigestUtils.sha256Hex(documentInputStream);
-            }
+        try (final BufferedInputStream documentInputStream = new BufferedInputStream(
+                new FileInputStream(stageFileLocation))) {
+            return DigestUtils.sha256Hex(documentInputStream);
         } catch (IOException e) {
             throw new RuntimeException("Failed to calculate file hash!", e);
         }
