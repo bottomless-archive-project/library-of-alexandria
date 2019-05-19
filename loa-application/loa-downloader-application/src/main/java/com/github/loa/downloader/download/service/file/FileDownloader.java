@@ -6,15 +6,19 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.zip.GZIPInputStream;
 
 /**
  * This service is responsible for downloading files from the internet.
  */
 @Service
 public class FileDownloader {
+
+    private static final String GZIP_ENCODING = "gzip";
 
     /**
      * Download a file from the provided url to the provided file location.
@@ -29,8 +33,9 @@ public class FileDownloader {
             final URLConnection urlConnection = downloadTarget.openConnection();
             urlConnection.setConnectTimeout(timeout);
             urlConnection.setReadTimeout(timeout);
+            urlConnection.setRequestProperty("Accept-Encoding", GZIP_ENCODING);
 
-            try (final InputStream inputStream = urlConnection.getInputStream()) {
+            try (final InputStream inputStream = buildInputStream(urlConnection)) {
                 try (final FileOutputStream outputStream = new FileOutputStream(resultLocation)) {
                     IOUtils.copyLarge(inputStream, outputStream);
                 }
@@ -38,5 +43,10 @@ public class FileDownloader {
         } catch (Exception e) {
             throw new FileDownloaderException("Error occurred while downloading file!", e);
         }
+    }
+
+    private InputStream buildInputStream(final URLConnection urlConnection) throws IOException {
+        return GZIP_ENCODING.equals(urlConnection.getContentEncoding()) ?
+                new GZIPInputStream(urlConnection.getInputStream()) : urlConnection.getInputStream();
     }
 }
