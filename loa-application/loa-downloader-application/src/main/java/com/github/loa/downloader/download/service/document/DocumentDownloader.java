@@ -83,7 +83,7 @@ public class DocumentDownloader {
             return;
         }
 
-        if (documentEntityFactory.isDocumentExists(checksum, fileSize)) {
+        if (documentEntityFactory.isDocumentExists(checksum, fileSize, documentType)) {
             documentFileManipulator.cleanup(documentId, documentType);
 
             return;

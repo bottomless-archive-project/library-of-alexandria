@@ -10,7 +10,7 @@ import java.time.Instant;
 @Setter
 @Entity(value = "document", noClassnameStored = true)
 @Indexes(
-        @Index(fields = {@Field("checksum"), @Field("fileSize")})
+        @Index(fields = {@Field("checksum"), @Field("fileSize"), @Field("type")})
 )
 public class DocumentDatabaseEntity {
 

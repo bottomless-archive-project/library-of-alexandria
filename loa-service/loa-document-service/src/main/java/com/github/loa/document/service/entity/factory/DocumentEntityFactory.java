@@ -5,6 +5,7 @@ import com.github.loa.document.repository.DocumentRepository;
 import com.github.loa.document.repository.domain.DocumentDatabaseEntity;
 import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.document.service.domain.DocumentStatus;
+import com.github.loa.document.service.domain.DocumentType;
 import com.github.loa.document.service.entity.factory.domain.DocumentCreationContext;
 import com.github.loa.document.service.entity.transformer.DocumentEntityTransformer;
 import dev.morphia.query.internal.MorphiaCursor;
@@ -42,8 +43,8 @@ public class DocumentEntityFactory {
      * @param fileSize the file size used for the checking
      * @return return true if a document exist with the provided parameters or false otherwise
      */
-    public boolean isDocumentExists(final String checksum, final long fileSize) {
-        return !documentRepository.findByChecksumAndFileSize(checksum, fileSize).isEmpty();
+    public boolean isDocumentExists(final String checksum, final long fileSize, final DocumentType type) {
+        return !documentRepository.findByChecksumAndFileSize(checksum, fileSize, type.name()).isEmpty();
     }
 
     public DocumentEntity getDocumentEntity(final String documentId) {
@@ -79,9 +80,9 @@ public class DocumentEntityFactory {
      * @param fileSize the file size value of the document
      * @return the list of documents with the provided values
      */
-    public List<DocumentEntity> getDocumentEntity(final String checksum, final long fileSize) {
+    public List<DocumentEntity> getDocumentEntity(final String checksum, final long fileSize, final DocumentType type) {
         final List<DocumentDatabaseEntity> documentDatabaseEntities =
-                documentRepository.findByChecksumAndFileSize(checksum, fileSize);
+                documentRepository.findByChecksumAndFileSize(checksum, fileSize, type.name());
 
         return documentEntityTransformer.transform(documentDatabaseEntities);
     }

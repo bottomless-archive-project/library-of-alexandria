@@ -81,10 +81,12 @@ public class DocumentRepository {
         datastore.update(query, updateOperations);
     }
 
-    public List<DocumentDatabaseEntity> findByChecksumAndFileSize(final String checksum, final long fileSize) {
+    public List<DocumentDatabaseEntity> findByChecksumAndFileSize(final String checksum, final long fileSize,
+            final String type) {
         return datastore.createQuery(DocumentDatabaseEntity.class)
                 .field("checksum").equal(checksum)
                 .field("fileSize").equal(fileSize)
+                .field("type").equal(type)
                 .find(
                         new FindOptions()
                                 .limit(100)
