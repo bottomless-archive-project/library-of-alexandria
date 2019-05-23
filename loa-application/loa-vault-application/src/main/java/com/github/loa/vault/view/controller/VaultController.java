@@ -8,10 +8,12 @@ import com.github.loa.vault.service.location.domain.VaultLocation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.CacheControl;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,7 +29,9 @@ public class VaultController {
     @PostMapping("/document/{documentId}")
     public void archiveDocument(@PathVariable final String documentId,
             @RequestParam("content") final MultipartFile content) throws IOException {
-        final DocumentEntity documentEntity = documentEntityFactory.getDocumentEntity(documentId);
+        final DocumentEntity documentEntity = documentEntityFactory.getDocumentEntity(documentId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Document not found with id " + documentId + "!"));
 
         vaultDocumentManager.archiveDocument(documentEntity, content.getInputStream());
     }
@@ -40,7 +44,9 @@ public class VaultController {
      */
     @GetMapping("/document/{documentId}")
     public ResponseEntity<InputStreamResource> queryDocument(@PathVariable final String documentId) {
-        final DocumentEntity documentEntity = documentEntityFactory.getDocumentEntity(documentId);
+        final DocumentEntity documentEntity = documentEntityFactory.getDocumentEntity(documentId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Document not found with id " + documentId + "!"));
         final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentEntity,
                 documentEntity.getCompression());
 

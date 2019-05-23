@@ -11,6 +11,7 @@ import org.springframework.http.*;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.InputStream;
 
@@ -33,7 +34,9 @@ public class DocumentQueryController {
      */
     @GetMapping("/document/{documentId}")
     public ResponseEntity<InputStreamResource> queryDocument(@PathVariable final String documentId) {
-        final DocumentEntity documentEntity = documentEntityFactory.getDocumentEntity(documentId);
+        final DocumentEntity documentEntity = documentEntityFactory.getDocumentEntity(documentId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Document not found with id " + documentId + "!"));
         final InputStream streamingContent = vaultClientService.queryDocument(documentEntity);
 
         final HttpHeaders httpHeaders = new HttpHeaders();

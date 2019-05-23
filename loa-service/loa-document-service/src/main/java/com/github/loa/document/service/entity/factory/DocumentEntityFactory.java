@@ -1,6 +1,5 @@
 package com.github.loa.document.service.entity.factory;
 
-import com.github.loa.compression.domain.DocumentCompression;
 import com.github.loa.document.repository.DocumentRepository;
 import com.github.loa.document.repository.domain.DocumentDatabaseEntity;
 import com.github.loa.document.service.domain.DocumentEntity;
@@ -14,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.stream.Stream;
@@ -27,16 +27,6 @@ public class DocumentEntityFactory {
     private final DocumentEntityTransformer documentEntityTransformer;
 
     /**
-     * Check if a document exists based on the provided document id.
-     *
-     * @param documentId the id of the document to check
-     * @return return true if a document exists with the provided id
-     */
-    public boolean isDocumentExists(final String documentId) {
-        return documentRepository.findById(documentId) != null;
-    }
-
-    /**
      * Return true if any document exists with the provided checksum and file size.
      *
      * @param checksum the checksum to use for the checking
@@ -47,10 +37,12 @@ public class DocumentEntityFactory {
         return !documentRepository.findByChecksumAndFileSize(checksum, fileSize, type.name()).isEmpty();
     }
 
-    public DocumentEntity getDocumentEntity(final String documentId) {
+    public Optional<DocumentEntity> getDocumentEntity(final String documentId) {
         final DocumentDatabaseEntity documentDatabaseEntities = documentRepository.findById(documentId);
 
-        return documentEntityTransformer.transform(documentDatabaseEntities);
+        return documentDatabaseEntities == null ? Optional.empty() : Optional.of(
+                documentEntityTransformer.transform(documentDatabaseEntities));
+
     }
 
     /**
@@ -62,27 +54,6 @@ public class DocumentEntityFactory {
     public List<DocumentEntity> getDocumentEntity(final DocumentStatus documentStatus) {
         final List<DocumentDatabaseEntity> documentDatabaseEntities =
                 documentRepository.findByStatus(documentStatus.toString());
-
-        return documentEntityTransformer.transform(documentDatabaseEntities);
-    }
-
-    public List<DocumentEntity> getDocumentEntity(final DocumentCompression compression) {
-        final List<DocumentDatabaseEntity> documentDatabaseEntities =
-                documentRepository.findByCompression(compression.toString());
-
-        return documentEntityTransformer.transform(documentDatabaseEntities);
-    }
-
-    /**
-     * Return the document entities belonging to the provided checksum and file size values.
-     *
-     * @param checksum the checksum value of the document
-     * @param fileSize the file size value of the document
-     * @return the list of documents with the provided values
-     */
-    public List<DocumentEntity> getDocumentEntity(final String checksum, final long fileSize, final DocumentType type) {
-        final List<DocumentDatabaseEntity> documentDatabaseEntities =
-                documentRepository.findByChecksumAndFileSize(checksum, fileSize, type.name());
 
         return documentEntityTransformer.transform(documentDatabaseEntities);
     }
@@ -115,6 +86,6 @@ public class DocumentEntityFactory {
 
         documentRepository.insertDocument(documentDatabaseEntity);
 
-        return getDocumentEntity(documentCreationContext.getId());
+        return getDocumentEntity(documentCreationContext.getId()).get();
     }
 }
