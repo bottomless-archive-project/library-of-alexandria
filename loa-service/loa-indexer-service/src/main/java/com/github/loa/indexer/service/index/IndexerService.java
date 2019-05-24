@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.common.unit.TimeValue;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -17,7 +18,8 @@ public class IndexerService {
     private final IndexResponseActionListenerFactory indexResponseActionListenerFactory;
 
     public void indexDocument(final DocumentEntity documentEntity) {
-        final IndexRequest indexRequest = indexRequestFactory.newIndexRequest(documentEntity);
+        final IndexRequest indexRequest = indexRequestFactory.newIndexRequest(documentEntity)
+                .timeout(TimeValue.timeValueMinutes(30));
 
         restHighLevelClient.indexAsync(indexRequest, RequestOptions.DEFAULT,
                 indexResponseActionListenerFactory.newListener(documentEntity));
