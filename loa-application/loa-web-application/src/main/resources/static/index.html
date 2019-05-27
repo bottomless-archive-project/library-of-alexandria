@@ -109,7 +109,7 @@
                                     });
                                 }
 
-                                $http.get('http://localhost/document/find-by/keyword/' + $scope.searchText + '/?pageNumber=' + $scope.page * 10)
+                                $http.get('/document/find-by/keyword/' + $scope.searchText + '/?pageNumber=' + $scope.page * 10)
                                     .then(function (response) {
                                         $scope.hits = response.data.searchHits;
                                         $scope.hitCount = response.data.totalHitCount;
