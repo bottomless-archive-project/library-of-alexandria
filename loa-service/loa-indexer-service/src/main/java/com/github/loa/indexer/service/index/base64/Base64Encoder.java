@@ -1,5 +1,6 @@
 package com.github.loa.indexer.service.index.base64;
 
+import com.github.loa.indexer.service.index.base64.domain.Base64EncodingException;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedInputStream;
@@ -13,7 +14,7 @@ public class Base64Encoder {
 
     private static final int BUFFER_SIZE = 3 * 1024;
 
-    public String encode(final InputStream input) throws IOException {
+    public String encode(final InputStream input) throws Base64EncodingException {
         try (BufferedInputStream in = new BufferedInputStream(input, BUFFER_SIZE)) {
             final Base64.Encoder encoder = Base64.getEncoder();
             final StringBuilder result = new StringBuilder();
@@ -28,7 +29,7 @@ public class Base64Encoder {
                     final byte[] workingChunk = new byte[BUFFER_SIZE];
                     byteBuffer.get(workingChunk);
 
-                    result.append(encoder.encodeToString(workingChunk));
+                    safeAppend(result, encoder.encodeToString(workingChunk));
                 }
             }
 
@@ -36,11 +37,26 @@ public class Base64Encoder {
                 final byte[] workingChunk = new byte[byteBuffer.available()];
                 byteBuffer.get(workingChunk);
 
-                result.append(encoder.encodeToString(workingChunk));
+                safeAppend(result, encoder.encodeToString(workingChunk));
             }
 
 
             return result.toString();
+        } catch (IOException e) {
+            throw new Base64EncodingException("Unable to encode the provided input stream!", e);
+        }
+    }
+
+    private void safeAppend(final StringBuilder stringBuilder, final String target) {
+        try {
+            stringBuilder.append(target);
+        } catch (OutOfMemoryError e) {
+            if (e.getMessage() == null) {
+                //Safe to catch and necessary. Check issue #54.
+                throw new Base64EncodingException("Unable to encode the provided input stream! It is too big!");
+            }
+
+            throw e;
         }
     }
 }

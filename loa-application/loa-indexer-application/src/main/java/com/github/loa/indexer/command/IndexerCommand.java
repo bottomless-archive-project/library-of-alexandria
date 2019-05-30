@@ -35,7 +35,7 @@ public class IndexerCommand implements CommandLineRunner {
 
                     Thread.sleep(indexerConfigurationProperties.getSleepTime());
                 } else {
-                    documentEntities.forEach(indexerService::indexDocument);
+                    indexerService.indexDocuments(documentEntities);
 
                     log.info("Indexed " + documentEntities.size() + " documents!");
                 }

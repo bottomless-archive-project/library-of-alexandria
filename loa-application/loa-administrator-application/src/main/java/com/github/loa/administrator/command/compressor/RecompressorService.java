@@ -33,6 +33,7 @@ public class RecompressorService {
 
         try {
             final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentEntity);
+            //TODO: IOUtils.toByteArray could overflow!
             final byte[] documentContent = IOUtils.toByteArray(
                     vaultDocumentManager.readDocument(documentEntity, vaultLocation));
 
