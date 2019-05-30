@@ -3,6 +3,7 @@ package com.github.loa.indexer.service.index;
 import com.github.loa.document.service.domain.DocumentEntity;
 import lombok.RequiredArgsConstructor;
 import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.common.unit.TimeValue;
 import org.springframework.stereotype.Service;
 import com.github.loa.indexer.service.index.base64.DocumentBase64Encoder;
 
@@ -20,6 +21,7 @@ public class IndexRequestFactory {
         return new IndexRequest("vault_documents")
                 .id(documentEntity.getId())
                 .source(Map.of("content", documentBase64String))
-                .setPipeline("vault-document-pipeline");
+                .setPipeline("vault-document-pipeline")
+                .timeout(TimeValue.timeValueMinutes(30));
     }
 }

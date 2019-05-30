@@ -30,6 +30,7 @@ public class IndexDatabaseConfiguration {
                                 requestConfigBuilder -> requestConfigBuilder
                                         .setConnectTimeout((int) TimeUnit.MINUTES.toMillis(1))
                                         .setSocketTimeout((int) TimeUnit.MINUTES.toMillis(30))
+                                        .setConnectionRequestTimeout((int) TimeUnit.MINUTES.toMillis(30))
                         )
         );
     }
