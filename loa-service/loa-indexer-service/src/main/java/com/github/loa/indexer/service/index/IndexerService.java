@@ -30,13 +30,13 @@ public class IndexerService {
 
     public void indexDocuments(final List<DocumentEntity> documentEntities) {
         for (DocumentEntity documentEntity : documentEntities) {
-            final IndexRequest indexRequest = indexRequestFactory.newIndexRequest(documentEntity);
-
             try {
                 semaphore.acquire();
 
                 executorService.submit(() -> {
                     try {
+                        final IndexRequest indexRequest = indexRequestFactory.newIndexRequest(documentEntity);
+
                         restHighLevelClient.index(indexRequest, RequestOptions.DEFAULT);
 
                         documentManipulator.markIndexed(documentEntity.getId());
