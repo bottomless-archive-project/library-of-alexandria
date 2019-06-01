@@ -1,5 +1,6 @@
 package com.github.loa.indexer.command;
 
+import com.github.loa.document.service.DocumentManipulator;
 import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.document.service.domain.DocumentStatus;
 import com.github.loa.document.service.entity.factory.DocumentEntityFactory;
@@ -20,6 +21,7 @@ public class IndexerCommand implements CommandLineRunner {
     private final DocumentEntityFactory documentEntityFactory;
     private final IndexerConfigurationProperties indexerConfigurationProperties;
     private final IndexerService indexerService;
+    private final DocumentManipulator documentManipulator;
 
     @Override
     public void run(final String... args) {
@@ -35,7 +37,15 @@ public class IndexerCommand implements CommandLineRunner {
 
                     Thread.sleep(indexerConfigurationProperties.getSleepTime());
                 } else {
-                    indexerService.indexDocuments(documentEntities);
+                    for (DocumentEntity documentEntity : documentEntities) {
+                        if (documentEntity.getFileSize() < indexerConfigurationProperties.getMaximumFileSize()) {
+                            indexerService.indexDocuments(documentEntity);
+                        } else {
+                            log.info("Skipping document " + documentEntity.getId() + " because it's size is too high.");
+
+                            documentManipulator.markIndexFailure(documentEntity.getId());
+                        }
+                    }
 
                     log.info("Indexed " + documentEntities.size() + " documents!");
                 }

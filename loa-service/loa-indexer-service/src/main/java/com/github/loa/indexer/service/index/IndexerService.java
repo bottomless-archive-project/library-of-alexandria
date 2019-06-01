@@ -12,7 +12,6 @@ import org.elasticsearch.client.RestHighLevelClient;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
@@ -28,30 +27,28 @@ public class IndexerService {
     private final ExecutorService executorService = Executors.newFixedThreadPool(20);
     private final Semaphore semaphore = new Semaphore(25);
 
-    public void indexDocuments(final List<DocumentEntity> documentEntities) {
-        for (DocumentEntity documentEntity : documentEntities) {
-            try {
-                semaphore.acquire();
+    public void indexDocuments(final DocumentEntity documentEntity) {
+        try {
+            semaphore.acquire();
 
-                executorService.submit(() -> {
-                    try {
-                        final IndexRequest indexRequest = indexRequestFactory.newIndexRequest(documentEntity);
+            executorService.submit(() -> {
+                try {
+                    final IndexRequest indexRequest = indexRequestFactory.newIndexRequest(documentEntity);
 
-                        restHighLevelClient.index(indexRequest, RequestOptions.DEFAULT);
+                    restHighLevelClient.index(indexRequest, RequestOptions.DEFAULT);
 
-                        documentManipulator.markIndexed(documentEntity.getId());
-                    } catch (IOException | ElasticsearchException | Base64EncodingException e) {
-                        log.info("Failed to index document " + documentEntity.getId() + "! Cause: '"
-                                + e.getMessage() + "'.");
+                    documentManipulator.markIndexed(documentEntity.getId());
+                } catch (IOException | ElasticsearchException | Base64EncodingException e) {
+                    log.info("Failed to index document " + documentEntity.getId() + "! Cause: '"
+                            + e.getMessage() + "'.");
 
-                        documentManipulator.markIndexFailure(documentEntity.getId());
-                    }
+                    documentManipulator.markIndexFailure(documentEntity.getId());
+                }
 
-                    semaphore.release();
-                });
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+                semaphore.release();
+            });
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 }

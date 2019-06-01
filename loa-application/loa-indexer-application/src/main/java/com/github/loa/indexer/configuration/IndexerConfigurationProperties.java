@@ -10,4 +10,5 @@ import org.springframework.stereotype.Component;
 public class IndexerConfigurationProperties {
 
     private int sleepTime;
+    private int maximumFileSize;
 }
