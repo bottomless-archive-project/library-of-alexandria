@@ -1,29 +1,36 @@
-<div class="form-group">
-    <input ng-model="searchText" ng-change="searchTextChanged()" ng-model-options='{ debounce: 1000 }'
-           class="form-control" placeholder="Search for something">
-</div>
-<div class="text-center" style="user-select: none;" ng-if="hits.length > 0">
-    <nav aria-label="Page navigation example">
-        <ul class="pagination justify-content-center">
-            <li class="page-item">
-                <a class="page-link" ng-click="jumpToPage(page-1)" ng-if="page != 0">Prev</a>
-                <a class="page-link disabled" ng-if="page == 0">Prev</a>
-            </li>
-            <li ng-repeat="x in getPageCountToDisplayOnLeftSide() track by $index" class="page-item">
-                <a class="page-link" ng-bind="x + 1" ng-click="jumpToPage(x)"></a>
-            </li>
-            <li class="page-item active">
-                <a class="page-link disabled" ng-bind="page + 1"></a>
-            </li>
-            <li ng-repeat="x in getPageCountToDisplayOnRightSide() track by $index" class="page-item">
-                <a class="page-link" ng-bind="x+1" ng-click="jumpToPage(x)"></a>
-            </li>
-            <li class="page-item">
-                <a class="page-link" ng-click="jumpToPage(page+1)" ng-if="page != totalPages -1">Next</a>
-                <a class="page-link disabled" ng-if="page == totalPages -1">Next</a>
-            </li>
-        </ul>
-    </nav>
+<div class="row">
+    <div class="col">
+        <div class="form-group">
+            <input ng-model="searchText" ng-change="searchTextChanged()" ng-model-options='{ debounce: 1000 }'
+                   class="form-control" placeholder="Search for something">
+        </div>
+    </div>
+</div><div class="row">
+    <div class="col">
+        <div class="text-center" style="user-select: none;" ng-if="hits.length > 0">
+            <nav aria-label="Page navigation example">
+                <ul class="pagination justify-content-center" style="flex-wrap: wrap;">
+                    <li class="page-item">
+                        <a class="page-link" ng-click="jumpToPage(page-1)" ng-if="page != 0">Prev</a>
+                        <a class="page-link disabled" ng-if="page == 0">Prev</a>
+                    </li>
+                    <li ng-repeat="x in getPageCountToDisplayOnLeftSide() track by $index" class="page-item">
+                        <a class="page-link" ng-bind="x + 1" ng-click="jumpToPage(x)"></a>
+                    </li>
+                    <li class="page-item active">
+                        <a class="page-link disabled" ng-bind="page + 1"></a>
+                    </li>
+                    <li ng-repeat="x in getPageCountToDisplayOnRightSide() track by $index" class="page-item">
+                        <a class="page-link" ng-bind="x+1" ng-click="jumpToPage(x)"></a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" ng-click="jumpToPage(page+1)" ng-if="page != totalPages -1">Next</a>
+                        <a class="page-link disabled" ng-if="page == totalPages -1">Next</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
 </div>
 <div class="row mb-3 text-center" ng-if="hits.length > 0">
     <div class="col">
