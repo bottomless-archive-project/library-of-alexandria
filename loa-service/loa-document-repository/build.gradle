@@ -1,3 +1,3 @@
 dependencies {
-    compile group: 'dev.morphia.morphia', name: 'core', version: '1.5.2'
+    compile group: 'dev.morphia.morphia', name: 'core', version: '1.5.3'
 }
