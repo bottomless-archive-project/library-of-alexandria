@@ -3,8 +3,6 @@ package com.github.loa.vault.view.controller;
 import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.document.service.entity.factory.DocumentEntityFactory;
 import com.github.loa.vault.service.VaultDocumentManager;
-import com.github.loa.vault.service.VaultLocationFactory;
-import com.github.loa.vault.service.location.domain.VaultLocation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.CacheControl;
@@ -24,7 +22,6 @@ public class VaultController {
 
     private final DocumentEntityFactory documentEntityFactory;
     private final VaultDocumentManager vaultDocumentManager;
-    private final VaultLocationFactory vaultLocationFactory;
 
     @PostMapping("/document/{documentId}")
     public void archiveDocument(@PathVariable final String documentId,
@@ -47,10 +44,8 @@ public class VaultController {
         final DocumentEntity documentEntity = documentEntityFactory.getDocumentEntity(documentId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Document not found with id " + documentId + "!"));
-        final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentEntity,
-                documentEntity.getCompression());
 
-        final InputStream streamingContent = vaultDocumentManager.readDocument(documentEntity, vaultLocation);
+        final InputStream streamingContent = vaultDocumentManager.readDocument(documentEntity);
 
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)

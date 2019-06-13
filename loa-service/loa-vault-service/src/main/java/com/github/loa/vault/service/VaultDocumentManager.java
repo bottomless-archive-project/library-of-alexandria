@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
 import org.springframework.stereotype.Service;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -43,11 +42,25 @@ public class VaultDocumentManager {
         }
     }
 
-    public InputStream readDocument(final DocumentEntity documentEntity, final VaultLocation vaultLocation) {
+    /**
+     * Return the content of a document as an {@link InputStream}.
+     *
+     * @param documentEntity the document to return the content for
+     * @return the content of the document
+     */
+    public InputStream readDocument(final DocumentEntity documentEntity) {
+        final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentEntity,
+                documentEntity.getCompression());
+
         return compressionServiceProvider.getCompressionService(documentEntity.getCompression())
                 .decompress(vaultLocation.content());
     }
 
+    /**
+     * Remove the content of a document from the vault.
+     *
+     * @param documentEntity the document to remove
+     */
     public void removeDocument(final DocumentEntity documentEntity) {
         final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentEntity,
                 documentEntity.getCompression());

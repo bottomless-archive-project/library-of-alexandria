@@ -11,6 +11,11 @@ public class SMBAuthenticationContextFactory {
 
     private final SMBConfigurationProperties smbConfigurationProperties;
 
+    /**
+     * Return a new authentication context based on the provided configuration properties.
+     *
+     * @return the new authentication context
+     */
     public AuthenticationContext newContext() {
         final String username = smbConfigurationProperties.getUsername() == null ? ""
                 : smbConfigurationProperties.getUsername();

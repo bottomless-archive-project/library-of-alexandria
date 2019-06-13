@@ -87,6 +87,11 @@ public class SMBFileManipulator {
         }
     }
 
+    /**
+     * Remove a file on the SMB share.
+     *
+     * @param location the location of the file
+     */
     public void removeFile(final String location) {
         try (Connection connection = smbClient.connect(smbConfigurationProperties.getHost())) {
             final AuthenticationContext authenticationContext = smbAuthenticationContextFactory.newContext();
@@ -94,19 +99,6 @@ public class SMBFileManipulator {
 
             try (DiskShare share = (DiskShare) session.connectShare(smbConfigurationProperties.getShareName())) {
                 share.rm(location);
-            }
-        } catch (IOException e) {
-            throw new VaultAccessException("Unable to remove file from vault!", e);
-        }
-    }
-
-    public long length(final String location) {
-        try (Connection connection = smbClient.connect(smbConfigurationProperties.getHost())) {
-            final AuthenticationContext authenticationContext = smbAuthenticationContextFactory.newContext();
-            final Session session = connection.authenticate(authenticationContext);
-
-            try (DiskShare share = (DiskShare) session.connectShare(smbConfigurationProperties.getShareName())) {
-                return share.getFileInformation(location).getStandardInformation().getAllocationSize();
             }
         } catch (IOException e) {
             throw new VaultAccessException("Unable to remove file from vault!", e);

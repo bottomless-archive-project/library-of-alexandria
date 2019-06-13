@@ -4,8 +4,6 @@ import com.github.loa.compression.configuration.CompressionConfigurationProperti
 import com.github.loa.document.service.DocumentManipulator;
 import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.vault.service.VaultDocumentManager;
-import com.github.loa.vault.service.VaultLocationFactory;
-import com.github.loa.vault.service.location.domain.VaultLocation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
@@ -21,7 +19,6 @@ import java.io.IOException;
 @ConditionalOnProperty("silent-compressor")
 public class RecompressorService {
 
-    private final VaultLocationFactory vaultLocationFactory;
     private final VaultDocumentManager vaultDocumentManager;
     private final DocumentManipulator documentManipulator;
     private final CompressionConfigurationProperties compressionConfigurationProperties;
@@ -32,10 +29,9 @@ public class RecompressorService {
                 + compressionConfigurationProperties.getAlgorithm() + ".");
 
         try {
-            final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentEntity);
             //TODO: IOUtils.toByteArray could overflow!
             final byte[] documentContent = IOUtils.toByteArray(
-                    vaultDocumentManager.readDocument(documentEntity, vaultLocation));
+                    vaultDocumentManager.readDocument(documentEntity));
 
             vaultDocumentManager.removeDocument(documentEntity);
             vaultDocumentManager.archiveDocument(documentEntity, new ByteArrayInputStream(documentContent));
