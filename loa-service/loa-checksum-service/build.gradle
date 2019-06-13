@@ -1,5 +1,5 @@
 dependencies {
-    compile group: 'commons-codec', name: 'commons-codec', version: '1.11'
+    compile group: 'commons-codec', name: 'commons-codec', version: '1.12'
 
     compile project(':loa-service:loa-stage-service')
 }

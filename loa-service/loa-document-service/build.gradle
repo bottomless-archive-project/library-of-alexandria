@@ -2,5 +2,5 @@ dependencies {
     compile project(':loa-service:loa-document-repository')
     compile project(':loa-service:loa-compression-service')
 
-    compile group: 'commons-codec', name: 'commons-codec', version: '1.11'
+    compile group: 'commons-codec', name: 'commons-codec', version: '1.12'
 }
