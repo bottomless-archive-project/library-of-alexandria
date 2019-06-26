@@ -4,6 +4,8 @@ dependencies {
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-webflux'
 
+    compile group: 'org.easybatch', name: 'easybatch-core', version: '5.2.0'
+
     compile project(':loa-service:loa-document-service')
     compile project(':loa-service:loa-source-service')
     compile project(':loa-service:loa-stage-service')
