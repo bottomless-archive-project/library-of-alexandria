@@ -68,7 +68,7 @@ public class CommonCrawlDocumentLocationRecordReader implements RecordReader {
             processedWarcFiles++;
         }
 
-        return new StringRecord(new Header(line++, "file", new Date()), availableUrls.get(0).toString());
+        return new StringRecord(new Header(line++, "file", new Date()), availableUrls.remove(0).toString());
     }
 
     @Override

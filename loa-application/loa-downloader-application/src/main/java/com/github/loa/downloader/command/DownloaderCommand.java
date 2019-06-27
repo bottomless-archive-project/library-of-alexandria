@@ -4,6 +4,7 @@ import com.github.loa.downloader.command.batch.filter.DocumentLocationRecordFilt
 import com.github.loa.downloader.command.batch.mapper.DocumentLocationEncoderRecordMapper;
 import com.github.loa.downloader.command.batch.mapper.DocumentLocationRecordMapper;
 import com.github.loa.downloader.command.batch.processor.DocumentLocationRecordProcessor;
+import com.github.loa.downloader.command.configuration.DownloaderExecutorConfigurationProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.easybatch.core.job.Job;
@@ -23,6 +24,7 @@ public class DownloaderCommand implements CommandLineRunner {
     private final DocumentLocationRecordMapper documentLocationRecordMapper;
     private final DocumentLocationEncoderRecordMapper documentLocationEncoderRecordMapper;
     private final DocumentLocationRecordProcessor documentLocationRecordProcessor;
+    private final DownloaderExecutorConfigurationProperties downloaderExecutorConfigurationProperties;
 
     @Override
     public void run(final String... args) {
@@ -36,7 +38,7 @@ public class DownloaderCommand implements CommandLineRunner {
                 .processor(documentLocationRecordProcessor)
                 .build();
 
-        final JobExecutor jobExecutor = new JobExecutor(30);
+        final JobExecutor jobExecutor = new JobExecutor(downloaderExecutorConfigurationProperties.getThreadCount());
         jobExecutor.execute(job);
         jobExecutor.shutdown();
         //documentSourceProcessor.processDocumentSource(documentSourceProviderFactory.openSource());
