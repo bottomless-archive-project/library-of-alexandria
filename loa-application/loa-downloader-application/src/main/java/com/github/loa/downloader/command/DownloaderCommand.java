@@ -1,16 +1,17 @@
 package com.github.loa.downloader.command;
 
-import com.github.loa.downloader.command.batch.filter.DocumentLocationRecordFilter;
-import com.github.loa.downloader.command.batch.mapper.DocumentLocationEncoderRecordMapper;
-import com.github.loa.downloader.command.batch.mapper.DocumentLocationRecordMapper;
-import com.github.loa.downloader.command.batch.processor.DocumentLocationRecordProcessor;
+import com.github.loa.downloader.command.batch.mapper.DocumentLocationConverterTask;
+import com.github.loa.downloader.command.batch.mapper.DocumentLocationEncoderTask;
+import com.github.loa.downloader.command.batch.mapper.DocumentLocationFilterTask;
+import com.github.loa.downloader.command.batch.processor.DocumentLocationProcessorTask;
 import com.github.loa.downloader.command.configuration.DownloaderExecutorConfigurationProperties;
+import com.morethanheroic.taskforce.executor.JobExecutor;
+import com.morethanheroic.taskforce.generator.Generator;
+import com.morethanheroic.taskforce.job.Job;
+import com.morethanheroic.taskforce.job.builder.JobBuilder;
+import com.morethanheroic.taskforce.sink.DiscardingSink;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.easybatch.core.job.Job;
-import org.easybatch.core.job.JobBuilder;
-import org.easybatch.core.job.JobExecutor;
-import org.easybatch.core.reader.RecordReader;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -19,28 +20,29 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class DownloaderCommand implements CommandLineRunner {
 
-    private final RecordReader recordReader;
-    private final DocumentLocationRecordFilter documentLocationRecordFilter;
-    private final DocumentLocationRecordMapper documentLocationRecordMapper;
-    private final DocumentLocationEncoderRecordMapper documentLocationEncoderRecordMapper;
-    private final DocumentLocationRecordProcessor documentLocationRecordProcessor;
     private final DownloaderExecutorConfigurationProperties downloaderExecutorConfigurationProperties;
+
+    private final Generator<String> generator;
+    private final DocumentLocationConverterTask documentLocationConverterTask;
+    private final DocumentLocationFilterTask documentLocationFilterTask;
+    private final DocumentLocationEncoderTask documentLocationEncoderTask;
+    private final DocumentLocationProcessorTask documentLocationRecordProcessor;
+
+    private final JobExecutor jobExecutor;
 
     @Override
     public void run(final String... args) {
         log.info("Initializing document processing.");
 
-        final Job job = JobBuilder.aNewJob()
-                .reader(recordReader)
-                .mapper(documentLocationRecordMapper)
-                .filter(documentLocationRecordFilter)
-                .mapper(documentLocationEncoderRecordMapper)
-                .processor(documentLocationRecordProcessor)
+        final Job job = JobBuilder.newBuilder()
+                .generator(generator)
+                .task(documentLocationConverterTask)
+                .task(documentLocationFilterTask)
+                .task(documentLocationEncoderTask)
+                .task(documentLocationRecordProcessor)
+                .sink(DiscardingSink.of())
                 .build();
 
-        final JobExecutor jobExecutor = new JobExecutor(downloaderExecutorConfigurationProperties.getThreadCount());
-        jobExecutor.execute(job);
-        jobExecutor.shutdown();
-        //documentSourceProcessor.processDocumentSource(documentSourceProviderFactory.openSource());
+        jobExecutor.execute(job, downloaderExecutorConfigurationProperties.getThreadCount());
     }
 }

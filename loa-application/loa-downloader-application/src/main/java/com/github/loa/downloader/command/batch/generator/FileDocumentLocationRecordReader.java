@@ -1,12 +1,9 @@
-package com.github.loa.downloader.command.batch.reader;
+package com.github.loa.downloader.command.batch.generator;
 
 import com.github.loa.source.configuration.file.FileDocumentSourceConfiguration;
 import com.github.loa.source.service.file.FileSourceFactory;
+import com.morethanheroic.taskforce.generator.Generator;
 import lombok.RequiredArgsConstructor;
-import org.easybatch.core.reader.RecordReader;
-import org.easybatch.core.record.Header;
-import org.easybatch.core.record.Record;
-import org.easybatch.core.record.StringRecord;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Scope;
@@ -15,19 +12,27 @@ import org.springframework.stereotype.Service;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Date;
+import java.util.Optional;
 
 @Service
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 @RequiredArgsConstructor
 @ConditionalOnProperty(name = "loa.source.type", havingValue = "file")
-public class FileDocumentLocationRecordReader implements RecordReader {
+public class FileDocumentLocationRecordReader implements Generator<String> {
 
     private final FileDocumentSourceConfiguration fileDocumentSourceConfiguration;
     private final FileSourceFactory fileSourceFactory;
 
     private BufferedReader reader;
-    private long line = 1;
+
+    @Override
+    public Optional<String> generate() {
+        try {
+            return Optional.ofNullable(reader.readLine());
+        } catch (IOException e) {
+            return Optional.empty();
+        }
+    }
 
     @Override
     public void open() {
@@ -36,14 +41,11 @@ public class FileDocumentLocationRecordReader implements RecordReader {
     }
 
     @Override
-    public Record readRecord() throws Exception {
-        final String recordValue = reader.readLine();
-
-        return recordValue != null ? new StringRecord(new Header(line++, "file", new Date()), recordValue) : null;
-    }
-
-    @Override
-    public void close() throws IOException {
-        reader.close();
+    public void close() {
+        try {
+            reader.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
