@@ -1,4 +1,4 @@
-package com.github.loa.downloader.command.batch.mapper;
+package com.github.loa.downloader.command.batch.task;
 
 import com.github.loa.url.service.UrlEncoder;
 import com.morethanheroic.taskforce.task.Task;

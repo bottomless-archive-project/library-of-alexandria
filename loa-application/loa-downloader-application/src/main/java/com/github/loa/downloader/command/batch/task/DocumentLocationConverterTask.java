@@ -1,4 +1,4 @@
-package com.github.loa.downloader.command.batch.mapper;
+package com.github.loa.downloader.command.batch.task;
 
 import com.morethanheroic.taskforce.task.Task;
 import lombok.extern.slf4j.Slf4j;

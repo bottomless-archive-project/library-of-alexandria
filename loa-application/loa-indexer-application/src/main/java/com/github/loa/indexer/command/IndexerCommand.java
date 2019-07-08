@@ -1,32 +1,41 @@
 package com.github.loa.indexer.command;
 
-import com.github.loa.document.service.DocumentManipulator;
-import com.github.loa.document.service.domain.DocumentEntity;
-import com.github.loa.document.service.domain.DocumentStatus;
-import com.github.loa.document.service.entity.factory.DocumentEntityFactory;
-import com.github.loa.indexer.configuration.IndexerConfigurationProperties;
-import com.github.loa.indexer.service.index.IndexerService;
+import com.github.loa.indexer.batch.generator.DownloadedDocumentEntityGenerator;
+import com.github.loa.indexer.batch.task.IndexerTask;
+import com.morethanheroic.taskforce.executor.JobExecutor;
+import com.morethanheroic.taskforce.job.Job;
+import com.morethanheroic.taskforce.job.builder.JobBuilder;
+import com.morethanheroic.taskforce.sink.DiscardingSink;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class IndexerCommand implements CommandLineRunner {
 
-    private final DocumentEntityFactory documentEntityFactory;
-    private final IndexerConfigurationProperties indexerConfigurationProperties;
-    private final IndexerService indexerService;
-    private final DocumentManipulator documentManipulator;
+    private final JobExecutor jobExecutor;
+    private final DownloadedDocumentEntityGenerator downloadedDocumentEntityGenerator;
+    private final IndexerTask indexerTask;
 
     @Override
     public void run(final String... args) {
         log.info("Initializing document indexing.");
 
+        final Job job = JobBuilder.newBuilder()
+                .generator(downloadedDocumentEntityGenerator)
+                .task(indexerTask)
+                .sink(DiscardingSink.of())
+                .withThreadCount(1)
+                .build();
+
+        jobExecutor.execute(job);
+
+        log.info("Finished document indexing.");
+
+        /*
         try {
             while (true) {
                 final List<DocumentEntity> documentEntities = documentEntityFactory
@@ -53,5 +62,6 @@ public class IndexerCommand implements CommandLineRunner {
         } catch (InterruptedException e) {
             log.error("Failed to index documents!", e);
         }
+        */
     }
 }

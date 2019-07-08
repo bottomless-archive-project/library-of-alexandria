@@ -1,4 +1,4 @@
-package com.github.loa.downloader.command.batch.processor;
+package com.github.loa.downloader.command.batch.task;
 
 import com.github.loa.downloader.download.service.document.DocumentDownloader;
 import com.morethanheroic.taskforce.task.Task;
