@@ -1,9 +1,9 @@
 package com.github.loa.downloader.command;
 
-import com.github.loa.downloader.command.batch.mapper.DocumentLocationConverterTask;
-import com.github.loa.downloader.command.batch.mapper.DocumentLocationEncoderTask;
-import com.github.loa.downloader.command.batch.mapper.DocumentLocationFilterTask;
-import com.github.loa.downloader.command.batch.processor.DocumentLocationProcessorTask;
+import com.github.loa.downloader.command.batch.task.DocumentLocationConverterTask;
+import com.github.loa.downloader.command.batch.task.DocumentLocationEncoderTask;
+import com.github.loa.downloader.command.batch.task.DocumentLocationFilterTask;
+import com.github.loa.downloader.command.batch.task.DocumentLocationProcessorTask;
 import com.github.loa.downloader.command.configuration.DownloaderExecutorConfigurationProperties;
 import com.morethanheroic.taskforce.executor.JobExecutor;
 import com.morethanheroic.taskforce.generator.Generator;
@@ -41,8 +41,9 @@ public class DownloaderCommand implements CommandLineRunner {
                 .task(documentLocationEncoderTask)
                 .task(documentLocationRecordProcessor)
                 .sink(DiscardingSink.of())
+                .withThreadCount(downloaderExecutorConfigurationProperties.getThreadCount())
                 .build();
 
-        jobExecutor.execute(job, downloaderExecutorConfigurationProperties.getThreadCount());
+        jobExecutor.execute(job);
     }
 }
