@@ -11,4 +11,5 @@ public class IndexerConfigurationProperties {
 
     private int sleepTime;
     private int maximumFileSize;
+    private int concurrentIndexerThreads;
 }
