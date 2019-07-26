@@ -66,21 +66,7 @@ public class CommonCrawlDocumentGenerator implements Generator<String> {
         try {
             return WarcRecordStreamFactory.streamOf(buildWarcLocation(warcLocation))
                     .filter(WarcRecord::isResponse)
-                    .map(warcRecord -> {
-                        try {
-                            final String warcRecordUrl = warcRecord.getHeader("WARC-Target-URI");
-
-                            final Document document = Jsoup.parse(((ResponseContentBlock) warcRecord.getWarcContentBlock())
-                                    .getPayloadAsString(), warcRecordUrl);
-
-                            return document.select("a").stream()
-                                    .map(element -> Optional.of(element.attr("abs:href")));
-                        } catch (Exception e) {
-                            log.info("Failed to parse url content!");
-
-                            return Stream.of(Optional.<String>empty());
-                        }
-                    })
+                    .map(this::handleWarcRecord)
                     .flatMap(Function.identity());
         } catch (Exception e) {
             throw new RuntimeException("Unable to load urls from WARC location: " + warcLocation, e);
@@ -92,6 +78,22 @@ public class CommonCrawlDocumentGenerator implements Generator<String> {
             return new URL("https://commoncrawl.s3.amazonaws.com/" + warcLocation);
         } catch (MalformedURLException e) {
             throw new RuntimeException("Unable to build WARC location!", e);
+        }
+    }
+
+    private Stream<Optional<String>> handleWarcRecord(final WarcRecord warcRecord) {
+        try {
+            final String warcRecordUrl = warcRecord.getHeader("WARC-Target-URI");
+
+            final Document document = Jsoup.parse(((ResponseContentBlock) warcRecord.getWarcContentBlock())
+                    .getPayloadAsString(), warcRecordUrl);
+
+            return document.select("a").stream()
+                    .map(element -> Optional.of(element.attr("abs:href")));
+        } catch (Exception e) {
+            log.debug("Failed to parse url content!");
+
+            return Stream.of(Optional.<String>empty());
         }
     }
 }
