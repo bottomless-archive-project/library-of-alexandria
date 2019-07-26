@@ -17,7 +17,7 @@ public class DocumentLocationConverterTask implements Task<String, URL> {
         try {
             return Optional.of(new URL(recordUrl));
         } catch (MalformedURLException e) {
-            log.warn("Unable to parse url with location: " + recordUrl, e);
+            log.debug("Unable to parse url with location: " + recordUrl, e);
 
             return Optional.empty();
         }
