@@ -31,7 +31,8 @@ public class IndexerJobConfiguration {
     }
 
     @Bean
-    protected DocumentEntityGenerator downloadedDocumentEntityGenerator(final DocumentEntityFactory documentEntityFactory,
+    protected DocumentEntityGenerator downloadedDocumentEntityGenerator(
+            final DocumentEntityFactory documentEntityFactory,
             final IndexerConfigurationProperties indexerConfigurationProperties) {
         return new DocumentEntityGenerator(DocumentStatus.DOWNLOADED, documentEntityFactory,
                 indexerConfigurationProperties);

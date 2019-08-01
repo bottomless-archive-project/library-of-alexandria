@@ -32,7 +32,7 @@ public class DocumentRepository {
                 .field("status").equal(status)
                 .find(
                         new FindOptions()
-                                .limit(100)
+                                .limit(5000)
                 )
                 .toList();
     }

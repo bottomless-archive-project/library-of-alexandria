@@ -8,8 +8,11 @@ import com.morethanheroic.taskforce.generator.Generator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -20,13 +23,17 @@ public class DocumentEntityGenerator implements Generator<DocumentEntity> {
     private final IndexerConfigurationProperties indexerConfigurationProperties;
 
     private List<DocumentEntity> documentEntities;
+    private Set<String> processedDocuments = new HashSet<>();
 
     @Override
     public Optional<DocumentEntity> generate() {
-        if (shouldQueryMoreEntities()) {
-            log.info("Requesting new documents for indexing.");
+        while (shouldQueryMoreEntities()) {
+            documentEntities = documentEntityFactory.getDocumentEntity(documentStatus).stream()
+                    .filter(documentEntity -> !processedDocuments.contains(documentEntity.getId()))
+                    .peek(documentEntity -> processedDocuments.add(documentEntity.getId()))
+                    .collect(Collectors.toList());
 
-            documentEntities = documentEntityFactory.getDocumentEntity(documentStatus);
+            log.info("Added " + documentEntities.size() + " new documents for indexing.");
 
             if (documentEntities.isEmpty()) {
                 log.info("Waiting for a while because no documents are available for indexing.");
