@@ -9,9 +9,10 @@ import java.time.Instant;
 @Getter
 @Setter
 @Entity(value = "document", noClassnameStored = true)
-@Indexes(
+@Indexes({
+        @Index(fields = {@Field("status")}),
         @Index(fields = {@Field("checksum"), @Field("fileSize"), @Field("type")})
-)
+})
 public class DocumentDatabaseEntity {
 
     @Id
