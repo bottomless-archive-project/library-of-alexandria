@@ -43,6 +43,6 @@ public class DocumentEntityGenerator implements Generator<DocumentEntity> {
     }
 
     private boolean shouldQueryMoreEntities() {
-        return documentEntities == null || documentEntities.size() == 0;
+        return documentEntities == null || documentEntities.isEmpty();
     }
 }

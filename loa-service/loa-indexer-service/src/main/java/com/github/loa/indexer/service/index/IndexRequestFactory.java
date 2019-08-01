@@ -1,27 +1,33 @@
 package com.github.loa.indexer.service.index;
 
 import com.github.loa.document.service.domain.DocumentEntity;
+import com.github.loa.vault.client.service.VaultClientService;
 import lombok.RequiredArgsConstructor;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.common.unit.TimeValue;
 import org.springframework.stereotype.Service;
-import com.github.loa.indexer.service.index.base64.DocumentBase64Encoder;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class IndexRequestFactory {
 
-    private final DocumentBase64Encoder documentBase64Encoder;
+    private final VaultClientService vaultClientService;
 
     public IndexRequest newIndexRequest(final DocumentEntity documentEntity) {
-        final String documentBase64String = documentBase64Encoder.encodeDocument(documentEntity);
+        final InputStream inputStream = vaultClientService.queryDocument(documentEntity);
 
-        return new IndexRequest("vault_documents")
-                .id(documentEntity.getId())
-                .source(Map.of("content", documentBase64String))
-                .setPipeline("vault-document-pipeline")
-                .timeout(TimeValue.timeValueMinutes(30));
+        try {
+            return new IndexRequest("vault_documents")
+                    .id(documentEntity.getId())
+                    .source(Map.of("content", inputStream.readAllBytes()))
+                    .setPipeline("vault-document-pipeline")
+                    .timeout(TimeValue.timeValueMinutes(30));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
