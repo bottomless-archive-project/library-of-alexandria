@@ -15,13 +15,9 @@ import org.springframework.stereotype.Service;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -36,6 +32,7 @@ public class CommonCrawlDocumentGenerator implements Generator<String> {
     private int processedWarcFiles;
     private List<String> crawlLocations = new ArrayList<>();
     private List<String> availableUrls = Collections.synchronizedList(new ArrayList<>());
+    private Set<String> upcomingUrls = Collections.synchronizedSet(new HashSet<>());
     private final ExecutorService executorService = Executors.newFixedThreadPool(10);
 
     @Override
@@ -52,6 +49,9 @@ public class CommonCrawlDocumentGenerator implements Generator<String> {
                     commonCrawlDocumentSourceConfiguration.getWarcId() + processedWarcFiles));
 
             handleWarcFile(crawlLocations.remove(0));
+
+            availableUrls.addAll(upcomingUrls);
+            upcomingUrls.clear();
 
             log.info("Finished the processing of WARC file with ID: " + (
                     commonCrawlDocumentSourceConfiguration.getWarcId() + processedWarcFiles));
@@ -89,16 +89,16 @@ public class CommonCrawlDocumentGenerator implements Generator<String> {
             executorService.submit(() -> {
                 final Document document = Jsoup.parse(contentString, warcRecordUrl);
 
-                final List<String> urlsOnPage = document.select("a").stream()
+                final Set<String> urlsOnPage = document.select("a").stream()
                         .map(element -> element.attr("abs:href"))
                         .filter(url -> !url.isEmpty())
-                        .collect(Collectors.toList());
+                        .collect(Collectors.toSet());
 
-                final int beforeUrls = availableUrls.size();
+                final int beforeUrls = upcomingUrls.size();
 
-                availableUrls.addAll(urlsOnPage);
+                upcomingUrls.addAll(urlsOnPage);
 
-                final int afterUrls = availableUrls.size();
+                final int afterUrls = upcomingUrls.size();
 
                 if ((afterUrls / 25000) - (beforeUrls / 25000) > 0) {
                     log.info("Collected " + afterUrls + " urls!");
