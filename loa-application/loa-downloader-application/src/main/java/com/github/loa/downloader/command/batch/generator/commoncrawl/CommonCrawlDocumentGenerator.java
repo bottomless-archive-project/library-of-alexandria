@@ -16,11 +16,13 @@ import org.springframework.stereotype.Service;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -33,7 +35,8 @@ public class CommonCrawlDocumentGenerator implements Generator<String> {
 
     private int processedWarcFiles;
     private List<String> crawlLocations = new ArrayList<>();
-    private List<Optional<String>> availableUrls = new ArrayList<>();
+    private List<String> availableUrls = Collections.synchronizedList(new ArrayList<>());
+    private final ExecutorService executorService = Executors.newFixedThreadPool(10);
 
     @Override
     public void open() {
@@ -42,16 +45,13 @@ public class CommonCrawlDocumentGenerator implements Generator<String> {
                 .collect(Collectors.toList());
     }
 
-    //TODO: Clean this up!
     @Override
     public Optional<String> generate() {
         if (availableUrls.size() == 0) {
             log.info("Starting the processing of WARC file with ID: " + (
                     commonCrawlDocumentSourceConfiguration.getWarcId() + processedWarcFiles));
 
-            availableUrls = handleWarcFile(crawlLocations.remove(0))
-                    .filter(Optional::isPresent)
-                    .collect(Collectors.toList());
+            handleWarcFile(crawlLocations.remove(0));
 
             log.info("Finished the processing of WARC file with ID: " + (
                     commonCrawlDocumentSourceConfiguration.getWarcId() + processedWarcFiles));
@@ -59,15 +59,14 @@ public class CommonCrawlDocumentGenerator implements Generator<String> {
             processedWarcFiles++;
         }
 
-        return availableUrls.remove(0);
+        return Optional.of(availableUrls.remove(0));
     }
 
-    private Stream<Optional<String>> handleWarcFile(final String warcLocation) {
+    private void handleWarcFile(final String warcLocation) {
         try {
-            return WarcRecordStreamFactory.streamOf(buildWarcLocation(warcLocation))
+            WarcRecordStreamFactory.streamOf(buildWarcLocation(warcLocation))
                     .filter(WarcRecord::isResponse)
-                    .map(this::handleWarcRecord)
-                    .flatMap(Function.identity());
+                    .forEach(this::handleWarcRecord);
         } catch (Exception e) {
             throw new RuntimeException("Unable to load urls from WARC location: " + warcLocation, e);
         }
@@ -81,19 +80,32 @@ public class CommonCrawlDocumentGenerator implements Generator<String> {
         }
     }
 
-    private Stream<Optional<String>> handleWarcRecord(final WarcRecord warcRecord) {
+    private void handleWarcRecord(final WarcRecord warcRecord) {
         try {
+            // All information should be read from the stream before doing parallel processing!
             final String warcRecordUrl = warcRecord.getHeader("WARC-Target-URI");
+            final String contentString = ((ResponseContentBlock) warcRecord.getWarcContentBlock()).getPayloadAsString();
 
-            final Document document = Jsoup.parse(((ResponseContentBlock) warcRecord.getWarcContentBlock())
-                    .getPayloadAsString(), warcRecordUrl);
+            executorService.submit(() -> {
+                final Document document = Jsoup.parse(contentString, warcRecordUrl);
 
-            return document.select("a").stream()
-                    .map(element -> Optional.of(element.attr("abs:href")));
+                final List<String> urlsOnPage = document.select("a").stream()
+                        .map(element -> element.attr("abs:href"))
+                        .filter(url -> !url.isEmpty())
+                        .collect(Collectors.toList());
+
+                final int beforeUrls = availableUrls.size();
+
+                availableUrls.addAll(urlsOnPage);
+
+                final int afterUrls = availableUrls.size();
+
+                if ((afterUrls / 25000) - (beforeUrls / 25000) > 0) {
+                    log.info("Collected " + afterUrls + " urls!");
+                }
+            });
         } catch (Exception e) {
             log.debug("Failed to parse url content!");
-
-            return Stream.of(Optional.<String>empty());
         }
     }
 }
