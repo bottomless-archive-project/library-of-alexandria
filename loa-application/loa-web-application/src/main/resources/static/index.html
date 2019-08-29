@@ -73,45 +73,11 @@
                             };
 
                             $scope.refreshHits = function () {
-                                if ($scope.searchText.startsWith("\"") && $scope.searchText.endsWith("\"")) {
-                                    console.log("Doing exact search!");
+                                var pageNumber = $scope.page * 10;
+                                var exactMatch = $scope.searchText.startsWith("\"") && $scope.searchText.endsWith("\"");
 
-                                    var payload = JSON.stringify({
-                                        query: {
-                                            match_phrase: {
-                                                "attachment.content": $scope.searchText
-                                            }
-                                        },
-                                        highlight: {
-                                            fields: {
-                                                "attachment.content": {
-                                                    fragment_size: 500,
-                                                    number_of_fragments: 1,
-                                                    order: "score"
-                                                }
-                                            }
-                                        }
-                                    });
-                                } else {
-                                    var payload = JSON.stringify({
-                                        query: {
-                                            match: {
-                                                "attachment.content": $scope.searchText
-                                            }
-                                        },
-                                        highlight: {
-                                            fields: {
-                                                "attachment.content": {
-                                                    fragment_size: 500,
-                                                    number_of_fragments: 1,
-                                                    order: "score"
-                                                }
-                                            }
-                                        }
-                                    });
-                                }
-
-                                $http.get('/document/find-by/keyword/' + $scope.searchText + '/?pageNumber=' + $scope.page * 10)
+                                $http.get('/document/find-by/keyword/' + $scope.searchText + '/?pageNumber='
+                                    + pageNumber + "&exactMatch=" + exactMatch)
                                     .then(function (response) {
                                         $scope.hits = response.data.searchHits;
                                         $scope.hitCount = response.data.totalHitCount;

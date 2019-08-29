@@ -21,8 +21,9 @@ public class DocumentSearchService {
     private final SearchRequestFactory searchRequestFactory;
     private final DocumentSearchEntityTransformer documentSearchEntityTransformer;
 
-    public DocumentSearchResult searchDocuments(final String keyword, final int pageNumber) {
-        final SearchRequest searchRequest = searchRequestFactory.newKeywordSearchRequest(keyword, pageNumber);
+    public DocumentSearchResult searchDocuments(final String keyword, final int pageNumber, final boolean exactMatch) {
+        final SearchRequest searchRequest = searchRequestFactory
+                .newKeywordSearchRequest(keyword, pageNumber, exactMatch);
 
         try {
             final SearchResponse searchResponse = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);

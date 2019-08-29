@@ -12,19 +12,22 @@ public class SearchRequestFactory {
 
     private static final String[] INDICES = new String[]{"vault_documents"};
 
-    public SearchRequest newKeywordSearchRequest(final String keyword, final int pageNumber) {
-        return new SearchRequest(INDICES, newDocumentContentQuery(keyword, pageNumber));
+    public SearchRequest newKeywordSearchRequest(final String keyword, final int pageNumber, final boolean exactMatch) {
+        return new SearchRequest(INDICES, newDocumentContentQuery(keyword, pageNumber, exactMatch));
     }
 
-    private SearchSourceBuilder newDocumentContentQuery(final String keyword, final int pageNumber) {
+    private SearchSourceBuilder newDocumentContentQuery(final String keyword, final int pageNumber,
+            final boolean exactMatch) {
         return new SearchSourceBuilder()
                 .from(pageNumber)
-                .query(newQueryBuilder(keyword))
+                .query(newQueryBuilder(keyword, exactMatch))
                 .highlighter(newHighlightBuilder());
     }
 
-    private QueryBuilder newQueryBuilder(final String keyword) {
-        return QueryBuilders.matchQuery("attachment.content", keyword);
+    private QueryBuilder newQueryBuilder(final String keyword, final boolean exactMatch) {
+        return exactMatch ? QueryBuilders.matchPhraseQuery("attachment.content", keyword)
+                : QueryBuilders.matchQuery("attachment.content", keyword);
+
     }
 
     private HighlightBuilder newHighlightBuilder() {

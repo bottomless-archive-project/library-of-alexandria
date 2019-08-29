@@ -19,8 +19,10 @@ public class DocumentSearchController {
 
     @GetMapping("/document/find-by/keyword/{keyword}")
     public DocumentSearchResponse queryDocuments(@PathVariable final String keyword,
-                                                 @RequestParam(defaultValue = "0") final int pageNumber) {
-        final DocumentSearchResult documentSearchResult = documentSearchService.searchDocuments(keyword, pageNumber);
+            @RequestParam(defaultValue = "0") final int pageNumber,
+            @RequestParam(defaultValue = "false") final boolean exactMatch) {
+        final DocumentSearchResult documentSearchResult = documentSearchService
+                .searchDocuments(keyword, pageNumber, exactMatch);
 
         return DocumentSearchResponse.builder()
                 .searchHits(documentEntityResponseTransformer.transform(documentSearchResult.getSearchHits()))
