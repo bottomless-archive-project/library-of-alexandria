@@ -21,3 +21,7 @@ body {
 .search-hit em {
     font-weight: 700;
 }
+
+.page-link {
+    cursor: pointer;
+}
