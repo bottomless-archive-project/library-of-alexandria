@@ -1,14 +1,24 @@
 <html lang="en">
 <head>
     <title>Bottomless Archive Project - Library of Alexandria</title>
+
     <link rel="icon" href="./images/sphinx.svg" type="image/svg+xml">
 
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
+    <!-- jQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+    <!-- AngularJS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.8/angular.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/1.0.22/angular-ui-router.js"></script>
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.css"/>
+    <!-- Bootstrap -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css"/>
+
+    <!-- Custom -->
     <link rel="stylesheet" href="./style/index.css"/>
 
     <script>
@@ -87,7 +97,38 @@
 
                             $scope.openPdf = function (pdfId) {
                                 $scope.openPdfs[pdfId] = !$scope.openPdfs[pdfId];
-                            }
+                            };
+
+                            $scope.languages = [
+                                ['be', 'Belarusian'],
+                                ['ca', 'Catalan'],
+                                ['da', 'Danish'],
+                                ['de', 'German'],
+                                ['eo', 'Esperanto'],
+                                ['et', 'Estonian'],
+                                ['el', 'Greek'],
+                                ['en', 'English'],
+                                ['es', 'Spanish'],
+                                ['fi', 'Finnish'],
+                                ['fr', 'French'],
+                                ['fa', 'Persian'],
+                                ['gl', 'Galician'],
+                                ['hu', 'Hungarian'],
+                                ['is', 'Icelandic'],
+                                ['it', 'Italian'],
+                                ['lt', 'Lithuanian'],
+                                ['nl', 'Dutch'],
+                                ['no', 'Norwegian'],
+                                ['pl', 'Polish'],
+                                ['pt', 'Portuguese'],
+                                ['ro', 'Romanian'],
+                                ['ru', 'Russian'],
+                                ['sk', 'Slovakian'],
+                                ['sl', 'Slovenian'],
+                                ['sv', 'Swedish'],
+                                ['th', 'Thai'],
+                                ['uk', 'Ukrainian'],
+                            ];
                         }
                     });
             }])
