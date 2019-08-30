@@ -1,17 +1,17 @@
 <div class="row">
-    <div class="col-8">
+    <div class="col-9 pr-0">
         <div class="form-group">
             <input ng-model="searchText" ng-change="searchTextChanged()" ng-model-options='{ debounce: 1000 }'
                    class="form-control" placeholder="Search for something">
         </div>
     </div>
-    <div class="col-4">
+    <div class="col-3">
         <div class="dropdown">
-            <a class="btn btn-secondary dropdown-toggle" style=" width: 250px;" href="#" role="button"
-               id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Dropdown link
-            </a>
-            <div class="dropdown-menu" style="max-height: 300px; width: 250px; overflow: auto;">
+            <button class="btn btn-info btn-block dropdown-toggle" role="button"
+                    id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Language
+            </button>
+            <div class="dropdown-menu btn-block mt-0" style="max-height: 300px; overflow: auto;">
                 <button class="dropdown-item" ng-repeat="language in languages">
                     <img ng-src="./images/flags/{{language[0]}}.png"> - {{language[1]}}
                 </button>
