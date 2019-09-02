@@ -25,3 +25,7 @@ body {
 .page-link {
     cursor: pointer;
 }
+
+.language-dropdown .dropdown-menu .dropdown-toggle:after {
+    content: none;
+}

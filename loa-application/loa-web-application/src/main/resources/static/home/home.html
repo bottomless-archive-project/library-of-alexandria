@@ -6,14 +6,19 @@
         </div>
     </div>
     <div class="col-3">
-        <div class="dropdown">
-            <button class="btn btn-info btn-block dropdown-toggle" role="button"
+        <div class="dropdown language-dropdown">
+            <button class="btn btn-info btn-block dropdown-toggle" role="button" ng-if="language === undefined"
                     id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 Language
             </button>
+            <button class="btn btn-info btn-block" ng-if="language !== undefined" ng-click="setLanguage(undefined)"
+                    style="padding-top: 2px; padding-bottom: 2px;">
+                <span ng-if="language[2]"><img ng-src="./images/flags/{{language[0]}}.png"> - </span>{{language[1]}}
+            </button>
             <div class="dropdown-menu btn-block mt-0" style="max-height: 300px; overflow: auto;">
-                <button class="dropdown-item" ng-repeat="language in languages">
-                    <img ng-src="./images/flags/{{language[0]}}.png"> - {{language[1]}}
+                <button class="dropdown-item dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
+                        aria-expanded="false" ng-repeat="language in languages" ng-click="setLanguage(language)">
+                    <span ng-if="language[2]"><img ng-src="./images/flags/{{language[0]}}.png"> - </span>{{language[1]}}
                 </button>
             </div>
         </div>
