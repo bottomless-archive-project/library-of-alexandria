@@ -2,6 +2,7 @@ package com.github.loa.indexer.service.search;
 
 import com.github.loa.indexer.domain.DocumentSearchResult;
 import com.github.loa.indexer.domain.IndexerAccessException;
+import com.github.loa.indexer.service.search.domain.SearchContext;
 import com.github.loa.indexer.service.search.request.SearchRequestFactory;
 import com.github.loa.indexer.service.search.transformer.DocumentSearchEntityTransformer;
 import lombok.RequiredArgsConstructor;
@@ -21,9 +22,8 @@ public class DocumentSearchService {
     private final SearchRequestFactory searchRequestFactory;
     private final DocumentSearchEntityTransformer documentSearchEntityTransformer;
 
-    public DocumentSearchResult searchDocuments(final String keyword, final int pageNumber, final boolean exactMatch) {
-        final SearchRequest searchRequest = searchRequestFactory
-                .newKeywordSearchRequest(keyword, pageNumber, exactMatch);
+    public DocumentSearchResult searchDocuments(final SearchContext searchContext) {
+        final SearchRequest searchRequest = searchRequestFactory.newKeywordSearchRequest(searchContext);
 
         try {
             final SearchResponse searchResponse = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);

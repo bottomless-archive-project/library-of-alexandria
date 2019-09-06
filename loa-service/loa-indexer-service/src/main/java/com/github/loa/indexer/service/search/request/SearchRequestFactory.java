@@ -1,38 +1,39 @@
 package com.github.loa.indexer.service.search.request;
 
+import com.github.loa.indexer.service.search.domain.SearchContext;
+import com.github.loa.indexer.service.search.domain.SearchField;
+import lombok.RequiredArgsConstructor;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class SearchRequestFactory {
+
+    private final QueryBuilderFactory queryBuilderFactory;
 
     private static final String[] INDICES = new String[]{"vault_documents"};
 
-    public SearchRequest newKeywordSearchRequest(final String keyword, final int pageNumber, final boolean exactMatch) {
-        return new SearchRequest(INDICES, newDocumentContentQuery(keyword, pageNumber, exactMatch));
+    public SearchRequest newKeywordSearchRequest(final SearchContext searchContext) {
+        return new SearchRequest(INDICES, newDocumentContentQuery(searchContext));
     }
 
-    private SearchSourceBuilder newDocumentContentQuery(final String keyword, final int pageNumber,
-            final boolean exactMatch) {
+    private SearchSourceBuilder newDocumentContentQuery(final SearchContext searchContext) {
+        final QueryBuilder queryBuilder = queryBuilderFactory.newQueryBuilder(searchContext);
+
         return new SearchSourceBuilder()
-                .from(pageNumber)
-                .query(newQueryBuilder(keyword, exactMatch))
+                .from(searchContext.getPageNumber())
+                .query(queryBuilder)
                 .highlighter(newHighlightBuilder());
     }
 
-    private QueryBuilder newQueryBuilder(final String keyword, final boolean exactMatch) {
-        return exactMatch ? QueryBuilders.matchPhraseQuery("attachment.content", keyword)
-                : QueryBuilders.matchQuery("attachment.content", keyword);
-
-    }
 
     private HighlightBuilder newHighlightBuilder() {
         return new HighlightBuilder()
-                .field("attachment.content", 500, 1)
+                .field(SearchField.CONTENT.getName(), 500, 1)
                 .order("score");
     }
 }
