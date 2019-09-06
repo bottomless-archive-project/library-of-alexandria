@@ -4,9 +4,9 @@ dependencies {
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-webflux'
 
-    compile 'com.github.laxika:java-task-force:889d3f9bb9'
-
     compile project(':loa-service:loa-document-service')
     compile project(':loa-service:loa-indexer-service')
     compile project(':loa-service:loa-vault-client-service')
+
+    compile group: 'com.morethanheroic', name: 'java-task-force-core', version: '1.0.0'
 }
