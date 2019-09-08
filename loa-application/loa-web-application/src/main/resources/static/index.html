@@ -45,6 +45,8 @@
 
                             $scope.setLanguage = function (language) {
                                 $scope.language = language;
+
+                                $scope.refreshHits();
                             };
 
                             $scope.searchTextChanged = function () {
