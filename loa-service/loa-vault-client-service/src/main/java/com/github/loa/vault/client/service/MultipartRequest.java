@@ -3,7 +3,7 @@ package com.github.loa.vault.client.service;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 
 public class MultipartRequest {
@@ -29,10 +29,9 @@ public class MultipartRequest {
         httpURLConnection.setDoOutput(true);
         httpURLConnection.setDoInput(true);
         httpURLConnection.setConnectTimeout(UPLOAD_TIMEOUT); // It takes time to save lots of data to disk for the vault
-        httpURLConnection.setRequestProperty("Content-Type",
-                "multipart/form-data; boundary=" + boundary);
+        httpURLConnection.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
         outputStream = httpURLConnection.getOutputStream();
-        writer = new PrintWriter(new OutputStreamWriter(outputStream, Charset.forName("UTF-8")), true);
+        writer = new PrintWriter(new OutputStreamWriter(outputStream, StandardCharsets.UTF_8), true);
     }
 
     /**

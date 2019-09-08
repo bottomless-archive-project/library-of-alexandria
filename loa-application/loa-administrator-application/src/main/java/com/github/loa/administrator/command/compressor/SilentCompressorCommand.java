@@ -3,6 +3,7 @@ package com.github.loa.administrator.command.compressor;
 import com.github.loa.compression.configuration.CompressionConfigurationProperties;
 import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.document.service.entity.factory.DocumentEntityFactory;
+import com.github.loa.vault.client.service.VaultClientService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
@@ -17,17 +18,18 @@ public class SilentCompressorCommand implements CommandLineRunner {
 
     private final DocumentEntityFactory documentEntityFactory;
     private final CompressionConfigurationProperties compressionConfigurationProperties;
-    private final RecompressorService recompressorService;
+    private final VaultClientService vaultClientService;
 
     @Override
     public void run(final String... args) {
         documentEntityFactory.getDocumentEntities()
                 .filter(DocumentEntity::isInVault)
-                .filter(this::shouldRecompress)
-                .forEach(recompressorService::recompress);
+                .filter(this::shouldCompress)
+                .forEach(documentEntity -> vaultClientService.recompressDocument(documentEntity,
+                        compressionConfigurationProperties.getAlgorithm()));
     }
 
-    private boolean shouldRecompress(final DocumentEntity documentEntity) {
+    private boolean shouldCompress(final DocumentEntity documentEntity) {
         return documentEntity.getCompression() != compressionConfigurationProperties.getAlgorithm();
     }
 }

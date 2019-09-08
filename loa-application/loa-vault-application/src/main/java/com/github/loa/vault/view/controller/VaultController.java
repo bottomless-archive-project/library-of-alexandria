@@ -1,8 +1,10 @@
 package com.github.loa.vault.view.controller;
 
+import com.github.loa.vault.service.RecompressorService;
 import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.document.service.entity.factory.DocumentEntityFactory;
 import com.github.loa.vault.service.VaultDocumentManager;
+import com.github.loa.vault.view.request.domain.RecompressRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.CacheControl;
@@ -22,6 +24,7 @@ public class VaultController {
 
     private final DocumentEntityFactory documentEntityFactory;
     private final VaultDocumentManager vaultDocumentManager;
+    private final RecompressorService recompressorService;
 
     @PostMapping("/document/{documentId}")
     public void archiveDocument(@PathVariable final String documentId,
@@ -53,5 +56,15 @@ public class VaultController {
                         + documentEntity.getType().getFileExtension())
                 .cacheControl(CacheControl.noCache())
                 .body(new InputStreamResource(streamingContent));
+    }
+
+    @PostMapping("/document/{documentId}/recompress")
+    public void recompressDocument(@PathVariable final String documentId,
+            @RequestBody final RecompressRequest recompressRequest) {
+        final DocumentEntity documentEntity = documentEntityFactory.getDocumentEntity(documentId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Document not found with id " + documentId + "!"));
+
+        recompressorService.recompress(documentEntity, recompressRequest.getCompression());
     }
 }

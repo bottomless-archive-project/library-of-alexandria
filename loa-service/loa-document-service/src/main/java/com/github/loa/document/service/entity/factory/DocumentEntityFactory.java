@@ -58,6 +58,11 @@ public class DocumentEntityFactory {
         return documentEntityTransformer.transform(documentDatabaseEntities);
     }
 
+    /**
+     * Return a {@link Stream} for all documents available in the database.
+     *
+     * @return the stream of the documents
+     */
     public Stream<DocumentEntity> getDocumentEntities() {
         final MorphiaCursor<DocumentDatabaseEntity> documentDatabaseEntities = documentRepository.findAll();
 

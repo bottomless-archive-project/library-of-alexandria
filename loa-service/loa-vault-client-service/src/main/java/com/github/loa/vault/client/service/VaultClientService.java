@@ -1,5 +1,6 @@
 package com.github.loa.vault.client.service;
 
+import com.github.loa.compression.domain.DocumentCompression;
 import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.vault.client.configuration.VaultClientConfigurationProperties;
 import lombok.RequiredArgsConstructor;
@@ -7,7 +8,13 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.net.URL;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+
+import static java.net.http.HttpRequest.BodyPublishers.ofString;
 
 @Service
 @RequiredArgsConstructor
@@ -39,5 +46,20 @@ public class VaultClientService {
             throw new RuntimeException("Unable to get content for document " + documentEntity.getId()
                     + " from vault!", e);
         }
+    }
+
+    public void recompressDocument(final DocumentEntity documentEntity, final DocumentCompression documentCompression) {
+        final HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://" + vaultClientConfigurationProperties.getHost() + ":"
+                        + vaultClientConfigurationProperties.getPort() + "/document/" + documentEntity.getId()
+                        + "/recompress"))
+                .header("Content-Type", "application/json")
+                .POST(ofString("{compression: \"" + documentCompression + "\"}"))
+                .build();
+
+        HttpClient.newHttpClient().sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                .thenApply(HttpResponse::body)
+                .thenAccept(System.out::println)
+                .join();
     }
 }

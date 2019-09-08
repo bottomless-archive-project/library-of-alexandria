@@ -1,7 +1,8 @@
 apply plugin: 'org.springframework.boot'
 
 dependencies {
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-web'
+
     compile project(':loa-service:loa-indexer-service')
-    compile project(':loa-service:loa-document-service')
-    compile project(':loa-service:loa-vault-service')
+    compile project(':loa-service:loa-vault-client-service')
 }

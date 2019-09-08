@@ -1,6 +1,7 @@
 package com.github.loa.vault.service;
 
 import com.github.loa.compression.configuration.CompressionConfigurationProperties;
+import com.github.loa.compression.domain.DocumentCompression;
 import com.github.loa.compression.service.provider.CompressionServiceProvider;
 import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.vault.domain.exception.VaultAccessException;
@@ -31,9 +32,20 @@ public class VaultDocumentManager {
      * @param documentContents the content to archive for the document
      */
     public void archiveDocument(final DocumentEntity documentEntity, final InputStream documentContents) {
+        archiveDocument(documentEntity, documentContents, compressionConfigurationProperties.getAlgorithm());
+    }
+
+    /**
+     * Archive the content of an input stream as the content of the provided document in the vault.
+     *
+     * @param documentEntity   the document to save the content for
+     * @param documentContents the content to archive for the document
+     */
+    public void archiveDocument(final DocumentEntity documentEntity, final InputStream documentContents,
+            final DocumentCompression documentCompression) {
         try (final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentEntity)) {
-            try (final OutputStream outputStream = compressionServiceProvider.getCompressionService(
-                    compressionConfigurationProperties.getAlgorithm()).compress(vaultLocation.destination())) {
+            try (final OutputStream outputStream = compressionServiceProvider
+                    .getCompressionService(documentCompression).compress(vaultLocation.destination())) {
                 IOUtils.copy(documentContents, outputStream);
             }
         } catch (IOException e) {
