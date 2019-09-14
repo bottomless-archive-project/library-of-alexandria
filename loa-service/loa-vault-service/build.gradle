@@ -1,5 +1,3 @@
 dependencies {
-    compile group: 'com.hierynomus', name: 'smbj', version: '0.9.1'
-
     compile project(':loa-service:loa-document-service')
 }
