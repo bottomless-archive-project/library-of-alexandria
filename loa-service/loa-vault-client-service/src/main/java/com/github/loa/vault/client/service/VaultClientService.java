@@ -3,6 +3,7 @@ package com.github.loa.vault.client.service;
 import com.github.loa.compression.domain.DocumentCompression;
 import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.vault.client.configuration.VaultClientConfigurationProperties;
+import com.github.loa.vault.client.service.domain.VaultAccessException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -33,7 +34,7 @@ public class VaultClientService {
         int response = multipartRequest.execute();
 
         if (response != 200) {
-            throw new RuntimeException("Unable to index document " + documentEntity.getId()
+            throw new VaultAccessException("Unable to index document " + documentEntity.getId()
                     + "! Returned status code: " + response + ",");
         }
     }
@@ -43,7 +44,19 @@ public class VaultClientService {
             return new URL("http://" + vaultClientConfigurationProperties.getHost() + ":"
                     + vaultClientConfigurationProperties.getPort() + "/document/" + documentEntity.getId()).openStream();
         } catch (IOException e) {
-            throw new RuntimeException("Unable to get content for document " + documentEntity.getId()
+            throw new VaultAccessException("Unable to get content for document " + documentEntity.getId()
+                    + " from vault!", e);
+        }
+    }
+
+    public byte[] queryDocumentRaw(final DocumentEntity documentEntity) {
+        try {
+            final URL documentLocation = new URL("http://" + vaultClientConfigurationProperties.getHost() + ":"
+                    + vaultClientConfigurationProperties.getPort() + "/document/" + documentEntity.getId());
+
+            return documentLocation.openStream().readAllBytes();
+        } catch (IOException e) {
+            throw new VaultAccessException("Unable to get content for document " + documentEntity.getId()
                     + " from vault!", e);
         }
     }
