@@ -15,8 +15,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
+import reactor.core.publisher.Mono;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 @RestController
 @RequiredArgsConstructor
@@ -27,13 +29,15 @@ public class VaultController {
     private final RecompressorService recompressorService;
 
     @PostMapping("/document/{documentId}")
-    public void archiveDocument(@PathVariable final String documentId,
+    public Mono<DocumentEntity> archiveDocument(@PathVariable final String documentId,
             @RequestParam("content") final MultipartFile content) throws IOException {
-        final DocumentEntity documentEntity = documentEntityFactory.getDocumentEntity(documentId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "Document not found with id " + documentId + "!"));
+        final InputStream contentInputStream = content.getInputStream();
 
-        vaultDocumentManager.archiveDocument(documentEntity, content.getInputStream());
+        return documentEntityFactory.getDocumentEntity(documentId)
+                .doOnNext(documentEntity -> vaultDocumentManager.archiveDocument(documentEntity, contentInputStream))
+                .switchIfEmpty(Mono.just(DocumentEntity.builder().build()));
+        //new ResponseStatusException(HttpStatus.NOT_FOUND,
+        //                                "Document not found with id " + documentId + "!");
     }
 
     /**

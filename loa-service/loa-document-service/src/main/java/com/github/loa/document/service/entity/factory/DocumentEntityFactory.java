@@ -7,17 +7,12 @@ import com.github.loa.document.service.domain.DocumentStatus;
 import com.github.loa.document.service.domain.DocumentType;
 import com.github.loa.document.service.entity.factory.domain.DocumentCreationContext;
 import com.github.loa.document.service.entity.transformer.DocumentEntityTransformer;
-import dev.morphia.query.internal.MorphiaCursor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.time.Instant;
-import java.util.List;
-import java.util.Optional;
-import java.util.Spliterator;
-import java.util.Spliterators;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 @Service
 @RequiredArgsConstructor
@@ -34,15 +29,12 @@ public class DocumentEntityFactory {
      * @return return true if a document exist with the provided parameters or false otherwise
      */
     public boolean isDocumentExists(final String checksum, final long fileSize, final DocumentType type) {
-        return !documentRepository.findByChecksumAndFileSize(checksum, fileSize, type.name()).isEmpty();
+        return documentRepository.existsByChecksumAndFileSize(checksum, fileSize, type.name()).block();
     }
 
-    public Optional<DocumentEntity> getDocumentEntity(final String documentId) {
-        final DocumentDatabaseEntity documentDatabaseEntities = documentRepository.findById(documentId);
-
-        return documentDatabaseEntities == null ? Optional.empty() : Optional.of(
-                documentEntityTransformer.transform(documentDatabaseEntities));
-
+    public Mono<DocumentEntity> getDocumentEntity(final String documentId) {
+        return documentRepository.findById(documentId)
+                .map(documentEntityTransformer::transform);
     }
 
     /**
@@ -51,23 +43,18 @@ public class DocumentEntityFactory {
      * @param documentStatus the status to query for
      * @return the list of documents with the provided values
      */
-    public List<DocumentEntity> getDocumentEntity(final DocumentStatus documentStatus) {
-        final List<DocumentDatabaseEntity> documentDatabaseEntities =
-                documentRepository.findByStatus(documentStatus.toString());
-
-        return documentEntityTransformer.transform(documentDatabaseEntities);
+    public Flux<DocumentEntity> getDocumentEntity(final DocumentStatus documentStatus) {
+        return documentRepository.findByStatus(documentStatus.toString())
+                .map(documentEntityTransformer::transform);
     }
 
     /**
-     * Return a {@link Stream} for all documents available in the database.
+     * Return all documents available in the database.
      *
-     * @return the stream of the documents
+     * @return all documents available in the database
      */
-    public Stream<DocumentEntity> getDocumentEntities() {
-        final MorphiaCursor<DocumentDatabaseEntity> documentDatabaseEntities = documentRepository.findAll();
-
-        return StreamSupport.stream(
-                Spliterators.spliteratorUnknownSize(documentDatabaseEntities, Spliterator.ORDERED), false)
+    public Flux<DocumentEntity> getDocumentEntities() {
+        return documentRepository.findAll()
                 .map(documentEntityTransformer::transform);
     }
 
@@ -77,7 +64,7 @@ public class DocumentEntityFactory {
      * @param documentCreationContext the parameters of the document to create
      * @return the freshly created document
      */
-    public DocumentEntity newDocumentEntity(final DocumentCreationContext documentCreationContext) {
+    public Mono<DocumentEntity> newDocumentEntity(final DocumentCreationContext documentCreationContext) {
         final DocumentDatabaseEntity documentDatabaseEntity = new DocumentDatabaseEntity();
 
         documentDatabaseEntity.setId(documentCreationContext.getId());
@@ -89,8 +76,7 @@ public class DocumentEntityFactory {
         documentDatabaseEntity.setCompression(documentCreationContext.getCompression().name());
         documentDatabaseEntity.setDownloadDate(Instant.now());
 
-        documentRepository.insertDocument(documentDatabaseEntity);
-
-        return getDocumentEntity(documentCreationContext.getId()).get();
+        return documentRepository.insertDocument(documentDatabaseEntity)
+                .map(documentEntityTransformer::transform);
     }
 }

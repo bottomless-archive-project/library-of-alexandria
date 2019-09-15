@@ -1,13 +1,13 @@
 package com.github.loa.document.repository.domain;
 
-import dev.morphia.annotations.Entity;
-import dev.morphia.annotations.Id;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 @Getter
 @Setter
-@Entity(value = "documentLocation", noClassnameStored = true)
+@Document("documentLocation")
 public class DocumentLocationDatabaseEntity {
 
     @Id

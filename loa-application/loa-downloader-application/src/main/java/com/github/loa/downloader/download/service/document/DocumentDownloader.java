@@ -101,7 +101,7 @@ public class DocumentDownloader {
                             .checksum(checksum)
                             .fileSize(fileSize)
                             .build()
-            );
+            ).block();
 
             documentFileManipulator.moveToVault(documentEntity);
         } catch (FailedToArchiveException e) {

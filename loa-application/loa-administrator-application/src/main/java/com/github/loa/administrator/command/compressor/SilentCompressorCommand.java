@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
+import reactor.core.scheduler.Schedulers;
 
 @Slf4j
 @Component
@@ -23,9 +24,11 @@ public class SilentCompressorCommand implements CommandLineRunner {
     @Override
     public void run(final String... args) {
         documentEntityFactory.getDocumentEntities()
+                .parallel(10)
+                .runOn(Schedulers.parallel())
                 .filter(DocumentEntity::isArchived)
                 .filter(this::shouldCompress)
-                .forEach(documentEntity -> vaultClientService.recompressDocument(documentEntity,
+                .doOnNext(documentEntity -> vaultClientService.recompressDocument(documentEntity,
                         compressionConfigurationProperties.getAlgorithm()));
     }
 

@@ -1,23 +1,22 @@
 package com.github.loa.document.repository;
 
 import com.github.loa.document.repository.domain.DocumentLocationDatabaseEntity;
-import dev.morphia.Datastore;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 @Component
 @RequiredArgsConstructor
 public class DocumentLocationRepository {
 
-    private final Datastore datastore;
+    private final ReactiveMongoTemplate mongoTemplate;
 
-    public DocumentLocationDatabaseEntity findById(final String id) {
-        return datastore.createQuery(DocumentLocationDatabaseEntity.class)
-                .field("_id").equal(id)
-                .first();
+    public Mono<DocumentLocationDatabaseEntity> findById(final String id) {
+        return mongoTemplate.findById(id, DocumentLocationDatabaseEntity.class);
     }
 
     public void insertDocumentLocation(final DocumentLocationDatabaseEntity documentLocationDatabaseEntity) {
-        datastore.save(documentLocationDatabaseEntity);
+        mongoTemplate.insert(documentLocationDatabaseEntity);
     }
 }

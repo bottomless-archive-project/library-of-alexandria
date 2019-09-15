@@ -1,17 +1,20 @@
 package com.github.loa.document.repository.domain;
 
-import dev.morphia.annotations.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
+import org.springframework.data.mongodb.core.index.CompoundIndexes;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.Instant;
 
 @Getter
 @Setter
-@Entity(value = "document", noClassnameStored = true)
-@Indexes({
-        @Index(fields = {@Field("status")}),
-        @Index(fields = {@Field("checksum"), @Field("fileSize"), @Field("type")})
+@Document("document")
+@CompoundIndexes({
+        @CompoundIndex(name = "unsaved_query", def = "{'status' : 1"),
+        @CompoundIndex(name = "unsaved_query", def = "{'checksum' : 1, 'fileSize': 1, 'type': 1}")
 })
 public class DocumentDatabaseEntity {
 

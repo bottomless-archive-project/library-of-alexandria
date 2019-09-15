@@ -11,6 +11,7 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
+import reactor.core.scheduler.Schedulers;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
@@ -37,7 +38,9 @@ public class DocumentValidatorCommand implements CommandLineRunner {
         log.info("Starting the document validator command.");
 
         documentEntityFactory.getDocumentEntities()
-                .peek((documentEntity) -> {
+                .parallel(10)
+                .runOn(Schedulers.parallel())
+                .doOnNext((documentEntity) -> {
                     try {
                         semaphore.acquire();
                     } catch (InterruptedException e) {
@@ -46,7 +49,7 @@ public class DocumentValidatorCommand implements CommandLineRunner {
                 })
                 .filter(DocumentEntity::isArchived)
                 .filter(documentEntity -> documentEntity.getType() == DocumentType.PDF)
-                .forEach(this::processDocument);
+                .doOnNext(this::processDocument);
 
         log.info("Stopped the document validator command.");
     }

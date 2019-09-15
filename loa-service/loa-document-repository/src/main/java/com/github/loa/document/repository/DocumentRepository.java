@@ -1,100 +1,80 @@
 package com.github.loa.document.repository;
 
 import com.github.loa.document.repository.domain.DocumentDatabaseEntity;
-import dev.morphia.Datastore;
-import dev.morphia.query.FindOptions;
-import dev.morphia.query.Query;
-import dev.morphia.query.UpdateOperations;
-import dev.morphia.query.internal.MorphiaCursor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Component
 @RequiredArgsConstructor
 public class DocumentRepository {
 
-    private final Datastore datastore;
+    private final ReactiveMongoTemplate mongoTemplate;
 
-    public void insertDocument(final DocumentDatabaseEntity documentDatabaseEntity) {
-        datastore.save(documentDatabaseEntity);
+    public Mono<DocumentDatabaseEntity> insertDocument(final DocumentDatabaseEntity documentDatabaseEntity) {
+        return mongoTemplate.insert(documentDatabaseEntity);
     }
 
-    public DocumentDatabaseEntity findById(final String id) {
-        return datastore.createQuery(DocumentDatabaseEntity.class)
-                .field("_id").equal(id)
-                .first();
+    public Mono<DocumentDatabaseEntity> findById(final String id) {
+        return mongoTemplate.findById(id, DocumentDatabaseEntity.class);
     }
 
-    public List<DocumentDatabaseEntity> findByStatus(final String status) {
-        return datastore.createQuery(DocumentDatabaseEntity.class)
-                .field("status").equal(status)
-                .find(
-                        new FindOptions()
-                                .limit(5000)
+    public Flux<DocumentDatabaseEntity> findByStatus(final String status) {
+        final Query query = Query
+                .query(
+                        Criteria.where("status").is(status)
                 )
-                .toList();
+                .limit(5000);
+
+        return mongoTemplate.find(query, DocumentDatabaseEntity.class);
     }
 
-    public List<DocumentDatabaseEntity> findByCompression(final String compression) {
-        return datastore.createQuery(DocumentDatabaseEntity.class)
-                .field("compression").equal(compression)
-                .find(
-                        new FindOptions()
-                                .limit(100)
+    public Flux<DocumentDatabaseEntity> findByCompression(final String compression) {
+        final Query query = Query
+                .query(
+                        Criteria.where("compression").is(compression)
                 )
-                .toList();
+                .limit(100);
+
+        return mongoTemplate.find(query, DocumentDatabaseEntity.class);
     }
 
     public void updateStatus(final String id, final String status) {
-        final Query<DocumentDatabaseEntity> query = datastore.createQuery(DocumentDatabaseEntity.class)
-                .filter("id", id);
+        final Query query = Query
+                .query(
+                        Criteria.where("id").is(id)
+                );
 
-        final UpdateOperations<DocumentDatabaseEntity> updateOperations = datastore
-                .createUpdateOperations(DocumentDatabaseEntity.class)
-                .set("status", status);
-
-        datastore.update(query, updateOperations);
+        mongoTemplate.updateFirst(query, Update.update("status", status), DocumentDatabaseEntity.class);
     }
 
     public void updateCompression(final String id, final String compression) {
-        final Query<DocumentDatabaseEntity> query = datastore.createQuery(DocumentDatabaseEntity.class)
-                .filter("id", id);
+        final Query query = Query
+                .query(
+                        Criteria.where("id").is(id)
+                );
 
-        final UpdateOperations<DocumentDatabaseEntity> updateOperations = datastore
-                .createUpdateOperations(DocumentDatabaseEntity.class)
-                .set("compression", compression);
-
-        datastore.update(query, updateOperations);
+        mongoTemplate.updateFirst(query, Update.update("compression", compression), DocumentDatabaseEntity.class);
     }
 
-    public void updateFileSizeAndChecksum(final String id, final long fileSize, final String checksum) {
-        final Query<DocumentDatabaseEntity> query = datastore.createQuery(DocumentDatabaseEntity.class)
-                .filter("id", id);
-
-        final UpdateOperations<DocumentDatabaseEntity> updateOperations = datastore
-                .createUpdateOperations(DocumentDatabaseEntity.class)
-                .set("fileSize", fileSize)
-                .set("checksum", checksum);
-
-        datastore.update(query, updateOperations);
-    }
-
-    public List<DocumentDatabaseEntity> findByChecksumAndFileSize(final String checksum, final long fileSize,
+    public Mono<Boolean> existsByChecksumAndFileSize(final String checksum, final long fileSize,
             final String type) {
-        return datastore.createQuery(DocumentDatabaseEntity.class)
-                .field("checksum").equal(checksum)
-                .field("fileSize").equal(fileSize)
-                .field("type").equal(type)
-                .find(
-                        new FindOptions()
-                                .limit(100)
-                )
-                .toList();
+        final Query query = Query
+                .query(
+                        Criteria.where("checksum").is(checksum)
+                                .and("fileSize").is(fileSize)
+                                .and("type").is(type)
+                );
+
+        return mongoTemplate.exists(query, DocumentDatabaseEntity.class);
     }
 
-    public MorphiaCursor<DocumentDatabaseEntity> findAll() {
-        return datastore.createQuery(DocumentDatabaseEntity.class).find();
+    public Flux<DocumentDatabaseEntity> findAll() {
+        return mongoTemplate.findAll(DocumentDatabaseEntity.class);
     }
 }
