@@ -6,9 +6,9 @@ import com.github.loa.document.service.DocumentManipulator;
 import com.github.loa.document.service.domain.DocumentEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -31,7 +31,7 @@ public class RecompressorService {
             final byte[] documentContent = documentContentInputStream.readAllBytes();
 
             vaultDocumentManager.removeDocument(documentEntity);
-            vaultDocumentManager.archiveDocument(documentEntity, new ByteArrayInputStream(documentContent));
+            vaultDocumentManager.archiveDocument(documentEntity, new ByteArrayResource(documentContent));
 
             documentManipulator.updateCompression(documentEntity.getId(), documentCompression);
         } catch (IOException e) {

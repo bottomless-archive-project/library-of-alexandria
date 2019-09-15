@@ -35,8 +35,13 @@ public class VaultDocumentManager {
      * @param documentEntity   the document to save the content for
      * @param documentContents the content to archive for the document
      */
-    public void archiveDocument(final DocumentEntity documentEntity, final InputStream documentContents) {
-        archiveDocument(documentEntity, documentContents, compressionConfigurationProperties.getAlgorithm());
+    public void archiveDocument(final DocumentEntity documentEntity, final Resource documentContents) {
+        try {
+            archiveDocument(documentEntity, documentContents.getInputStream(),
+                    compressionConfigurationProperties.getAlgorithm());
+        } catch (IOException e) {
+            throw new RuntimeException("Unable to read document content!");
+        }
     }
 
     /**

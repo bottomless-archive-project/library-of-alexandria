@@ -18,6 +18,7 @@ public class DocumentSearchController {
     private final DocumentSearchService documentSearchService;
     private final SearchDocumentEntityResponseTransformer documentEntityResponseTransformer;
 
+    //TODO: Do this reactive!!!
     @GetMapping("/document/find-by/keyword/{keyword}")
     public DocumentSearchResponse queryDocuments(@PathVariable final String keyword,
             @RequestParam(defaultValue = "0") final int pageNumber,
