@@ -8,6 +8,9 @@ import com.github.loa.vault.domain.exception.VaultAccessException;
 import com.github.loa.vault.service.location.domain.VaultLocation;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -21,6 +24,7 @@ import java.io.OutputStream;
 @RequiredArgsConstructor
 public class VaultDocumentManager {
 
+    private final ResourceLoader resourceLoader;
     private final VaultLocationFactory vaultLocationFactory;
     private final CompressionServiceProvider compressionServiceProvider;
     private final CompressionConfigurationProperties compressionConfigurationProperties;
@@ -60,12 +64,20 @@ public class VaultDocumentManager {
      * @param documentEntity the document to return the content for
      * @return the content of the document
      */
-    public InputStream readDocument(final DocumentEntity documentEntity) {
+    public Resource readDocument(final DocumentEntity documentEntity) {
         final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentEntity,
                 documentEntity.getCompression());
 
-        return compressionServiceProvider.getCompressionService(documentEntity.getCompression())
-                .decompress(vaultLocation.content());
+        // The non-compressed entries will be served via a zero-copy response
+        // See: https://developer.ibm.com/articles/j-zerocopy/
+        if (documentEntity.isCompressed()) {
+            final InputStream decompressedInputStream = compressionServiceProvider
+                    .getCompressionService(documentEntity.getCompression()).decompress(vaultLocation.content());
+
+            return new InputStreamResource(decompressedInputStream);
+        } else {
+            return resourceLoader.getResource(vaultLocation.file().getPath());
+        }
     }
 
     /**

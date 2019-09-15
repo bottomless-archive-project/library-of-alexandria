@@ -18,7 +18,6 @@ import java.io.File;
  */
 @Service
 @RequiredArgsConstructor
-@ConditionalOnProperty(name = "loa.vault.location.type", havingValue = "file")
 public class FileVaultLocationFactory implements VaultLocationFactory {
 
     private final FileConfigurationProperties fileConfigurationProperties;
@@ -30,7 +29,7 @@ public class FileVaultLocationFactory implements VaultLocationFactory {
      * @param documentEntity the entity to create the location for
      * @return the location of the document
      */
-    public VaultLocation getLocation(final DocumentEntity documentEntity) {
+    public FileVaultLocation getLocation(final DocumentEntity documentEntity) {
         return getLocation(documentEntity, compressionConfigurationProperties.getAlgorithm());
     }
 
@@ -42,7 +41,7 @@ public class FileVaultLocationFactory implements VaultLocationFactory {
      * @param compression    the compression used in the location calculation
      * @return the location of the document
      */
-    public VaultLocation getLocation(final DocumentEntity documentEntity, final DocumentCompression compression) {
+    public FileVaultLocation getLocation(final DocumentEntity documentEntity, final DocumentCompression compression) {
         return new FileVaultLocation(new File(fileConfigurationProperties.getPath(), documentEntity.getId() + "."
                 + documentEntity.getType().getFileExtension() + "." + compression.getFileExtension()));
     }

@@ -4,7 +4,6 @@ import com.github.loa.compression.domain.DocumentCompression;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.net.URL;
 import java.time.Instant;
 
 @Getter
@@ -25,7 +24,16 @@ public class DocumentEntity {
      *
      * @return true if the document is available in the vault, false otherwise
      */
-    public boolean isInVault() {
+    public boolean isArchived() {
         return status == DocumentStatus.DOWNLOADED || status == DocumentStatus.INDEXED;
+    }
+
+    /**
+     * Returns true if the document is compressed with a {@link DocumentCompression}.
+     *
+     * @return true if the document is compressed, false otherwise
+     */
+    public boolean isCompressed() {
+        return compression != DocumentCompression.NONE;
     }
 }

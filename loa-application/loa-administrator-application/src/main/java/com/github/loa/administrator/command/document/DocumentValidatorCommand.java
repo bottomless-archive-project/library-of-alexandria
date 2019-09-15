@@ -44,7 +44,7 @@ public class DocumentValidatorCommand implements CommandLineRunner {
                         log.info("Failed to acquire permit!");
                     }
                 })
-                .filter(DocumentEntity::isInVault)
+                .filter(DocumentEntity::isArchived)
                 .filter(documentEntity -> documentEntity.getType() == DocumentType.PDF)
                 .forEach(this::processDocument);
 

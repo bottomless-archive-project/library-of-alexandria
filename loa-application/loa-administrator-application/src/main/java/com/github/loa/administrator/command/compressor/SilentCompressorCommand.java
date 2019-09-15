@@ -23,7 +23,7 @@ public class SilentCompressorCommand implements CommandLineRunner {
     @Override
     public void run(final String... args) {
         documentEntityFactory.getDocumentEntities()
-                .filter(DocumentEntity::isInVault)
+                .filter(DocumentEntity::isArchived)
                 .filter(this::shouldCompress)
                 .forEach(documentEntity -> vaultClientService.recompressDocument(documentEntity,
                         compressionConfigurationProperties.getAlgorithm()));

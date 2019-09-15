@@ -1,6 +1,7 @@
 package com.github.loa.vault.service.location.domain;
 
 import java.io.Closeable;
+import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -21,6 +22,13 @@ public interface VaultLocation extends Closeable {
      * @return the content of the location
      */
     InputStream content();
+
+    /**
+     * Get the content of the location as a {@link File}.
+     *
+     * @return the content of the location
+     */
+    File file();
 
     /**
      * Removes any previously stored data from the location.

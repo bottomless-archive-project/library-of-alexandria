@@ -6,11 +6,11 @@ import com.github.loa.document.service.DocumentManipulator;
 import com.github.loa.document.service.domain.DocumentEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.IOUtils;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 @Slf4j
 @Service
@@ -26,16 +26,14 @@ public class RecompressorService {
                 + documentEntity.getCompression() + " compression to "
                 + compressionConfigurationProperties.getAlgorithm() + ".");
 
-        try {
-            //TODO: IOUtils.toByteArray could overflow!
-            final byte[] documentContent = IOUtils.toByteArray(
-                    vaultDocumentManager.readDocument(documentEntity));
+        try (final InputStream documentContentInputStream = vaultDocumentManager.readDocument(documentEntity)
+                .getInputStream()) {
+            final byte[] documentContent = documentContentInputStream.readAllBytes();
 
             vaultDocumentManager.removeDocument(documentEntity);
             vaultDocumentManager.archiveDocument(documentEntity, new ByteArrayInputStream(documentContent));
 
-            documentManipulator.updateCompression(documentEntity.getId(),
-                    compressionConfigurationProperties.getAlgorithm());
+            documentManipulator.updateCompression(documentEntity.getId(), documentCompression);
         } catch (IOException e) {
             throw new RuntimeException("Unable to base64 encode document " + documentEntity.getId() + "!", e);
         }

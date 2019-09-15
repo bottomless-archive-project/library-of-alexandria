@@ -4,7 +4,6 @@ import com.github.loa.compression.domain.DocumentCompression;
 import com.github.loa.compression.service.CompressionService;
 import com.github.loa.compression.service.GZIPCompressionService;
 import com.github.loa.compression.service.LZMACompressionService;
-import com.github.loa.compression.service.NoneCompressionService;
 import com.github.loa.compression.service.provider.domain.MissingCompressionServiceException;
 import org.springframework.stereotype.Service;
 
@@ -18,13 +17,9 @@ public class CompressionServiceProvider {
 
     private final Map<DocumentCompression, CompressionService> compressionServices;
 
-    public CompressionServiceProvider(
-            final NoneCompressionService noneCompressionService,
-            final GZIPCompressionService gzipCompressionService,
-            final LZMACompressionService lzmaCompressionService
-    ) {
+    public CompressionServiceProvider(final GZIPCompressionService gzipCompressionService,
+            final LZMACompressionService lzmaCompressionService) {
         compressionServices = Map.of(
-                DocumentCompression.NONE, noneCompressionService,
                 DocumentCompression.GZIP, gzipCompressionService,
                 DocumentCompression.LZMA, lzmaCompressionService
         );
