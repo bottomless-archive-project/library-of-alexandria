@@ -24,8 +24,7 @@ public class VaultClientService {
 
     private final VaultClientConfigurationProperties vaultClientConfigurationProperties;
 
-    public void createDocument(final DocumentEntity documentEntity, final InputStream documentContent)
-            throws IOException {
+    public void createDocument(final DocumentEntity documentEntity, final InputStream documentContent) {
         final HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("http://" + vaultClientConfigurationProperties.getHost() + ":"
                         + vaultClientConfigurationProperties.getPort() + "/document/" + documentEntity.getId()))
@@ -37,20 +36,6 @@ public class VaultClientService {
                 .thenApply(HttpResponse::body)
                 .thenAccept(System.out::println)
                 .join();
-
-
-        /*final MultipartRequest multipartRequest = new MultipartRequest("http://"
-                + vaultClientConfigurationProperties.getHost() + ":" + vaultClientConfigurationProperties.getPort()
-                + "/document/" + documentEntity.getId());
-
-        multipartRequest.addFilePart("content", documentContent);
-
-        int response = multipartRequest.execute();
-
-        if (response != 200) {
-            throw new VaultAccessException("Unable to index document " + documentEntity.getId()
-                    + "! Returned status code: " + response + ",");
-        }*/
     }
 
     public InputStream queryDocument(final DocumentEntity documentEntity) {
