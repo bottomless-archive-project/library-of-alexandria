@@ -34,16 +34,6 @@ public class DocumentRepository {
         return mongoTemplate.find(query, DocumentDatabaseEntity.class);
     }
 
-    public Flux<DocumentDatabaseEntity> findByCompression(final String compression) {
-        final Query query = Query
-                .query(
-                        Criteria.where("compression").is(compression)
-                )
-                .limit(100);
-
-        return mongoTemplate.find(query, DocumentDatabaseEntity.class);
-    }
-
     public void updateStatus(final String id, final String status) {
         final Query query = Query
                 .query(

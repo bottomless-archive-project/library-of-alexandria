@@ -1,6 +1,5 @@
 package com.github.loa.downloader.download.service.document;
 
-import com.github.loa.document.service.domain.DocumentStatus;
 import com.github.loa.document.service.location.factory.DocumentLocationEntityFactory;
 import com.github.loa.document.service.location.id.factory.DocumentLocationIdFactory;
 import com.github.loa.downloader.command.configuration.DownloaderConfigurationProperties;
@@ -47,6 +46,6 @@ public class DocumentDownloadEvaluator {
     }
 
     private boolean shouldDownload(final String documentId) {
-        return !documentLocationEntityFactory.isDocumentLocationExists(documentId);
+        return !documentLocationEntityFactory.isDocumentLocationExists(documentId).block();
     }
 }

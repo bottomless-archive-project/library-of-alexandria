@@ -13,8 +13,8 @@ import java.time.Instant;
 @Setter
 @Document("document")
 @CompoundIndexes({
-        @CompoundIndex(name = "unsaved_query", def = "{'status' : 1"),
-        @CompoundIndex(name = "unsaved_query", def = "{'checksum' : 1, 'fileSize': 1, 'type': 1}")
+        @CompoundIndex(name = "unsaved_query", def = "{'status' : 1}"),
+        @CompoundIndex(name = "unique_file", def = "{'checksum' : 1, 'fileSize': 1, 'type': 1}")
 })
 public class DocumentDatabaseEntity {
 
