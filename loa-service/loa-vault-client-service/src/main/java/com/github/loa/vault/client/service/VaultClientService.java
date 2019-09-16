@@ -15,6 +15,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
+import static java.net.http.HttpRequest.BodyPublishers.ofInputStream;
 import static java.net.http.HttpRequest.BodyPublishers.ofString;
 
 @Service
@@ -25,7 +26,20 @@ public class VaultClientService {
 
     public void createDocument(final DocumentEntity documentEntity, final InputStream documentContent)
             throws IOException {
-        final MultipartRequest multipartRequest = new MultipartRequest("http://"
+        final HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://" + vaultClientConfigurationProperties.getHost() + ":"
+                        + vaultClientConfigurationProperties.getPort() + "/document/" + documentEntity.getId()))
+                .header("Content-Type", "application/json")
+                .POST(ofInputStream(() -> documentContent))
+                .build();
+
+        HttpClient.newHttpClient().sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                .thenApply(HttpResponse::body)
+                .thenAccept(System.out::println)
+                .join();
+
+
+        /*final MultipartRequest multipartRequest = new MultipartRequest("http://"
                 + vaultClientConfigurationProperties.getHost() + ":" + vaultClientConfigurationProperties.getPort()
                 + "/document/" + documentEntity.getId());
 
@@ -36,7 +50,7 @@ public class VaultClientService {
         if (response != 200) {
             throw new VaultAccessException("Unable to index document " + documentEntity.getId()
                     + "! Returned status code: " + response + ",");
-        }
+        }*/
     }
 
     public InputStream queryDocument(final DocumentEntity documentEntity) {

@@ -53,9 +53,13 @@ public class VaultDocumentManager {
     public void archiveDocument(final DocumentEntity documentEntity, final InputStream documentContents,
             final DocumentCompression documentCompression) {
         try (final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentEntity)) {
-            try (final OutputStream outputStream = compressionServiceProvider
-                    .getCompressionService(documentCompression).compress(vaultLocation.destination())) {
-                IOUtils.copy(documentContents, outputStream);
+            if (documentEntity.isCompressed()) {
+                try (final OutputStream outputStream = compressionServiceProvider
+                        .getCompressionService(documentCompression).compress(vaultLocation.destination())) {
+                    IOUtils.copy(documentContents, outputStream);
+                }
+            } else {
+                IOUtils.copy(documentContents, vaultLocation.destination());
             }
         } catch (IOException e) {
             throw new VaultAccessException("Unable to move document with id " + documentEntity.getId()

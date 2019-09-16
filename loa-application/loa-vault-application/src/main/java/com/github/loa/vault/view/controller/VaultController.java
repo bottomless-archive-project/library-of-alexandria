@@ -12,7 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 
@@ -26,9 +25,9 @@ public class VaultController {
 
     @PostMapping("/document/{documentId}")
     public Mono<DocumentEntity> archiveDocument(@PathVariable final String documentId,
-            @RequestParam("content") final MultipartFile content) {
+            @RequestBody final Resource requestBody) {
         return documentEntityFactory.getDocumentEntity(documentId)
-                .doOnNext(documentEntity -> vaultDocumentManager.archiveDocument(documentEntity, content.getResource()))
+                .doOnNext(documentEntity -> vaultDocumentManager.archiveDocument(documentEntity, requestBody))
                 .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Document not found with id " + documentId + "!")));
     }
