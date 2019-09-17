@@ -29,8 +29,7 @@ public class IndexerService {
 
             documentManipulator.markIndexed(documentEntity.getId());
         } catch (IOException | ElasticsearchException e) {
-            log.info("Failed to index document " + documentEntity.getId() + "! Cause: '"
-                    + e.getMessage() + "'.");
+            log.info("Failed to index document " + documentEntity.getId() + "! Cause: '" + e.getMessage() + "'.");
 
             documentManipulator.markIndexFailure(documentEntity.getId());
         }

@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties("loa.indexer")
 public class IndexerConfigurationProperties {
 
-    private int sleepTime;
     private int maximumFileSize;
     private int concurrentIndexerThreads;
 }

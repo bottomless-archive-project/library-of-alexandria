@@ -28,8 +28,7 @@ public class DocumentRepository {
         final Query query = Query
                 .query(
                         Criteria.where("status").is(status)
-                )
-                .limit(5000);
+                );
 
         return mongoTemplate.find(query, DocumentDatabaseEntity.class);
     }

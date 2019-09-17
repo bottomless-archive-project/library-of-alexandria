@@ -38,7 +38,7 @@ public class DocumentEntityFactory {
     }
 
     /**
-     * Return the document entities belonging to the provided status. The returned list size is limited ti 100.
+     * Return the document entities belonging to the provided status.
      *
      * @param documentStatus the status to query for
      * @return the list of documents with the provided values
