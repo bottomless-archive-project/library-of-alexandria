@@ -85,7 +85,7 @@ public class VaultDocumentManager {
 
             return new InputStreamResource(decompressedInputStream);
         } else {
-            return resourceLoader.getResource(vaultLocation.file().getPath());
+            return resourceLoader.getResource("file:/" + vaultLocation.file().getPath());
         }
     }
 

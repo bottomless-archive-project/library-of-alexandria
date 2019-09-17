@@ -8,7 +8,6 @@ import com.github.loa.vault.service.VaultLocationFactory;
 import com.github.loa.vault.service.location.domain.VaultLocation;
 import com.github.loa.vault.service.location.file.domain.FileVaultLocation;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -42,7 +41,12 @@ public class FileVaultLocationFactory implements VaultLocationFactory {
      * @return the location of the document
      */
     public FileVaultLocation getLocation(final DocumentEntity documentEntity, final DocumentCompression compression) {
-        return new FileVaultLocation(new File(fileConfigurationProperties.getPath(), documentEntity.getId() + "."
-                + documentEntity.getType().getFileExtension() + "." + compression.getFileExtension()));
+        if (documentEntity.isCompressed()) {
+            return new FileVaultLocation(new File(fileConfigurationProperties.getPath(), documentEntity.getId() + "."
+                    + documentEntity.getType().getFileExtension() + "." + compression.getFileExtension()));
+        } else {
+            return new FileVaultLocation(new File(fileConfigurationProperties.getPath(), documentEntity.getId() + "."
+                    + documentEntity.getType().getFileExtension()));
+        }
     }
 }
