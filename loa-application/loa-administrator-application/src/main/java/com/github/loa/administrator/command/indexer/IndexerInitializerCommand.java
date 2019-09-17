@@ -15,6 +15,9 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * This command will initialize the indexer database.
+ */
 @Component
 @RequiredArgsConstructor
 @ConditionalOnProperty("initialize-indexer")
@@ -22,6 +25,11 @@ public class IndexerInitializerCommand implements CommandLineRunner {
 
     private final RestHighLevelClient restHighLevelClient;
 
+    /**
+     * Runs the command.
+     *
+     * @param args the command arguments, none yet
+     */
     @Override
     public void run(final String... args) throws IOException {
         initializeAttachmentPipeline();

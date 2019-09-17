@@ -71,7 +71,6 @@ public class VaultClientService {
 
         HttpClient.newHttpClient().sendAsync(request, HttpResponse.BodyHandlers.ofString())
                 .thenApply(HttpResponse::body)
-                .thenAccept(System.out::println)
                 .join();
     }
 }
