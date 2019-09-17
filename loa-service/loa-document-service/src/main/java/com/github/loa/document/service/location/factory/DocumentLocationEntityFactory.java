@@ -4,6 +4,7 @@ import com.github.loa.document.repository.DocumentLocationRepository;
 import com.github.loa.document.repository.domain.DocumentLocationDatabaseEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 import java.net.URL;
 
@@ -13,8 +14,8 @@ public class DocumentLocationEntityFactory {
 
     private final DocumentLocationRepository documentLocationRepository;
 
-    public boolean isDocumentLocationExists(final String documentLocationId) {
-        return documentLocationRepository.findById(documentLocationId) != null;
+    public Mono<Boolean> isDocumentLocationExists(final String documentLocationId) {
+        return documentLocationRepository.existsById(documentLocationId);
     }
 
     public void newDocumentLocationEntity(final String id, final URL location, final int versionNumber,

@@ -1,6 +1,5 @@
 package com.github.loa.web.view.document.controller;
 
-import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.document.service.domain.DocumentType;
 import com.github.loa.document.service.entity.factory.DocumentEntityFactory;
 import com.github.loa.vault.client.service.VaultClientService;
@@ -12,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
+import reactor.core.publisher.Mono;
 
 import java.io.InputStream;
 
@@ -33,26 +33,28 @@ public class DocumentQueryController {
      * @return the returned document's content
      */
     @GetMapping("/document/{documentId}")
-    public ResponseEntity<InputStreamResource> queryDocument(@PathVariable final String documentId) {
-        final DocumentEntity documentEntity = documentEntityFactory.getDocumentEntity(documentId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "Document not found with id " + documentId + "!"));
-        final InputStream streamingContent = vaultClientService.queryDocument(documentEntity);
+    public Mono<ResponseEntity<InputStreamResource>> queryDocument(@PathVariable final String documentId) {
+        return documentEntityFactory.getDocumentEntity(documentId)
+                .map(documentEntity -> {
+                    final InputStream streamingContent = vaultClientService.queryDocument(documentEntity);
 
-        final HttpHeaders httpHeaders = new HttpHeaders();
+                    final HttpHeaders httpHeaders = new HttpHeaders();
 
-        if (documentEntity.getType() != DocumentType.PDF) {
-            httpHeaders.setContentDisposition(
-                    ContentDisposition.builder("attachment")
-                            .filename(documentId + "." + documentEntity.getType().getFileExtension())
-                            .build()
-            );
-        }
+                    if (documentEntity.getType() != DocumentType.PDF) {
+                        httpHeaders.setContentDisposition(
+                                ContentDisposition.builder("attachment")
+                                        .filename(documentId + "." + documentEntity.getType().getFileExtension())
+                                        .build()
+                        );
+                    }
 
-        return ResponseEntity.ok()
-                .headers(httpHeaders)
-                .contentType(mediaTypeCalculator.calculateMediaType(documentEntity.getType()))
-                .cacheControl(CacheControl.noCache())
-                .body(new InputStreamResource(streamingContent));
+                    return ResponseEntity.ok()
+                            .headers(httpHeaders)
+                            .contentType(mediaTypeCalculator.calculateMediaType(documentEntity.getType()))
+                            .cacheControl(CacheControl.noCache())
+                            .body(new InputStreamResource(streamingContent));
+                })
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Document not found with id " + documentId + "!")));
     }
 }

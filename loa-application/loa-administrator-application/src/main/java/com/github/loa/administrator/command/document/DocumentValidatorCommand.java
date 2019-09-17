@@ -11,73 +11,90 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
+import reactor.core.scheduler.Scheduler;
+import reactor.core.scheduler.Schedulers;
 
 import java.io.IOException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.DoubleAdder;
 
+/**
+ * This command will go through all of the {@link DocumentEntity}s available in the database and validate if they are
+ * openable and parsable.
+ */
 @Slf4j
 @Component
 @RequiredArgsConstructor
 @ConditionalOnProperty("document-validator")
 public class DocumentValidatorCommand implements CommandLineRunner {
 
+    private final static String SCHEDULER_NAME = "document-validator-scheduler";
+
     private final DocumentEntityFactory documentEntityFactory;
     private final VaultClientService vaultClientService;
+    private final DocumentValidatorConfigurationProperties documentValidatorConfigurationProperties;
+
     private final Semaphore semaphore = new Semaphore(5000);
-    private final ExecutorService executorService = Executors.newFixedThreadPool(1000);
     private final AtomicLong processedDocumentCount = new AtomicLong();
     private final DoubleAdder doubleAdder = new DoubleAdder();
 
+    /**
+     * Runs the command.
+     *
+     * @param args the command arguments, none yet
+     */
     @Override
     public void run(final String... args) {
         log.info("Starting the document validator command.");
 
         documentEntityFactory.getDocumentEntities()
-                .peek((documentEntity) -> {
+                .parallel(documentValidatorConfigurationProperties.getParallelismLevel())
+                .runOn(newScheduler())
+                .doOnNext((documentEntity) -> {
                     try {
                         semaphore.acquire();
                     } catch (InterruptedException e) {
                         log.info("Failed to acquire permit!");
                     }
                 })
-                .filter(DocumentEntity::isInVault)
+                .filter(DocumentEntity::isArchived)
                 .filter(documentEntity -> documentEntity.getType() == DocumentType.PDF)
-                .forEach(this::processDocument);
+                .doOnNext(this::processDocument);
 
         log.info("Stopped the document validator command.");
     }
 
     private void processDocument(final DocumentEntity documentEntity) {
-        executorService.execute(() -> {
-            final byte[] documentContents = vaultClientService.queryDocumentRaw(documentEntity);
+        final byte[] documentContents = vaultClientService.queryDocumentRaw(documentEntity);
 
-            try (final PDDocument document = PDDocument.load(documentContents)) {
-                //log.info(documentEntity.getId() + " is a valid pdf!");
-            } catch (IOException e) {
-                final double documentContentSize = (double) documentContents.length / (double) (1024L * 1024L);
+        try (final PDDocument document = PDDocument.load(documentContents)) {
+            //log.info(documentEntity.getId() + " is a valid pdf!");
+        } catch (IOException e) {
+            final double documentContentSize = (double) documentContents.length / (double) (1024L * 1024L);
 
-                doubleAdder.add(documentContentSize);
+            doubleAdder.add(documentContentSize);
 
-                log.info(documentEntity.getId() + " with size: " + Precision.round(documentContentSize, 2) + " mb and total size: " + Precision.round(doubleAdder.doubleValue(), 2)
-                        + " mb is an invalid pdf! [" + e.getClass() + "]: " + e.getMessage() + ".");
+            log.info(documentEntity.getId() + " with size: " + Precision.round(documentContentSize, 2)
+                    + " mb and total size: " + Precision.round(doubleAdder.doubleValue(), 2)
+                    + " mb is an invalid pdf! [" + e.getClass() + "]: " + e.getMessage() + ".");
 
-                removeDocument(documentEntity);
-            }
+            removeDocument(documentEntity);
+        }
 
-            final long processedDocument = processedDocumentCount.incrementAndGet();
-            if (processedDocument % 100 == 0) {
-                log.info("Processed " + processedDocument + " documents.");
-            }
+        final long processedDocument = processedDocumentCount.incrementAndGet();
+        if (processedDocument % 100 == 0) {
+            log.info("Processed " + processedDocument + " documents.");
+        }
 
-            semaphore.release();
-        });
+        semaphore.release();
     }
 
     private void removeDocument(final DocumentEntity documentEntity) {
+        //TODO
+    }
 
+    private Scheduler newScheduler() {
+        return Schedulers.newParallel(SCHEDULER_NAME, documentValidatorConfigurationProperties.getParallelismLevel());
     }
 }

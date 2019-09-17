@@ -8,7 +8,6 @@ import com.github.loa.vault.service.VaultLocationFactory;
 import com.github.loa.vault.service.location.domain.VaultLocation;
 import com.github.loa.vault.service.location.file.domain.FileVaultLocation;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -18,7 +17,6 @@ import java.io.File;
  */
 @Service
 @RequiredArgsConstructor
-@ConditionalOnProperty(name = "loa.vault.location.type", havingValue = "file")
 public class FileVaultLocationFactory implements VaultLocationFactory {
 
     private final FileConfigurationProperties fileConfigurationProperties;
@@ -30,7 +28,7 @@ public class FileVaultLocationFactory implements VaultLocationFactory {
      * @param documentEntity the entity to create the location for
      * @return the location of the document
      */
-    public VaultLocation getLocation(final DocumentEntity documentEntity) {
+    public FileVaultLocation getLocation(final DocumentEntity documentEntity) {
         return getLocation(documentEntity, compressionConfigurationProperties.getAlgorithm());
     }
 
@@ -42,8 +40,13 @@ public class FileVaultLocationFactory implements VaultLocationFactory {
      * @param compression    the compression used in the location calculation
      * @return the location of the document
      */
-    public VaultLocation getLocation(final DocumentEntity documentEntity, final DocumentCompression compression) {
-        return new FileVaultLocation(new File(fileConfigurationProperties.getPath(), documentEntity.getId() + "."
-                + documentEntity.getType().getFileExtension() + "." + compression.getFileExtension()));
+    public FileVaultLocation getLocation(final DocumentEntity documentEntity, final DocumentCompression compression) {
+        if (documentEntity.isCompressed()) {
+            return new FileVaultLocation(new File(fileConfigurationProperties.getPath(), documentEntity.getId() + "."
+                    + documentEntity.getType().getFileExtension() + "." + compression.getFileExtension()));
+        } else {
+            return new FileVaultLocation(new File(fileConfigurationProperties.getPath(), documentEntity.getId() + "."
+                    + documentEntity.getType().getFileExtension()));
+        }
     }
 }

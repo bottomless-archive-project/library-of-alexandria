@@ -15,6 +15,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
+import static java.net.http.HttpRequest.BodyPublishers.ofInputStream;
 import static java.net.http.HttpRequest.BodyPublishers.ofString;
 
 @Service
@@ -23,20 +24,18 @@ public class VaultClientService {
 
     private final VaultClientConfigurationProperties vaultClientConfigurationProperties;
 
-    public void createDocument(final DocumentEntity documentEntity, final InputStream documentContent)
-            throws IOException {
-        final MultipartRequest multipartRequest = new MultipartRequest("http://"
-                + vaultClientConfigurationProperties.getHost() + ":" + vaultClientConfigurationProperties.getPort()
-                + "/document/" + documentEntity.getId());
+    public void createDocument(final DocumentEntity documentEntity, final InputStream documentContent) {
+        final HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://" + vaultClientConfigurationProperties.getHost() + ":"
+                        + vaultClientConfigurationProperties.getPort() + "/document/" + documentEntity.getId()))
+                .header("Content-Type", "application/json")
+                .POST(ofInputStream(() -> documentContent))
+                .build();
 
-        multipartRequest.addFilePart("content", documentContent);
-
-        int response = multipartRequest.execute();
-
-        if (response != 200) {
-            throw new VaultAccessException("Unable to index document " + documentEntity.getId()
-                    + "! Returned status code: " + response + ",");
-        }
+        HttpClient.newHttpClient().sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                .thenApply(HttpResponse::body)
+                .thenAccept(System.out::println)
+                .join();
     }
 
     public InputStream queryDocument(final DocumentEntity documentEntity) {
@@ -72,7 +71,6 @@ public class VaultClientService {
 
         HttpClient.newHttpClient().sendAsync(request, HttpResponse.BodyHandlers.ofString())
                 .thenApply(HttpResponse::body)
-                .thenAccept(System.out::println)
                 .join();
     }
 }

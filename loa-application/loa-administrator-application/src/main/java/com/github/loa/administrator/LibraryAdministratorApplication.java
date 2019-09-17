@@ -2,12 +2,12 @@ package com.github.loa.administrator;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfiguration;
-import org.springframework.boot.autoconfigure.data.mongo.MongoRepositoriesAutoConfiguration;
-import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
 
-@SpringBootApplication(scanBasePackages = "com.github.loa", exclude = {MongoAutoConfiguration.class,
-        MongoRepositoriesAutoConfiguration.class, MongoDataAutoConfiguration.class})
+/**
+ * This application contains useful commands that manipulates either the database or the vault. These commands are
+ * usually batch processing in nature and fixes/corrects errors, remove certain documents etc.
+ */
+@SpringBootApplication(scanBasePackages = "com.github.loa")
 public class LibraryAdministratorApplication {
 
     public static void main(final String[] args) {

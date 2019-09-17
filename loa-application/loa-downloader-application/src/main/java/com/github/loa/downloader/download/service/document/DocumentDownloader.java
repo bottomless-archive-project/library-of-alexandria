@@ -2,20 +2,18 @@ package com.github.loa.downloader.download.service.document;
 
 import com.github.loa.checksum.service.ChecksumProvider;
 import com.github.loa.compression.configuration.CompressionConfigurationProperties;
-import com.github.loa.compression.domain.DocumentCompression;
 import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.document.service.domain.DocumentStatus;
 import com.github.loa.document.service.domain.DocumentType;
+import com.github.loa.document.service.entity.factory.DocumentEntityFactory;
 import com.github.loa.document.service.entity.factory.domain.DocumentCreationContext;
 import com.github.loa.document.service.location.id.factory.DocumentLocationIdFactory;
-import com.github.loa.document.service.DocumentManipulator;
-import com.github.loa.document.service.entity.factory.DocumentEntityFactory;
 import com.github.loa.downloader.command.configuration.DownloaderConfigurationProperties;
 import com.github.loa.downloader.download.service.file.DocumentFileManipulator;
 import com.github.loa.downloader.download.service.file.DocumentFileValidator;
 import com.github.loa.downloader.download.service.file.FileDownloader;
-import com.github.loa.downloader.download.service.file.domain.FileDownloaderException;
 import com.github.loa.downloader.download.service.file.domain.FailedToArchiveException;
+import com.github.loa.downloader.download.service.file.domain.FileDownloaderException;
 import com.github.loa.stage.service.StageLocationFactory;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +23,6 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.Optional;
 
 /**
  * This service is responsible for downloading documents.
@@ -101,7 +98,7 @@ public class DocumentDownloader {
                             .checksum(checksum)
                             .fileSize(fileSize)
                             .build()
-            );
+            ).block();
 
             documentFileManipulator.moveToVault(documentEntity);
         } catch (FailedToArchiveException e) {

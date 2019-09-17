@@ -1,22 +1,19 @@
 package com.github.loa.vault.view.controller;
 
-import com.github.loa.vault.service.RecompressorService;
 import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.document.service.entity.factory.DocumentEntityFactory;
+import com.github.loa.vault.service.RecompressorService;
 import com.github.loa.vault.service.VaultDocumentManager;
 import com.github.loa.vault.view.request.domain.RecompressRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
-
-import java.io.IOException;
-import java.io.InputStream;
+import reactor.core.publisher.Mono;
 
 @RestController
 @RequiredArgsConstructor
@@ -27,13 +24,12 @@ public class VaultController {
     private final RecompressorService recompressorService;
 
     @PostMapping("/document/{documentId}")
-    public void archiveDocument(@PathVariable final String documentId,
-            @RequestParam("content") final MultipartFile content) throws IOException {
-        final DocumentEntity documentEntity = documentEntityFactory.getDocumentEntity(documentId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "Document not found with id " + documentId + "!"));
-
-        vaultDocumentManager.archiveDocument(documentEntity, content.getInputStream());
+    public Mono<DocumentEntity> archiveDocument(@PathVariable final String documentId,
+            @RequestBody final Resource requestBody) {
+        return documentEntityFactory.getDocumentEntity(documentId)
+                .doOnNext(documentEntity -> vaultDocumentManager.archiveDocument(documentEntity, requestBody))
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Document not found with id " + documentId + "!")));
     }
 
     /**
@@ -43,28 +39,29 @@ public class VaultController {
      * @return the returned document's content
      */
     @GetMapping("/document/{documentId}")
-    public ResponseEntity<InputStreamResource> queryDocument(@PathVariable final String documentId) {
-        final DocumentEntity documentEntity = documentEntityFactory.getDocumentEntity(documentId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "Document not found with id " + documentId + "!"));
+    public Mono<ResponseEntity<Resource>> queryDocument(@PathVariable final String documentId) {
+        return documentEntityFactory.getDocumentEntity(documentId)
+                .map(documentEntity -> {
+                    final Resource resource = vaultDocumentManager.readDocument(documentEntity);
 
-        final InputStream streamingContent = vaultDocumentManager.readDocument(documentEntity);
-
-        return ResponseEntity.ok()
-                .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .header("Content-Disposition", "attachment; filename=" + documentId + "."
-                        + documentEntity.getType().getFileExtension())
-                .cacheControl(CacheControl.noCache())
-                .body(new InputStreamResource(streamingContent));
+                    return ResponseEntity.ok()
+                            .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                            .header("Content-Disposition", "attachment; filename="
+                                    + documentId + "." + documentEntity.getType().getFileExtension())
+                            .cacheControl(CacheControl.noCache())
+                            .body(resource);
+                })
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Document not found with id " + documentId + "!")));
     }
 
     @PostMapping("/document/{documentId}/recompress")
-    public void recompressDocument(@PathVariable final String documentId,
+    public Mono<DocumentEntity> recompressDocument(@PathVariable final String documentId,
             @RequestBody final RecompressRequest recompressRequest) {
-        final DocumentEntity documentEntity = documentEntityFactory.getDocumentEntity(documentId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "Document not found with id " + documentId + "!"));
-
-        recompressorService.recompress(documentEntity, recompressRequest.getCompression());
+        return documentEntityFactory.getDocumentEntity(documentId)
+                .doOnNext(documentEntity ->
+                        recompressorService.recompress(documentEntity, recompressRequest.getCompression()))
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Document not found with id " + documentId + "!")));
     }
 }

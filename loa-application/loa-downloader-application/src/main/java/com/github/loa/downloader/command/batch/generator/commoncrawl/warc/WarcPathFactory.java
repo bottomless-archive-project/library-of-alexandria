@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 public class WarcPathFactory {
 
     public List<String> newPaths(final String crawlId) {
-        try (BufferedReader downloadPathsReader = downloadPaths(crawlId)) {
+        try (final BufferedReader downloadPathsReader = downloadPaths(crawlId)) {
             return downloadPathsReader.lines()
                     .collect(Collectors.toList());
         } catch (IOException e) {

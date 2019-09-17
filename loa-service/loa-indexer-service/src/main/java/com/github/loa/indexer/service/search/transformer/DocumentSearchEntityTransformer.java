@@ -1,10 +1,9 @@
 package com.github.loa.indexer.service.search.transformer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.document.service.entity.factory.DocumentEntityFactory;
-import com.github.loa.indexer.domain.IndexerAccessException;
 import com.github.loa.indexer.domain.DocumentSearchEntity;
+import com.github.loa.indexer.domain.IndexerAccessException;
 import com.github.loa.indexer.service.search.domain.SearchDatabaseEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +15,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -38,7 +36,7 @@ public class DocumentSearchEntityTransformer {
             final SearchDatabaseEntity searchDatabaseEntity = objectMapper
                     .readValue(searchHit.getSourceAsString(), SearchDatabaseEntity.class);
 
-            return documentEntityFactory.getDocumentEntity(searchHit.getId())
+            final DocumentSearchEntity documentSearchEntity = documentEntityFactory.getDocumentEntity(searchHit.getId())
                     .map(documentEntity ->
                             DocumentSearchEntity.builder()
                                     .title(searchDatabaseEntity.getAttachment().getTitle())
@@ -48,9 +46,14 @@ public class DocumentSearchEntityTransformer {
                                             .getFragments()[0].string())
                                     .documentEntity(documentEntity)
                                     .build()
-                    )
-                    .orElseThrow(() -> new NoSuchElementException("Missing document " + searchHit.getId()
-                            + " from the database!"));
+                    ).block();
+
+            if (documentSearchEntity == null) {
+                throw new NoSuchElementException("Missing document " + searchHit.getId()
+                        + " from the database!");
+            }
+
+            return documentSearchEntity;
         } catch (IOException e) {
             throw new IndexerAccessException("Failed to convert source!", e);
         }

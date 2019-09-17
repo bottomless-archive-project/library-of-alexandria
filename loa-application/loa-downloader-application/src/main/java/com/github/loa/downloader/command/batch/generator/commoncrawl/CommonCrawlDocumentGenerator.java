@@ -20,6 +20,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
+/**
+ * A {@link Generator} that generates locations for parsable items. The items are collected from the
+ * <a href="https://commoncrawl.org/the-data/get-started/">Common Crawl</a> corpus.
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -44,7 +48,7 @@ public class CommonCrawlDocumentGenerator implements Generator<String> {
 
     @Override
     public Optional<String> generate() {
-        if (availableUrls.size() == 0) {
+        if (availableUrls.isEmpty()) {
             log.info("Starting the processing of WARC file with ID: " + (
                     commonCrawlDocumentSourceConfiguration.getWarcId() + processedWarcFiles));
 
@@ -75,7 +79,7 @@ public class CommonCrawlDocumentGenerator implements Generator<String> {
     private URL buildWarcLocation(final String warcLocation) {
         try {
             return new URL("https://commoncrawl.s3.amazonaws.com/" + warcLocation);
-        } catch (MalformedURLException e) {
+        } catch (final MalformedURLException e) {
             throw new RuntimeException("Unable to build WARC location!", e);
         }
     }
