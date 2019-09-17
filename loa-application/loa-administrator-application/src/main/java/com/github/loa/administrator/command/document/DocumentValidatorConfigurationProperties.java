@@ -9,5 +9,5 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties("loa.command.document-validator")
 public class DocumentValidatorConfigurationProperties {
 
-    private int parallelismLevel = 10;
+    private int parallelismLevel = 25;
 }

@@ -1,7 +1,6 @@
 package com.github.loa.administrator.command.document;
 
 import com.github.loa.document.service.domain.DocumentEntity;
-import com.github.loa.document.service.domain.DocumentType;
 import com.github.loa.document.service.entity.factory.DocumentEntityFactory;
 import com.github.loa.vault.client.service.VaultClientService;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +14,6 @@ import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
 
 import java.io.IOException;
-import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.DoubleAdder;
 
@@ -35,7 +33,6 @@ public class DocumentValidatorCommand implements CommandLineRunner {
     private final VaultClientService vaultClientService;
     private final DocumentValidatorConfigurationProperties documentValidatorConfigurationProperties;
 
-    private final Semaphore semaphore = new Semaphore(5000);
     private final AtomicLong processedDocumentCount = new AtomicLong();
     private final DoubleAdder doubleAdder = new DoubleAdder();
 
@@ -49,20 +46,12 @@ public class DocumentValidatorCommand implements CommandLineRunner {
         log.info("Starting the document validator command.");
 
         documentEntityFactory.getDocumentEntities()
+                .limitRate(100)
                 .parallel(documentValidatorConfigurationProperties.getParallelismLevel())
                 .runOn(newScheduler())
-                .doOnNext((documentEntity) -> {
-                    try {
-                        semaphore.acquire();
-                    } catch (InterruptedException e) {
-                        log.info("Failed to acquire permit!");
-                    }
-                })
                 .filter(DocumentEntity::isArchived)
-                .filter(documentEntity -> documentEntity.getType() == DocumentType.PDF)
-                .doOnNext(this::processDocument);
-
-        log.info("Stopped the document validator command.");
+                .filter(DocumentEntity::isPdf)
+                .subscribe(this::processDocument);
     }
 
     private void processDocument(final DocumentEntity documentEntity) {
@@ -86,8 +75,6 @@ public class DocumentValidatorCommand implements CommandLineRunner {
         if (processedDocument % 100 == 0) {
             log.info("Processed " + processedDocument + " documents.");
         }
-
-        semaphore.release();
     }
 
     private void removeDocument(final DocumentEntity documentEntity) {

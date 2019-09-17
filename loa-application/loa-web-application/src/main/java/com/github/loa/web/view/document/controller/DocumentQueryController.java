@@ -1,6 +1,5 @@
 package com.github.loa.web.view.document.controller;
 
-import com.github.loa.document.service.domain.DocumentType;
 import com.github.loa.document.service.entity.factory.DocumentEntityFactory;
 import com.github.loa.vault.client.service.VaultClientService;
 import com.github.loa.web.view.document.service.MediaTypeCalculator;
@@ -40,7 +39,7 @@ public class DocumentQueryController {
 
                     final HttpHeaders httpHeaders = new HttpHeaders();
 
-                    if (documentEntity.getType() != DocumentType.PDF) {
+                    if (documentEntity.isPdf()) {
                         httpHeaders.setContentDisposition(
                                 ContentDisposition.builder("attachment")
                                         .filename(documentId + "." + documentEntity.getType().getFileExtension())
