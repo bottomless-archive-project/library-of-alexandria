@@ -1,7 +1,6 @@
 apply plugin: 'org.springframework.boot'
 
 dependencies {
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter-webflux'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-json'
 
     compile group: 'org.apache.commons', name: 'commons-math3', version: '3.6.1'
