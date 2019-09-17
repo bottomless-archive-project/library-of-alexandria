@@ -44,7 +44,7 @@ public class CommonCrawlDocumentGenerator implements Generator<String> {
 
     @Override
     public Optional<String> generate() {
-        if (availableUrls.size() == 0) {
+        if (availableUrls.isEmpty()) {
             log.info("Starting the processing of WARC file with ID: " + (
                     commonCrawlDocumentSourceConfiguration.getWarcId() + processedWarcFiles));
 
@@ -75,7 +75,7 @@ public class CommonCrawlDocumentGenerator implements Generator<String> {
     private URL buildWarcLocation(final String warcLocation) {
         try {
             return new URL("https://commoncrawl.s3.amazonaws.com/" + warcLocation);
-        } catch (MalformedURLException e) {
+        } catch (final MalformedURLException e) {
             throw new RuntimeException("Unable to build WARC location!", e);
         }
     }
@@ -89,16 +89,16 @@ public class CommonCrawlDocumentGenerator implements Generator<String> {
             executorService.submit(() -> {
                 final Document document = Jsoup.parse(contentString, warcRecordUrl);
 
-                final Set<String> urlsOnPage = document.select("a").stream()
-                        .map(element -> element.attr("abs:href"))
-                        .filter(url -> !url.isEmpty())
-                        .collect(Collectors.toSet());
+            final Set<String> urlsOnPage = document.select("a").stream()
+                    .map(element -> element.attr("abs:href"))
+                    .filter(url -> !url.isEmpty())
+                    .collect(Collectors.toSet());
 
-                final int beforeUrls = upcomingUrls.size();
+            final int beforeUrls = upcomingUrls.size();
 
-                upcomingUrls.addAll(urlsOnPage);
+            upcomingUrls.addAll(urlsOnPage);
 
-                final int afterUrls = upcomingUrls.size();
+            final int afterUrls = upcomingUrls.size();
 
                 if ((afterUrls / 25000) - (beforeUrls / 25000) > 0) {
                     log.info("Collected " + afterUrls + " urls!");
