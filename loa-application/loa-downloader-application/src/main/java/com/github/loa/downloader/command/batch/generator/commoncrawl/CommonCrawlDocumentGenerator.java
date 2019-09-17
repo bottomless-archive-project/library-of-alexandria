@@ -20,6 +20,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
+/**
+ * A {@link Generator} that generates locations for parsable items. The items are collected from the
+ * <a href="https://commoncrawl.org/the-data/get-started/">Common Crawl</a> corpus.
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -89,16 +93,16 @@ public class CommonCrawlDocumentGenerator implements Generator<String> {
             executorService.submit(() -> {
                 final Document document = Jsoup.parse(contentString, warcRecordUrl);
 
-            final Set<String> urlsOnPage = document.select("a").stream()
-                    .map(element -> element.attr("abs:href"))
-                    .filter(url -> !url.isEmpty())
-                    .collect(Collectors.toSet());
+                final Set<String> urlsOnPage = document.select("a").stream()
+                        .map(element -> element.attr("abs:href"))
+                        .filter(url -> !url.isEmpty())
+                        .collect(Collectors.toSet());
 
-            final int beforeUrls = upcomingUrls.size();
+                final int beforeUrls = upcomingUrls.size();
 
-            upcomingUrls.addAll(urlsOnPage);
+                upcomingUrls.addAll(urlsOnPage);
 
-            final int afterUrls = upcomingUrls.size();
+                final int afterUrls = upcomingUrls.size();
 
                 if ((afterUrls / 25000) - (beforeUrls / 25000) > 0) {
                     log.info("Collected " + afterUrls + " urls!");
