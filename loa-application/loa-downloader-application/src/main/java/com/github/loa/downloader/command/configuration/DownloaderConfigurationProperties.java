@@ -9,5 +9,9 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties("loa.downloader")
 public class DownloaderConfigurationProperties {
 
+    /**
+     * 1 = M1 - RC-2 -> Updated because normal files had a dot at the end.
+     * 2 = RC-3+
+     */
     private int versionNumber;
 }

@@ -45,8 +45,14 @@ public class FileVaultLocationFactory implements VaultLocationFactory {
             return new FileVaultLocation(new File(fileConfigurationProperties.getPath(), documentEntity.getId() + "."
                     + documentEntity.getType().getFileExtension() + "." + compression.getFileExtension()));
         } else {
-            return new FileVaultLocation(new File(fileConfigurationProperties.getPath(), documentEntity.getId() + "."
-                    + documentEntity.getType().getFileExtension()));
+            // There was a bug in version 1 that added a . to the end of the document files
+            if (documentEntity.getDownloaderVersion() == 1) {
+                return new FileVaultLocation(new File(fileConfigurationProperties.getPath(), documentEntity.getId() + "."
+                        + documentEntity.getType().getFileExtension() + "."));
+            } else {
+                return new FileVaultLocation(new File(fileConfigurationProperties.getPath(), documentEntity.getId() + "."
+                        + documentEntity.getType().getFileExtension()));
+            }
         }
     }
 }
