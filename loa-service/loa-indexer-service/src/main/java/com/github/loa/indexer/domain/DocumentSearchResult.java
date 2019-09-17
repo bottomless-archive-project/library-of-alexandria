@@ -2,8 +2,7 @@ package com.github.loa.indexer.domain;
 
 import lombok.Builder;
 import lombok.Getter;
-
-import java.util.List;
+import reactor.core.publisher.Flux;
 
 /**
  * Contains the result of a document search in the indexer repository.
@@ -13,5 +12,5 @@ import java.util.List;
 public class DocumentSearchResult {
 
     private final long totalHitCount;
-    private final List<DocumentSearchEntity> searchHits;
+    private final Flux<DocumentSearchEntity> searchHits;
 }

@@ -6,6 +6,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.time.Instant;
 
@@ -19,6 +20,7 @@ import java.time.Instant;
 public class DocumentDatabaseEntity {
 
     @Id
+    @Field("_id")
     private String id;
     private String type;
     private String status;

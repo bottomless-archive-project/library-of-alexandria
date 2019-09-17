@@ -46,7 +46,7 @@ public class VaultController {
 
                     return ResponseEntity.ok()
                             .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                            .header("Content-Disposition", "attachment; filename="
+                            .header("Content-Disposition", "inline; filename="
                                     + documentId + "." + documentEntity.getType().getFileExtension())
                             .cacheControl(CacheControl.noCache())
                             .body(resource);

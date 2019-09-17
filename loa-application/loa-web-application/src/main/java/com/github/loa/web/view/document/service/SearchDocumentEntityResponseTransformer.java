@@ -1,7 +1,7 @@
 package com.github.loa.web.view.document.service;
 
-import com.github.loa.web.view.document.response.SearchDocumentEntityResponse;
 import com.github.loa.indexer.domain.DocumentSearchEntity;
+import com.github.loa.web.view.document.response.SearchDocumentEntityResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

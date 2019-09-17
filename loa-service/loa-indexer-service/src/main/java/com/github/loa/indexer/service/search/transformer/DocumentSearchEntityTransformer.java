@@ -10,12 +10,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
+import java.util.function.Function;
 
 @Slf4j
 @Service
@@ -25,18 +24,18 @@ public class DocumentSearchEntityTransformer {
     private final ObjectMapper objectMapper;
     private final DocumentEntityFactory documentEntityFactory;
 
-    public List<DocumentSearchEntity> transform(final SearchHits searchHits) {
-        return Arrays.stream(searchHits.getHits())
+    public Flux<DocumentSearchEntity> transform(final SearchHits searchHits) {
+        return Flux.fromArray(searchHits.getHits())
                 .map(this::transform)
-                .collect(Collectors.toList());
+                .flatMap(Function.identity());
     }
 
-    public DocumentSearchEntity transform(final SearchHit searchHit) {
+    public Mono<DocumentSearchEntity> transform(final SearchHit searchHit) {
         try {
             final SearchDatabaseEntity searchDatabaseEntity = objectMapper
                     .readValue(searchHit.getSourceAsString(), SearchDatabaseEntity.class);
 
-            final DocumentSearchEntity documentSearchEntity = documentEntityFactory.getDocumentEntity(searchHit.getId())
+            return documentEntityFactory.getDocumentEntity(searchHit.getId())
                     .map(documentEntity ->
                             DocumentSearchEntity.builder()
                                     .title(searchDatabaseEntity.getAttachment().getTitle())
@@ -46,14 +45,9 @@ public class DocumentSearchEntityTransformer {
                                             .getFragments()[0].string())
                                     .documentEntity(documentEntity)
                                     .build()
-                    ).block();
-
-            if (documentSearchEntity == null) {
-                throw new NoSuchElementException("Missing document " + searchHit.getId()
-                        + " from the database!");
-            }
-
-            return documentSearchEntity;
+                    )
+                    /*.switchIfEmpty(Mono.error(new NoSuchElementException("Missing document " + searchHit.getId()
+                            + " from the database!")))*/;
         } catch (IOException e) {
             throw new IndexerAccessException("Failed to convert source!", e);
         }
