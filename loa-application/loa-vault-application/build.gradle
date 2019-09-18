@@ -5,4 +5,5 @@ dependencies {
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-webflux'
 
     compile project(':loa-service:loa-vault-service')
+    compile project(':loa-service:loa-document-view')
 }

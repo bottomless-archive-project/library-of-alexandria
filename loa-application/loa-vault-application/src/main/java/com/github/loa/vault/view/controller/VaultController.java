@@ -2,6 +2,7 @@ package com.github.loa.vault.view.controller;
 
 import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.document.service.entity.factory.DocumentEntityFactory;
+import com.github.loa.document.view.service.MediaTypeCalculator;
 import com.github.loa.vault.service.RecompressorService;
 import com.github.loa.vault.service.VaultDocumentManager;
 import com.github.loa.vault.view.request.domain.RecompressRequest;
@@ -9,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -22,6 +22,7 @@ public class VaultController {
     private final DocumentEntityFactory documentEntityFactory;
     private final VaultDocumentManager vaultDocumentManager;
     private final RecompressorService recompressorService;
+    private final MediaTypeCalculator mediaTypeCalculator;
 
     @PostMapping("/document/{documentId}")
     public Mono<DocumentEntity> archiveDocument(@PathVariable final String documentId,
@@ -45,9 +46,7 @@ public class VaultController {
                     final Resource resource = vaultDocumentManager.readDocument(documentEntity);
 
                     return ResponseEntity.ok()
-                            .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                            .header("Content-Disposition", "inline; filename="
-                                    + documentId + "." + documentEntity.getType().getFileExtension())
+                            .contentType(mediaTypeCalculator.calculateMediaType(documentEntity.getType()))
                             .cacheControl(CacheControl.noCache())
                             .body(resource);
                 })

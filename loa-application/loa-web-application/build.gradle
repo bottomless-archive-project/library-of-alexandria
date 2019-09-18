@@ -3,7 +3,7 @@ apply plugin: 'org.springframework.boot'
 dependencies {
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-webflux'
 
-    compile project(':loa-service:loa-document-service')
+    compile project(':loa-service:loa-document-view')
     compile project(':loa-service:loa-indexer-service')
     compile project(':loa-service:loa-vault-client-service')
 }

@@ -2,7 +2,7 @@ package com.github.loa.web.view.document.controller;
 
 import com.github.loa.document.service.entity.factory.DocumentEntityFactory;
 import com.github.loa.vault.client.service.VaultClientService;
-import com.github.loa.web.view.document.service.MediaTypeCalculator;
+import com.github.loa.document.view.service.MediaTypeCalculator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.*;
@@ -37,18 +37,7 @@ public class DocumentQueryController {
                 .map(documentEntity -> {
                     final InputStream streamingContent = vaultClientService.queryDocument(documentEntity);
 
-                    final HttpHeaders httpHeaders = new HttpHeaders();
-
-                    if (documentEntity.isPdf()) {
-                        httpHeaders.setContentDisposition(
-                                ContentDisposition.builder("attachment")
-                                        .filename(documentId + "." + documentEntity.getType().getFileExtension())
-                                        .build()
-                        );
-                    }
-
                     return ResponseEntity.ok()
-                            .headers(httpHeaders)
                             .contentType(mediaTypeCalculator.calculateMediaType(documentEntity.getType()))
                             .cacheControl(CacheControl.noCache())
                             .body(new InputStreamResource(streamingContent));

@@ -42,7 +42,7 @@ public class IndexerCommand implements CommandLineRunner {
                     if (documentEntity.getFileSize() < indexerConfigurationProperties.getMaximumFileSize()) {
                         indexerService.indexDocuments(documentEntity);
                     } else {
-                        log.info("Skipping document " + documentEntity.getId() + " because it's size is too high.");
+                        log.info("Skipping document " + documentEntity.getId() + " because it's size is too big.");
 
                         documentManipulator.markIndexFailure(documentEntity.getId());
                     }
