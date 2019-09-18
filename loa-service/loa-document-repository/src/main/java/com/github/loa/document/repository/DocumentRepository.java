@@ -39,7 +39,7 @@ public class DocumentRepository {
                         Criteria.where("id").is(id)
                 );
 
-        mongoTemplate.updateFirst(query, Update.update("status", status), DocumentDatabaseEntity.class);
+        mongoTemplate.updateFirst(query, Update.update("status", status), DocumentDatabaseEntity.class).subscribe();
     }
 
     public void updateCompression(final String id, final String compression) {
@@ -48,7 +48,8 @@ public class DocumentRepository {
                         Criteria.where("id").is(id)
                 );
 
-        mongoTemplate.updateFirst(query, Update.update("compression", compression), DocumentDatabaseEntity.class);
+        mongoTemplate.updateFirst(query, Update.update("compression", compression), DocumentDatabaseEntity.class)
+                .subscribe();
     }
 
     public Mono<Boolean> existsByChecksumAndFileSize(final String checksum, final long fileSize,
