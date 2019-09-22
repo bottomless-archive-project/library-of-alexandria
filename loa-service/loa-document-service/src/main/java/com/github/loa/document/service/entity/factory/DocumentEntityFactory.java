@@ -58,6 +58,10 @@ public class DocumentEntityFactory {
                 .map(documentEntityTransformer::transform);
     }
 
+    public Mono<Long> getDocumentCount() {
+        return documentRepository.count();
+    }
+
     /**
      * Creates a new document. The document is persisted to the database.
      *

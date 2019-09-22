@@ -10,6 +10,9 @@ import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.client.core.CountRequest;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -32,6 +35,17 @@ public class DocumentSearchService {
                     .searchHits(documentSearchEntityTransformer.transform(searchResponse.getHits()))
                     .totalHitCount(searchResponse.getHits().getTotalHits().value)
                     .build();
+        } catch (IOException e) {
+            throw new IndexerAccessException("Failed to search in the indexer!", e);
+        }
+    }
+
+    public long countDocuments() {
+        final CountRequest countRequest = new CountRequest("vault_documents")
+                .source(SearchSourceBuilder.searchSource().query(QueryBuilders.matchAllQuery()));
+
+        try {
+            return restHighLevelClient.count(countRequest, RequestOptions.DEFAULT).getCount();
         } catch (IOException e) {
             throw new IndexerAccessException("Failed to search in the indexer!", e);
         }

@@ -67,4 +67,8 @@ public class DocumentRepository {
     public Flux<DocumentDatabaseEntity> findAll() {
         return mongoTemplate.findAll(DocumentDatabaseEntity.class);
     }
+
+    public Mono<Long> count() {
+        return mongoTemplate.count(Query.query(new Criteria()), DocumentDatabaseEntity.class);
+    }
 }
