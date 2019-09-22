@@ -35,8 +35,8 @@ public class CommonCrawlDocumentGenerator implements Generator<String> {
 
     private int processedWarcFiles;
     private List<String> crawlLocations = new ArrayList<>();
-    private List<String> availableUrls = Collections.synchronizedList(new ArrayList<>());
-    private Set<String> upcomingUrls = Collections.synchronizedSet(new HashSet<>());
+    private final List<String> availableUrls = Collections.synchronizedList(new ArrayList<>());
+    private final Set<String> upcomingUrls = Collections.synchronizedSet(new HashSet<>());
     private final ExecutorService executorService = Executors.newFixedThreadPool(10);
 
     @Override

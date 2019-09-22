@@ -45,9 +45,7 @@ public class DocumentSearchEntityTransformer {
                                             .getFragments()[0].string())
                                     .documentEntity(documentEntity)
                                     .build()
-                    )
-                    /*.switchIfEmpty(Mono.error(new NoSuchElementException("Missing document " + searchHit.getId()
-                            + " from the database!")))*/;
+                    );
         } catch (IOException e) {
             throw new IndexerAccessException("Failed to convert source!", e);
         }

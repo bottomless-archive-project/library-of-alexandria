@@ -24,7 +24,6 @@ public class UrlEncoder {
      * @return the encoded url
      */
     public Optional<URL> encode(final URL url) {
-        //TODO: Refact this one! Especially the exception handling because its no longer needed!
         try {
             final URI uri = new URI(url.getProtocol(), url.getUserInfo(), url.getHost(), url.getPort(), url.getPath(),
                     url.getQuery(), url.getRef());

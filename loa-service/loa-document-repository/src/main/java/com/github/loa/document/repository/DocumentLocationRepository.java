@@ -24,11 +24,8 @@ public class DocumentLocationRepository {
         return mongoTemplate.exists(query, DocumentDatabaseEntity.class);
     }
 
-    public Mono<DocumentLocationDatabaseEntity> findById(final String id) {
-        return mongoTemplate.findById(id, DocumentLocationDatabaseEntity.class);
-    }
-
-    public void insertDocumentLocation(final DocumentLocationDatabaseEntity documentLocationDatabaseEntity) {
-        mongoTemplate.insert(documentLocationDatabaseEntity);
+    public Mono<DocumentLocationDatabaseEntity> insertDocumentLocation(
+            final DocumentLocationDatabaseEntity documentLocationDatabaseEntity) {
+        return mongoTemplate.insert(documentLocationDatabaseEntity);
     }
 }

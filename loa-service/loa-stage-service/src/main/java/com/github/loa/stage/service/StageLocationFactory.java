@@ -18,6 +18,12 @@ public class StageLocationFactory {
 
     private final StageConfigurationProperties stageConfigurationProperties;
 
+    /**
+     * Return a file in the staging area that's uniquely generated for the provided document.
+     *
+     * @param documentEntity the document that we need to create the location for
+     * @return the location created in the staging area
+     */
     public File getLocation(final DocumentEntity documentEntity) {
         return getLocation(documentEntity.getId(), documentEntity.getType());
     }
@@ -25,14 +31,11 @@ public class StageLocationFactory {
     /**
      * Return a file in the staging area that's uniquely generated for the provided document id.
      *
-     * @param documentId the document's id that we need to create the location for
+     * @param documentId   the document's id that we need to create the location for
+     * @param documentType the type of the document that we need to create the location for
      * @return the location created in the staging area
      */
     public File getLocation(final String documentId, final DocumentType documentType) {
-        if (documentType==null){
-            System.out.println("asd");
-        }
-
         return new File(stageConfigurationProperties.getLocation(), documentId + "."
                 + documentType.getFileExtension());
     }

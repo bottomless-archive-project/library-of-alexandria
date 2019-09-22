@@ -34,7 +34,7 @@ public class CompressionServiceProvider {
      */
     public CompressionService getCompressionService(final DocumentCompression documentCompression) {
         if (!compressionServices.containsKey(documentCompression)) {
-            throw new MissingCompressionServiceException("No compression servide is registered for "
+            throw new MissingCompressionServiceException("No compression service is registered for "
                     + documentCompression + "!");
         }
 
