@@ -35,7 +35,16 @@
                         name: 'home',
                         url: '/',
                         templateUrl: './home/home.html',
-                        controller: function ($scope, $http) {
+                        resolve: {
+                            documentStatistics: ['$http', function ($http) {
+                                return $http.get('/statistics')
+                                    .then(function (response) {
+                                        return response.data;
+                                    });
+                            }]
+                        },
+                        controller: function ($scope, $http, documentStatistics) {
+                            $scope.statistics = documentStatistics;
                             $scope.searchText = '';
                             $scope.hits = [];
                             $scope.openPdfs = [];
