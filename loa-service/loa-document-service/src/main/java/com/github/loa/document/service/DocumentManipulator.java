@@ -16,16 +16,30 @@ public class DocumentManipulator {
     private final DocumentRepository documentRepository;
 
     /**
-     * Mark a document's status as {@link DocumentStatus#INDEXED proccess failure}.
+     * Set the document's status as {@link DocumentStatus#INDEXED indexed}.
      *
-     * @param documentId the id of the document to mark
+     * @param documentId the id of the document to mark as indexer
      */
     public void markIndexed(final String documentId) {
-        updateStatus(documentId, DocumentStatus.INDEXED);
+        updateStatus(documentId, DocumentStatus.INDEXING_FAILURE);
     }
 
+    /**
+     * Set the document's status to {@link DocumentStatus#INDEXING_FAILURE indexing failure}.
+     *
+     * @param documentId the id of the document to mark as indexer
+     */
     public void markIndexFailure(final String documentId) {
         updateStatus(documentId, DocumentStatus.INDEXING_FAILURE);
+    }
+
+    /**
+     * Set the document's status to {@link DocumentStatus#REMOVED removed}.
+     *
+     * @param documentId the id of the document to mark as removed
+     */
+    public void markRemoved(final String documentId) {
+        updateStatus(documentId, DocumentStatus.REMOVED);
     }
 
     /**

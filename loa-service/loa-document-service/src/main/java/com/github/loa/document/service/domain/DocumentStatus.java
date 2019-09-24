@@ -13,5 +13,10 @@ public enum DocumentStatus {
     /**
      * An attempt was made to index the document but it failed.
      */
-    INDEXING_FAILURE
+    INDEXING_FAILURE,
+    /**
+     * The document's content is removed from the vault. The reason for this could vary but most likely the document
+     * was either password protected or corrupt.
+     */
+    REMOVED
 }

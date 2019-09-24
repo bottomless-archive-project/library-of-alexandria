@@ -29,6 +29,15 @@ public class DocumentEntity {
     }
 
     /**
+     * Returns true if the document is removed from the vault.
+     *
+     * @return true if the document is removed, false otherwise
+     */
+    public boolean isRemoved() {
+        return status == DocumentStatus.REMOVED;
+    }
+
+    /**
      * Returns true if the document's type is {@link DocumentType#PDF}.
      *
      * @return true if the document's type is PDF, false otherwise

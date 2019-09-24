@@ -24,11 +24,18 @@ public class VaultController {
     private final RecompressorService recompressorService;
     private final MediaTypeCalculator mediaTypeCalculator;
 
+    /**
+     * Saves a document's content to the vault.
+     *
+     * @param documentId       the id of the document to save the content for
+     * @param documentContents the content to save
+     * @return the document entity that the content was updated for
+     */
     @PostMapping("/document/{documentId}")
     public Mono<DocumentEntity> archiveDocument(@PathVariable final String documentId,
-            @RequestBody final Resource requestBody) {
+            @RequestBody final Resource documentContents) {
         return documentEntityFactory.getDocumentEntity(documentId)
-                .doOnNext(documentEntity -> vaultDocumentManager.archiveDocument(documentEntity, requestBody))
+                .doOnNext(documentEntity -> vaultDocumentManager.archiveDocument(documentEntity, documentContents))
                 .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Document not found with id " + documentId + "!")));
     }
@@ -54,12 +61,33 @@ public class VaultController {
                         "Document not found with id " + documentId + "!")));
     }
 
+    /**
+     * Recompress a document in the vault.
+     *
+     * @param documentId        the id of the document to recompress
+     * @param recompressRequest the request for recompression
+     * @return the document entity that the content was recompressed
+     */
     @PostMapping("/document/{documentId}/recompress")
     public Mono<DocumentEntity> recompressDocument(@PathVariable final String documentId,
             @RequestBody final RecompressRequest recompressRequest) {
         return documentEntityFactory.getDocumentEntity(documentId)
                 .doOnNext(documentEntity ->
                         recompressorService.recompress(documentEntity, recompressRequest.getCompression()))
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Document not found with id " + documentId + "!")));
+    }
+
+    /**
+     * Removes a document's content from the vault.
+     *
+     * @param documentId the document to remove the contents for
+     * @return the document entity that the content was removed
+     */
+    @DeleteMapping("/document/{documentId}")
+    public Mono<DocumentEntity> removeDocument(@PathVariable final String documentId) {
+        return documentEntityFactory.getDocumentEntity(documentId)
+                .doOnNext(vaultDocumentManager::removeDocument)
                 .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Document not found with id " + documentId + "!")));
     }

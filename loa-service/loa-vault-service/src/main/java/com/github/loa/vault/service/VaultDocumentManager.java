@@ -3,6 +3,7 @@ package com.github.loa.vault.service;
 import com.github.loa.compression.configuration.CompressionConfigurationProperties;
 import com.github.loa.compression.domain.DocumentCompression;
 import com.github.loa.compression.service.provider.CompressionServiceProvider;
+import com.github.loa.document.service.DocumentManipulator;
 import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.vault.domain.exception.VaultAccessException;
 import com.github.loa.vault.service.location.domain.VaultLocation;
@@ -28,6 +29,7 @@ public class VaultDocumentManager {
     private final VaultLocationFactory vaultLocationFactory;
     private final CompressionServiceProvider compressionServiceProvider;
     private final CompressionConfigurationProperties compressionConfigurationProperties;
+    private final DocumentManipulator documentManipulator;
 
     /**
      * Archive the content of an input stream as the content of the provided document in the vault.
@@ -99,5 +101,7 @@ public class VaultDocumentManager {
                 documentEntity.getCompression());
 
         vaultLocation.clear();
+
+        documentManipulator.markRemoved(documentEntity.getId());
     }
 }
