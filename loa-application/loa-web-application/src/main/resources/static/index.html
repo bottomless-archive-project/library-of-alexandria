@@ -20,6 +20,7 @@
 
     <!-- Custom -->
     <link rel="stylesheet" href="./style/index.css"/>
+    <link rel="stylesheet" href="./style/spinner.css"/>
 
     <script>
         angular.module('library-of-alexandria', ['ui.router'])
@@ -51,6 +52,8 @@
                             $scope.page = 0;
                             $scope.totalPages = 0;
                             $scope.language = undefined;
+
+                            $scope.loading = false;
 
                             $scope.setLanguage = function (language) {
                                 $scope.language = language;
@@ -99,6 +102,8 @@
                             };
 
                             $scope.refreshHits = function () {
+                                $scope.loading = true;
+
                                 var pageNumber = $scope.page * 10;
                                 var exactMatch = $scope.searchText.startsWith("\"") && $scope.searchText.endsWith("\"");
 
@@ -118,6 +123,7 @@
                                         $scope.hits = response.data.searchHits;
                                         $scope.hitCount = response.data.totalHitCount;
                                         $scope.totalPages = Math.ceil(response.data.totalHitCount / 10);
+                                        $scope.loading = false;
                                     });
                             };
 
