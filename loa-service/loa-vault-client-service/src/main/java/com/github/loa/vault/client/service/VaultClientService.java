@@ -3,14 +3,13 @@ package com.github.loa.vault.client.service;
 import com.github.loa.compression.domain.DocumentCompression;
 import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.vault.client.configuration.VaultClientConfigurationProperties;
-import com.github.loa.vault.client.service.domain.VaultAccessException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -23,8 +22,9 @@ import static java.net.http.HttpRequest.BodyPublishers.ofString;
 public class VaultClientService {
 
     private final VaultClientConfigurationProperties vaultClientConfigurationProperties;
+    private final WebClient vaultWebClient;
 
-    public void createDocument(final DocumentEntity documentEntity, final InputStream documentContent) {
+    public void archiveDocument(final DocumentEntity documentEntity, final InputStream documentContent) {
         final HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("http://" + vaultClientConfigurationProperties.getHost() + ":"
                         + vaultClientConfigurationProperties.getPort() + "/document/" + documentEntity.getId()))
@@ -38,26 +38,11 @@ public class VaultClientService {
                 .join();
     }
 
-    public InputStream queryDocument(final DocumentEntity documentEntity) {
-        try {
-            return new URL("http://" + vaultClientConfigurationProperties.getHost() + ":"
-                    + vaultClientConfigurationProperties.getPort() + "/document/" + documentEntity.getId()).openStream();
-        } catch (IOException e) {
-            throw new VaultAccessException("Unable to get content for document " + documentEntity.getId()
-                    + " from vault!", e);
-        }
-    }
-
-    public byte[] queryDocumentRaw(final DocumentEntity documentEntity) {
-        try {
-            final URL documentLocation = new URL("http://" + vaultClientConfigurationProperties.getHost() + ":"
-                    + vaultClientConfigurationProperties.getPort() + "/document/" + documentEntity.getId());
-
-            return documentLocation.openStream().readAllBytes();
-        } catch (IOException e) {
-            throw new VaultAccessException("Unable to get content for document " + documentEntity.getId()
-                    + " from vault!", e);
-        }
+    public Mono<byte[]> queryDocument(final DocumentEntity documentEntity) {
+        return vaultWebClient.get()
+                .uri("/document/" + documentEntity.getId())
+                .retrieve()
+                .bodyToMono(byte[].class);
     }
 
     public void recompressDocument(final DocumentEntity documentEntity, final DocumentCompression documentCompression) {

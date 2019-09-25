@@ -6,9 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.common.unit.TimeValue;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Map;
 
 @Service
@@ -17,17 +16,13 @@ public class IndexRequestFactory {
 
     private final VaultClientService vaultClientService;
 
-    public IndexRequest newIndexRequest(final DocumentEntity documentEntity) {
-        final InputStream inputStream = vaultClientService.queryDocument(documentEntity);
-
-        try {
-            return new IndexRequest("vault_documents")
-                    .id(documentEntity.getId())
-                    .source(Map.of("content", inputStream.readAllBytes()))
-                    .setPipeline("vault-document-pipeline")
-                    .timeout(TimeValue.timeValueMinutes(30));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    public Mono<IndexRequest> newIndexRequest(final DocumentEntity documentEntity) {
+        return vaultClientService.queryDocument(documentEntity)
+                .map(documentContents -> new IndexRequest("vault_documents")
+                        .id(documentEntity.getId())
+                        .source(Map.of("content", documentContents))
+                        .setPipeline("vault-document-pipeline")
+                        .timeout(TimeValue.timeValueMinutes(30))
+                );
     }
 }

@@ -3,6 +3,8 @@ package com.github.loa.administrator.command.document;
 import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.document.service.entity.factory.DocumentEntityFactory;
 import com.github.loa.vault.client.service.VaultClientService;
+import lombok.Builder;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.math3.util.Precision;
@@ -10,6 +12,7 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
 
@@ -51,24 +54,31 @@ public class DocumentValidatorCommand implements CommandLineRunner {
                 .runOn(newScheduler())
                 .filter(DocumentEntity::isArchived)
                 .filter(DocumentEntity::isPdf)
+                // Request should be limited otherwise the Spring webclient would eat up all of the open connections
+                .flatMap(this::buildDocument, false, 5)
                 .subscribe(this::processDocument);
     }
 
-    private void processDocument(final DocumentEntity documentEntity) {
-        final byte[] documentContents = vaultClientService.queryDocumentRaw(documentEntity);
+    private Mono<Document> buildDocument(final DocumentEntity documentEntity) {
+        return vaultClientService.queryDocument(documentEntity)
+                .map(documentContent -> Document.builder()
+                        .documentEntity(documentEntity)
+                        .documentContents(documentContent)
+                        .build()
+                );
+    }
 
-        try (final PDDocument document = PDDocument.load(documentContents)) {
-            //log.info(documentEntity.getId() + " is a valid pdf!");
+    private void processDocument(final Document document) {
+        try (final PDDocument pdfDocument = PDDocument.load(document.getDocumentContents())) {
+            // Doing nothing when the pdf is valid
         } catch (IOException e) {
-            final double documentContentSize = (double) documentContents.length / (double) (1024L * 1024L);
+            doubleAdder.add(document.getSize());
 
-            doubleAdder.add(documentContentSize);
-
-            log.info(documentEntity.getId() + " with size: " + Precision.round(documentContentSize, 2)
+            log.info(document.documentEntity.getId() + " with size: " + Precision.round(document.getSize(), 2)
                     + " mb and total size: " + Precision.round(doubleAdder.doubleValue(), 2)
                     + " mb is an invalid pdf! [" + e.getClass() + "]: " + e.getMessage() + ".");
 
-            removeDocument(documentEntity);
+            removeDocument(document.documentEntity);
         }
 
         final long processedDocument = processedDocumentCount.incrementAndGet();
@@ -78,10 +88,23 @@ public class DocumentValidatorCommand implements CommandLineRunner {
     }
 
     private void removeDocument(final DocumentEntity documentEntity) {
+        log.info("Removing document: " + documentEntity.getId());
         //TODO
     }
 
     private Scheduler newScheduler() {
         return Schedulers.newParallel(SCHEDULER_NAME, documentValidatorConfigurationProperties.getParallelismLevel());
+    }
+
+    @Getter
+    @Builder
+    private static class Document {
+
+        private final DocumentEntity documentEntity;
+        private final byte[] documentContents;
+
+        private double getSize() {
+            return (double) documentContents.length / (double) (1024L * 1024L);
+        }
     }
 }

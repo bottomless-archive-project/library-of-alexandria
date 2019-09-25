@@ -31,7 +31,7 @@ public class DocumentFileManipulator {
     public void moveToVault(final DocumentEntity documentEntity) {
         try (final InputStream documentContents = new FileInputStream(
                 stageLocationFactory.getLocation(documentEntity))) {
-            vaultClientService.createDocument(documentEntity, documentContents);
+            vaultClientService.archiveDocument(documentEntity, documentContents);
         } catch (Exception e) {
             throw new FailedToArchiveException("Unable to move document to vault!", e);
         }
