@@ -78,19 +78,15 @@ public class DocumentValidatorCommand implements CommandLineRunner {
                     + " mb and total size: " + Precision.round(doubleAdder.doubleValue(), 2)
                     + " mb is an invalid pdf! [" + e.getClass() + "]: " + e.getMessage() + ".");
 
-            removeDocument(document.documentEntity);
+            vaultClientService.removeDocument(document.documentEntity)
+                    .doOnNext(response -> log.info("Removed document with id: " + document.documentEntity.getId()))
+                    .subscribe();
         }
 
         final long processedDocument = processedDocumentCount.incrementAndGet();
         if (processedDocument % 100 == 0) {
             log.info("Processed " + processedDocument + " documents.");
         }
-    }
-
-    private void removeDocument(final DocumentEntity documentEntity) {
-        vaultClientService.removeDocument(documentEntity)
-                .doOnNext(response -> log.info("Removed document with id: " + documentEntity.getId()))
-                .subscribe();
     }
 
     private Scheduler newScheduler() {
