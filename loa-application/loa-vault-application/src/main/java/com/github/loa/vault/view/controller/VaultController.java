@@ -49,6 +49,7 @@ public class VaultController {
     @GetMapping("/document/{documentId}")
     public Mono<ResponseEntity<Resource>> queryDocument(@PathVariable final String documentId) {
         return documentEntityFactory.getDocumentEntity(documentId)
+                .filter(documentEntity -> !documentEntity.isRemoved())
                 .map(documentEntity -> {
                     final Resource resource = vaultDocumentManager.readDocument(documentEntity);
 
@@ -58,7 +59,7 @@ public class VaultController {
                             .body(resource);
                 })
                 .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "Document not found with id " + documentId + "!")));
+                        "Document not found with id " + documentId + " or already removed!")));
     }
 
     /**

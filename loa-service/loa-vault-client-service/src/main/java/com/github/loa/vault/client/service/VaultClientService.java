@@ -58,4 +58,11 @@ public class VaultClientService {
                 .thenApply(HttpResponse::body)
                 .join();
     }
+
+    public Mono<String> removeDocument(final DocumentEntity documentEntity) {
+        return vaultWebClient.delete()
+                .uri("/document/" + documentEntity.getId())
+                .retrieve()
+                .bodyToMono(String.class);
+    }
 }

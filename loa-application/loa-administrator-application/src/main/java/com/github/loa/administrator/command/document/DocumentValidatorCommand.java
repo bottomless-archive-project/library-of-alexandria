@@ -88,8 +88,9 @@ public class DocumentValidatorCommand implements CommandLineRunner {
     }
 
     private void removeDocument(final DocumentEntity documentEntity) {
-        log.info("Removing document: " + documentEntity.getId());
-        //TODO
+        vaultClientService.removeDocument(documentEntity)
+                .doOnNext(response -> log.info("Removed document with id: " + documentEntity.getId()))
+                .subscribe();
     }
 
     private Scheduler newScheduler() {
