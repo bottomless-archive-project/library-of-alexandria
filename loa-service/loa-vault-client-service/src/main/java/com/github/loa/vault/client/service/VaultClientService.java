@@ -59,6 +59,7 @@ public class VaultClientService {
                 .join();
     }
 
+    //TODO: Instead of string return the DocumentEntity as a response.
     public Mono<String> removeDocument(final DocumentEntity documentEntity) {
         return vaultWebClient.delete()
                 .uri("/document/" + documentEntity.getId())
