@@ -34,18 +34,19 @@ public class DocumentValidatorProcessor {
         } catch (IOException e) {
             doubleAdder.add(document.getSize());
 
-            log.info(documentEntity.getId() + " with size: " + Precision.round(document.getSize(), 2)
-                    + " mb and total size: " + Precision.round(doubleAdder.doubleValue(), 2)
-                    + " mb is an invalid pdf! [" + e.getClass() + "]: " + e.getMessage() + ".");
+            log.info("{} with size: {} mb and total size: {} mb is an invalid pdf! [{}]: {}.", documentEntity.getId(),
+                    document.getSize(), Precision.round(doubleAdder.doubleValue(), 2), e.getClass(),
+                    e.getMessage());
 
             vaultClientService.removeDocument(documentEntity)
-                    .doOnNext(response -> log.info("Removed document with id: " + documentEntity.getId()))
+                    .doOnNext(response -> log.info("Removed document with id: {}.", documentEntity.getId()))
                     .subscribe();
         }
 
         final long processedDocumentCount = processedDocumentCounter.incrementAndGet();
         if (processedDocumentCount % 100 == 0) {
-            log.info("Processed " + processedDocumentCount + " documents.");
+            log.info("Processed {} documents in this run. Total processed: {}.", processedDocumentCount,
+                    validatorDocumentCollector.count());
         }
 
         if (processedDocumentCount % 10000 == 0) {

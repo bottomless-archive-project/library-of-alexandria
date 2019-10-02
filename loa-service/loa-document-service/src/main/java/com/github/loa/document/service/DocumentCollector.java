@@ -32,7 +32,7 @@ public class DocumentCollector {
 
                 sets.addAll(documents);
 
-                log.info("Loaded " + sets.size() + " document ids to the document collector.");
+                log.info("Loaded {} document ids to the document collector.", sets.size());
             } catch (IOException e) {
                 log.error("Failed to load document id collection!", e);
             }
@@ -58,6 +58,12 @@ public class DocumentCollector {
             }
         } catch (IOException e) {
             log.error("Failed to persist document id collection!", e);
+        }
+    }
+
+    public long count() {
+        synchronized (sets) {
+            return sets.size();
         }
     }
 }
