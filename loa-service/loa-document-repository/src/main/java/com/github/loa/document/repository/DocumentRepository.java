@@ -20,8 +20,8 @@ public class DocumentRepository {
         return mongoTemplate.insert(documentDatabaseEntity);
     }
 
-    public Mono<DocumentDatabaseEntity> findById(final String id) {
-        return mongoTemplate.findById(id, DocumentDatabaseEntity.class);
+    public Mono<DocumentDatabaseEntity> findById(final String documentId) {
+        return mongoTemplate.findById(documentId, DocumentDatabaseEntity.class);
     }
 
     public Flux<DocumentDatabaseEntity> findByStatus(final String status) {
@@ -33,19 +33,19 @@ public class DocumentRepository {
         return mongoTemplate.find(query, DocumentDatabaseEntity.class);
     }
 
-    public void updateStatus(final String id, final String status) {
+    public void updateStatus(final String documentId, final String status) {
         final Query query = Query
                 .query(
-                        Criteria.where("id").is(id)
+                        Criteria.where("id").is(documentId)
                 );
 
         mongoTemplate.updateFirst(query, Update.update("status", status), DocumentDatabaseEntity.class).subscribe();
     }
 
-    public void updateCompression(final String id, final String compression) {
+    public void updateCompression(final String documentId, final String compression) {
         final Query query = Query
                 .query(
-                        Criteria.where("id").is(id)
+                        Criteria.where("id").is(documentId)
                 );
 
         mongoTemplate.updateFirst(query, Update.update("compression", compression), DocumentDatabaseEntity.class)
@@ -62,6 +62,16 @@ public class DocumentRepository {
                 );
 
         return mongoTemplate.exists(query, DocumentDatabaseEntity.class);
+    }
+
+    public void updatePageCount(final String documentId, final int pageCount) {
+        final Query query = Query
+                .query(
+                        Criteria.where("id").is(documentId)
+                );
+
+        mongoTemplate.updateFirst(query, Update.update("pageCount", pageCount), DocumentDatabaseEntity.class)
+                .subscribe();
     }
 
     public Flux<DocumentDatabaseEntity> findAll() {

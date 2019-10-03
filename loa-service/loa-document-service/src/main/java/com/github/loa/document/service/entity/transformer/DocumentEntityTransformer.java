@@ -29,6 +29,7 @@ public class DocumentEntityTransformer {
                 .downloadDate(documentDatabaseEntity.getDownloadDate())
                 .downloaderVersion(documentDatabaseEntity.getDownloaderVersion())
                 .compression(DocumentCompression.valueOf(documentDatabaseEntity.getCompression()))
+                .pageCount(documentDatabaseEntity.getPageCount())
                 .build();
     }
 }

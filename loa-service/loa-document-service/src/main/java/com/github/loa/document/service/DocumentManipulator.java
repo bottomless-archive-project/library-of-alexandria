@@ -52,7 +52,23 @@ public class DocumentManipulator {
         documentRepository.updateStatus(documentId, documentStatus.toString());
     }
 
-    public void updateCompression(final String documentId, DocumentCompression documentCompression) {
+    /**
+     * Update the compression of a document.
+     *
+     * @param documentId          the id of the document to update the status for
+     * @param documentCompression the new compression of the document
+     */
+    public void updateCompression(final String documentId, final DocumentCompression documentCompression) {
         documentRepository.updateCompression(documentId, documentCompression.toString());
+    }
+
+    /**
+     * Update the page count of a document.
+     *
+     * @param documentId the id of the document to update the page count for
+     * @param pageCount  the new page count of the document
+     */
+    public void updatePageCount(final String documentId, final int pageCount) {
+        documentRepository.updatePageCount(documentId, pageCount);
     }
 }

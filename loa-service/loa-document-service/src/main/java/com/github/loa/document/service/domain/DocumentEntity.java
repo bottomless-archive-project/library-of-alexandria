@@ -17,6 +17,7 @@ public class DocumentEntity {
     private final String checksum;
     private final long fileSize;
     private final int downloaderVersion;
+    private final int pageCount;
     private final DocumentCompression compression;
 
     /**

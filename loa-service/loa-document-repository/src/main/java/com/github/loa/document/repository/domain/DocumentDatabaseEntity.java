@@ -29,4 +29,5 @@ public class DocumentDatabaseEntity {
     private long fileSize;
     private Instant downloadDate;
     private int downloaderVersion;
+    private int pageCount;
 }
