@@ -42,22 +42,22 @@ public class DocumentCollector {
     public void insert(final DocumentEntity documentEntity) {
         synchronized (sets) {
             sets.add(documentEntity.getId());
+
+            if (sets.size() % 10000 == 0) {
+                try {
+                    synchronized (sets) {
+                        objectMapper.writeValue(documentCollectionLocation, sets);
+                    }
+                } catch (IOException e) {
+                    log.error("Failed to persist document id collection!", e);
+                }
+            }
         }
     }
 
     public boolean contains(final DocumentEntity documentEntity) {
         synchronized (sets) {
             return sets.contains(documentEntity.getId());
-        }
-    }
-
-    public void persist() {
-        try {
-            synchronized (sets) {
-                objectMapper.writeValue(documentCollectionLocation, sets);
-            }
-        } catch (IOException e) {
-            log.error("Failed to persist document id collection!", e);
         }
     }
 

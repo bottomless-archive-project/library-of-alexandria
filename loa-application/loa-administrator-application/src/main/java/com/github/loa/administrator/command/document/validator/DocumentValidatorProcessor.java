@@ -49,10 +49,6 @@ public class DocumentValidatorProcessor {
                     validatorDocumentCollector.count());
         }
 
-        if (processedDocumentCount % 10000 == 0) {
-            validatorDocumentCollector.persist();
-        }
-
         validatorDocumentCollector.insert(documentEntity);
     }
 }
