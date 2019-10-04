@@ -10,4 +10,5 @@ import org.springframework.stereotype.Component;
 public class DocumentValidatorConfigurationProperties {
 
     private int parallelismLevel = 25;
+    private String collectorFile;
 }

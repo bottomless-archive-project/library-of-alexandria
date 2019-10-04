@@ -15,9 +15,10 @@ public class DocumentValidatorConfiguration {
     private final static String SCHEDULER_NAME = "document-validator-scheduler";
 
     @Bean
-    public DocumentCollector validatorDocumentCollector(final ObjectMapper objectMapper) {
-        //TODO: Get this from config!
-        return new DocumentCollector(new File("F:/document-validator-command.json"), objectMapper);
+    public DocumentCollector validatorDocumentCollector(final ObjectMapper objectMapper,
+            final DocumentValidatorConfigurationProperties documentValidatorConfigurationProperties) {
+        return new DocumentCollector(new File(documentValidatorConfigurationProperties.getCollectorFile()),
+                objectMapper);
     }
 
     @Bean
