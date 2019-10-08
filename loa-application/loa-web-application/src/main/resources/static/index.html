@@ -102,6 +102,14 @@
                             };
 
                             $scope.refreshHits = function () {
+                                if ($scope.searchText === "") {
+                                    $scope.hits = [];
+                                    $scope.hitCount = 0;
+                                    $scope.totalPages = 0;
+
+                                    return;
+                                }
+
                                 $scope.loading = true;
 
                                 var pageNumber = $scope.page * 10;
