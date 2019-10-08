@@ -4,7 +4,7 @@ buildscript {
     ext {
         springBootVersion = '2.1.8.RELEASE'
 
-        set('elasticsearch.version', '7.3.1')
+        set('elasticsearch.version', '7.4.0')
     }
     repositories {
         mavenCentral()
