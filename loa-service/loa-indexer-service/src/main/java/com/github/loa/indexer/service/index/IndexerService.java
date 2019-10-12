@@ -20,8 +20,8 @@ public class IndexerService {
     private final RestHighLevelClient restHighLevelClient;
     private final DocumentManipulator documentManipulator;
 
-    public void indexDocuments(final DocumentEntity documentEntity) {
-        indexRequestFactory.newIndexRequest(documentEntity)
+    public void indexDocuments(final DocumentEntity documentEntity, final int pageCount) {
+        indexRequestFactory.newIndexRequest(documentEntity, pageCount)
                 .subscribe(indexRequest -> {
                     try {
                         restHighLevelClient.index(indexRequest, RequestOptions.DEFAULT);

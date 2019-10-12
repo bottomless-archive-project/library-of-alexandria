@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.math3.util.Precision;
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -17,6 +18,7 @@ import java.util.concurrent.atomic.DoubleAdder;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@ConditionalOnProperty("document-validator")
 public class DocumentValidatorProcessor {
 
     private final VaultClientService vaultClientService;

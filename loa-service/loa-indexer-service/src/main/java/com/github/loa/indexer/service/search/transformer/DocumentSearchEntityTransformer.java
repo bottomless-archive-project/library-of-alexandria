@@ -43,6 +43,7 @@ public class DocumentSearchEntityTransformer {
                                     .language(searchDatabaseEntity.getAttachment().getLanguage())
                                     .description(searchHit.getHighlightFields().get("attachment.content")
                                             .getFragments()[0].string())
+                                    .pageCount(searchDatabaseEntity.getPageCount())
                                     .documentEntity(documentEntity)
                                     .build()
                     );

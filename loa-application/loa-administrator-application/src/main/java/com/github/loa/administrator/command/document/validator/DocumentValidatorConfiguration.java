@@ -2,6 +2,7 @@ package com.github.loa.administrator.command.document.validator;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.loa.document.service.DocumentCollector;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import reactor.core.scheduler.Scheduler;
@@ -10,6 +11,7 @@ import reactor.core.scheduler.Schedulers;
 import java.io.File;
 
 @Configuration
+@ConditionalOnProperty("document-validator")
 public class DocumentValidatorConfiguration {
 
     private final static String SCHEDULER_NAME = "document-validator-scheduler";

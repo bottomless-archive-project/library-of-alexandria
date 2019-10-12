@@ -11,5 +11,6 @@ public class SearchDocumentEntityResponse {
     private final String author;
     private final String description;
     private final String language;
+    private final int pageCount;
     private final DocumentEntityResponse document;
 }

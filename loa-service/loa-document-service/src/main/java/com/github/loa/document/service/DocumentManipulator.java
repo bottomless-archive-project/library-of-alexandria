@@ -21,7 +21,7 @@ public class DocumentManipulator {
      * @param documentId the id of the document to mark as indexer
      */
     public void markIndexed(final String documentId) {
-        updateStatus(documentId, DocumentStatus.INDEXING_FAILURE);
+        updateStatus(documentId, DocumentStatus.INDEXED);
     }
 
     /**

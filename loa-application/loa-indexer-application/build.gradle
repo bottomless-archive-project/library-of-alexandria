@@ -3,6 +3,8 @@ apply plugin: 'org.springframework.boot'
 dependencies {
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-json'
 
+    compile group: 'org.apache.pdfbox', name: 'pdfbox', version: '2.0.17'
+
     compile project(':loa-service:loa-document-service')
     compile project(':loa-service:loa-indexer-service')
     compile project(':loa-service:loa-vault-client-service')

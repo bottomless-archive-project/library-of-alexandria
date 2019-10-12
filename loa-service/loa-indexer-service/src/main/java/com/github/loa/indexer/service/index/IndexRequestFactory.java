@@ -16,11 +16,11 @@ public class IndexRequestFactory {
 
     private final VaultClientService vaultClientService;
 
-    public Mono<IndexRequest> newIndexRequest(final DocumentEntity documentEntity) {
+    public Mono<IndexRequest> newIndexRequest(final DocumentEntity documentEntity, final int pageCount) {
         return vaultClientService.queryDocument(documentEntity)
                 .map(documentContents -> new IndexRequest("vault_documents")
                         .id(documentEntity.getId())
-                        .source(Map.of("content", documentContents))
+                        .source(Map.of("content", documentContents, "page_count", pageCount))
                         .setPipeline("vault-document-pipeline")
                         .timeout(TimeValue.timeValueMinutes(30))
                 );

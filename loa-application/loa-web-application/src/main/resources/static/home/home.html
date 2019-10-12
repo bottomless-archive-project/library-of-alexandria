@@ -94,13 +94,14 @@
                 <!-- /DOC and the like - downloading -->
 
                 <!-- PDF - rendering -->
-                <div ng-if="hit.document.type == 'PDF'" style="float: right;">
-                    <button ng-if="openPdfs[hit.document.id]" class="btn btn-primary"
-                            ng-click="openPdf(hit.document.id)">Close .pdf
+                <div ng-if="hit.document.type == 'PDF'" style="width: 100%; height: 32px; line-height: 32px;">
+                    <button ng-if="openPdfs[hit.document.id]" class="btn btn-primary btn-sm w-25"
+                            ng-click="openPdf(hit.document.id)" style="float: right; min-width: 135px;">Close .pdf
                     </button>
-                    <button ng-if="!openPdfs[hit.document.id]" class="btn btn-primary"
-                            ng-click="openPdf(hit.document.id)">Open .pdf
+                    <button ng-if="!openPdfs[hit.document.id]" class="btn btn-primary btn-sm w-25"
+                            ng-click="openPdf(hit.document.id)" style="float: right; min-width: 135px;">Open .pdf
                     </button>
+                    <span style="float: right; font-weight: bold;" class="mr-3">{{hit.pageCount}} pages</span>
                 </div>
 
                 <iframe ng-if="openPdfs[hit.document.id] && hit.document.type == 'PDF'"

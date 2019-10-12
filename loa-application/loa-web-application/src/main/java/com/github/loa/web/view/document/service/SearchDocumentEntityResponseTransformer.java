@@ -26,6 +26,7 @@ public class SearchDocumentEntityResponseTransformer {
                 .description(documentSearchEntity.getDescription())
                 .language(documentSearchEntity.getLanguage())
                 .title(documentSearchEntity.getTitle())
+                .pageCount(documentSearchEntity.getPageCount())
                 .document(documentEntityResponseTransformer.transform(documentSearchEntity.getDocumentEntity()))
                 .build();
     }
