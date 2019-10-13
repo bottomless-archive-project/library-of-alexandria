@@ -2,6 +2,7 @@ package com.github.loa.indexer.command;
 
 import com.github.loa.document.service.DocumentManipulator;
 import com.github.loa.document.service.domain.DocumentEntity;
+import com.github.loa.document.service.domain.DocumentStatus;
 import com.github.loa.document.service.entity.factory.DocumentEntityFactory;
 import com.github.loa.indexer.command.domain.IndexDocument;
 import com.github.loa.indexer.configuration.IndexerConfigurationProperties;
@@ -35,7 +36,7 @@ public class IndexerCommand implements CommandLineRunner {
     public void run(final String... args) {
         log.info("Initializing document indexing.");
 
-        documentEntityFactory.getDocumentEntities() //TODO: Only downloaded!!!!
+        documentEntityFactory.getDocumentEntity(DocumentStatus.DOWNLOADED)
                 .parallel(indexerConfigurationProperties.getConcurrentIndexerThreads())
                 .runOn(newScheduler(indexerConfigurationProperties))
                 .flatMap(this::buildDocument, false, 5)
