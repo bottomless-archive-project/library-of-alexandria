@@ -2,6 +2,7 @@ package com.github.loa.web.view.document.controller;
 
 import com.github.loa.indexer.service.search.DocumentSearchService;
 import com.github.loa.indexer.service.search.domain.SearchContext;
+import com.github.loa.indexer.service.search.domain.DocumentLength;
 import com.github.loa.web.view.document.response.DocumentSearchResponse;
 import com.github.loa.web.view.document.service.SearchDocumentEntityResponseTransformer;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +27,8 @@ public class DocumentSearchController {
     public Mono<DocumentSearchResponse> queryDocuments(@PathVariable final String keyword,
             @RequestParam(defaultValue = "0") final int pageNumber,
             @RequestParam(defaultValue = "false") final boolean exactMatch,
-            @RequestParam(required = false) final String language) {
+            @RequestParam(required = false) final String language,
+            @RequestParam(required = false) final DocumentLength documentLength) {
         return Mono
                 .fromSupplier(() -> documentSearchService.searchDocuments(
                         SearchContext.builder()
@@ -34,6 +36,7 @@ public class DocumentSearchController {
                                 .pageNumber(pageNumber)
                                 .exactMatch(exactMatch)
                                 .language(language)
+                                .documentLength(documentLength)
                                 .build()
                 ))
                 .subscribeOn(Schedulers.elastic())

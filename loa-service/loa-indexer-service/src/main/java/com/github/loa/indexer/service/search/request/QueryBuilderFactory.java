@@ -18,6 +18,7 @@ public class QueryBuilderFactory {
 
         initializeContentQuery(parentQuery, searchContext);
         initializeLanguageQuery(parentQuery, searchContext);
+        initializeDocumentLengthQuery(parentQuery, searchContext);
 
         return parentQuery;
     }
@@ -32,6 +33,16 @@ public class QueryBuilderFactory {
     private void initializeLanguageQuery(final BoolQueryBuilder parentQuery, final SearchContext searchContext) {
         searchContext.getLanguage().ifPresent(language ->
                 parentQuery.filter(QueryBuilders.matchPhraseQuery(SearchField.LANGUAGE.getName(), language)));
+    }
+
+    private void initializeDocumentLengthQuery(final BoolQueryBuilder parentQuery, final SearchContext searchContext) {
+        searchContext.getDocumentLength().ifPresent(documentLength ->
+                parentQuery.filter(
+                        QueryBuilders.rangeQuery(SearchField.PAGE_COUNT.getName())
+                                .gte(documentLength.getMinimumPageCount())
+                                .lte(documentLength.getMaximumPageCount())
+                )
+        );
     }
 
     private QueryBuilder newContentQuery(final boolean exactMatch, final String keyword) {

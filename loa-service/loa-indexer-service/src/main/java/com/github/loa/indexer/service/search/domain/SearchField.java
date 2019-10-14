@@ -18,7 +18,12 @@ public enum SearchField {
     /**
      * The language of the document.
      */
-    LANGUAGE("attachment.language");
+    LANGUAGE("attachment.language"),
+
+    /**
+     * The page count of the document.
+     */
+    PAGE_COUNT("page_count");
 
     /**
      * The name of the field in the search engine.

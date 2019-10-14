@@ -29,3 +29,7 @@ body {
 .language-dropdown .dropdown-menu .dropdown-toggle:after {
     content: none;
 }
+
+.document-length-dropdown .dropdown-menu .dropdown-toggle:after {
+    content: none;
+}

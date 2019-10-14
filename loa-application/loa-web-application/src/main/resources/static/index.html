@@ -52,8 +52,15 @@
                             $scope.page = 0;
                             $scope.totalPages = 0;
                             $scope.language = undefined;
+                            $scope.documentLength = undefined;
 
                             $scope.loading = false;
+
+                            $scope.setDocumentLength = function (documentLength) {
+                                $scope.documentLength = documentLength;
+
+                                $scope.refreshHits();
+                            };
 
                             $scope.setLanguage = function (language) {
                                 $scope.language = language;
@@ -126,6 +133,10 @@
                                     urlBase += '&language=' + $scope.language[0];
                                 }
 
+                                if ($scope.documentLength !== undefined) {
+                                    urlBase += '&documentLength=' + $scope.documentLength[0];
+                                }
+
                                 $http.get(urlBase)
                                     .then(function (response) {
                                         $scope.hits = response.data.searchHits;
@@ -138,6 +149,13 @@
                             $scope.openPdf = function (pdfId) {
                                 $scope.openPdfs[pdfId] = !$scope.openPdfs[pdfId];
                             };
+
+                            $scope.documentLengths = [
+                                ['SHORT_STORY', 'Short story (1 - 10 pages)'],
+                                ['NOVELETTE', 'Novelette (11 - 50 pages)'],
+                                ['NOVELLA', 'Novella (51 - 150 pages)'],
+                                ['NOVEL', 'Novel (150+ pages)']
+                            ];
 
                             $scope.languages = [
                                 ['be', 'Belarusian', true],
