@@ -5,6 +5,7 @@ import com.github.loa.document.repository.DocumentRepository;
 import com.github.loa.document.service.domain.DocumentStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 /**
  * This service contains methods to manipulating documents.
@@ -20,8 +21,8 @@ public class DocumentManipulator {
      *
      * @param documentId the id of the document to mark as indexer
      */
-    public void markIndexed(final String documentId) {
-        updateStatus(documentId, DocumentStatus.INDEXED);
+    public Mono<Void> markIndexed(final String documentId) {
+        return updateStatus(documentId, DocumentStatus.INDEXED);
     }
 
     /**
@@ -29,8 +30,8 @@ public class DocumentManipulator {
      *
      * @param documentId the id of the document to mark as indexer
      */
-    public void markIndexFailure(final String documentId) {
-        updateStatus(documentId, DocumentStatus.INDEXING_FAILURE);
+    public Mono<Void> markIndexFailure(final String documentId) {
+        return updateStatus(documentId, DocumentStatus.INDEXING_FAILURE);
     }
 
     /**
@@ -38,8 +39,8 @@ public class DocumentManipulator {
      *
      * @param documentId the id of the document to mark as removed
      */
-    public void markRemoved(final String documentId) {
-        updateStatus(documentId, DocumentStatus.REMOVED);
+    public Mono<Void> markRemoved(final String documentId) {
+        return updateStatus(documentId, DocumentStatus.REMOVED);
     }
 
     /**
@@ -48,8 +49,8 @@ public class DocumentManipulator {
      * @param documentId     the id of the document to update the status for
      * @param documentStatus the new status of the document
      */
-    public void updateStatus(final String documentId, final DocumentStatus documentStatus) {
-        documentRepository.updateStatus(documentId, documentStatus.toString());
+    public Mono<Void> updateStatus(final String documentId, final DocumentStatus documentStatus) {
+        return documentRepository.updateStatus(documentId, documentStatus.toString());
     }
 
     /**
@@ -68,7 +69,7 @@ public class DocumentManipulator {
      * @param documentId the id of the document to update the page count for
      * @param pageCount  the new page count of the document
      */
-    public void updatePageCount(final String documentId, final int pageCount) {
-        documentRepository.updatePageCount(documentId, pageCount);
+    public Mono<Void> updatePageCount(final String documentId, final int pageCount) {
+        return documentRepository.updatePageCount(documentId, pageCount);
     }
 }
