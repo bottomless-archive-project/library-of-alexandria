@@ -34,7 +34,7 @@ public class IndexerCommand implements CommandLineRunner {
         log.info("Initializing document indexing.");
 
         documentEntityFactory.getDocumentEntity(DocumentStatus.DOWNLOADED)
-                .flatMap(this::buildDocument)
+                .flatMap(this::buildDocument, indexerConfigurationProperties.getConcurrentIndexerThreads())
                 .flatMap(this::processDocument)
                 .subscribe();
     }
@@ -95,11 +95,12 @@ public class IndexerCommand implements CommandLineRunner {
 
     private Mono<IndexDocument> buildDocument(final DocumentEntity documentEntity) {
         return vaultClientService.queryDocument(documentEntity)
-                .doOnError(error -> log.error(error.getMessage()))
+                .doOnError(error -> log.error("Error while downloading the document!", error))
                 .map(documentContent -> IndexDocument.builder()
                         .documentEntity(documentEntity)
                         .documentContents(documentContent)
                         .build()
-                );
+                )
+                .onErrorResume(error -> Mono.empty());
     }
 }

@@ -44,7 +44,7 @@ public class VaultClientService {
                 .uri("/document/" + documentEntity.getId())
                 .retrieve()
                 .bodyToMono(byte[].class)
-                .timeout(Duration.ofSeconds(30));
+                .timeout(Duration.ofMinutes(5));
     }
 
     public void recompressDocument(final DocumentEntity documentEntity, final DocumentCompression documentCompression) {
@@ -67,6 +67,6 @@ public class VaultClientService {
                 .uri("/document/" + documentEntity.getId())
                 .retrieve()
                 .bodyToMono(String.class)
-                .timeout(Duration.ofSeconds(30));
+                .timeout(Duration.ofMinutes(5));
     }
 }
