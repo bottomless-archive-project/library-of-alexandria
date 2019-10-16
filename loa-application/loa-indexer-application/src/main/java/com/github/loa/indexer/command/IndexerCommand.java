@@ -14,14 +14,13 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
+
+import java.io.IOException;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class IndexerCommand implements CommandLineRunner {
-
-    private static final String SCHEDULER_NAME = "indexer-scheduler";
 
     private final DocumentEntityFactory documentEntityFactory;
     private final VaultClientService vaultClientService;
@@ -34,11 +33,7 @@ public class IndexerCommand implements CommandLineRunner {
     public void run(final String... args) {
         log.info("Initializing document indexing.");
 
-        final int parallelismLevel = indexerConfigurationProperties.getConcurrentIndexerThreads();
-
         documentEntityFactory.getDocumentEntity(DocumentStatus.DOWNLOADED)
-                .parallel(parallelismLevel)
-                .runOn(Schedulers.newParallel(SCHEDULER_NAME, parallelismLevel))
                 .flatMap(this::buildDocument)
                 .flatMap(this::processDocument)
                 .subscribe();
@@ -51,7 +46,20 @@ public class IndexerCommand implements CommandLineRunner {
             return Mono.just(indexDocument)
                     .flatMap(document -> parseDocument(indexDocument))
                     .flatMap(pdfDocument -> updatePageCount(documentEntity, pdfDocument))
-                    .flatMap(pdfDocument -> handleDocument(documentEntity, pdfDocument.getNumberOfPages()));
+                    .flatMap(pdfDocument -> {
+                        final Integer pageCount = pdfDocument.getNumberOfPages();
+
+                        return Mono.just(pdfDocument)
+                                .doOnNext(pdDocument -> {
+                                    try {
+                                        pdfDocument.close();
+                                    } catch (IOException e) {
+                                        log.error("Unable to close document!", e);
+                                    }
+                                })
+                                .thenReturn(pageCount);
+                    })
+                    .flatMap(pdfDocument -> handleDocument(documentEntity, pdfDocument));
         } else {
             return Mono.just(indexDocument)
                     .flatMap(document -> handleDocument(document.getDocumentEntity(), -1));
@@ -78,14 +86,16 @@ public class IndexerCommand implements CommandLineRunner {
 
     private Mono<PDDocument> parseDocument(final IndexDocument indexDocument) {
         return Mono.fromSupplier(() -> documentParser.parseDocument(indexDocument.getDocumentContents()))
-                .doOnError(error -> vaultClientService.removeDocument(indexDocument.getDocumentEntity())
+                .onErrorResume(error -> vaultClientService.removeDocument(indexDocument.getDocumentEntity())
                         .doOnNext(response -> log.info("Removed document with id: {}.",
                                 indexDocument.getDocumentEntity().getId()))
+                        .then(Mono.empty())
                 );
     }
 
     private Mono<IndexDocument> buildDocument(final DocumentEntity documentEntity) {
         return vaultClientService.queryDocument(documentEntity)
+                .doOnError(error -> log.error(error.getMessage()))
                 .map(documentContent -> IndexDocument.builder()
                         .documentEntity(documentEntity)
                         .documentContents(documentContent)

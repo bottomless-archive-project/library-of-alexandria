@@ -13,6 +13,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.Duration;
 
 import static java.net.http.HttpRequest.BodyPublishers.ofInputStream;
 import static java.net.http.HttpRequest.BodyPublishers.ofString;
@@ -42,7 +43,8 @@ public class VaultClientService {
         return vaultWebClient.get()
                 .uri("/document/" + documentEntity.getId())
                 .retrieve()
-                .bodyToMono(byte[].class);
+                .bodyToMono(byte[].class)
+                .timeout(Duration.ofSeconds(30));
     }
 
     public void recompressDocument(final DocumentEntity documentEntity, final DocumentCompression documentCompression) {
@@ -64,6 +66,7 @@ public class VaultClientService {
         return vaultWebClient.delete()
                 .uri("/document/" + documentEntity.getId())
                 .retrieve()
-                .bodyToMono(String.class);
+                .bodyToMono(String.class)
+                .timeout(Duration.ofSeconds(30));
     }
 }
