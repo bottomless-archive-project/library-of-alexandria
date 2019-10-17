@@ -26,11 +26,11 @@ public class IndexerService {
                     try {
                         restHighLevelClient.index(indexRequest, RequestOptions.DEFAULT);
 
-                        documentManipulator.markIndexed(documentEntity.getId());
+                        documentManipulator.markIndexed(documentEntity.getId()).subscribe();
                     } catch (IOException | ElasticsearchException e) {
                         log.info("Failed to index document " + documentEntity.getId() + "! Cause: '" + e.getMessage() + "'.");
 
-                        documentManipulator.markIndexFailure(documentEntity.getId());
+                        documentManipulator.markIndexFailure(documentEntity.getId()).subscribe();
                     }
                 });
     }

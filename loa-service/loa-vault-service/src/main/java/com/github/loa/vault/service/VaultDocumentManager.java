@@ -13,6 +13,7 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -95,13 +96,13 @@ public class VaultDocumentManager {
      * Remove the content of a document from the vault.
      *
      * @param documentEntity the document to remove
+     * @return the document that was removed
      */
-    public void removeDocument(final DocumentEntity documentEntity) {
-        final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentEntity,
-                documentEntity.getCompression());
-
-        vaultLocation.clear();
-
-        documentManipulator.markRemoved(documentEntity.getId());
+    public Mono<DocumentEntity> removeDocument(final DocumentEntity documentEntity) {
+        return Mono.just(documentEntity)
+                .flatMap(document -> documentManipulator.markRemoved(document.getId()).thenReturn(document))
+                .map(document -> vaultLocationFactory.getLocation(document, documentEntity.getCompression()))
+                .doOnNext(VaultLocation::clear)
+                .thenReturn(documentEntity);
     }
 }

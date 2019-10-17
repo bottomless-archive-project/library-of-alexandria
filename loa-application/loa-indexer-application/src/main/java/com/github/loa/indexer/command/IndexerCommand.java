@@ -14,8 +14,6 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Scheduler;
-import reactor.core.scheduler.Schedulers;
 
 import java.io.IOException;
 
@@ -24,12 +22,11 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class IndexerCommand implements CommandLineRunner {
 
-    private static final String SCHEDULER_NAME = "indexer-scheduler";
-
     private final DocumentEntityFactory documentEntityFactory;
     private final VaultClientService vaultClientService;
     private final IndexerConfigurationProperties indexerConfigurationProperties;
     private final IndexerService indexerService;
+    private final DocumentParser documentParser;
     private final DocumentManipulator documentManipulator;
 
     @Override
@@ -37,58 +34,73 @@ public class IndexerCommand implements CommandLineRunner {
         log.info("Initializing document indexing.");
 
         documentEntityFactory.getDocumentEntity(DocumentStatus.DOWNLOADED)
-                .parallel(indexerConfigurationProperties.getConcurrentIndexerThreads())
-                .runOn(newScheduler(indexerConfigurationProperties))
-                .flatMap(this::buildDocument, false, 5)
-                .subscribe(this::processDocument);
+                .flatMap(this::buildDocument, indexerConfigurationProperties.getConcurrentIndexerThreads())
+                .flatMap(this::processDocument)
+                .subscribe();
     }
 
-    private Scheduler newScheduler(final IndexerConfigurationProperties indexerConfigurationProperties) {
-        return Schedulers.newParallel(SCHEDULER_NAME, indexerConfigurationProperties.getConcurrentIndexerThreads());
-    }
-
-    private void processDocument(final IndexDocument indexDocument) {
+    private Mono<Void> processDocument(final IndexDocument indexDocument) {
         final DocumentEntity documentEntity = indexDocument.getDocumentEntity();
 
         if (documentEntity.isPdf()) {
-            try (final PDDocument pdfDocument = PDDocument.load(indexDocument.getDocumentContents())) {
-                // When the document is valid parse it's page count and update it
-                final int pageCount = pdfDocument.getNumberOfPages();
+            return Mono.just(indexDocument)
+                    .flatMap(document -> parseDocument(indexDocument))
+                    .flatMap(pdfDocument -> updatePageCount(documentEntity, pdfDocument))
+                    .flatMap(pdfDocument -> {
+                        final Integer pageCount = pdfDocument.getNumberOfPages();
 
-                documentManipulator.updatePageCount(indexDocument.getDocumentEntity().getId(), pageCount);
-
-                // Index the document
-                if (documentEntity.getFileSize() < indexerConfigurationProperties.getMaximumFileSize()) {
-                    indexerService.indexDocuments(documentEntity, pageCount);
-                } else {
-                    log.info("Skipping document {} because it's size is too big.", documentEntity.getId());
-
-                    documentManipulator.markIndexFailure(documentEntity.getId());
-                }
-            } catch (IOException e) {
-                // When the document is invalid remove it
-                vaultClientService.removeDocument(indexDocument.getDocumentEntity())
-                        .doOnNext(response -> log.info("Removed document with id: {}.", documentEntity.getId()))
-                        .subscribe();
-            }
+                        return Mono.just(pdfDocument)
+                                .doOnNext(pdDocument -> {
+                                    try {
+                                        pdfDocument.close();
+                                    } catch (IOException e) {
+                                        log.error("Unable to close document!", e);
+                                    }
+                                })
+                                .thenReturn(pageCount);
+                    })
+                    .flatMap(pdfDocument -> handleDocument(documentEntity, pdfDocument));
         } else {
-            // Index the document
-            if (documentEntity.getFileSize() < indexerConfigurationProperties.getMaximumFileSize()) {
-                indexerService.indexDocuments(documentEntity, -1);
-            } else {
-                log.info("Skipping document {} because it's size is too big.", documentEntity.getId());
-
-                documentManipulator.markIndexFailure(documentEntity.getId());
-            }
+            return Mono.just(indexDocument)
+                    .flatMap(document -> handleDocument(document.getDocumentEntity(), -1));
         }
+    }
+
+    private Mono<PDDocument> updatePageCount(final DocumentEntity documentEntity, final PDDocument pdfDocument) {
+        return documentManipulator.updatePageCount(documentEntity.getId(), pdfDocument.getNumberOfPages())
+                .thenReturn(pdfDocument);
+    }
+
+    private Mono<Void> handleDocument(final DocumentEntity documentEntity, final int pageCount) {
+        if (documentEntity.getFileSize() < indexerConfigurationProperties.getMaximumFileSize()) {
+            return Mono.just(documentEntity)
+                    .doOnNext(document -> indexerService.indexDocuments(documentEntity, pageCount))
+                    .then();
+        } else {
+            return Mono.just(documentEntity)
+                    .doOnNext(document -> log.info("Skipping document {} because it's size is too big.", documentEntity.getId()))
+                    .flatMap(document -> documentManipulator.markIndexFailure(documentEntity.getId()))
+                    .then();
+        }
+    }
+
+    private Mono<PDDocument> parseDocument(final IndexDocument indexDocument) {
+        return Mono.fromSupplier(() -> documentParser.parseDocument(indexDocument.getDocumentContents()))
+                .onErrorResume(error -> vaultClientService.removeDocument(indexDocument.getDocumentEntity())
+                        .doOnNext(response -> log.info("Removed document with id: {}.",
+                                indexDocument.getDocumentEntity().getId()))
+                        .then(Mono.empty())
+                );
     }
 
     private Mono<IndexDocument> buildDocument(final DocumentEntity documentEntity) {
         return vaultClientService.queryDocument(documentEntity)
+                .doOnError(error -> log.error("Error while downloading the document!", error))
                 .map(documentContent -> IndexDocument.builder()
                         .documentEntity(documentEntity)
                         .documentContents(documentContent)
                         .build()
-                );
+                )
+                .onErrorResume(error -> Mono.empty());
     }
 }
