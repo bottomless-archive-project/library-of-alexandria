@@ -16,13 +16,13 @@ public class IndexResponseActionListener implements ActionListener<IndexResponse
 
     @Override
     public void onResponse(final IndexResponse indexResponse) {
-        documentManipulator.markIndexed(documentEntity.getId());
+        documentManipulator.markIndexed(documentEntity.getId()).subscribe();
     }
 
     @Override
     public void onFailure(final Exception e) {
         log.info("Failed to index document " + documentEntity.getId() + "!", e);
 
-        documentManipulator.markIndexFailure(documentEntity.getId());
+        documentManipulator.markIndexFailure(documentEntity.getId()).subscribe();
     }
 }

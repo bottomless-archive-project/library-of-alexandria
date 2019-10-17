@@ -88,7 +88,7 @@ public class VaultController {
     @DeleteMapping("/document/{documentId}")
     public Mono<DocumentEntity> removeDocument(@PathVariable final String documentId) {
         return documentEntityFactory.getDocumentEntity(documentId)
-                .doOnNext(vaultDocumentManager::removeDocument)
+                .flatMap(vaultDocumentManager::removeDocument)
                 .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Document not found with id " + documentId + "!")));
     }

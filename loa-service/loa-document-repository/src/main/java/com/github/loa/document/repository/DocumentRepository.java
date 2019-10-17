@@ -33,13 +33,13 @@ public class DocumentRepository {
         return mongoTemplate.find(query, DocumentDatabaseEntity.class);
     }
 
-    public void updateStatus(final String documentId, final String status) {
+    public Mono<Void> updateStatus(final String documentId, final String status) {
         final Query query = Query
                 .query(
                         Criteria.where("id").is(documentId)
                 );
 
-        mongoTemplate.updateFirst(query, Update.update("status", status), DocumentDatabaseEntity.class).subscribe();
+        return mongoTemplate.updateFirst(query, Update.update("status", status), DocumentDatabaseEntity.class).then();
     }
 
     public void updateCompression(final String documentId, final String compression) {
@@ -64,14 +64,14 @@ public class DocumentRepository {
         return mongoTemplate.exists(query, DocumentDatabaseEntity.class);
     }
 
-    public void updatePageCount(final String documentId, final int pageCount) {
+    public Mono<Void> updatePageCount(final String documentId, final int pageCount) {
         final Query query = Query
                 .query(
                         Criteria.where("id").is(documentId)
                 );
 
-        mongoTemplate.updateFirst(query, Update.update("pageCount", pageCount), DocumentDatabaseEntity.class)
-                .subscribe();
+        return mongoTemplate.updateFirst(query, Update.update("pageCount", pageCount), DocumentDatabaseEntity.class)
+                .then();
     }
 
     public Flux<DocumentDatabaseEntity> findAll() {
