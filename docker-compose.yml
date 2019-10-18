@@ -1,0 +1,24 @@
+version: '3.7'
+
+services:
+  mongo:
+    image: 'mongo:4.2.0-bionic'
+    ports:
+      - 27017:27017
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+
+  mongo-express:
+    image: 'mongo-express:0.49'
+    ports:
+      - 8081:8081
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
