@@ -7,16 +7,17 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum DocumentType {
 
-    PDF("pdf"),
-    DOC("doc"),
-    DOCX("docx"),
-    PPT("ppt"),
-    PPTX("pptx"),
-    XLS("xls"),
-    XLSX("xlsx"),
-    RTF("rtf"),
-    MOBI("mobi"),
-    EPUB("epub");
+    PDF("pdf", "application/pdf"),
+    DOC("doc", "application/msword"),
+    DOCX("docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"),
+    PPT("ppt", "application/vnd.ms-powerpoint"),
+    PPTX("pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation"),
+    XLS("xls", "application/vnd.ms-excel"),
+    XLSX("xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"),
+    RTF("rtf", "application/rtf"),
+    MOBI("mobi", "application/x-mobipocket-ebook"),
+    EPUB("epub", "application/epub+zip");
 
     private final String fileExtension;
+    private final String mimeType;
 }

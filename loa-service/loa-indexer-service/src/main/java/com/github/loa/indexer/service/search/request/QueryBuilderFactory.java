@@ -1,5 +1,6 @@
 package com.github.loa.indexer.service.search.request;
 
+import com.github.loa.document.service.domain.DocumentType;
 import com.github.loa.indexer.service.search.domain.SearchContext;
 import com.github.loa.indexer.service.search.domain.SearchField;
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -19,6 +20,14 @@ public class QueryBuilderFactory {
         initializeContentQuery(parentQuery, searchContext);
         initializeLanguageQuery(parentQuery, searchContext);
         initializeDocumentLengthQuery(parentQuery, searchContext);
+
+        if (!searchContext.getDocumentTypes().isEmpty()) {
+            final Object[] docTypes = searchContext.getDocumentTypes().stream()
+                    .map(DocumentType::getMimeType)
+                    .toArray();
+
+            parentQuery.must(QueryBuilders.termQuery(SearchField.DOCUMENT_TYPE.getName(), docTypes));
+        }
 
         return parentQuery;
     }

@@ -21,6 +21,11 @@ public enum SearchField {
     LANGUAGE("attachment.language"),
 
     /**
+     * The type of the document.
+     */
+    DOCUMENT_TYPE("attachment.content_type"),
+
+    /**
      * The page count of the document.
      */
     PAGE_COUNT("page_count");

@@ -53,6 +53,7 @@
                             $scope.totalPages = 0;
                             $scope.language = undefined;
                             $scope.documentLength = undefined;
+                            $scope.fileTypes = {};
 
                             $scope.loading = false;
 
@@ -135,6 +136,11 @@
 
                                 if ($scope.documentLength !== undefined) {
                                     urlBase += '&documentLength=' + $scope.documentLength[0];
+                                }
+
+                                var types = Object.keys($scope.fileTypes).filter(value => $scope.fileTypes[value]);
+                                if (types.length > 0) {
+                                    urlBase += '&documentTypes=' + types.join();
                                 }
 
                                 $http.get(urlBase)

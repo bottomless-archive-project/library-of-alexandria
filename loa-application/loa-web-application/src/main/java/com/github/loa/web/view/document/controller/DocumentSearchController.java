@@ -1,8 +1,9 @@
 package com.github.loa.web.view.document.controller;
 
+import com.github.loa.document.service.domain.DocumentType;
 import com.github.loa.indexer.service.search.DocumentSearchService;
-import com.github.loa.indexer.service.search.domain.SearchContext;
 import com.github.loa.indexer.service.search.domain.DocumentLength;
+import com.github.loa.indexer.service.search.domain.SearchContext;
 import com.github.loa.web.view.document.response.DocumentSearchResponse;
 import com.github.loa.web.view.document.service.SearchDocumentEntityResponseTransformer;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
+import java.util.List;
 import java.util.function.Function;
 
 @RestController
@@ -27,7 +29,8 @@ public class DocumentSearchController {
             @RequestParam(defaultValue = "0") final int pageNumber,
             @RequestParam(defaultValue = "false") final boolean exactMatch,
             @RequestParam(required = false) final String language,
-            @RequestParam(required = false) final DocumentLength documentLength) {
+            @RequestParam(required = false) final DocumentLength documentLength,
+            @RequestParam(required = false) final List<DocumentType> documentTypes) {
         return Mono
                 .fromSupplier(() -> documentSearchService.searchDocuments(
                         SearchContext.builder()
@@ -36,6 +39,7 @@ public class DocumentSearchController {
                                 .exactMatch(exactMatch)
                                 .language(language)
                                 .documentLength(documentLength)
+                                .documentTypes(documentTypes)
                                 .build()
                 ))
                 .subscribeOn(Schedulers.elastic())
