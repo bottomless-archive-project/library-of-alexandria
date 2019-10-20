@@ -34,9 +34,22 @@ public class IndexerCommand implements CommandLineRunner {
         log.info("Initializing document indexing.");
 
         documentEntityFactory.getDocumentEntity(DocumentStatus.DOWNLOADED)
+                .filter(this::filterDocument)
                 .flatMap(this::buildDocument, indexerConfigurationProperties.getConcurrentIndexerThreads())
                 .flatMap(this::processDocument)
                 .subscribe();
+    }
+
+    private boolean filterDocument(final DocumentEntity documentEntity) {
+        if (documentEntity.getFileSize() > indexerConfigurationProperties.getMaximumFileSize()) {
+            log.info("Skipping document {} because it's size is too big.", documentEntity.getId());
+
+            documentManipulator.markIndexFailure(documentEntity.getId()).subscribe();
+
+            return false;
+        }
+
+        return true;
     }
 
     private Mono<Void> processDocument(final IndexDocument indexDocument) {
@@ -59,29 +72,18 @@ public class IndexerCommand implements CommandLineRunner {
                                 })
                                 .thenReturn(pageCount);
                     })
-                    .flatMap(pdfDocument -> handleDocument(documentEntity, pdfDocument));
+                    .doOnNext(pageCount -> indexerService.indexDocuments(documentEntity, pageCount))
+                    .then();
         } else {
             return Mono.just(indexDocument)
-                    .flatMap(document -> handleDocument(document.getDocumentEntity(), -1));
+                    .doOnNext(pdfDocument -> indexerService.indexDocuments(documentEntity, -1))
+                    .then();
         }
     }
 
     private Mono<PDDocument> updatePageCount(final DocumentEntity documentEntity, final PDDocument pdfDocument) {
         return documentManipulator.updatePageCount(documentEntity.getId(), pdfDocument.getNumberOfPages())
                 .thenReturn(pdfDocument);
-    }
-
-    private Mono<Void> handleDocument(final DocumentEntity documentEntity, final int pageCount) {
-        if (documentEntity.getFileSize() < indexerConfigurationProperties.getMaximumFileSize()) {
-            return Mono.just(documentEntity)
-                    .doOnNext(document -> indexerService.indexDocuments(documentEntity, pageCount))
-                    .then();
-        } else {
-            return Mono.just(documentEntity)
-                    .doOnNext(document -> log.info("Skipping document {} because it's size is too big.", documentEntity.getId()))
-                    .flatMap(document -> documentManipulator.markIndexFailure(documentEntity.getId()))
-                    .then();
-        }
     }
 
     private Mono<PDDocument> parseDocument(final IndexDocument indexDocument) {
