@@ -8,6 +8,9 @@ import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 /**
  * This class is responsible to build the search query for a search request to the search engine.
  */
@@ -20,14 +23,7 @@ public class QueryBuilderFactory {
         initializeContentQuery(parentQuery, searchContext);
         initializeLanguageQuery(parentQuery, searchContext);
         initializeDocumentLengthQuery(parentQuery, searchContext);
-
-        if (!searchContext.getDocumentTypes().isEmpty()) {
-            final Object[] docTypes = searchContext.getDocumentTypes().stream()
-                    .map(DocumentType::getMimeType)
-                    .toArray();
-
-            parentQuery.must(QueryBuilders.termQuery(SearchField.DOCUMENT_TYPE.getName(), docTypes));
-        }
+        initializeDocumentTypeQuery(parentQuery, searchContext);
 
         return parentQuery;
     }
@@ -52,6 +48,21 @@ public class QueryBuilderFactory {
                                 .lte(documentLength.getMaximumPageCount())
                 )
         );
+    }
+
+    private void initializeDocumentTypeQuery(final BoolQueryBuilder parentQuery, final SearchContext searchContext) {
+        if (!searchContext.getDocumentTypes().isEmpty()) {
+            final List<String> docTypes = searchContext.getDocumentTypes().stream()
+                    .map(DocumentType::getMimeType)
+                    .collect(Collectors.toList());
+
+            final BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery().minimumShouldMatch(1);
+
+            for (final String type : docTypes) {
+                boolQueryBuilder.should(QueryBuilders.termQuery(SearchField.DOCUMENT_TYPE.getName() + ".keyword", type));
+            }
+            parentQuery.filter(boolQueryBuilder);
+        }
     }
 
     private QueryBuilder newContentQuery(final boolean exactMatch, final String keyword) {
