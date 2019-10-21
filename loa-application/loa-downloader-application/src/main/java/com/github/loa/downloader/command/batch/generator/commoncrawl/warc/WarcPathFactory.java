@@ -12,9 +12,20 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * This service is responsible for creating the locations to the WARC files for a batch of Common Crawl corpus.
+ *
+ * @see <a href="http://commoncrawl.org/">Common Crawl</a>
+ */
 @Service
 public class WarcPathFactory {
 
+    /**
+     * Return the locations for the WARC files that belong to the provided Common Crawl crawl id.
+     *
+     * @param crawlId the id of the Common Crawl crawl to get the locations for
+     * @return the locations of the WARC files
+     */
     public List<String> newPaths(final String crawlId) {
         try (final BufferedReader downloadPathsReader = downloadPaths(crawlId)) {
             return downloadPathsReader.lines()
