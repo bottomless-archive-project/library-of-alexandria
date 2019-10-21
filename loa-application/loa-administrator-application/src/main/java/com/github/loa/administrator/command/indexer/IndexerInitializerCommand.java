@@ -10,10 +10,12 @@ import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 
 /**
  * This command will initialize the indexer database.
@@ -24,6 +26,7 @@ import java.nio.charset.StandardCharsets;
 public class IndexerInitializerCommand implements CommandLineRunner {
 
     private final RestHighLevelClient restHighLevelClient;
+    private final ResourceLoader resourceLoader;
 
     /**
      * Runs the command.
@@ -37,19 +40,20 @@ public class IndexerInitializerCommand implements CommandLineRunner {
     }
 
     private void initializeAttachmentPipeline() throws IOException {
-        final String source = "{\"description\":\"Processors for the Library of Alexandria project.\", " +
-                "\"processors\":[{\"attachment\":{\"field\":\"content\", \"indexed_chars\" : -1}, \"remove\": {" +
-                "\"field\": \"content\"}}]}";
+        final String pipelineConfiguration = loadConfiguration("classpath:indexer/pipeline.json");
 
         final PutPipelineRequest request = new PutPipelineRequest("vault-document-pipeline",
-                new BytesArray(source.getBytes(StandardCharsets.UTF_8)), XContentType.JSON
+                new BytesArray(pipelineConfiguration.getBytes(StandardCharsets.UTF_8)), XContentType.JSON
         );
 
         restHighLevelClient.ingest().putPipeline(request, RequestOptions.DEFAULT);
     }
 
     private void initializeIndex() throws IOException {
+        final String mappingConfiguration = loadConfiguration("classpath:indexer/mapping.json");
+
         final CreateIndexRequest createIndexRequest = new CreateIndexRequest("vault_documents")
+                .mapping(mappingConfiguration, XContentType.JSON)
                 .settings(
                         Settings.builder()
                                 .put("index.number_of_shards", 3)
@@ -57,5 +61,9 @@ public class IndexerInitializerCommand implements CommandLineRunner {
                 );
 
         restHighLevelClient.indices().create(createIndexRequest, RequestOptions.DEFAULT);
+    }
+
+    private String loadConfiguration(final String configurationLocation) throws IOException {
+        return new String(Files.readAllBytes(resourceLoader.getResource(configurationLocation).getFile().toPath()));
     }
 }

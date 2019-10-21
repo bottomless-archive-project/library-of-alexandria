@@ -1,0 +1,32 @@
+{
+  "properties": {
+    "attachment": {
+      "properties": {
+        "author": {
+          "type": "text"
+        },
+        "content": {
+          "type": "text"
+        },
+        "content_length": {
+          "type": "long"
+        },
+        "content_type": {
+          "type": "keyword"
+        },
+        "date": {
+          "type": "date"
+        },
+        "language": {
+          "type": "keyword"
+        },
+        "title": {
+          "type": "text"
+        }
+      }
+    },
+    "page_count": {
+      "type": "long"
+    }
+  }
+}

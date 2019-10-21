@@ -59,7 +59,7 @@ public class QueryBuilderFactory {
             final BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery().minimumShouldMatch(1);
 
             for (final String type : docTypes) {
-                boolQueryBuilder.should(QueryBuilders.termQuery(SearchField.DOCUMENT_TYPE.getName() + ".keyword", type));
+                boolQueryBuilder.should(QueryBuilders.termQuery(SearchField.DOCUMENT_TYPE.getName(), type));
             }
             parentQuery.filter(boolQueryBuilder);
         }

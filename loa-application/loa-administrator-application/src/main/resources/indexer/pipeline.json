@@ -1,0 +1,23 @@
+{
+  "description": "Processors for the Library of Alexandria project.",
+  "processors": [
+    {
+      "attachment": {
+        "field": "content",
+        "indexed_chars": -1,
+        "properties": [
+          "content",
+          "title",
+          "author",
+          "date",
+          "content_type",
+          "content_length",
+          "language"
+        ]
+      },
+      "remove": {
+        "field": "content"
+      }
+    }
+  ]
+}

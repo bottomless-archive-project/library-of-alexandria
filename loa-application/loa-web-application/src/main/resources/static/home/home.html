@@ -155,8 +155,9 @@
                    ng-bind-html="hit.description"></p>
 
                 <!-- DOC and the like - downloading -->
-                <div ng-if="hit.document.type != 'PDF'" style="float: right;">
-                    <a class="btn btn-primary" ng-href="./document/{{hit.document.id}}">
+                <div ng-if="hit.document.type != 'PDF'" style="width: 100%; height: 32px; line-height: 32px;">
+                    <a class="btn btn-primary btn-sm w-25" ng-href="./document/{{hit.document.id}}"
+                       style="float: right; min-width: 135px;">
                         Download .{{hit.document.type | lowercase}}</a>
                 </div>
                 <!-- /DOC and the like - downloading -->
