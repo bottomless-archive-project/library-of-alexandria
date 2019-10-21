@@ -6,7 +6,8 @@
           "type": "text"
         },
         "content": {
-          "type": "text"
+          "type": "text",
+          "index_options": "offsets"
         },
         "content_length": {
           "type": "long"

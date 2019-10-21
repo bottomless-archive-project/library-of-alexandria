@@ -56,8 +56,9 @@ public class IndexerInitializerCommand implements CommandLineRunner {
                 .mapping(mappingConfiguration, XContentType.JSON)
                 .settings(
                         Settings.builder()
-                                .put("index.number_of_shards", 3)
+                                .put("index.number_of_shards", 10)
                                 .put("index.codec", "best_compression")
+                                .put("index.refresh_interval", "60s")
                 );
 
         restHighLevelClient.indices().create(createIndexRequest, RequestOptions.DEFAULT);
