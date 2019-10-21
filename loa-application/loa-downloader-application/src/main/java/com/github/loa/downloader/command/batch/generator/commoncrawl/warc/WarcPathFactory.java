@@ -1,13 +1,13 @@
 package com.github.loa.downloader.command.batch.generator.commoncrawl.warc;
 
-import org.davidmoten.io.extras.IOUtil;
+import com.github.loa.url.service.StreamFactory;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,7 +18,10 @@ import java.util.stream.Collectors;
  * @see <a href="http://commoncrawl.org/">Common Crawl</a>
  */
 @Service
+@RequiredArgsConstructor
 public class WarcPathFactory {
+
+    private final StreamFactory streamFactory;
 
     /**
      * Return the locations for the WARC files that belong to the provided Common Crawl crawl id.
@@ -36,9 +39,9 @@ public class WarcPathFactory {
     }
 
     private BufferedReader downloadPaths(final String pathsLocation) throws IOException {
-        final InputStream unzippedPaths = IOUtil.gunzip(new URL("https://commoncrawl.s3.amazonaws.com/crawl-data/"
-                + pathsLocation + "/warc.paths.gz").openStream());
+        final InputStream warcPathLocation = streamFactory.openGZIPLocation(
+                "https://commoncrawl.s3.amazonaws.com/crawl-data/" + pathsLocation + "/warc.paths.gz");
 
-        return new BufferedReader(new InputStreamReader(unzippedPaths, StandardCharsets.UTF_8));
+        return new BufferedReader(new InputStreamReader(warcPathLocation, StandardCharsets.UTF_8));
     }
 }

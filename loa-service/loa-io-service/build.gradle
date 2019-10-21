@@ -1,0 +1,3 @@
+dependencies {
+    compile group: 'com.github.davidmoten', name: 'io-extras', version: '0.1'
+}
