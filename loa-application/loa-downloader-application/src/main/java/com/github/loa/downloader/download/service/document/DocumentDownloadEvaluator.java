@@ -40,7 +40,8 @@ public class DocumentDownloadEvaluator {
         }
 
         documentLocationEntityFactory.newDocumentLocationEntity(documentLocationId, documentLocation,
-                downloaderConfigurationProperties.getVersionNumber(), documentSourceConfiguration.getName());
+                downloaderConfigurationProperties.getVersionNumber(), documentSourceConfiguration.getName())
+                .subscribe();
 
         return true;
     }

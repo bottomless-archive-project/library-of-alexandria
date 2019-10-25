@@ -18,7 +18,7 @@ public class DocumentLocationEntityFactory {
         return documentLocationRepository.existsById(documentLocationId);
     }
 
-    public void newDocumentLocationEntity(final String id, final URL location, final int versionNumber,
+    public Mono<Void> newDocumentLocationEntity(final String id, final URL location, final int versionNumber,
             final String source) {
         final DocumentLocationDatabaseEntity documentLocationDatabaseEntity = new DocumentLocationDatabaseEntity();
 
@@ -27,6 +27,7 @@ public class DocumentLocationEntityFactory {
         documentLocationDatabaseEntity.setDownloaderVersion(versionNumber);
         documentLocationDatabaseEntity.setSource(source);
 
-        documentLocationRepository.insertDocumentLocation(documentLocationDatabaseEntity);
+        return documentLocationRepository.insertDocumentLocation(documentLocationDatabaseEntity)
+                .then();
     }
 }
