@@ -1,25 +1,23 @@
 package com.github.loa.downloader.command.batch.task;
 
-import com.morethanheroic.taskforce.task.Task;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Optional;
 
 @Slf4j
 @Service
-public class DocumentLocationConverterTask implements Task<String, URL> {
+public class DocumentLocationConverterTask {
 
-    @Override
-    public Optional<URL> execute(final String recordUrl) {
+    public Mono<URL> execute(final String recordUrl) {
         try {
-            return Optional.of(new URL(recordUrl));
+            return Mono.just(new URL(recordUrl));
         } catch (MalformedURLException e) {
             log.debug("Unable to parse url with location: " + recordUrl, e);
 
-            return Optional.empty();
+            return Mono.empty();
         }
     }
 }
