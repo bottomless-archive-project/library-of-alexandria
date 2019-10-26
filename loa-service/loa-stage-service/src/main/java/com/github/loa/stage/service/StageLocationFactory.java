@@ -5,6 +5,7 @@ import com.github.loa.document.service.domain.DocumentType;
 import com.github.loa.stage.configuration.StageConfigurationProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 import java.io.File;
 
@@ -24,7 +25,7 @@ public class StageLocationFactory {
      * @param documentEntity the document that we need to create the location for
      * @return the location created in the staging area
      */
-    public File getLocation(final DocumentEntity documentEntity) {
+    public Mono<File> getLocation(final DocumentEntity documentEntity) {
         return getLocation(documentEntity.getId(), documentEntity.getType());
     }
 
@@ -35,8 +36,8 @@ public class StageLocationFactory {
      * @param documentType the type of the document that we need to create the location for
      * @return the location created in the staging area
      */
-    public File getLocation(final String documentId, final DocumentType documentType) {
-        return new File(stageConfigurationProperties.getLocation(), documentId + "."
-                + documentType.getFileExtension());
+    public Mono<File> getLocation(final String documentId, final DocumentType documentType) {
+        return Mono.just(new File(stageConfigurationProperties.getLocation(), documentId + "."
+                + documentType.getFileExtension()));
     }
 }

@@ -2,11 +2,11 @@ package com.github.loa.downloader.download.service.file;
 
 import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.document.service.domain.DocumentType;
-import com.github.loa.downloader.download.service.file.domain.FailedToArchiveException;
 import com.github.loa.stage.service.StageLocationFactory;
 import com.github.loa.vault.client.service.VaultClientService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -28,15 +28,20 @@ public class DocumentFileManipulator {
      *
      * @param documentEntity the document's id that we want to move to the vault
      */
-    public void moveToVault(final DocumentEntity documentEntity) {
-        try (final InputStream documentContents = new FileInputStream(
-                stageLocationFactory.getLocation(documentEntity))) {
-            vaultClientService.archiveDocument(documentEntity, documentContents);
-        } catch (Exception e) {
-            throw new FailedToArchiveException("Unable to move document to vault!", e);
-        }
+    public Mono<Void> moveToVault(final DocumentEntity documentEntity) {
+        return stageLocationFactory.getLocation(documentEntity)
+                .flatMap(documentLocation -> {
+                    try (final InputStream documentContents = new FileInputStream(documentLocation)) {
+                        //TODO: Archive should be reactive!
+                        vaultClientService.archiveDocument(documentEntity, documentContents);
+                    } catch (Exception e) {
+                        return Mono.empty();
+                    }
 
-        cleanup(documentEntity);
+                    return Mono.just(documentLocation);
+                })
+                .map(documentLocation -> cleanup(documentEntity))
+                .then();
     }
 
     /**
@@ -44,13 +49,13 @@ public class DocumentFileManipulator {
      *
      * @param documentEntity the document to clean up after
      */
-    public void cleanup(final DocumentEntity documentEntity) {
-        cleanup(documentEntity.getId(), documentEntity.getType());
+    public Mono<Void> cleanup(final DocumentEntity documentEntity) {
+        return cleanup(documentEntity.getId(), documentEntity.getType());
     }
 
-    public void cleanup(final String documentId, final DocumentType documentType) {
-        final File stageFileLocation = stageLocationFactory.getLocation(documentId, documentType);
-
-        stageFileLocation.delete();
+    public Mono<Void> cleanup(final String documentId, final DocumentType documentType) {
+        return stageLocationFactory.getLocation(documentId, documentType)
+                .map(File::delete)
+                .then();
     }
 }

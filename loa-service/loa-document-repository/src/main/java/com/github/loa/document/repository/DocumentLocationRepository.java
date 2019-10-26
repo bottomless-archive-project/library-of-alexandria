@@ -1,6 +1,5 @@
 package com.github.loa.document.repository;
 
-import com.github.loa.document.repository.domain.DocumentDatabaseEntity;
 import com.github.loa.document.repository.domain.DocumentLocationDatabaseEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
@@ -21,7 +20,7 @@ public class DocumentLocationRepository {
                         Criteria.where("_id").is(id)
                 );
 
-        return mongoTemplate.exists(query, DocumentDatabaseEntity.class);
+        return mongoTemplate.exists(query, DocumentLocationDatabaseEntity.class);
     }
 
     public Mono<DocumentLocationDatabaseEntity> insertDocumentLocation(

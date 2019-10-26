@@ -30,18 +30,7 @@ public class DownloaderCommand implements CommandLineRunner {
                 .flatMap(documentLocationConverterTask::execute)
                 .filter(documentLocationFilterTask::execute)
                 .flatMap(documentLocationEncoderTask::execute)
-                .subscribe(documentLocationRecordProcessor::execute);
-
-        /*final Job job = JobBuilder.newBuilder()
-                .generator(generator)
-                .task(documentLocationConverterTask)
-                .task(documentLocationFilterTask)
-                .task(documentLocationEncoderTask)
-                .task(documentLocationRecordProcessor)
-                .sink(DiscardingSink.of())
-                .withThreadCount(downloaderExecutorConfigurationProperties.getThreadCount())
-                .build();
-
-        jobExecutor.execute(job);*/
+                .flatMap(documentLocationRecordProcessor::execute)
+                .subscribe();
     }
 }
