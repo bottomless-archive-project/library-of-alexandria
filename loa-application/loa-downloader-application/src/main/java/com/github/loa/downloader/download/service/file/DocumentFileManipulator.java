@@ -5,6 +5,7 @@ import com.github.loa.document.service.domain.DocumentType;
 import com.github.loa.stage.service.StageLocationFactory;
 import com.github.loa.vault.client.service.VaultClientService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -16,6 +17,7 @@ import java.io.InputStream;
  * This service is responsible for the manipulating of document files. For example moving them to the vault or removing
  * them if necessary.
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class DocumentFileManipulator {
@@ -29,6 +31,8 @@ public class DocumentFileManipulator {
      * @param documentEntity the document's id that we want to move to the vault
      */
     public Mono<Void> moveToVault(final DocumentEntity documentEntity) {
+        log.info("Moving document to vault: " + documentEntity + "!");
+
         return stageLocationFactory.getLocation(documentEntity)
                 .flatMap(documentLocation -> {
                     try (final InputStream documentContents = new FileInputStream(documentLocation)) {

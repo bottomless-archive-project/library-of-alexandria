@@ -30,6 +30,7 @@ public class DownloaderCommand implements CommandLineRunner {
                 .flatMap(documentLocationConverterTask::execute)
                 .filter(documentLocationFilterTask::execute)
                 .flatMap(documentLocationEncoderTask::execute)
+                .distinct()
                 .flatMap(documentLocationRecordProcessor::execute)
                 .subscribe();
     }

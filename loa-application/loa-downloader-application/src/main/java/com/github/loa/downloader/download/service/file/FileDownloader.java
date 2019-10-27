@@ -3,6 +3,7 @@ package com.github.loa.downloader.download.service.file;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferUtils;
+import org.springframework.core.io.buffer.DefaultDataBufferFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
@@ -20,6 +21,7 @@ import java.net.URL;
 public class FileDownloader {
 
     private final WebClient webClient;
+    private final DefaultDataBufferFactory defaultDataBufferFactory;
 
     /**
      * Download a file from the provided url to the provided file location.
@@ -32,7 +34,8 @@ public class FileDownloader {
             final Flux<DataBuffer> inputStream = webClient.get()
                     .uri(downloadTarget.toURI())
                     .retrieve()
-                    .bodyToFlux(DataBuffer.class);
+                    .bodyToFlux(DataBuffer.class)
+                    .onErrorReturn(defaultDataBufferFactory.allocateBuffer(0));
 
             return DataBufferUtils.write(inputStream, resultLocation.toPath())
                     .thenReturn(resultLocation);
