@@ -47,6 +47,12 @@ public class DocumentFileManipulator {
         return cleanup(documentEntity.getId(), documentEntity.getType());
     }
 
+    /**
+     * Clean up after a document's download by removing all the staging information belonging to that document.
+     *
+     * @param documentId   the id of the document to clean up after
+     * @param documentType the type of the document to clean up after
+     */
     public Mono<Void> cleanup(final String documentId, final DocumentType documentType) {
         log.debug("Cleaning up staging for document {}.", documentId);
 
