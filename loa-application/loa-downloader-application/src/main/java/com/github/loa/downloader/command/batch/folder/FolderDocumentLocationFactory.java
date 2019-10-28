@@ -24,15 +24,19 @@ public class FolderDocumentLocationFactory implements DocumentLocationFactory {
 
     @Override
     public Flux<URL> streamLocations() {
-        try (Stream<Path> paths = Files.walk(Paths.get(folderDocumentSourceConfiguration.getLocation()))) {
-            return Flux.fromStream(paths)
-                    .map(path -> {
-                        try {
-                            return path.toUri().toURL();
-                        } catch (MalformedURLException e) {
-                            throw new RuntimeException("Unable to convert file!", e);
-                        }
-                    });
+        return Flux.fromStream(this::buildPaths)
+                .map(path -> {
+                    try {
+                        return path.toUri().toURL();
+                    } catch (MalformedURLException e) {
+                        throw new RuntimeException("Unable to convert file!", e);
+                    }
+                });
+    }
+
+    private Stream<Path> buildPaths() {
+        try {
+            return Files.walk(Paths.get(folderDocumentSourceConfiguration.getLocation()));
         } catch (IOException e) {
             throw new RuntimeException("Unable to walk folder!", e);
         }

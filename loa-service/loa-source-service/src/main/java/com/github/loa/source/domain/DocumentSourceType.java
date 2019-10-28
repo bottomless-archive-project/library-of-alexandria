@@ -12,5 +12,10 @@ public enum DocumentSourceType {
      *
      * @see <a href="http://commoncrawl.org/">Common Crawl</a>
      */
-    COMMON_CRAWL
+    COMMON_CRAWL,
+
+    /**
+     * The source data are document files available in a folder.
+     */
+    FOLDER
 }

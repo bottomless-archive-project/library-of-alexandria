@@ -10,7 +10,7 @@ import com.github.loa.document.service.location.id.factory.DocumentLocationIdFac
 import com.github.loa.downloader.command.configuration.DownloaderConfigurationProperties;
 import com.github.loa.downloader.download.service.file.DocumentFileManipulator;
 import com.github.loa.downloader.download.service.file.DocumentFileValidator;
-import com.github.loa.downloader.download.service.file.FileDownloader;
+import com.github.loa.downloader.download.service.file.FileCollector;
 import com.github.loa.stage.service.StageLocationFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +30,6 @@ import java.util.Arrays;
 public class DocumentDownloader {
 
     private final DocumentEntityFactory documentEntityFactory;
-    private final FileDownloader fileDownloader;
     private final DocumentLocationIdFactory documentLocationIdFactory;
     private final StageLocationFactory stageLocationFactory;
     private final DocumentFileValidator documentFileValidator;
@@ -39,6 +38,7 @@ public class DocumentDownloader {
     private final ChecksumProvider checksumProvider;
     private final DownloaderConfigurationProperties downloaderConfigurationProperties;
     private final CompressionConfigurationProperties compressionConfigurationProperties;
+    private final FileCollector fileCollector;
 
     public Mono<Void> downloadDocument(final URL documentLocation) {
         log.debug("Starting to download document {}.", documentLocation);
@@ -55,7 +55,7 @@ public class DocumentDownloader {
                                         + documentLocation));
 
                         return stageLocationFactory.getLocation(documentId, documentType)
-                                .flatMap(stageFileLocation -> fileDownloader.downloadFile(documentLocation, stageFileLocation))
+                                .flatMap(stageFileLocation -> fileCollector.acquireFile(documentLocation, stageFileLocation))
                                 .flatMap(documentFileLocation -> documentFileValidator.isValidDocument(documentId, documentType)
                                         .filter(validationResult -> !validationResult)
                                         .flatMap(validationResult -> documentFileManipulator.cleanup(documentId, documentType))
