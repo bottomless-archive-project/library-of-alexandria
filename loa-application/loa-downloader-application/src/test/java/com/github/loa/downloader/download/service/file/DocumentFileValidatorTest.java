@@ -41,9 +41,9 @@ class DocumentFileValidatorTest {
         when(stageLocationFactory.getLocation(DOCUMENT_ID, DOCUMENT_TYPE))
                 .thenReturn(Mono.just(documentFile));
 
-        final Mono<Boolean> validator = underTest.isValidDocument(DOCUMENT_ID, DOCUMENT_TYPE);
+        final Mono<Boolean> result = underTest.isValidDocument(DOCUMENT_ID, DOCUMENT_TYPE);
 
-        StepVerifier.create(validator)
+        StepVerifier.create(result)
                 .consumeNextWith(Assertions::assertFalse)
                 .verifyComplete();
     }
@@ -57,9 +57,9 @@ class DocumentFileValidatorTest {
         when(stageLocationFactory.getLocation(DOCUMENT_ID, DOCUMENT_TYPE))
                 .thenReturn(Mono.just(documentFile));
 
-        final Mono<Boolean> validator = underTest.isValidDocument(DOCUMENT_ID, DOCUMENT_TYPE);
+        final Mono<Boolean> result = underTest.isValidDocument(DOCUMENT_ID, DOCUMENT_TYPE);
 
-        StepVerifier.create(validator)
+        StepVerifier.create(result)
                 .consumeNextWith(Assertions::assertFalse)
                 .verifyComplete();
     }
@@ -73,9 +73,9 @@ class DocumentFileValidatorTest {
         when(stageLocationFactory.getLocation(DOCUMENT_ID, DOCUMENT_TYPE))
                 .thenReturn(Mono.just(documentFile));
 
-        final Mono<Boolean> validator = underTest.isValidDocument(DOCUMENT_ID, DOCUMENT_TYPE);
+        final Mono<Boolean> result = underTest.isValidDocument(DOCUMENT_ID, DOCUMENT_TYPE);
 
-        StepVerifier.create(validator)
+        StepVerifier.create(result)
                 .consumeNextWith(Assertions::assertTrue)
                 .verifyComplete();
     }
