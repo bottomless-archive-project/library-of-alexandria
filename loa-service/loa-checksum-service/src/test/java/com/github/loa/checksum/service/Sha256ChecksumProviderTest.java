@@ -35,7 +35,8 @@ class Sha256ChecksumProviderTest {
         final File checksumTestFile = new File(this.getClass().getClassLoader().getResource("checksum_test.txt")
                 .getFile());
 
-        when(stageLocationFactory.getLocation(DOCUMENT_ID, DOCUMENT_TYPE)).thenReturn(Mono.just(checksumTestFile));
+        when(stageLocationFactory.getLocation(DOCUMENT_ID, DOCUMENT_TYPE))
+                .thenReturn(Mono.just(checksumTestFile));
 
         final Mono<String> result = sha256ChecksumProvider.checksum(DOCUMENT_ID, DOCUMENT_TYPE);
 

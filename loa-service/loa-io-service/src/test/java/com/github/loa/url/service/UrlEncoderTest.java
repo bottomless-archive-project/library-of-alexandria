@@ -3,12 +3,13 @@ package com.github.loa.url.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class UrlEncoderTest {
 
@@ -28,10 +29,11 @@ class UrlEncoderTest {
             }
     )
     void testEncodeWhenUsingValidUrls(final String urlToEncode, final String expected) throws MalformedURLException {
-        final Optional<URL> encoded = urlEncoder.encode(new URL(urlToEncode));
+        final Mono<URL> result = urlEncoder.encode(new URL(urlToEncode));
 
-        assertTrue(encoded.isPresent());
-        assertEquals(expected, encoded.get().toString());
+        StepVerifier.create(result)
+                .consumeNextWith(resultValue -> assertEquals(expected, resultValue.toString()))
+                .verifyComplete();
     }
 
     @ParameterizedTest
@@ -41,8 +43,9 @@ class UrlEncoderTest {
             }
     )
     void testEncodeWhenUsingInvalidUrls(final String urlToEncode) throws MalformedURLException {
-        final Optional<URL> encoded = urlEncoder.encode(new URL(urlToEncode));
+        final Mono<URL> result = urlEncoder.encode(new URL(urlToEncode));
 
-        assertFalse(encoded.isPresent());
+        StepVerifier.create(result)
+                .verifyComplete();
     }
 }
