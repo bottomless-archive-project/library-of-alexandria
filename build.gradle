@@ -58,9 +58,6 @@ subprojects {
         // Spring starters
         compile('org.springframework.boot:spring-boot-starter')
 
-        // Statistics
-        compile group: 'io.micrometer', name: 'micrometer-core'
-
         // Configuration
         annotationProcessor('org.springframework.boot:spring-boot-configuration-processor')
 
