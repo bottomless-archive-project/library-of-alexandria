@@ -1,4 +1,4 @@
-package com.github.loa.downloader.command.batch.generator.commoncrawl.warc;
+package com.github.loa.downloader.command.batch.commoncrawl.path;
 
 import com.github.loa.url.service.StreamFactory;
 import lombok.RequiredArgsConstructor;

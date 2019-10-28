@@ -1,6 +1,8 @@
-package com.github.loa.downloader.command.batch;
+package com.github.loa.downloader.command.batch.commoncrawl;
 
-import com.github.loa.downloader.command.batch.generator.commoncrawl.warc.WarcPathFactory;
+import com.github.loa.downloader.command.batch.DocumentLocationFactory;
+import com.github.loa.downloader.command.batch.commoncrawl.path.WarcPathFactory;
+import com.github.loa.downloader.service.url.URLConverter;
 import com.github.loa.source.configuration.commoncrawl.CommonCrawlDocumentSourceConfiguration;
 import com.morethanheroic.warc.service.WarcRecordStreamFactory;
 import com.morethanheroic.warc.service.content.response.domain.ResponseContentBlock;
@@ -19,23 +21,29 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * A {@link DocumentLocationFactory} that generates locations for parsable items. The items are collected from the
+ * <a href="https://commoncrawl.org/the-data/get-started/">Common Crawl</a> corpus.
+ */
 @Service
 @RequiredArgsConstructor
 @ConditionalOnProperty(name = "loa.source.type", havingValue = "common-crawl")
 public class CommonCrawlDocumentLocationFactory implements DocumentLocationFactory {
 
     private final WarcPathFactory warcPathFactory;
+    private final URLConverter urlConverter;
     private final CommonCrawlDocumentSourceConfiguration commonCrawlDocumentSourceConfiguration;
 
     @Override
-    public Flux<String> streamLocations() {
+    public Flux<URL> streamLocations() {
         final List<String> paths = warcPathFactory.newPaths(commonCrawlDocumentSourceConfiguration.getCrawlId()).stream()
                 .skip(commonCrawlDocumentSourceConfiguration.getWarcId())
                 .collect(Collectors.toList());
 
         return Flux.fromIterable(paths)
                 .flatMap(warcLocation -> Flux.fromStream(() -> buildWarcRecordStream(warcLocation)))
-                .flatMap(this::handleWarcRecord);
+                .flatMap(this::handleWarcRecord)
+                .flatMap(urlConverter::execute);
     }
 
     private Stream<WarcRecord> buildWarcRecordStream(final String warcLocation) {

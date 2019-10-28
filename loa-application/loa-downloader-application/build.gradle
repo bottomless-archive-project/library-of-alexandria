@@ -12,7 +12,5 @@ dependencies {
 
     compile group: 'commons-io', name: 'commons-io', version: '2.6'
 
-    compile group: 'com.morethanheroic', name: 'java-task-force-core', version: '1.0.0'
-
     implementation 'org.hibernate.validator:hibernate-validator:6.0.17.Final'
 }

@@ -1,4 +1,4 @@
-package com.github.loa.downloader.command.batch.task;
+package com.github.loa.downloader.service.url;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -9,7 +9,7 @@ import java.net.URL;
 
 @Slf4j
 @Service
-public class DocumentLocationConverterTask {
+public class URLConverter {
 
     public Mono<URL> execute(final String recordUrl) {
         try {

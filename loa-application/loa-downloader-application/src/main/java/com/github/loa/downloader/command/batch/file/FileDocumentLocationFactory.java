@@ -1,5 +1,7 @@
-package com.github.loa.downloader.command.batch;
+package com.github.loa.downloader.command.batch.file;
 
+import com.github.loa.downloader.command.batch.DocumentLocationFactory;
+import com.github.loa.downloader.service.url.URLConverter;
 import com.github.loa.source.configuration.file.FileDocumentSourceConfiguration;
 import com.github.loa.source.service.file.FileSourceFactory;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +11,7 @@ import reactor.core.publisher.Flux;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.net.URL;
 
 @Service
 @RequiredArgsConstructor
@@ -17,12 +20,14 @@ public class FileDocumentLocationFactory implements DocumentLocationFactory {
 
     private final FileDocumentSourceConfiguration fileDocumentSourceConfiguration;
     private final FileSourceFactory fileSourceFactory;
+    private final URLConverter urlConverter;
 
     @Override
-    public Flux<String> streamLocations() {
+    public Flux<URL> streamLocations() {
         final BufferedReader reader = new BufferedReader(new InputStreamReader(fileSourceFactory.newInputStream(
                 fileDocumentSourceConfiguration.getLocation())));
 
-        return Flux.fromStream(reader.lines());
+        return Flux.fromStream(reader.lines())
+                .flatMap(urlConverter::execute);
     }
 }
