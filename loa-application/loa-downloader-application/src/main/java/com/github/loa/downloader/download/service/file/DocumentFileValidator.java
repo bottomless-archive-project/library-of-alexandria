@@ -5,6 +5,9 @@ import com.github.loa.downloader.command.configuration.DownloaderConfigurationPr
 import com.github.loa.stage.service.StageLocationFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
+
+import java.io.File;
 
 /**
  * Validates a document after it's downloaded to the staging area.
@@ -25,10 +28,10 @@ public class DocumentFileValidator {
      * @param documentId   the id of the document to validate
      * @param documentType the type of the document to validate
      */
-    public boolean isValidDocument(final String documentId, final DocumentType documentType) {
-        final long stageFileLocationSize = stageLocationFactory.getLocation(documentId, documentType).length();
-
-        return stageFileLocationSize > MINIMUM_FILE_LENGTH
-                && stageFileLocationSize < downloaderConfigurationProperties.getMaximumArchiveSize();
+    public Mono<Boolean> isValidDocument(final String documentId, final DocumentType documentType) {
+        return stageLocationFactory.getLocation(documentId, documentType)
+                .map(File::length)
+                .map(stageFileLocationSize -> stageFileLocationSize > MINIMUM_FILE_LENGTH
+                        && stageFileLocationSize < downloaderConfigurationProperties.getMaximumArchiveSize());
     }
 }

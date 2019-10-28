@@ -2,20 +2,20 @@ package com.github.loa.downloader.download.service.file;
 
 import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.document.service.domain.DocumentType;
-import com.github.loa.downloader.download.service.file.domain.FailedToArchiveException;
 import com.github.loa.stage.service.StageLocationFactory;
 import com.github.loa.vault.client.service.VaultClientService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
 
 /**
  * This service is responsible for the manipulating of document files. For example moving them to the vault or removing
  * them if necessary.
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class DocumentFileManipulator {
@@ -28,15 +28,14 @@ public class DocumentFileManipulator {
      *
      * @param documentEntity the document's id that we want to move to the vault
      */
-    public void moveToVault(final DocumentEntity documentEntity) {
-        try (final InputStream documentContents = new FileInputStream(
-                stageLocationFactory.getLocation(documentEntity))) {
-            vaultClientService.archiveDocument(documentEntity, documentContents);
-        } catch (Exception e) {
-            throw new FailedToArchiveException("Unable to move document to vault!", e);
-        }
+    public Mono<Void> moveToVault(final DocumentEntity documentEntity) {
+        log.info("Moving document to vault {}!", documentEntity);
 
-        cleanup(documentEntity);
+        return stageLocationFactory.getLocation(documentEntity)
+                .flatMap(documentLocation -> vaultClientService.archiveDocument(documentEntity, documentLocation)
+                        .thenReturn(documentLocation))
+                .map(documentLocation -> cleanup(documentEntity))
+                .then();
     }
 
     /**
@@ -44,13 +43,15 @@ public class DocumentFileManipulator {
      *
      * @param documentEntity the document to clean up after
      */
-    public void cleanup(final DocumentEntity documentEntity) {
-        cleanup(documentEntity.getId(), documentEntity.getType());
+    public Mono<Void> cleanup(final DocumentEntity documentEntity) {
+        return cleanup(documentEntity.getId(), documentEntity.getType());
     }
 
-    public void cleanup(final String documentId, final DocumentType documentType) {
-        final File stageFileLocation = stageLocationFactory.getLocation(documentId, documentType);
+    public Mono<Void> cleanup(final String documentId, final DocumentType documentType) {
+        log.debug("Cleaning up staging for document {}.", documentId);
 
-        stageFileLocation.delete();
+        return stageLocationFactory.getLocation(documentId, documentType)
+                .map(File::delete)
+                .then();
     }
 }

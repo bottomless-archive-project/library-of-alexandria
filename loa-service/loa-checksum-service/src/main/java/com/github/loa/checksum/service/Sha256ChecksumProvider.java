@@ -6,11 +6,13 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -20,14 +22,17 @@ public class Sha256ChecksumProvider implements ChecksumProvider {
     private final StageLocationFactory stageLocationFactory;
 
     @Override
-    public String checksum(final String documentId, final DocumentType documentType) {
-        final File stageFileLocation = stageLocationFactory.getLocation(documentId, documentType);
+    public Mono<String> checksum(final String documentId, final DocumentType documentType) {
+        return stageLocationFactory.getLocation(documentId, documentType)
+                .flatMap(documentLocation -> Mono.justOrEmpty(convert(documentLocation)));
+    }
 
+    private Optional<String> convert(final File documentLocation) {
         try (final BufferedInputStream documentInputStream = new BufferedInputStream(
-                new FileInputStream(stageFileLocation))) {
-            return DigestUtils.sha256Hex(documentInputStream);
+                new FileInputStream(documentLocation))) {
+            return Optional.of(DigestUtils.sha256Hex(documentInputStream));
         } catch (IOException e) {
-            throw new RuntimeException("Failed to calculate file hash!", e);
+            return Optional.empty();
         }
     }
 }

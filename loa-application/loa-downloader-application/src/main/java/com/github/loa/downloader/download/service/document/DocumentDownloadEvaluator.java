@@ -7,6 +7,7 @@ import com.github.loa.source.configuration.DocumentSourceConfiguration;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 import java.net.URL;
 
@@ -30,23 +31,25 @@ public class DocumentDownloadEvaluator {
      * @param documentLocation the location of the document
      * @return true if the document should be downloaded and processed
      */
-    public boolean evaluateDocumentLocation(final URL documentLocation) {
-        final String documentLocationId = documentLocationIdFactory.newDocumentId(documentLocation);
+    public Mono<Boolean> evaluateDocumentLocation(final URL documentLocation) {
+        final String documentId = documentLocationIdFactory.newDocumentId(documentLocation);
 
-        if (!shouldDownload(documentLocationId)) {
-            log.debug("Document location already visited: {}.", documentLocation);
+        return shouldDownload(documentId)
+                .flatMap(shouldDownloadValue -> {
+                    if (!shouldDownloadValue) {
+                        log.debug("Document location already visited: {}.", documentLocation);
 
-            return false;
-        }
-
-        documentLocationEntityFactory.newDocumentLocationEntity(documentLocationId, documentLocation,
-                downloaderConfigurationProperties.getVersionNumber(), documentSourceConfiguration.getName())
-                .subscribe();
-
-        return true;
+                        return Mono.just(false);
+                    } else {
+                        return documentLocationEntityFactory.newDocumentLocationEntity(documentId, documentLocation,
+                                downloaderConfigurationProperties.getVersionNumber(), documentSourceConfiguration.getName())
+                                .thenReturn(true);
+                    }
+                });
     }
 
-    private boolean shouldDownload(final String documentId) {
-        return !documentLocationEntityFactory.isDocumentLocationExists(documentId).block();
+    private Mono<Boolean> shouldDownload(final String documentId) {
+        return documentLocationEntityFactory.isDocumentLocationExists(documentId)
+                .map(documentExists -> !documentExists);
     }
 }

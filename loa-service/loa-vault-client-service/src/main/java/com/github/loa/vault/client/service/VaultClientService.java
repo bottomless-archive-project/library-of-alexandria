@@ -4,18 +4,19 @@ import com.github.loa.compression.domain.DocumentCompression;
 import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.vault.client.configuration.VaultClientConfigurationProperties;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-import java.io.InputStream;
+import java.io.File;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 
-import static java.net.http.HttpRequest.BodyPublishers.ofInputStream;
 import static java.net.http.HttpRequest.BodyPublishers.ofString;
 
 @Service
@@ -25,17 +26,14 @@ public class VaultClientService {
     private final VaultClientConfigurationProperties vaultClientConfigurationProperties;
     private final WebClient vaultWebClient;
 
-    public void archiveDocument(final DocumentEntity documentEntity, final InputStream documentContent) {
-        final HttpRequest request = HttpRequest.newBuilder()
+    public Mono<Void> archiveDocument(final DocumentEntity documentEntity, final File documentStageLocation) {
+        return vaultWebClient.post()
                 .uri(URI.create("http://" + vaultClientConfigurationProperties.getHost() + ":"
                         + vaultClientConfigurationProperties.getPort() + "/document/" + documentEntity.getId()))
                 .header("Content-Type", "application/json")
-                .POST(ofInputStream(() -> documentContent))
-                .build();
-
-        HttpClient.newHttpClient().sendAsync(request, HttpResponse.BodyHandlers.ofString())
-                .thenApply(HttpResponse::body)
-                .join();
+                .body(BodyInserters.fromResource(new FileSystemResource(documentStageLocation)))
+                .exchange()
+                .then();
     }
 
     public Mono<byte[]> queryDocument(final DocumentEntity documentEntity) {

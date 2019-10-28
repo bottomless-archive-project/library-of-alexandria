@@ -1,6 +1,7 @@
 package com.github.loa.checksum.service;
 
 import com.github.loa.document.service.domain.DocumentType;
+import reactor.core.publisher.Mono;
 
 /**
  * This interface is responsible for providing checksum values for documents in the stage location.
@@ -14,5 +15,5 @@ public interface ChecksumProvider {
      * @param documentType the type of the document
      * @return the checksum for the document
      */
-    String checksum(String documentId, DocumentType documentType);
+    Mono<String> checksum(String documentId, DocumentType documentType);
 }

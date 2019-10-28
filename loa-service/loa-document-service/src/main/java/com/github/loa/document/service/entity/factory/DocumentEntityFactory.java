@@ -28,8 +28,8 @@ public class DocumentEntityFactory {
      * @param fileSize the file size used for the checking
      * @return return true if a document exist with the provided parameters or false otherwise
      */
-    public boolean isDocumentExists(final String checksum, final long fileSize, final DocumentType type) {
-        return documentRepository.existsByChecksumAndFileSize(checksum, fileSize, type.name()).block();
+    public Mono<Boolean> isDocumentExists(final String checksum, final long fileSize, final DocumentType type) {
+        return documentRepository.existsByChecksumAndFileSize(checksum, fileSize, type.name());
     }
 
     public Mono<DocumentEntity> getDocumentEntity(final String documentId) {
