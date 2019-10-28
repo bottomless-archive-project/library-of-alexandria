@@ -4,6 +4,9 @@ dependencies {
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-webflux'
 
+    testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test'
+    testCompile group: 'io.projectreactor', name: 'reactor-test', version: '3.3.0.RELEASE'
+
     compile project(':loa-service:loa-document-service')
     compile project(':loa-service:loa-source-service')
     compile project(':loa-service:loa-stage-service')
