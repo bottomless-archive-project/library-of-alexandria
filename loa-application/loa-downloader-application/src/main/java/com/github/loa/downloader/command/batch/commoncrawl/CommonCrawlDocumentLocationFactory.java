@@ -1,19 +1,25 @@
 package com.github.loa.downloader.command.batch.commoncrawl;
 
 import com.github.loa.downloader.command.batch.DocumentLocationFactory;
-import com.github.loa.source.cc.service.WarcPathFactory;
+import com.github.loa.downloader.download.service.file.FileDownloader;
 import com.github.loa.downloader.service.url.URLConverter;
 import com.github.loa.source.cc.configuration.CommonCrawlDocumentSourceConfiguration;
+import com.github.loa.source.cc.service.WarcPathFactory;
+import com.github.loa.stage.configuration.StageConfigurationProperties;
 import com.morethanheroic.warc.service.WarcRecordStreamFactory;
 import com.morethanheroic.warc.service.content.response.domain.ResponseContentBlock;
 import com.morethanheroic.warc.service.record.domain.WarcRecord;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -25,6 +31,7 @@ import java.util.stream.Stream;
  * A {@link DocumentLocationFactory} that generates locations for parsable items. The items are collected from the
  * <a href="https://commoncrawl.org/the-data/get-started/">Common Crawl</a> corpus.
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @ConditionalOnProperty(name = "loa.source.type", havingValue = "common-crawl")
@@ -32,7 +39,9 @@ public class CommonCrawlDocumentLocationFactory implements DocumentLocationFacto
 
     private final WarcPathFactory warcPathFactory;
     private final URLConverter urlConverter;
+    private final FileDownloader fileDownloader;
     private final CommonCrawlDocumentSourceConfiguration commonCrawlDocumentSourceConfiguration;
+    private final StageConfigurationProperties stageConfigurationProperties;
 
     //TODO: Move these things to it's own service!
     @Override
@@ -42,14 +51,25 @@ public class CommonCrawlDocumentLocationFactory implements DocumentLocationFacto
                 .collect(Collectors.toList());
 
         return Flux.fromIterable(paths)
+                .flatMap(warcLocation -> {
+                    log.info("Started to download warc file!");
+
+                    // Blocking is usually bad in a flux, but here we need it to stop the WebClient from async
+                    // downloading.
+                    fileDownloader.downloadFile(buildWarcLocation(warcLocation),
+                            new File(stageConfigurationProperties.getLocation(), "under-progress.warc"))
+                            .block();
+
+                    return Mono.just(new File(stageConfigurationProperties.getLocation(), "under-progress.warc"));
+                })
                 .flatMap(warcLocation -> Flux.fromStream(() -> buildWarcRecordStream(warcLocation)))
                 .flatMap(this::handleWarcRecord)
                 .flatMap(urlConverter::execute);
     }
 
-    private Stream<WarcRecord> buildWarcRecordStream(final String warcLocation) {
+    private Stream<WarcRecord> buildWarcRecordStream(final File warcLocation) {
         try {
-            return WarcRecordStreamFactory.streamOf(buildWarcLocation(warcLocation))
+            return WarcRecordStreamFactory.streamOf(new FileInputStream(warcLocation))
                     .filter(WarcRecord::isResponse);
         } catch (IOException e) {
             throw new RuntimeException(e);
