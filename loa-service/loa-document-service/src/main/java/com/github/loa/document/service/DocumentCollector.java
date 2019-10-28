@@ -1,5 +1,6 @@
 package com.github.loa.document.service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.loa.document.service.domain.DocumentEntity;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +17,9 @@ import java.util.Set;
 @Slf4j
 public class DocumentCollector {
 
+    private static final TypeReference<Set<String>> DOCUMENT_TYPE_REFERENCE = new TypeReference<>() {
+    };
+
     private final File documentCollectionLocation;
     private final ObjectMapper objectMapper;
 
@@ -28,7 +32,8 @@ public class DocumentCollector {
 
         if (documentCollectionLocation.exists()) {
             try {
-                final Set<String> documents = objectMapper.readValue(documentCollectionLocation, Set.class);
+                final Set<String> documents = objectMapper.readValue(documentCollectionLocation,
+                        DOCUMENT_TYPE_REFERENCE);
 
                 sets.addAll(documents);
 

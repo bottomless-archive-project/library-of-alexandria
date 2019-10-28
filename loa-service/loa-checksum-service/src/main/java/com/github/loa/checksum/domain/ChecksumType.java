@@ -5,5 +5,8 @@ package com.github.loa.checksum.domain;
  */
 public enum ChecksumType {
 
+    /**
+     * @see <a href="https://en.wikipedia.org/wiki/SHA-2">https://en.wikipedia.org/wiki/SHA-2</a>
+     */
     SHA256
 }

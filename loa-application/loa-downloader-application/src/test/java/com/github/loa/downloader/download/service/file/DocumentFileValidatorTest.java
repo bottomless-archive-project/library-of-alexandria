@@ -17,7 +17,7 @@ class DocumentFileValidatorTest {
     private final static String DOCUMENT_ID = "123";
     private final static DocumentType DOCUMENT_TYPE = DocumentType.DOC;
 
-    private DownloaderConfigurationProperties downloaderConfigurationProperties =
+    private final DownloaderConfigurationProperties downloaderConfigurationProperties =
             new DownloaderConfigurationProperties();
 
     private StageLocationFactory stageLocationFactory;
