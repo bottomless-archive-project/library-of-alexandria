@@ -1,4 +1,4 @@
-package com.github.loa.source.service.file.domain;
+package com.github.loa.source.file.service.domain;
 
 public enum FileEncodingType {
 

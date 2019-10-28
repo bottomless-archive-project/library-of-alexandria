@@ -1,7 +1,7 @@
-package com.github.loa.source.service.file;
+package com.github.loa.source.file.service;
 
 import com.github.loa.source.configuration.file.FileDocumentSourceConfiguration;
-import com.github.loa.source.service.file.domain.FileEncodingType;
+import com.github.loa.source.file.service.domain.FileEncodingType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

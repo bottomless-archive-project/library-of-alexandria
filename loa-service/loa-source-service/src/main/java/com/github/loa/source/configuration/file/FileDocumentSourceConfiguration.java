@@ -1,6 +1,6 @@
 package com.github.loa.source.configuration.file;
 
-import com.github.loa.source.service.file.domain.FileEncodingType;
+import com.github.loa.source.file.service.domain.FileEncodingType;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;

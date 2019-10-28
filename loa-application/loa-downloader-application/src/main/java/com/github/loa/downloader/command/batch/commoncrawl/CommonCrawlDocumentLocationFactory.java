@@ -1,7 +1,7 @@
 package com.github.loa.downloader.command.batch.commoncrawl;
 
 import com.github.loa.downloader.command.batch.DocumentLocationFactory;
-import com.github.loa.downloader.command.batch.commoncrawl.path.WarcPathFactory;
+import com.github.loa.source.cc.service.WarcPathFactory;
 import com.github.loa.downloader.service.url.URLConverter;
 import com.github.loa.source.configuration.commoncrawl.CommonCrawlDocumentSourceConfiguration;
 import com.morethanheroic.warc.service.WarcRecordStreamFactory;
@@ -34,6 +34,7 @@ public class CommonCrawlDocumentLocationFactory implements DocumentLocationFacto
     private final URLConverter urlConverter;
     private final CommonCrawlDocumentSourceConfiguration commonCrawlDocumentSourceConfiguration;
 
+    //TODO: Move these things to it's own service!
     @Override
     public Flux<URL> streamLocations() {
         final List<String> paths = warcPathFactory.newPaths(commonCrawlDocumentSourceConfiguration.getCrawlId()).stream()

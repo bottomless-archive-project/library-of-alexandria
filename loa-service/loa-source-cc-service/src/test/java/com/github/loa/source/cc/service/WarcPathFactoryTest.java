@@ -1,4 +1,4 @@
-package com.github.loa.downloader.command.batch.commoncrawl.path;
+package com.github.loa.source.cc.service;
 
 import com.github.loa.url.service.StreamFactory;
 import org.junit.jupiter.api.BeforeEach;
