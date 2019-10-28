@@ -3,7 +3,7 @@ package com.github.loa.downloader.command.batch.commoncrawl;
 import com.github.loa.downloader.command.batch.DocumentLocationFactory;
 import com.github.loa.source.cc.service.WarcPathFactory;
 import com.github.loa.downloader.service.url.URLConverter;
-import com.github.loa.source.configuration.commoncrawl.CommonCrawlDocumentSourceConfiguration;
+import com.github.loa.source.cc.configuration.CommonCrawlDocumentSourceConfiguration;
 import com.morethanheroic.warc.service.WarcRecordStreamFactory;
 import com.morethanheroic.warc.service.content.response.domain.ResponseContentBlock;
 import com.morethanheroic.warc.service.record.domain.WarcRecord;

@@ -2,7 +2,7 @@ package com.github.loa.downloader.command.batch.file;
 
 import com.github.loa.downloader.command.batch.DocumentLocationFactory;
 import com.github.loa.downloader.service.url.URLConverter;
-import com.github.loa.source.configuration.file.FileDocumentSourceConfiguration;
+import com.github.loa.source.file.configuration.FileDocumentSourceConfiguration;
 import com.github.loa.source.file.service.FileSourceFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;

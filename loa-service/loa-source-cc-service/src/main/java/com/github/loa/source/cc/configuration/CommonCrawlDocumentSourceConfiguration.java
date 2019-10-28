@@ -1,4 +1,4 @@
-package com.github.loa.source.configuration.commoncrawl;
+package com.github.loa.source.cc.configuration;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
