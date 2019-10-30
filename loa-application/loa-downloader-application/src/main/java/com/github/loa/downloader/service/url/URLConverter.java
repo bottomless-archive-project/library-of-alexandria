@@ -11,13 +11,21 @@ import java.net.URL;
 @Service
 public class URLConverter {
 
-    public Mono<URL> execute(final String recordUrl) {
+    public Mono<URL> convert(final String recordUrl) {
         try {
             return Mono.just(new URL(recordUrl));
         } catch (MalformedURLException e) {
             log.debug("Unable to parse url with location: " + recordUrl, e);
 
             return Mono.empty();
+        }
+    }
+
+    public Mono<URL> convertOrThrow(final String recordUrl) {
+        try {
+            return Mono.just(new URL(recordUrl));
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("Unable to parse url with location: " + recordUrl, e);
         }
     }
 }

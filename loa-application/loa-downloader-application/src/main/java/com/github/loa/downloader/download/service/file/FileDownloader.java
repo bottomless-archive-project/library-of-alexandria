@@ -37,8 +37,10 @@ public class FileDownloader {
                     .bodyToFlux(DataBuffer.class)
                     .onErrorReturn(defaultDataBufferFactory.allocateBuffer(0));
 
-            return DataBufferUtils.write(inputStream, resultLocation.toPath())
-                    .thenReturn(resultLocation);
+            DataBufferUtils.write(inputStream, resultLocation.toPath())
+                    .block();
+
+            return Mono.just(resultLocation);
         } catch (URISyntaxException e) {
             return Mono.empty();
         }

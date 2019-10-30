@@ -28,6 +28,6 @@ public class FileDocumentLocationFactory implements DocumentLocationFactory {
                 fileDocumentSourceConfiguration.getLocation())));
 
         return Flux.fromStream(reader.lines())
-                .flatMap(urlConverter::execute);
+                .flatMap(urlConverter::convert);
     }
 }
