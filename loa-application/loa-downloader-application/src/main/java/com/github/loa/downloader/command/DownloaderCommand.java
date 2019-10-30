@@ -25,7 +25,7 @@ public class DownloaderCommand implements CommandLineRunner {
 
         documentLocationFactory.streamLocations()
                 .filter(documentLocationValidator::validDocumentLocation)
-                .flatMap(urlEncoder::encode, 5)
+                .flatMap(urlEncoder::encode)
                 .distinct()
                 .flatMap(documentDownloader::downloadDocument)
                 .subscribe();
