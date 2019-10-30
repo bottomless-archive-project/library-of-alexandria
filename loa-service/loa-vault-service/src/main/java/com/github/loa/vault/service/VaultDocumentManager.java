@@ -62,7 +62,9 @@ public class VaultDocumentManager {
                     IOUtils.copy(documentContents, outputStream);
                 }
             } else {
-                IOUtils.copy(documentContents, vaultLocation.destination());
+                try (final OutputStream outputStream = vaultLocation.destination()) {
+                    IOUtils.copy(documentContents, outputStream);
+                }
             }
         } catch (IOException e) {
             throw new VaultAccessException("Unable to move document with id " + documentEntity.getId()
