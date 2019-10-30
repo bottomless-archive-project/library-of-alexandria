@@ -4,6 +4,7 @@ import com.github.loa.compression.domain.DocumentCompression;
 import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.vault.client.configuration.VaultClientConfigurationProperties;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
@@ -19,6 +20,7 @@ import java.time.Duration;
 
 import static java.net.http.HttpRequest.BodyPublishers.ofString;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class VaultClientService {
@@ -27,12 +29,16 @@ public class VaultClientService {
     private final WebClient vaultWebClient;
 
     public Mono<Void> archiveDocument(final DocumentEntity documentEntity, final File documentStageLocation) {
-        return vaultWebClient.post()
+        vaultWebClient.post()
                 .uri(URI.create("http://" + vaultClientConfigurationProperties.getHost() + ":"
                         + vaultClientConfigurationProperties.getPort() + "/document/" + documentEntity.getId()))
                 .header("Content-Type", "application/json")
                 .body(BodyInserters.fromResource(new FileSystemResource(documentStageLocation)))
-                .exchange()
+                .retrieve()
+                .bodyToMono(Void.class)
+                .block();
+
+        return Mono.empty()
                 .then();
     }
 

@@ -19,13 +19,13 @@ public class FileCollector {
     private final FileCopier fileCopier;
     private final FileDownloader fileDownloader;
 
-    public Mono<File> acquireFile(final URL fileLocation, final File resultLocation) {
+    public Mono<File> acquireFile(final URL fileLocation, final File resultLocation, final boolean fileAllowed) {
         final String protocol = fileLocation.getProtocol();
 
-        if ("file".equals(protocol)) {
+        if (fileAllowed && "file".equals(protocol)) {
             try {
                 return fileCopier.copyFile(Paths.get(fileLocation.toURI()).toFile(), resultLocation);
-            } catch (URISyntaxException e) {
+            } catch (URISyntaxException | IllegalArgumentException e) {
                 throw new RuntimeException("Unable to copy file: " + fileLocation);
             }
         } else if ("http".equals(protocol) || "https".equals(protocol)) {

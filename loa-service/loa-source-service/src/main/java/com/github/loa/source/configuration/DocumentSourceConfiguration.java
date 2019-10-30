@@ -12,4 +12,8 @@ public class DocumentSourceConfiguration {
 
     private String name;
     private DocumentSourceType type;
+
+    public boolean isFolderDocumentSource() {
+        return type == DocumentSourceType.FOLDER;
+    }
 }

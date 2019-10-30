@@ -34,7 +34,7 @@ public class DocumentFileManipulator {
         return stageLocationFactory.getLocation(documentEntity)
                 .flatMap(documentLocation -> vaultClientService.archiveDocument(documentEntity, documentLocation)
                         .thenReturn(documentLocation))
-                .map(documentLocation -> cleanup(documentEntity))
+                .flatMap(documentLocation -> cleanup(documentEntity))
                 .then();
     }
 

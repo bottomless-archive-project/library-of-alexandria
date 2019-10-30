@@ -11,6 +11,7 @@ import com.github.loa.downloader.command.configuration.DownloaderConfigurationPr
 import com.github.loa.downloader.download.service.file.DocumentFileManipulator;
 import com.github.loa.downloader.download.service.file.DocumentFileValidator;
 import com.github.loa.downloader.download.service.file.FileCollector;
+import com.github.loa.source.configuration.DocumentSourceConfiguration;
 import com.github.loa.stage.service.StageLocationFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,6 +40,7 @@ public class DocumentDownloader {
     private final DownloaderConfigurationProperties downloaderConfigurationProperties;
     private final CompressionConfigurationProperties compressionConfigurationProperties;
     private final FileCollector fileCollector;
+    private final DocumentSourceConfiguration documentSourceConfiguration;
 
     public Mono<Void> downloadDocument(final URL documentLocation) {
         log.debug("Starting to download document {}.", documentLocation);
@@ -55,7 +57,8 @@ public class DocumentDownloader {
                                         + documentLocation));
 
                         return stageLocationFactory.getLocation(documentId, documentType)
-                                .flatMap(stageFileLocation -> fileCollector.acquireFile(documentLocation, stageFileLocation))
+                                .flatMap(stageFileLocation -> fileCollector.acquireFile(documentLocation, stageFileLocation,
+                                        documentSourceConfiguration.isFolderDocumentSource()))
                                 .flatMap(documentFileLocation -> documentFileValidator.isValidDocument(documentId, documentType)
                                         .filter(validationResult -> !validationResult)
                                         .flatMap(validationResult -> documentFileManipulator.cleanup(documentId, documentType))
