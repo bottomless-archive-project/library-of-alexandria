@@ -59,8 +59,8 @@ public class DocumentManipulator {
      * @param documentId          the id of the document to update the status for
      * @param documentCompression the new compression of the document
      */
-    public void updateCompression(final String documentId, final DocumentCompression documentCompression) {
-        documentRepository.updateCompression(documentId, documentCompression.toString());
+    public Mono<Void> updateCompression(final String documentId, final DocumentCompression documentCompression) {
+        return documentRepository.updateCompression(documentId, documentCompression.toString());
     }
 
     /**

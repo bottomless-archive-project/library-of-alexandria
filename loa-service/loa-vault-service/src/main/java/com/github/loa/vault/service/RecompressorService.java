@@ -30,10 +30,10 @@ public class RecompressorService {
                 .getInputStream()) {
             final byte[] documentContent = documentContentInputStream.readAllBytes();
 
-            vaultDocumentManager.removeDocument(documentEntity);
+            vaultDocumentManager.removeDocument(documentEntity).subscribe();
             vaultDocumentManager.archiveDocument(documentEntity, new ByteArrayResource(documentContent));
 
-            documentManipulator.updateCompression(documentEntity.getId(), documentCompression);
+            documentManipulator.updateCompression(documentEntity.getId(), documentCompression).subscribe();
         } catch (IOException e) {
             throw new RuntimeException("Unable to base64 encode document " + documentEntity.getId() + "!", e);
         }

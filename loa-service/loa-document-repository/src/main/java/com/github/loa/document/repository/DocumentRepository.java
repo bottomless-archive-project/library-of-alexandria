@@ -42,14 +42,14 @@ public class DocumentRepository {
         return mongoTemplate.updateFirst(query, Update.update("status", status), DocumentDatabaseEntity.class).then();
     }
 
-    public void updateCompression(final String documentId, final String compression) {
+    public Mono<Void> updateCompression(final String documentId, final String compression) {
         final Query query = Query
                 .query(
                         Criteria.where("id").is(documentId)
                 );
 
-        mongoTemplate.updateFirst(query, Update.update("compression", compression), DocumentDatabaseEntity.class)
-                .subscribe();
+        return mongoTemplate.updateFirst(query, Update.update("compression", compression), DocumentDatabaseEntity.class)
+                .then();
     }
 
     public Mono<Boolean> existsByChecksumAndFileSize(final String checksum, final long fileSize,
