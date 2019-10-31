@@ -1,4 +1,4 @@
-package com.github.loa.vault.service.location.domain;
+package com.github.loa.vault.service.location;
 
 import java.io.Closeable;
 import java.io.File;

@@ -1,7 +1,7 @@
 package com.github.loa.vault.service.location.file.domain;
 
 import com.github.loa.vault.domain.exception.VaultAccessException;
-import com.github.loa.vault.service.location.domain.VaultLocation;
+import com.github.loa.vault.service.location.VaultLocation;
 import lombok.RequiredArgsConstructor;
 
 import java.io.*;

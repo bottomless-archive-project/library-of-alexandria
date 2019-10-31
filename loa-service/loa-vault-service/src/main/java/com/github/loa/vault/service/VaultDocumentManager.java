@@ -6,7 +6,7 @@ import com.github.loa.compression.service.provider.CompressionServiceProvider;
 import com.github.loa.document.service.DocumentManipulator;
 import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.vault.domain.exception.VaultAccessException;
-import com.github.loa.vault.service.location.domain.VaultLocation;
+import com.github.loa.vault.service.location.VaultLocation;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
 import org.springframework.core.io.InputStreamResource;
