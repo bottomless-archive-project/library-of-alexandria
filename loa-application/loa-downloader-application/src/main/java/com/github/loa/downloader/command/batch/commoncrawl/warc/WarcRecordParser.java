@@ -19,7 +19,7 @@ public class WarcRecordParser {
             final Document document = Jsoup.parse(contentString, warcRecordUrl);
 
             return Flux.fromStream(() -> document.select("a").stream()
-                    .map(element -> element.attr("abs:href"))
+                    .map(element -> element.absUrl("href"))
                     .filter(url -> !url.isEmpty()));
         } catch (Exception e) {
             return Flux.empty();
