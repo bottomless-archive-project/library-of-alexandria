@@ -1,6 +1,6 @@
-package com.github.loa.downloader.command.batch.file;
+package com.github.loa.generator.command.batch.file;
 
-import com.github.loa.downloader.command.batch.DocumentLocationFactory;
+import com.github.loa.generator.command.batch.DocumentLocationFactory;
 import com.github.loa.downloader.service.url.URLConverter;
 import com.github.loa.source.file.configuration.FileDocumentSourceConfiguration;
 import com.github.loa.source.file.service.FileSourceFactory;

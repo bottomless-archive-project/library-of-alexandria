@@ -1,4 +1,4 @@
-package com.github.loa.downloader.command.batch.commoncrawl.warc;
+package com.github.loa.generator.command.batch.commoncrawl.warc;
 
 import com.github.loa.downloader.download.service.file.FileDownloader;
 import com.github.loa.downloader.service.url.URLConverter;

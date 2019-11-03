@@ -1,9 +1,9 @@
-package com.github.loa.downloader.command.batch.commoncrawl;
+package com.github.loa.generator.command.batch.commoncrawl;
 
-import com.github.loa.downloader.command.batch.DocumentLocationFactory;
-import com.github.loa.downloader.command.batch.commoncrawl.warc.WarcDownloader;
-import com.github.loa.downloader.command.batch.commoncrawl.warc.WarcFluxFactory;
-import com.github.loa.downloader.command.batch.commoncrawl.warc.WarcRecordParser;
+import com.github.loa.generator.command.batch.DocumentLocationFactory;
+import com.github.loa.generator.command.batch.commoncrawl.warc.WarcDownloader;
+import com.github.loa.generator.command.batch.commoncrawl.warc.WarcFluxFactory;
+import com.github.loa.generator.command.batch.commoncrawl.warc.WarcRecordParser;
 import com.github.loa.downloader.service.url.URLConverter;
 import com.github.loa.source.cc.configuration.CommonCrawlDocumentSourceConfiguration;
 import com.github.loa.source.cc.service.WarcPathFactory;

@@ -1,4 +1,4 @@
-package com.github.loa.downloader.command.batch;
+package com.github.loa.generator.command.batch;
 
 import reactor.core.publisher.Flux;
 

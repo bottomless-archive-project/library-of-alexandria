@@ -1,6 +1,6 @@
-package com.github.loa.downloader.command.batch.folder;
+package com.github.loa.generator.command.batch.folder;
 
-import com.github.loa.downloader.command.batch.DocumentLocationFactory;
+import com.github.loa.generator.command.batch.DocumentLocationFactory;
 import com.github.loa.source.folder.configuration.FolderDocumentSourceConfiguration;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;

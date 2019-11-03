@@ -1,4 +1,4 @@
-package com.github.loa.downloader.command.batch.commoncrawl.warc;
+package com.github.loa.generator.command.batch.commoncrawl.warc;
 
 import com.morethanheroic.warc.service.WarcRecordStreamFactory;
 import com.morethanheroic.warc.service.record.domain.WarcRecord;
