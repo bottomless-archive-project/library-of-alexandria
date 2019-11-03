@@ -1,7 +1,7 @@
 package com.github.loa.generator.command;
 
 import com.github.loa.document.service.location.DocumentLocationValidator;
-import com.github.loa.downloader.command.batch.DocumentLocationFactory;
+import com.github.loa.generator.command.batch.DocumentLocationFactory;
 import com.github.loa.url.service.UrlEncoder;
 
 import lombok.RequiredArgsConstructor;
@@ -25,6 +25,7 @@ public class GeneratorCommand implements CommandLineRunner {
         documentLocationFactory.streamLocations()
                 .filter(documentLocationValidator::validDocumentLocation)
                 .flatMap(urlEncoder::encode)
-                .distinct();
+                .distinct()
+                .doOnEach(System.out::println);
     }
 }
