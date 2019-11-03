@@ -1,4 +1,4 @@
-package com.github.loa.downloader.download.service.file;
+package com.github.loa.url.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

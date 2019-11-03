@@ -5,21 +5,20 @@ import com.morethanheroic.warc.service.record.domain.WarcRecord;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URL;
 import java.util.stream.Stream;
 
 @Service
 public class WarcFluxFactory {
 
-    public Flux<WarcRecord> buildWarcRecordFlux(final File warcLocation) {
+    public Flux<WarcRecord> buildWarcRecordFlux(final URL warcLocation) {
         return Flux.fromStream(() -> buildWarcRecordStream(warcLocation));
     }
 
-    private Stream<WarcRecord> buildWarcRecordStream(final File warcLocation) {
+    private Stream<WarcRecord> buildWarcRecordStream(final URL warcLocation) {
         try {
-            return WarcRecordStreamFactory.streamOf(new FileInputStream(warcLocation))
+            return WarcRecordStreamFactory.streamOf(warcLocation)
                     .filter(WarcRecord::isResponse);
         } catch (IOException e) {
             throw new RuntimeException(e);

@@ -1,9 +1,7 @@
 dependencies {
     compile group: 'org.elasticsearch.client', name: 'elasticsearch-rest-high-level-client'
 
-    compile group: 'com.fasterxml.jackson.core', name: 'jackson-core'
-    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind'
-    compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-json'
 
     compile project(':loa-service:loa-document-service')
     compile project(':loa-service:loa-vault-client-service')

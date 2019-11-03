@@ -1,5 +1,6 @@
 package com.github.loa.downloader.download.service.file;
 
+import com.github.loa.url.service.FileDownloader;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;

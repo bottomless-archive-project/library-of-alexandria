@@ -26,6 +26,7 @@ public class GeneratorCommand implements CommandLineRunner {
                 .filter(documentLocationValidator::validDocumentLocation)
                 .flatMap(urlEncoder::encode)
                 .distinct()
-                .doOnEach(System.out::println);
+                //.doOnNext(System.out::println)
+                .subscribe();
     }
 }

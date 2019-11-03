@@ -1,9 +1,9 @@
 package com.github.loa.generator.command.batch.file;
 
 import com.github.loa.generator.command.batch.DocumentLocationFactory;
-import com.github.loa.downloader.service.url.URLConverter;
 import com.github.loa.source.file.configuration.FileDocumentSourceConfiguration;
 import com.github.loa.source.file.service.FileSourceFactory;
+import com.github.loa.url.service.URLConverter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
