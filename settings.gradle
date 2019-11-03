@@ -5,6 +5,7 @@ include 'loa-application:loa-web-application'
 include 'loa-application:loa-administrator-application'
 include 'loa-application:loa-indexer-application'
 include 'loa-application:loa-vault-application'
+include 'loa-application:loa-generator-application'
 
 include 'loa-service:loa-document-service'
 include 'loa-service:loa-document-repository'
