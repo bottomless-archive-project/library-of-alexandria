@@ -27,7 +27,6 @@ public class GeneratorCommand implements CommandLineRunner {
         documentLocationFactory.streamLocations()
                 .filter(documentLocationValidator::validDocumentLocation)
                 .flatMap(urlEncoder::encode)
-                .distinct()
                 .doOnNext(url -> jmsTemplate.convertAndSend("loa.downloader", url))
                 .subscribe();
     }
