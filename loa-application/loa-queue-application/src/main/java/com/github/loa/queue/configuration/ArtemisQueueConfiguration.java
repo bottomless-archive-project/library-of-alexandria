@@ -11,7 +11,8 @@ public class ArtemisQueueConfiguration implements ArtemisConfigurationCustomizer
 
     @Override
     public void customize(final org.apache.activemq.artemis.core.config.Configuration configuration) {
-        configuration.addConnectorConfiguration("netty-connector", new TransportConfiguration(NettyConnectorFactory.class.getName()));
+        configuration.addConnectorConfiguration("netty-connector", new TransportConfiguration(
+                NettyConnectorFactory.class.getName()));
         configuration.addAcceptorConfiguration(new TransportConfiguration(NettyAcceptorFactory.class.getName()));
     }
 }

@@ -2,27 +2,32 @@ package com.github.loa.generator.command.batch.commoncrawl.warc;
 
 import com.morethanheroic.warc.service.content.response.domain.ResponseContentBlock;
 import com.morethanheroic.warc.service.record.domain.WarcRecord;
+import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
+@Slf4j
 @Service
 public class WarcRecordParser {
 
     public Flux<String> parseUrlsFromRecord(final WarcRecord warcRecord) {
-        // All information should be read from the stream before doing parallel processing!
         final String warcRecordUrl = warcRecord.getHeader("WARC-Target-URI");
         final String contentString = ((ResponseContentBlock) warcRecord.getWarcContentBlock()).getPayloadAsString();
 
-        try {
-            final Document document = Jsoup.parse(contentString, warcRecordUrl);
+        return Mono.fromSupplier(() -> parseDocument(warcRecordUrl, contentString))
+                .flatMapIterable(document -> document.select("a"))
+                .map(element -> element.absUrl("href"))
+                .filter(url -> !url.isEmpty());
+    }
 
-            return Flux.fromStream(() -> document.select("a").stream()
-                    .map(element -> element.absUrl("href"))
-                    .filter(url -> !url.isEmpty()));
+    private Document parseDocument(final String warcRecordUrl, final String contentString) {
+        try {
+            return Jsoup.parse(contentString, warcRecordUrl);
         } catch (Exception e) {
-            return Flux.empty();
+            return null;
         }
     }
 }
