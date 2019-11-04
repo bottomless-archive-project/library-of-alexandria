@@ -7,6 +7,7 @@ import com.github.loa.url.service.UrlEncoder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -17,6 +18,7 @@ public class GeneratorCommand implements CommandLineRunner {
     private final DocumentLocationFactory documentLocationFactory;
     private final DocumentLocationValidator documentLocationValidator;
     private final UrlEncoder urlEncoder;
+    private final JmsTemplate jmsTemplate;
 
     @Override
     public void run(final String... args) {
@@ -26,7 +28,7 @@ public class GeneratorCommand implements CommandLineRunner {
                 .filter(documentLocationValidator::validDocumentLocation)
                 .flatMap(urlEncoder::encode)
                 .distinct()
-                //.doOnNext(System.out::println)
+                .doOnNext(url -> jmsTemplate.convertAndSend("loa.downloader", url))
                 .subscribe();
     }
 }
