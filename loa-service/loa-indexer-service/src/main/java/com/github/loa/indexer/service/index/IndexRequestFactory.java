@@ -31,6 +31,10 @@ public class IndexRequestFactory {
             sourceContent.put("date", documentMetadata.getDate().trim());
         }
 
+        if (documentMetadata.getLanguage() != null && !documentMetadata.getLanguage().isBlank()) {
+            sourceContent.put("language", documentMetadata.getLanguage().trim());
+        }
+
         sourceContent.put("page_count", documentMetadata.getPageCount());
 
         return Mono.just(
