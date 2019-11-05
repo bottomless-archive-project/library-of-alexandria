@@ -1,13 +1,13 @@
 package com.github.loa.indexer.service;
 
 import com.github.loa.document.service.domain.DocumentEntity;
-import com.github.loa.indexer.command.DocumentParser;
 import com.github.loa.indexer.service.index.domain.DocumentMetadata;
 import com.github.loa.vault.client.service.VaultClientService;
 import com.github.pemistahl.lingua.api.Language;
 import com.github.pemistahl.lingua.api.LanguageDetector;
 import com.github.pemistahl.lingua.api.LanguageDetectorBuilder;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.metadata.Metadata;
@@ -24,18 +24,19 @@ import reactor.core.publisher.Mono;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class DocumentDataParser {
 
-    private final DocumentParser documentParser;
     private final VaultClientService vaultClientService;
     //TODO: This should come from a config!
     private final LanguageDetector languageDetector = LanguageDetectorBuilder.fromAllBuiltInLanguages().build();
 
     public Mono<DocumentMetadata> parseDocumentData(final DocumentEntity documentEntity) {
         return vaultClientService.queryDocument(documentEntity)
-                .map(documentContent -> parseDocumentMetadata(documentEntity, documentContent));
+                .map(documentContent -> parseDocumentMetadata(documentEntity, documentContent))
+                .onErrorContinue((throwable, document) -> log.debug("Failed to parse document!", throwable));
     }
 
     private DocumentMetadata parseDocumentMetadata(final DocumentEntity documentEntity, final byte[] documentContents) {
@@ -52,9 +53,13 @@ public class DocumentDataParser {
 
         int pageCount = 0;
         if (documentEntity.isPdf()) {
-            try (final PDDocument pdDocument = documentParser.parseDocument(documentContents)) {
+            try (final PDDocument pdDocument = PDDocument.load(documentContents)) {
                 pageCount = pdDocument.getNumberOfPages();
             } catch (IOException e) {
+                log.info("Removing document {} because of a parse failure.", documentEntity.getId(), e);
+
+                vaultClientService.removeDocument(documentEntity).subscribe();
+
                 throw new RuntimeException(e);
             }
         }

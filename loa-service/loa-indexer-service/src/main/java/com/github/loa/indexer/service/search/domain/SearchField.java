@@ -13,17 +13,17 @@ public enum SearchField {
     /**
      * The content of the document.
      */
-    CONTENT("attachment.content"),
+    CONTENT("content"),
 
     /**
      * The language of the document.
      */
-    LANGUAGE("attachment.language"),
+    LANGUAGE("language"),
 
     /**
      * The type of the document.
      */
-    DOCUMENT_TYPE("attachment.content_type"),
+    DOCUMENT_TYPE("type"),
 
     /**
      * The page count of the document.
