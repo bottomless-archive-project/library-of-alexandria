@@ -15,6 +15,7 @@ public class DocumentCreationContext {
     private final String id;
     private final DocumentType type;
     private final URL location;
+    private final String source;
     private final String checksum;
     private final long fileSize;
     private final DocumentStatus status;

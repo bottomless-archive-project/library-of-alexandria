@@ -24,6 +24,7 @@ public class DocumentDatabaseEntity {
     private String id;
     private String type;
     private String status;
+    private String source;
     private String compression;
     private String checksum;
     private long fileSize;

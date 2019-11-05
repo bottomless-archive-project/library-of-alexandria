@@ -79,6 +79,7 @@ public class DocumentEntityFactory {
         documentDatabaseEntity.setDownloaderVersion(documentCreationContext.getVersionNumber());
         documentDatabaseEntity.setCompression(documentCreationContext.getCompression().name());
         documentDatabaseEntity.setDownloadDate(Instant.now());
+        documentDatabaseEntity.setSource(documentCreationContext.getSource());
 
         return documentRepository.insertDocument(documentDatabaseEntity)
                 .map(documentEntityTransformer::transform);

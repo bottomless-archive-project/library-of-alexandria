@@ -2,8 +2,8 @@ package com.github.loa.generator.command;
 
 import com.github.loa.document.service.location.DocumentLocationValidator;
 import com.github.loa.generator.command.batch.DocumentLocationFactory;
+import com.github.loa.source.service.DocumentSourceItemFactory;
 import com.github.loa.url.service.UrlEncoder;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
@@ -17,6 +17,7 @@ public class GeneratorCommand implements CommandLineRunner {
 
     private final DocumentLocationFactory documentLocationFactory;
     private final DocumentLocationValidator documentLocationValidator;
+    private final DocumentSourceItemFactory documentSourceItemFactory;
     private final UrlEncoder urlEncoder;
     private final JmsTemplate jmsTemplate;
 
@@ -27,7 +28,9 @@ public class GeneratorCommand implements CommandLineRunner {
         documentLocationFactory.streamLocations()
                 .filter(documentLocationValidator::validDocumentLocation)
                 .flatMap(urlEncoder::encode)
-                .doOnNext(url -> jmsTemplate.convertAndSend("loa.downloader", url))
+                .map(documentSourceItemFactory::newDocumentSourceItem)
+                .doOnNext(documentSourceItem ->
+                        jmsTemplate.convertAndSend("loa.downloader", documentSourceItem))
                 .subscribe();
     }
 }

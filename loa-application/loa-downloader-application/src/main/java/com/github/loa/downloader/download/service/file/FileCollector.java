@@ -17,19 +17,12 @@ import java.nio.file.Paths;
 @RequiredArgsConstructor
 public class FileCollector {
 
-    private final FileCopier fileCopier;
     private final FileDownloader fileDownloader;
 
-    public Mono<File> acquireFile(final URL fileLocation, final File resultLocation, final boolean fileAllowed) {
+    public Mono<File> acquireFile(final URL fileLocation, final File resultLocation) {
         final String protocol = fileLocation.getProtocol();
 
-        if (fileAllowed && "file".equals(protocol)) {
-            try {
-                return fileCopier.copyFile(Paths.get(fileLocation.toURI()).toFile(), resultLocation);
-            } catch (URISyntaxException | IllegalArgumentException e) {
-                throw new RuntimeException("Unable to copy file: " + fileLocation);
-            }
-        } else if ("http".equals(protocol) || "https".equals(protocol)) {
+        if ("http".equals(protocol) || "https".equals(protocol)) {
             return fileDownloader.downloadFile(fileLocation, resultLocation);
         }
 
