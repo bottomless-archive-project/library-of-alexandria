@@ -1,6 +1,7 @@
 package com.github.loa.administrator.command.indexer;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.ingest.PutPipelineRequest;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
@@ -20,6 +21,7 @@ import java.nio.file.Files;
 /**
  * This command will initialize the indexer database.
  */
+@Slf4j
 @Component
 @RequiredArgsConstructor
 @ConditionalOnProperty("initialize-indexer")
@@ -35,25 +37,17 @@ public class IndexerInitializerCommand implements CommandLineRunner {
      */
     @Override
     public void run(final String... args) throws IOException {
-        initializeAttachmentPipeline();
         initializeIndex();
     }
 
-    private void initializeAttachmentPipeline() throws IOException {
-        final String pipelineConfiguration = loadConfiguration("classpath:indexer/pipeline.json");
-
-        final PutPipelineRequest request = new PutPipelineRequest("vault-document-pipeline",
-                new BytesArray(pipelineConfiguration.getBytes(StandardCharsets.UTF_8)), XContentType.JSON
-        );
-
-        restHighLevelClient.ingest().putPipeline(request, RequestOptions.DEFAULT);
-    }
-
+    //TODO: Update the mappings!
     private void initializeIndex() throws IOException {
+        log.info("Started initializing the search database!");
+
         final String mappingConfiguration = loadConfiguration("classpath:indexer/mapping.json");
 
         final CreateIndexRequest createIndexRequest = new CreateIndexRequest("vault_documents")
-                .mapping(mappingConfiguration, XContentType.JSON)
+                //.mapping(mappingConfiguration, XContentType.JSON)
                 .settings(
                         Settings.builder()
                                 .put("index.number_of_shards", 10)

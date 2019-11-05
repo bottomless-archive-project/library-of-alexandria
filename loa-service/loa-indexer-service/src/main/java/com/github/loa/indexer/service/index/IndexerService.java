@@ -1,7 +1,7 @@
 package com.github.loa.indexer.service.index;
 
 import com.github.loa.document.service.DocumentManipulator;
-import com.github.loa.document.service.domain.DocumentEntity;
+import com.github.loa.indexer.service.index.domain.DocumentMetadata;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.ElasticsearchException;
@@ -20,17 +20,19 @@ public class IndexerService {
     private final RestHighLevelClient restHighLevelClient;
     private final DocumentManipulator documentManipulator;
 
-    public void indexDocuments(final DocumentEntity documentEntity, final int pageCount) {
-        indexRequestFactory.newIndexRequest(documentEntity, pageCount)
+    public void indexDocuments(final DocumentMetadata documentMetadata) {
+        final String documentId = documentMetadata.getId();
+
+        indexRequestFactory.newIndexRequest(documentMetadata)
                 .subscribe(indexRequest -> {
                     try {
                         restHighLevelClient.index(indexRequest, RequestOptions.DEFAULT);
 
-                        documentManipulator.markIndexed(documentEntity.getId()).subscribe();
+                        documentManipulator.markIndexed(documentId).subscribe();
                     } catch (IOException | ElasticsearchException e) {
-                        log.info("Failed to index document " + documentEntity.getId() + "! Cause: '" + e.getMessage() + "'.");
+                        log.info("Failed to index document " + documentId + "! Cause: '" + e.getMessage() + "'.");
 
-                        documentManipulator.markIndexFailure(documentEntity.getId()).subscribe();
+                        documentManipulator.markIndexFailure(documentId).subscribe();
                     }
                 });
     }
