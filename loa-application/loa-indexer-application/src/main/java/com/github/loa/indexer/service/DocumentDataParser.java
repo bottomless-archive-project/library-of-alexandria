@@ -68,6 +68,7 @@ public class DocumentDataParser {
                 .date(metadata.get(TikaCoreProperties.CREATED))
                 .content(handler.toString())
                 .language(language.getIsoCode())
+                .type(documentEntity.getType())
                 .pageCount(pageCount)
                 .build();
     }

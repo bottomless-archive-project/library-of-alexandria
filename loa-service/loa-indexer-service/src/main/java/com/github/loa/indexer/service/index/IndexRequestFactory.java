@@ -36,6 +36,7 @@ public class IndexRequestFactory {
         }
 
         sourceContent.put("page_count", documentMetadata.getPageCount());
+        sourceContent.put("type", documentMetadata.getType());
 
         return Mono.just(
                 new IndexRequest("vault_documents")

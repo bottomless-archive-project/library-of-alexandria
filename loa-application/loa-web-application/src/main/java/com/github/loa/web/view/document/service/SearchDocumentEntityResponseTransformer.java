@@ -12,8 +12,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class SearchDocumentEntityResponseTransformer {
 
-    private final DocumentEntityResponseTransformer documentEntityResponseTransformer;
-
     public List<SearchDocumentEntityResponse> transform(final List<DocumentSearchEntity> documentSearchEntity) {
         return documentSearchEntity.stream()
                 .map(this::transform)
@@ -22,12 +20,13 @@ public class SearchDocumentEntityResponseTransformer {
 
     public SearchDocumentEntityResponse transform(final DocumentSearchEntity documentSearchEntity) {
         return SearchDocumentEntityResponse.builder()
+                .id(documentSearchEntity.getId())
                 .author(documentSearchEntity.getAuthor())
                 .description(documentSearchEntity.getDescription())
                 .language(documentSearchEntity.getLanguage())
                 .title(documentSearchEntity.getTitle())
                 .pageCount(documentSearchEntity.getPageCount())
-                .document(documentEntityResponseTransformer.transform(documentSearchEntity.getDocumentEntity()))
+                .type(documentSearchEntity.getType())
                 .build();
     }
 }

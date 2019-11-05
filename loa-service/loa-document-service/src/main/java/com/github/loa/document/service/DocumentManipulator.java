@@ -62,14 +62,4 @@ public class DocumentManipulator {
     public Mono<Void> updateCompression(final String documentId, final DocumentCompression documentCompression) {
         return documentRepository.updateCompression(documentId, documentCompression.toString());
     }
-
-    /**
-     * Update the page count of a document.
-     *
-     * @param documentId the id of the document to update the page count for
-     * @param pageCount  the new page count of the document
-     */
-    public Mono<Void> updatePageCount(final String documentId, final int pageCount) {
-        return documentRepository.updatePageCount(documentId, pageCount);
-    }
 }

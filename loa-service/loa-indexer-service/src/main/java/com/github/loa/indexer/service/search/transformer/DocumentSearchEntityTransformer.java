@@ -1,7 +1,6 @@
 package com.github.loa.indexer.service.search.transformer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.loa.document.service.entity.factory.DocumentEntityFactory;
 import com.github.loa.indexer.domain.DocumentSearchEntity;
 import com.github.loa.indexer.domain.IndexerAccessException;
 import com.github.loa.indexer.service.search.domain.SearchDatabaseEntity;
@@ -22,7 +21,6 @@ import java.util.function.Function;
 public class DocumentSearchEntityTransformer {
 
     private final ObjectMapper objectMapper;
-    private final DocumentEntityFactory documentEntityFactory;
 
     public Flux<DocumentSearchEntity> transform(final SearchHits searchHits) {
         return Flux.fromArray(searchHits.getHits())
@@ -35,18 +33,17 @@ public class DocumentSearchEntityTransformer {
             final SearchDatabaseEntity searchDatabaseEntity = objectMapper
                     .readValue(searchHit.getSourceAsString(), SearchDatabaseEntity.class);
 
-            return documentEntityFactory.getDocumentEntity(searchHit.getId())
-                    .map(documentEntity ->
-                            DocumentSearchEntity.builder()
-                                    .title(searchDatabaseEntity.getAttachment().getTitle())
-                                    .author(searchDatabaseEntity.getAttachment().getAuthor())
-                                    .language(searchDatabaseEntity.getAttachment().getLanguage())
-                                    .description(searchHit.getHighlightFields().get("attachment.content")
-                                            .getFragments()[0].string())
-                                    .pageCount(searchDatabaseEntity.getPageCount())
-                                    .documentEntity(documentEntity)
-                                    .build()
-                    );
+            return Mono.just(
+                    DocumentSearchEntity.builder()
+                            .id(searchHit.getId())
+                            .title(searchDatabaseEntity.getTitle())
+                            .author(searchDatabaseEntity.getAuthor())
+                            .language(searchDatabaseEntity.getLanguage())
+                            .description(searchDatabaseEntity.getContent())
+                            .pageCount(searchDatabaseEntity.getPageCount())
+                            .type(searchDatabaseEntity.getType())
+                            .build()
+            );
         } catch (IOException e) {
             throw new IndexerAccessException("Failed to convert source!", e);
         }

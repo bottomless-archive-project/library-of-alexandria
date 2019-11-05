@@ -64,16 +64,6 @@ public class DocumentRepository {
         return mongoTemplate.exists(query, DocumentDatabaseEntity.class);
     }
 
-    public Mono<Void> updatePageCount(final String documentId, final int pageCount) {
-        final Query query = Query
-                .query(
-                        Criteria.where("id").is(documentId)
-                );
-
-        return mongoTemplate.updateFirst(query, Update.update("pageCount", pageCount), DocumentDatabaseEntity.class)
-                .then();
-    }
-
     public Flux<DocumentDatabaseEntity> findAll() {
         return mongoTemplate.findAll(DocumentDatabaseEntity.class);
     }
