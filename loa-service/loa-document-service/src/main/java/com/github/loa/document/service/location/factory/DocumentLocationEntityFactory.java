@@ -6,28 +6,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import java.net.URL;
-
 @Service
 @RequiredArgsConstructor
 public class DocumentLocationEntityFactory {
 
     private final DocumentLocationRepository documentLocationRepository;
 
-    public Mono<Boolean> isDocumentLocationExists(final String documentLocationId) {
-        return documentLocationRepository.existsById(documentLocationId);
-    }
-
-    public Mono<Void> newDocumentLocationEntity(final String id, final URL location, final int versionNumber,
-            final String source) {
-        final DocumentLocationDatabaseEntity documentLocationDatabaseEntity = new DocumentLocationDatabaseEntity();
-
-        documentLocationDatabaseEntity.setId(id);
-        documentLocationDatabaseEntity.setUrl(location.toString());
-        documentLocationDatabaseEntity.setDownloaderVersion(versionNumber);
-        documentLocationDatabaseEntity.setSource(source);
-
-        return documentLocationRepository.insertDocumentLocation(documentLocationDatabaseEntity)
-                .then();
+    public Mono<Boolean> isDocumentLocationExistsOrCreate(
+            final DocumentLocationDatabaseEntity documentLocationDatabaseEntity) {
+        return documentLocationRepository.existsOrInsert(documentLocationDatabaseEntity);
     }
 }

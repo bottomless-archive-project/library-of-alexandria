@@ -34,7 +34,6 @@ public class DocumentDownloader {
     private final DocumentLocationIdFactory documentLocationIdFactory;
     private final StageLocationFactory stageLocationFactory;
     private final DocumentFileValidator documentFileValidator;
-    private final DocumentDownloadEvaluator documentDownloadEvaluator;
     private final DocumentFileManipulator documentFileManipulator;
     private final ChecksumProvider checksumProvider;
     private final DownloaderConfigurationProperties downloaderConfigurationProperties;
@@ -46,11 +45,8 @@ public class DocumentDownloader {
 
         log.debug("Starting to download document {}.", documentLocation);
 
-        return documentDownloadEvaluator.evaluateDocumentLocation(documentLocation)
-                .flatMap(shouldDownload -> {
-                    if (shouldDownload) {
-                        final String documentId = documentLocationIdFactory.newDocumentId(documentLocation);
-
+        return Mono.just(documentLocationIdFactory.newDocumentId(documentLocation))
+                .flatMap(documentId -> {
                         final DocumentType documentType = Arrays.stream(DocumentType.values())
                                 .filter(type -> documentLocation.getPath().endsWith("." + type.getFileExtension()))
                                 .findFirst()
@@ -88,9 +84,6 @@ public class DocumentDownloader {
                                                 .flatMap(documentFileManipulator::moveToVault))
                                 )
                                 .then();
-                    } else {
-                        return Mono.empty();
-                    }
                 });
     }
 }
