@@ -4,7 +4,7 @@ import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.document.service.domain.DocumentStatus;
 import com.github.loa.document.service.entity.factory.DocumentEntityFactory;
 import com.github.loa.indexer.configuration.IndexerConfigurationProperties;
-import com.github.loa.indexer.service.DocumentDataParser;
+import com.github.loa.parser.service.DocumentDataParser;
 import com.github.loa.indexer.service.index.IndexerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

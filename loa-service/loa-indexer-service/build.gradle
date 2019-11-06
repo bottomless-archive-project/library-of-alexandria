@@ -4,5 +4,6 @@ dependencies {
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-json'
 
     compile project(':loa-service:loa-document-service')
+    compile project(':loa-service:loa-document-parser-service')
     compile project(':loa-service:loa-vault-client-service')
 }

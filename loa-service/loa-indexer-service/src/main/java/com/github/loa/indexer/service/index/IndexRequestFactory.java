@@ -1,6 +1,6 @@
 package com.github.loa.indexer.service.index;
 
-import com.github.loa.indexer.service.index.domain.DocumentMetadata;
+import com.github.loa.parser.domain.DocumentMetadata;
 import lombok.RequiredArgsConstructor;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.common.unit.TimeValue;

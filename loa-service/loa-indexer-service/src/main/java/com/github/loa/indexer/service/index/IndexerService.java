@@ -1,7 +1,7 @@
 package com.github.loa.indexer.service.index;
 
 import com.github.loa.document.service.DocumentManipulator;
-import com.github.loa.indexer.service.index.domain.DocumentMetadata;
+import com.github.loa.parser.domain.DocumentMetadata;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.ElasticsearchException;

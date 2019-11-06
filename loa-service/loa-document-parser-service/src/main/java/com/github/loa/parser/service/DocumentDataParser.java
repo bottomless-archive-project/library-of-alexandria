@@ -1,7 +1,8 @@
-package com.github.loa.indexer.service;
+package com.github.loa.parser.service;
 
 import com.github.loa.document.service.domain.DocumentEntity;
-import com.github.loa.indexer.service.index.domain.DocumentMetadata;
+import com.github.loa.document.service.domain.DocumentType;
+import com.github.loa.parser.domain.DocumentMetadata;
 import com.github.loa.vault.client.service.VaultClientService;
 import com.github.pemistahl.lingua.api.Language;
 import com.github.pemistahl.lingua.api.LanguageDetector;
@@ -35,11 +36,12 @@ public class DocumentDataParser {
 
     public Mono<DocumentMetadata> parseDocumentData(final DocumentEntity documentEntity) {
         return vaultClientService.queryDocument(documentEntity)
-                .map(documentContent -> parseDocumentMetadata(documentEntity, documentContent))
+                .map(documentContent -> parseDocumentMetadata(documentEntity.getId(), documentEntity.getType(), documentContent))
                 .onErrorContinue((throwable, document) -> log.debug("Failed to parse document!", throwable));
     }
 
-    private DocumentMetadata parseDocumentMetadata(final DocumentEntity documentEntity, final byte[] documentContents) {
+    public DocumentMetadata parseDocumentMetadata(final String documentId, final DocumentType documentType,
+            final byte[] documentContents) {
         final Parser parser = new AutoDetectParser();
         final ContentHandler handler = new BodyContentHandler(-1);
         final Metadata metadata = new Metadata();
@@ -52,14 +54,10 @@ public class DocumentDataParser {
         }
 
         int pageCount = 0;
-        if (documentEntity.isPdf()) {
+        if (documentType == DocumentType.PDF) {
             try (final PDDocument pdDocument = PDDocument.load(documentContents)) {
                 pageCount = pdDocument.getNumberOfPages();
             } catch (IOException e) {
-                log.info("Removing document {} because of a parse failure.", documentEntity.getId(), e);
-
-                vaultClientService.removeDocument(documentEntity).subscribe();
-
                 throw new RuntimeException(e);
             }
         }
@@ -67,13 +65,13 @@ public class DocumentDataParser {
         final Language language = languageDetector.detectLanguageOf(handler.toString());
 
         return DocumentMetadata.builder()
-                .id(documentEntity.getId())
+                .id(documentId)
                 .title(metadata.get(TikaCoreProperties.TITLE))
                 .author(metadata.get(TikaCoreProperties.CREATOR))
                 .date(metadata.get(TikaCoreProperties.CREATED))
                 .content(handler.toString())
                 .language(language.getIsoCode())
-                .type(documentEntity.getType())
+                .type(documentType)
                 .pageCount(pageCount)
                 .build();
     }

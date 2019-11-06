@@ -1,4 +1,4 @@
-package com.github.loa.indexer.service.index.domain;
+package com.github.loa.parser.domain;
 
 import com.github.loa.document.service.domain.DocumentType;
 import lombok.Builder;
