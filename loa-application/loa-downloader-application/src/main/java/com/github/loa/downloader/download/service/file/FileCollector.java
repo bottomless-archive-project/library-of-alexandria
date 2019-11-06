@@ -6,9 +6,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import java.io.File;
-import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.Paths;
 
 /**
  * 0this device is responsible to acquire a file from the an {@link URL}.

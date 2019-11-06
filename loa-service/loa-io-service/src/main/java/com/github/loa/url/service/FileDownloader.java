@@ -20,7 +20,7 @@ import java.net.URL;
 @RequiredArgsConstructor
 public class FileDownloader {
 
-    private final WebClient webClient;
+    private final WebClient downloaderWebClient;
 
     /**
      * Download a file from the provided url to the provided file location.
@@ -30,7 +30,7 @@ public class FileDownloader {
      */
     public Mono<File> downloadFile(final URL downloadTarget, final File resultLocation) {
         try {
-            final Flux<DataBuffer> inputStream = webClient.get()
+            final Flux<DataBuffer> inputStream = downloaderWebClient.get()
                     .uri(downloadTarget.toURI())
                     .retrieve()
                     .bodyToFlux(DataBuffer.class);
