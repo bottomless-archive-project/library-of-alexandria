@@ -20,7 +20,7 @@ public class DownloadQueueListener {
     private final DocumentLocationIdFactory documentLocationIdFactory;
     private final DocumentLocationEntityFactory documentLocationEntityFactory;
 
-    @JmsListener(destination = "loa.downloader", concurrency = "10-25")
+    @JmsListener(destination = "loa.downloader", concurrency = "10-100")
     public void receive(final Message<DocumentSourceItem> message) {
         final DocumentSourceItem documentSourceItem = message.getPayload();
 
