@@ -77,18 +77,4 @@ public class VaultController {
                 .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Document not found with id " + documentId + "!")));
     }
-
-    /**
-     * Removes a document's content from the vault.
-     *
-     * @param documentId the document to remove the contents for
-     * @return the document entity that the content was removed
-     */
-    @DeleteMapping("/document/{documentId}")
-    public Mono<DocumentEntity> removeDocument(@PathVariable final String documentId) {
-        return documentEntityFactory.getDocumentEntity(documentId)
-                .flatMap(vaultDocumentManager::removeDocument)
-                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "Document not found with id " + documentId + "!")));
-    }
 }
