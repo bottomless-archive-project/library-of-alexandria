@@ -29,7 +29,7 @@ public class FileVaultLocationFactory implements VaultLocationFactory {
      * @return the location of the document
      */
     public FileVaultLocation getLocation(final DocumentEntity documentEntity) {
-        return getLocation(documentEntity, compressionConfigurationProperties.getAlgorithm());
+        return getLocation(documentEntity, documentEntity.getCompression());
     }
 
     /**
@@ -41,10 +41,7 @@ public class FileVaultLocationFactory implements VaultLocationFactory {
      * @return the location of the document
      */
     public FileVaultLocation getLocation(final DocumentEntity documentEntity, final DocumentCompression compression) {
-        if (documentEntity.isCompressed()) {
-            return new FileVaultLocation(new File(fileConfigurationProperties.getPath(), documentEntity.getId() + "."
-                    + documentEntity.getType().getFileExtension() + "." + compression.getFileExtension()));
-        } else {
+        if (compression == DocumentCompression.NONE) {
             // There was a bug in version 1 that added a . to the end of the document files
             if (documentEntity.getDownloaderVersion() == 1) {
                 return new FileVaultLocation(new File(fileConfigurationProperties.getPath(), documentEntity.getId() + "."
@@ -53,6 +50,9 @@ public class FileVaultLocationFactory implements VaultLocationFactory {
                 return new FileVaultLocation(new File(fileConfigurationProperties.getPath(), documentEntity.getId() + "."
                         + documentEntity.getType().getFileExtension()));
             }
+        } else {
+            return new FileVaultLocation(new File(fileConfigurationProperties.getPath(), documentEntity.getId() + "."
+                    + documentEntity.getType().getFileExtension() + "." + compression.getFileExtension()));
         }
     }
 }

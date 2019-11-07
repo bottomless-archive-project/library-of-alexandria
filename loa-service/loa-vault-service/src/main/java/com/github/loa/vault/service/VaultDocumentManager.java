@@ -3,7 +3,6 @@ package com.github.loa.vault.service;
 import com.github.loa.compression.configuration.CompressionConfigurationProperties;
 import com.github.loa.compression.domain.DocumentCompression;
 import com.github.loa.compression.service.provider.CompressionServiceProvider;
-import com.github.loa.document.service.DocumentManipulator;
 import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.vault.domain.exception.VaultAccessException;
 import com.github.loa.vault.service.location.VaultLocation;
@@ -30,7 +29,6 @@ public class VaultDocumentManager {
     private final VaultLocationFactory vaultLocationFactory;
     private final CompressionServiceProvider compressionServiceProvider;
     private final CompressionConfigurationProperties compressionConfigurationProperties;
-    private final DocumentManipulator documentManipulator;
 
     /**
      * Archive the content of an input stream as the content of the provided document in the vault.
@@ -55,14 +53,14 @@ public class VaultDocumentManager {
      */
     public void archiveDocument(final DocumentEntity documentEntity, final InputStream documentContents,
             final DocumentCompression documentCompression) {
-        try (final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentEntity)) {
-            if (documentEntity.isCompressed()) {
-                try (final OutputStream outputStream = compressionServiceProvider
-                        .getCompressionService(documentCompression).compress(vaultLocation.destination())) {
+        try (final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentEntity, documentCompression)) {
+            if (documentCompression == DocumentCompression.NONE) {
+                try (final OutputStream outputStream = vaultLocation.destination()) {
                     IOUtils.copy(documentContents, outputStream);
                 }
             } else {
-                try (final OutputStream outputStream = vaultLocation.destination()) {
+                try (final OutputStream outputStream = compressionServiceProvider
+                        .getCompressionService(documentCompression).compress(vaultLocation.destination())) {
                     IOUtils.copy(documentContents, outputStream);
                 }
             }
@@ -79,8 +77,7 @@ public class VaultDocumentManager {
      * @return the content of the document
      */
     public Resource readDocument(final DocumentEntity documentEntity) {
-        final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentEntity,
-                documentEntity.getCompression());
+        final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentEntity);
 
         // The non-compressed entries will be served via a zero-copy response
         // See: https://developer.ibm.com/articles/j-zerocopy/
@@ -102,7 +99,7 @@ public class VaultDocumentManager {
      */
     public Mono<DocumentEntity> removeDocument(final DocumentEntity documentEntity) {
         return Mono.just(documentEntity)
-                .map(document -> vaultLocationFactory.getLocation(document, documentEntity.getCompression()))
+                .map(vaultLocationFactory::getLocation)
                 .doOnNext(VaultLocation::clear)
                 .thenReturn(documentEntity);
     }
