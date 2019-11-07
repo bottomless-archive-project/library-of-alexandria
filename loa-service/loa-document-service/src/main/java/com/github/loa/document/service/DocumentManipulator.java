@@ -35,15 +35,6 @@ public class DocumentManipulator {
     }
 
     /**
-     * Set the document's status to {@link DocumentStatus#REMOVED removed}.
-     *
-     * @param documentId the id of the document to mark as removed
-     */
-    public Mono<Void> markRemoved(final String documentId) {
-        return updateStatus(documentId, DocumentStatus.REMOVED);
-    }
-
-    /**
      * Update the status of a document.
      *
      * @param documentId     the id of the document to update the status for

@@ -102,7 +102,6 @@ public class VaultDocumentManager {
      */
     public Mono<DocumentEntity> removeDocument(final DocumentEntity documentEntity) {
         return Mono.just(documentEntity)
-                .flatMap(document -> documentManipulator.markRemoved(document.getId()).thenReturn(document))
                 .map(document -> vaultLocationFactory.getLocation(document, documentEntity.getCompression()))
                 .doOnNext(VaultLocation::clear)
                 .thenReturn(documentEntity);

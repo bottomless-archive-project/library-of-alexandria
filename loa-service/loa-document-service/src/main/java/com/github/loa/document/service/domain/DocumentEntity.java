@@ -33,23 +33,6 @@ public class DocumentEntity {
         return status == DocumentStatus.DOWNLOADED || status == DocumentStatus.INDEXED;
     }
 
-    /**
-     * Returns true if the document is removed from the vault.
-     *
-     * @return true if the document is removed, false otherwise
-     */
-    public boolean isRemoved() {
-        return status == DocumentStatus.REMOVED;
-    }
-
-    /**
-     * Returns true if the document's type is {@link DocumentType#PDF}.
-     *
-     * @return true if the document's type is PDF, false otherwise
-     */
-    public boolean isPdf() {
-        return type == DocumentType.PDF;
-    }
 
     /**
      * Returns true if the document is compressed with a {@link DocumentCompression}.

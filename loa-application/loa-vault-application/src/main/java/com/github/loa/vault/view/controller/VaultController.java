@@ -49,7 +49,6 @@ public class VaultController {
     @GetMapping("/document/{documentId}")
     public Mono<ResponseEntity<Resource>> queryDocument(@PathVariable final String documentId) {
         return documentEntityFactory.getDocumentEntity(documentId)
-                .filter(documentEntity -> !documentEntity.isRemoved())
                 .map(documentEntity -> {
                     final Resource resource = vaultDocumentManager.readDocument(documentEntity);
 
