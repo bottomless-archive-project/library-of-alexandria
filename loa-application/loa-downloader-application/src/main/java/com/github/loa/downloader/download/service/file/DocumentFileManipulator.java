@@ -1,7 +1,6 @@
 package com.github.loa.downloader.download.service.file;
 
-import com.github.loa.document.service.domain.DocumentEntity;
-import com.github.loa.document.service.domain.DocumentType;
+import com.github.loa.vault.client.service.domain.ArchivingContext;
 import com.github.loa.stage.service.StageLocationFactory;
 import com.github.loa.vault.client.service.VaultClientService;
 import lombok.RequiredArgsConstructor;
@@ -25,38 +24,25 @@ public class DocumentFileManipulator {
 
     /**
      * Move a document's file from the staging area to the vault. The document's metadata is not updated by this method!
-     *
-     * @param documentEntity the document's id that we want to move to the vault
      */
-    public Mono<Void> moveToVault(final DocumentEntity documentEntity) {
-        log.info("Moving document to vault {}!", documentEntity);
+    public Mono<Void> moveToVault(final ArchivingContext archivingContext) {
+        log.info("Moving document to vault {}!", archivingContext.getContents().getName());
 
-        return stageLocationFactory.getLocation(documentEntity)
-                .flatMap(documentLocation -> vaultClientService.archiveDocument(documentEntity, documentLocation)
+        return Mono.just(archivingContext)
+                .flatMap(documentLocation -> vaultClientService.archiveDocument(documentLocation)
                         .thenReturn(documentLocation))
-                .flatMap(documentLocation -> cleanup(documentEntity))
+                .map(ArchivingContext::getContents)
+                .flatMap(this::cleanup)
                 .then();
     }
 
     /**
      * Clean up after a document's download by removing all the staging information belonging to that document.
-     *
-     * @param documentEntity the document to clean up after
      */
-    public Mono<Void> cleanup(final DocumentEntity documentEntity) {
-        return cleanup(documentEntity.getId(), documentEntity.getType());
-    }
+    public Mono<Void> cleanup(final File documentFileLocation) {
+        log.debug("Cleaning up staging for document {}.", documentFileLocation.getName());
 
-    /**
-     * Clean up after a document's download by removing all the staging information belonging to that document.
-     *
-     * @param documentId   the id of the document to clean up after
-     * @param documentType the type of the document to clean up after
-     */
-    public Mono<Void> cleanup(final String documentId, final DocumentType documentType) {
-        log.debug("Cleaning up staging for document {}.", documentId);
-
-        return stageLocationFactory.getLocation(documentId, documentType)
+        return Mono.just(documentFileLocation)
                 .map(File::delete)
                 .then();
     }

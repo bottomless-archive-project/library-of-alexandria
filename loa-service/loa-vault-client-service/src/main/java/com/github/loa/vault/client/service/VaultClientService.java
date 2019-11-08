@@ -3,6 +3,7 @@ package com.github.loa.vault.client.service;
 import com.github.loa.compression.domain.DocumentCompression;
 import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.vault.client.configuration.VaultClientConfigurationProperties;
+import com.github.loa.vault.client.service.domain.ArchivingContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.FileSystemResource;
@@ -28,12 +29,16 @@ public class VaultClientService {
     private final VaultClientConfigurationProperties vaultClientConfigurationProperties;
     private final WebClient vaultWebClient;
 
-    public Mono<Void> archiveDocument(final DocumentEntity documentEntity, final File documentStageLocation) {
+    public Mono<Void> archiveDocument(final ArchivingContext documentStageLocation) {
         vaultWebClient.post()
                 .uri(URI.create("http://" + vaultClientConfigurationProperties.getHost() + ":"
-                        + vaultClientConfigurationProperties.getPort() + "/document/" + documentEntity.getId()))
-                .header("Content-Type", "application/json")
-                .body(BodyInserters.fromResource(new FileSystemResource(documentStageLocation)))
+                        + vaultClientConfigurationProperties.getPort() + "/document"))
+                //.header("Content-Type", "application/json")
+                .body(
+                        BodyInserters.fromMultipartData("contents", new FileSystemResource(documentStageLocation.getContents()))
+                                .with("document", documentStageLocation)
+                )
+                //.body(BodyInserters.fromResource(new FileSystemResource(documentStageLocation)))
                 .retrieve()
                 .bodyToMono(Void.class)
                 .block();

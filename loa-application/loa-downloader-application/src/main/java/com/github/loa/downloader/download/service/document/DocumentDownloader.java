@@ -1,18 +1,13 @@
 package com.github.loa.downloader.download.service.document;
 
-import com.github.loa.checksum.service.ChecksumProvider;
-import com.github.loa.compression.configuration.CompressionConfigurationProperties;
-import com.github.loa.document.service.domain.DocumentStatus;
 import com.github.loa.document.service.domain.DocumentType;
-import com.github.loa.document.service.entity.factory.DocumentEntityFactory;
-import com.github.loa.document.service.entity.factory.domain.DocumentCreationContext;
 import com.github.loa.document.service.location.id.factory.DocumentLocationIdFactory;
-import com.github.loa.downloader.command.configuration.DownloaderConfigurationProperties;
 import com.github.loa.downloader.download.service.file.DocumentFileManipulator;
 import com.github.loa.downloader.download.service.file.DocumentFileValidator;
 import com.github.loa.downloader.download.service.file.FileCollector;
 import com.github.loa.source.domain.DocumentSourceItem;
 import com.github.loa.stage.service.StageLocationFactory;
+import com.github.loa.vault.client.service.domain.ArchivingContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -30,60 +25,40 @@ import java.util.Arrays;
 @RequiredArgsConstructor
 public class DocumentDownloader {
 
-    private final DocumentEntityFactory documentEntityFactory;
     private final DocumentLocationIdFactory documentLocationIdFactory;
     private final StageLocationFactory stageLocationFactory;
     private final DocumentFileValidator documentFileValidator;
     private final DocumentFileManipulator documentFileManipulator;
-    private final ChecksumProvider checksumProvider;
-    private final DownloaderConfigurationProperties downloaderConfigurationProperties;
-    private final CompressionConfigurationProperties compressionConfigurationProperties;
     private final FileCollector fileCollector;
 
     public Mono<Void> downloadDocument(final DocumentSourceItem documentSourceItem) {
         final URL documentLocation = documentSourceItem.getDocumentLocation();
 
+        final DocumentType documentType = Arrays.stream(DocumentType.values())
+                .filter(type -> documentLocation.getPath().endsWith("." + type.getFileExtension()))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Unable to find valid document type for document: "
+                        + documentLocation));
+
         log.debug("Starting to download document {}.", documentLocation);
 
         return Mono.just(documentLocationIdFactory.newDocumentId(documentLocation))
-                .flatMap(documentId -> {
-                        final DocumentType documentType = Arrays.stream(DocumentType.values())
-                                .filter(type -> documentLocation.getPath().endsWith("." + type.getFileExtension()))
-                                .findFirst()
-                                .orElseThrow(() -> new RuntimeException("Unable to find valid document type for document: "
-                                        + documentLocation));
-
-                        return stageLocationFactory.getLocation(documentId, documentType)
-                                .flatMap(stageFileLocation -> fileCollector.acquireFile(documentLocation, stageFileLocation))
-                                .flatMap(documentFileLocation -> documentFileValidator.isValidDocument(documentId, documentType)
-                                        .filter(validationResult -> !validationResult)
-                                        .flatMap(validationResult -> documentFileManipulator.cleanup(documentId, documentType))
-                                        .thenReturn(documentFileLocation)
-                                )
-                                .map(File::length)
-                                .flatMap(fileLength -> checksumProvider.checksum(documentId, documentType)
-                                        .flatMap(checksum -> documentEntityFactory.isDocumentExists(checksum, fileLength, documentType))
-                                        .filter(documentExists -> documentExists)
-                                        .flatMap(documentExists -> documentFileManipulator.cleanup(documentId, documentType))
-                                        .thenReturn(fileLength)
-                                )
-                                .flatMap(fileLength -> checksumProvider.checksum(documentId, documentType)
-                                        .flatMap(checksum -> documentEntityFactory.newDocumentEntity(
-                                                DocumentCreationContext.builder()
-                                                        .id(documentId)
-                                                        .type(documentType)
-                                                        .location(documentLocation)
-                                                        .status(DocumentStatus.DOWNLOADED)
-                                                        .source(documentSourceItem.getSourceName())
-                                                        .versionNumber(downloaderConfigurationProperties.getVersionNumber())
-                                                        .compression(compressionConfigurationProperties.getAlgorithm())
-                                                        .checksum(checksum)
-                                                        .fileSize(fileLength)
-                                                        .build()
-                                        )
-                                                .flatMap(documentFileManipulator::moveToVault))
-                                )
-                                .then();
-                });
+                .flatMap(documentId -> stageLocationFactory.getLocation(documentId, documentType)
+                        .flatMap(stageFileLocation -> fileCollector.acquireFile(documentLocation, stageFileLocation))
+                        .flatMap(documentFileLocation -> documentFileValidator.isValidDocument(documentId, documentType)
+                                .filter(validationResult -> !validationResult)
+                                .flatMap(validationResult -> documentFileManipulator.cleanup(documentFileLocation))
+                                .thenReturn(documentFileLocation)
+                        )
+                        .filter(File::exists)
+                        .flatMap((File archivingContext) -> documentFileManipulator.moveToVault(
+                                ArchivingContext.builder()
+                                        .location(documentLocation.toString())
+                                        .source("unknown")//TODO!
+                                        .type(documentType)
+                                        .contents(archivingContext)
+                                        .build()
+                        ))
+                );
     }
 }

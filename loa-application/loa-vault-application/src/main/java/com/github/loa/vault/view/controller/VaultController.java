@@ -5,6 +5,8 @@ import com.github.loa.document.service.entity.factory.DocumentEntityFactory;
 import com.github.loa.document.view.service.MediaTypeCalculator;
 import com.github.loa.vault.service.RecompressorService;
 import com.github.loa.vault.service.VaultDocumentManager;
+import com.github.loa.vault.service.domain.DocumentArchivingContext;
+import com.github.loa.vault.view.request.ArchiveDocumentRequest;
 import com.github.loa.vault.view.request.domain.RecompressRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
@@ -27,17 +29,20 @@ public class VaultController {
     /**
      * Saves a document's content to the vault.
      *
-     * @param documentId       the id of the document to save the content for
-     * @param documentContents the content to save
+     * @param archiveDocumentRequest the content to save
      * @return the document entity that the content was updated for
      */
-    @PostMapping("/document/{documentId}")
-    public Mono<DocumentEntity> archiveDocument(@PathVariable final String documentId,
-            @RequestBody final Resource documentContents) {
-        return documentEntityFactory.getDocumentEntity(documentId)
-                .doOnNext(documentEntity -> vaultDocumentManager.archiveDocument(documentEntity, documentContents))
-                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "Document not found with id " + documentId + "!")));
+    @PostMapping("/document")
+    public Mono<DocumentEntity> archiveDocument(@RequestPart(value = "document") final ArchiveDocumentRequest archiveDocumentRequest,
+            @RequestPart(value = "contents") Resource documentContents) {
+        return vaultDocumentManager.archiveDocument(
+                DocumentArchivingContext.builder()
+                        .type(archiveDocumentRequest.getType())
+                        .location(archiveDocumentRequest.getLocation())
+                        .source(archiveDocumentRequest.getSource())
+                        .contents(documentContents)
+                        .build()
+        );
     }
 
     /**

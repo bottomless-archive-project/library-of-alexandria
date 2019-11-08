@@ -1,6 +1,5 @@
 package com.github.loa.vault.service.location.file;
 
-import com.github.loa.compression.configuration.CompressionConfigurationProperties;
 import com.github.loa.compression.domain.DocumentCompression;
 import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.vault.configuration.location.file.FileConfigurationProperties;
@@ -20,7 +19,6 @@ import java.io.File;
 public class FileVaultLocationFactory implements VaultLocationFactory {
 
     private final FileConfigurationProperties fileConfigurationProperties;
-    private final CompressionConfigurationProperties compressionConfigurationProperties;
 
     /**
      * Create the location for a given {@link DocumentEntity}.

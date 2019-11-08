@@ -1,3 +1,4 @@
 dependencies {
     compile project(':loa-service:loa-document-service')
+    compile project(':loa-service:loa-checksum-service')
 }

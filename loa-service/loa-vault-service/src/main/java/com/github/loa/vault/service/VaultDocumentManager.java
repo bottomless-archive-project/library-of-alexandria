@@ -1,10 +1,14 @@
 package com.github.loa.vault.service;
 
+import com.github.loa.checksum.service.ChecksumProvider;
 import com.github.loa.compression.configuration.CompressionConfigurationProperties;
-import com.github.loa.compression.domain.DocumentCompression;
 import com.github.loa.compression.service.provider.CompressionServiceProvider;
 import com.github.loa.document.service.domain.DocumentEntity;
+import com.github.loa.document.service.domain.DocumentStatus;
+import com.github.loa.document.service.entity.factory.DocumentEntityFactory;
+import com.github.loa.document.service.entity.factory.domain.DocumentCreationContext;
 import com.github.loa.vault.domain.exception.VaultAccessException;
+import com.github.loa.vault.service.domain.DocumentArchivingContext;
 import com.github.loa.vault.service.location.VaultLocation;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
@@ -14,9 +18,11 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.UUID;
 
 /**
  * Provide access to the content of the documents in the vault.
@@ -29,45 +35,57 @@ public class VaultDocumentManager {
     private final VaultLocationFactory vaultLocationFactory;
     private final CompressionServiceProvider compressionServiceProvider;
     private final CompressionConfigurationProperties compressionConfigurationProperties;
+    private final DocumentEntityFactory documentEntityFactory;
+    private final ChecksumProvider checksumProvider;
 
     /**
      * Archive the content of an input stream as the content of the provided document in the vault.
-     *
-     * @param documentEntity   the document to save the content for
-     * @param documentContents the content to archive for the document
      */
-    public void archiveDocument(final DocumentEntity documentEntity, final Resource documentContents) {
+    public Mono<DocumentEntity> archiveDocument(final DocumentArchivingContext documentArchivingContext) {
+        final String documentId = UUID.randomUUID().toString();
+
         try {
-            archiveDocument(documentEntity, documentContents.getInputStream(),
-                    compressionConfigurationProperties.getAlgorithm());
+            final byte[] documentContents = documentArchivingContext.getContents().getInputStream().readAllBytes();
+
+            return checksumProvider.checksum(documentId, documentContents)
+                    .flatMap(checksum -> documentEntityFactory.newDocumentEntity(
+                            DocumentCreationContext.builder()
+                                    .id(documentId)
+                                    .type(documentArchivingContext.getType())
+                                    .status(DocumentStatus.DOWNLOADED)
+                                    .location(documentArchivingContext.getLocation())
+                                    .source(documentArchivingContext.getSource())
+                                    .versionNumber(1) //TODO! Real configurable number!
+                                    .compression(compressionConfigurationProperties.getAlgorithm())
+                                    .checksum(checksum)
+                                    .fileSize(documentContents.length)
+                                    .build()
+                            )
+                    )
+                    .flatMap(documentEntity -> saveDocument(documentEntity, documentContents));
         } catch (IOException e) {
-            throw new RuntimeException("Unable to read document content!");
+            throw new VaultAccessException("Unable to move document to the vault!", e);
         }
     }
 
-    /**
-     * Archive the content of an input stream as the content of the provided document in the vault.
-     *
-     * @param documentEntity   the document to save the content for
-     * @param documentContents the content to archive for the document
-     */
-    public void archiveDocument(final DocumentEntity documentEntity, final InputStream documentContents,
-            final DocumentCompression documentCompression) {
-        try (final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentEntity, documentCompression)) {
-            if (documentCompression == DocumentCompression.NONE) {
+    public Mono<DocumentEntity> saveDocument(final DocumentEntity documentEntity, final byte[] documentContents) {
+        try (final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentEntity)) {
+            if (!documentEntity.isCompressed()) {
                 try (final OutputStream outputStream = vaultLocation.destination()) {
-                    IOUtils.copy(documentContents, outputStream);
+                    IOUtils.copy(new ByteArrayInputStream(documentContents), outputStream);
                 }
             } else {
                 try (final OutputStream outputStream = compressionServiceProvider
-                        .getCompressionService(documentCompression).compress(vaultLocation.destination())) {
-                    IOUtils.copy(documentContents, outputStream);
+                        .getCompressionService(documentEntity.getCompression()).compress(vaultLocation.destination())) {
+                    IOUtils.copy(new ByteArrayInputStream(documentContents), outputStream);
                 }
             }
         } catch (IOException e) {
             throw new VaultAccessException("Unable to move document with id " + documentEntity.getId()
                     + " to the vault!", e);
         }
+
+        return Mono.just(documentEntity);
     }
 
     /**

@@ -30,8 +30,9 @@ public class RecompressorService {
                 .getInputStream()) {
             final byte[] documentContent = documentContentInputStream.readAllBytes();
 
-            vaultDocumentManager.removeDocument(documentEntity).subscribe();
-            vaultDocumentManager.archiveDocument(documentEntity, new ByteArrayResource(documentContent));
+            vaultDocumentManager.removeDocument(documentEntity)
+                    .flatMap(documentEntity1 -> vaultDocumentManager.saveDocument(documentEntity1, documentContent))
+                    .subscribe();
 
             documentManipulator.updateCompression(documentEntity.getId(), documentCompression).subscribe();
         } catch (IOException e) {
