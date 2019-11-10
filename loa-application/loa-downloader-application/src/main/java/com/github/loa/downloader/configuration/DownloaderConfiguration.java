@@ -1,4 +1,4 @@
-package com.github.loa.downloader.command.configuration;
+package com.github.loa.downloader.configuration;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

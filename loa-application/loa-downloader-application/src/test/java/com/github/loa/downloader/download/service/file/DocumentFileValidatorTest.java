@@ -1,7 +1,7 @@
 package com.github.loa.downloader.download.service.file;
 
 import com.github.loa.document.service.domain.DocumentType;
-import com.github.loa.downloader.command.configuration.DownloaderConfigurationProperties;
+import com.github.loa.downloader.configuration.DownloaderConfigurationProperties;
 import com.github.loa.parser.service.DocumentDataParser;
 import com.github.loa.stage.service.StageLocationFactory;
 import org.junit.jupiter.api.Assertions;

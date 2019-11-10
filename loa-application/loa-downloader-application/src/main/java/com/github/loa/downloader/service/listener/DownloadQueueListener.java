@@ -1,4 +1,4 @@
-package com.github.loa.downloader.command;
+package com.github.loa.downloader.service.listener;
 
 import com.github.loa.document.repository.domain.DocumentLocationDatabaseEntity;
 import com.github.loa.document.service.location.factory.DocumentLocationEntityFactory;
