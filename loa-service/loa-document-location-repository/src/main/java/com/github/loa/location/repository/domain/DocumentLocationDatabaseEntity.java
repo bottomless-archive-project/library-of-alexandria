@@ -1,4 +1,4 @@
-package com.github.loa.document.repository.domain;
+package com.github.loa.location.repository.domain;
 
 import lombok.Getter;
 import lombok.Setter;

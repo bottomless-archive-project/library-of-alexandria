@@ -1,9 +1,10 @@
 package com.github.loa.downloader.service.listener;
 
-import com.github.loa.document.repository.domain.DocumentLocationDatabaseEntity;
-import com.github.loa.location.service.factory.DocumentLocationEntityFactory;
-import com.github.loa.location.service.id.factory.DocumentLocationIdFactory;
+import com.github.loa.downloader.configuration.DownloaderConfigurationProperties;
 import com.github.loa.downloader.download.service.document.DocumentDownloader;
+import com.github.loa.location.service.factory.DocumentLocationEntityFactory;
+import com.github.loa.location.service.factory.domain.DocumentLocationCreationContext;
+import com.github.loa.location.service.id.factory.DocumentLocationIdFactory;
 import com.github.loa.source.domain.DocumentSourceItem;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +20,7 @@ public class DownloadQueueListener {
     private final DocumentDownloader documentDownloader;
     private final DocumentLocationIdFactory documentLocationIdFactory;
     private final DocumentLocationEntityFactory documentLocationEntityFactory;
+    private final DownloaderConfigurationProperties downloaderConfigurationProperties;
 
     @JmsListener(destination = "loa.downloader", concurrency = "10-100")
     public void receive(final Message<DocumentSourceItem> message) {
@@ -26,14 +28,15 @@ public class DownloadQueueListener {
 
         final String documentId = documentLocationIdFactory.newDocumentId(documentSourceItem.getDocumentLocation());
 
-        //TODO: Don't leak database details to here!
-        final DocumentLocationDatabaseEntity documentLocationDatabaseEntity = new DocumentLocationDatabaseEntity();
-        documentLocationDatabaseEntity.setId(documentId);
-        documentLocationDatabaseEntity.setDownloaderVersion(1);
-        documentLocationDatabaseEntity.setSource(documentSourceItem.getSourceName());
-        documentLocationDatabaseEntity.setUrl(documentSourceItem.getDocumentLocation().toString());
+        final DocumentLocationCreationContext documentLocationCreationContext =
+                DocumentLocationCreationContext.builder()
+                        .id(documentId)
+                        .url(documentSourceItem.getDocumentLocation().toString())
+                        .source(documentSourceItem.getSourceName())
+                        .downloaderVersion(downloaderConfigurationProperties.getVersionNumber())
+                        .build();
 
-        documentLocationEntityFactory.isDocumentLocationExistsOrCreate(documentLocationDatabaseEntity)
+        documentLocationEntityFactory.isDocumentLocationExistsOrCreate(documentLocationCreationContext)
                 .filter(exists -> !exists)
                 .map(exists -> documentSourceItem)
                 .flatMap(documentDownloader::downloadDocument)

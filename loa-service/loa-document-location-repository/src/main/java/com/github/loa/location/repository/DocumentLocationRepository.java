@@ -1,6 +1,6 @@
-package com.github.loa.document.repository;
+package com.github.loa.location.repository;
 
-import com.github.loa.document.repository.domain.DocumentLocationDatabaseEntity;
+import com.github.loa.location.repository.domain.DocumentLocationDatabaseEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
