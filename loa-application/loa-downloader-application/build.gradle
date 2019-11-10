@@ -7,7 +7,7 @@ dependencies {
 
     compile project(':loa-service:loa-document-location-service')
     compile project(':loa-service:loa-document-parser-service')
-    compile project(':loa-service:loa-source-cc-service')
+    compile project(':loa-service:loa-source-commoncrawl-service')
     compile project(':loa-service:loa-source-file-service')
     compile project(':loa-service:loa-source-folder-service')
     compile project(':loa-service:loa-stage-service')

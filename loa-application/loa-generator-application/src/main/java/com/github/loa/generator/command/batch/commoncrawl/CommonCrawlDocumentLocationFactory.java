@@ -4,7 +4,7 @@ import com.github.loa.generator.command.batch.DocumentLocationFactory;
 import com.github.loa.generator.command.batch.commoncrawl.warc.WarcDownloader;
 import com.github.loa.generator.command.batch.commoncrawl.warc.WarcFluxFactory;
 import com.github.loa.generator.command.batch.commoncrawl.warc.WarcRecordParser;
-import com.github.loa.source.cc.configuration.CommonCrawlDocumentSourceConfiguration;
+import com.github.loa.source.cc.configuration.CommonCrawlDocumentSourceConfigurationProperties;
 import com.github.loa.source.cc.service.WarcPathFactory;
 import com.github.loa.url.service.URLConverter;
 import lombok.RequiredArgsConstructor;
@@ -32,18 +32,22 @@ public class CommonCrawlDocumentLocationFactory implements DocumentLocationFacto
     private final WarcPathFactory warcPathFactory;
     private final WarcFluxFactory warcFluxFactory;
     private final URLConverter urlConverter;
-    private final CommonCrawlDocumentSourceConfiguration commonCrawlDocumentSourceConfiguration;
+    private final CommonCrawlDocumentSourceConfigurationProperties commonCrawlDocumentSourceConfigurationProperties;
 
     @Override
     public Flux<URL> streamLocations() {
-        final List<String> paths = warcPathFactory.newPaths(commonCrawlDocumentSourceConfiguration.getCrawlId()).stream()
-                .skip(commonCrawlDocumentSourceConfiguration.getWarcId())
-                .collect(Collectors.toList());
+        final List<String> paths = buildPaths();
 
         return Flux.fromIterable(paths)
                 .flatMap(warcDownloader::downloadWarcFile)
                 .flatMap(warcFluxFactory::buildWarcRecordFlux)
                 .flatMap(warcRecordParser::parseUrlsFromRecord)
                 .flatMap(urlConverter::convert);
+    }
+
+    private List<String> buildPaths() {
+        return warcPathFactory.newPaths(commonCrawlDocumentSourceConfigurationProperties.getCrawlId()).stream()
+                .skip(commonCrawlDocumentSourceConfigurationProperties.getWarcId())
+                .collect(Collectors.toList());
     }
 }

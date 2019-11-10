@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 @Data
 @Component
 @ConfigurationProperties("loa.source.commoncrawl")
-public class CommonCrawlDocumentSourceConfiguration {
+public class CommonCrawlDocumentSourceConfigurationProperties {
 
     /**
      * The Id of the crawl. For example CC-MAIN-2019-09.
