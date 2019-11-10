@@ -7,6 +7,7 @@ import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.document.service.domain.DocumentStatus;
 import com.github.loa.document.service.entity.factory.DocumentEntityFactory;
 import com.github.loa.document.service.entity.factory.domain.DocumentCreationContext;
+import com.github.loa.vault.configuration.VaultConfigurationProperties;
 import com.github.loa.vault.domain.exception.VaultAccessException;
 import com.github.loa.vault.service.domain.DocumentArchivingContext;
 import com.github.loa.vault.service.location.VaultLocation;
@@ -35,6 +36,7 @@ public class VaultDocumentManager {
     private final VaultLocationFactory vaultLocationFactory;
     private final CompressionServiceProvider compressionServiceProvider;
     private final CompressionConfigurationProperties compressionConfigurationProperties;
+    private final VaultConfigurationProperties vaultConfigurationProperties;
     private final DocumentEntityFactory documentEntityFactory;
     private final ChecksumProvider checksumProvider;
 
@@ -55,7 +57,7 @@ public class VaultDocumentManager {
                                     .status(DocumentStatus.DOWNLOADED)
                                     .location(documentArchivingContext.getLocation())
                                     .source(documentArchivingContext.getSource())
-                                    .versionNumber(1) //TODO! Real configurable number!
+                                    .versionNumber(vaultConfigurationProperties.getVersionNumber())
                                     .compression(compressionConfigurationProperties.getAlgorithm())
                                     .checksum(checksum)
                                     .fileSize(documentContents.length)

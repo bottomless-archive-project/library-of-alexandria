@@ -1,4 +1,5 @@
 dependencies {
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-artemis'
+
     compile group: 'org.apache.activemq', name: 'artemis-jms-server'
 }
