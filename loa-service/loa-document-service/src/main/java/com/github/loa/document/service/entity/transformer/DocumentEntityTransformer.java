@@ -7,17 +7,8 @@ import com.github.loa.document.service.domain.DocumentStatus;
 import com.github.loa.document.service.domain.DocumentType;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 @Service
 public class DocumentEntityTransformer {
-
-    public List<DocumentEntity> transform(final List<DocumentDatabaseEntity> documentDatabaseEntities) {
-        return documentDatabaseEntities.stream()
-                .map(this::transform)
-                .collect(Collectors.toList());
-    }
 
     public DocumentEntity transform(final DocumentDatabaseEntity documentDatabaseEntity) {
         return DocumentEntity.builder()
@@ -29,7 +20,6 @@ public class DocumentEntityTransformer {
                 .downloadDate(documentDatabaseEntity.getDownloadDate())
                 .downloaderVersion(documentDatabaseEntity.getDownloaderVersion())
                 .compression(DocumentCompression.valueOf(documentDatabaseEntity.getCompression()))
-                .pageCount(documentDatabaseEntity.getPageCount())
                 .build();
     }
 }
