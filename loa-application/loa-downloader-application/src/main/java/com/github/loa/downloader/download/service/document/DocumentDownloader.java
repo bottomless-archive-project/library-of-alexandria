@@ -1,7 +1,7 @@
 package com.github.loa.downloader.download.service.document;
 
 import com.github.loa.document.service.domain.DocumentType;
-import com.github.loa.document.service.location.id.factory.DocumentLocationIdFactory;
+import com.github.loa.location.service.id.factory.DocumentLocationIdFactory;
 import com.github.loa.downloader.download.service.file.DocumentFileManipulator;
 import com.github.loa.downloader.download.service.file.DocumentFileValidator;
 import com.github.loa.downloader.download.service.file.FileCollector;

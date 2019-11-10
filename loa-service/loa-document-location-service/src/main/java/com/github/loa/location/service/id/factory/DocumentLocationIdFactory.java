@@ -1,4 +1,4 @@
-package com.github.loa.document.service.location.id.factory;
+package com.github.loa.location.service.id.factory;
 
 import java.net.URL;
 

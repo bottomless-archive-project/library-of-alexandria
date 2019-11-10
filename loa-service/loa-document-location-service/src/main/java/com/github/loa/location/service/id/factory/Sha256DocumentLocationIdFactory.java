@@ -1,4 +1,4 @@
-package com.github.loa.document.service.location.id.factory;
+package com.github.loa.location.service.id.factory;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.stereotype.Service;

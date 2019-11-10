@@ -1,8 +1,8 @@
 package com.github.loa.downloader.service.listener;
 
 import com.github.loa.document.repository.domain.DocumentLocationDatabaseEntity;
-import com.github.loa.document.service.location.factory.DocumentLocationEntityFactory;
-import com.github.loa.document.service.location.id.factory.DocumentLocationIdFactory;
+import com.github.loa.location.service.factory.DocumentLocationEntityFactory;
+import com.github.loa.location.service.id.factory.DocumentLocationIdFactory;
 import com.github.loa.downloader.download.service.document.DocumentDownloader;
 import com.github.loa.source.domain.DocumentSourceItem;
 import lombok.RequiredArgsConstructor;

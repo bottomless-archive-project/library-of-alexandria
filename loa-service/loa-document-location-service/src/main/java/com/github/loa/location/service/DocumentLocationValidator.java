@@ -1,4 +1,4 @@
-package com.github.loa.document.service.location;
+package com.github.loa.location.service;
 
 import com.github.loa.document.service.domain.DocumentType;
 import org.springframework.stereotype.Service;

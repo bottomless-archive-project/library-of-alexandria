@@ -1,4 +1,4 @@
-package com.github.loa.document.service.location.factory;
+package com.github.loa.location.service.factory;
 
 import com.github.loa.document.repository.DocumentLocationRepository;
 import com.github.loa.document.repository.domain.DocumentLocationDatabaseEntity;

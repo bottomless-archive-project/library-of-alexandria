@@ -1,0 +1,5 @@
+dependencies {
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter'
+
+    compile project(':loa-service:loa-document-service')
+}
