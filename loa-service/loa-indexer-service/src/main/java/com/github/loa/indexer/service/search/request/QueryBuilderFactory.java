@@ -52,14 +52,10 @@ public class QueryBuilderFactory {
 
     private void initializeDocumentTypeQuery(final BoolQueryBuilder parentQuery, final SearchContext searchContext) {
         if (!searchContext.getDocumentTypes().isEmpty()) {
-            final List<String> docTypes = searchContext.getDocumentTypes().stream()
-                    .map(DocumentType::getMimeType)
-                    .collect(Collectors.toList());
-
             final BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery().minimumShouldMatch(1);
 
-            for (final String type : docTypes) {
-                boolQueryBuilder.should(QueryBuilders.termQuery(SearchField.DOCUMENT_TYPE.getName(), type));
+            for (final DocumentType type : searchContext.getDocumentTypes()) {
+                boolQueryBuilder.should(QueryBuilders.termQuery(SearchField.DOCUMENT_TYPE.getName(), type.toString()));
             }
             parentQuery.filter(boolQueryBuilder);
         }
