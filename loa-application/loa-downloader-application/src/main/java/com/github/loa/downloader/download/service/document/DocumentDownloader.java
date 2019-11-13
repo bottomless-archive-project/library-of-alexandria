@@ -54,7 +54,7 @@ public class DocumentDownloader {
                         .flatMap((File archivingContext) -> documentFileManipulator.moveToVault(
                                 ArchivingContext.builder()
                                         .location(documentLocation.toString())
-                                        .source("unknown")//TODO!
+                                        .source(documentSourceItem.getSourceName())
                                         .type(documentType)
                                         .contents(archivingContext)
                                         .build()
