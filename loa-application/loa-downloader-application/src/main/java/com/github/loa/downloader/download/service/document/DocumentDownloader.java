@@ -1,5 +1,6 @@
 package com.github.loa.downloader.download.service.document;
 
+import com.github.loa.document.service.DocumentTypeCalculator;
 import com.github.loa.document.service.domain.DocumentType;
 import com.github.loa.location.service.id.factory.DocumentLocationIdFactory;
 import com.github.loa.downloader.download.service.file.DocumentFileManipulator;
@@ -30,13 +31,11 @@ public class DocumentDownloader {
     private final DocumentFileValidator documentFileValidator;
     private final DocumentFileManipulator documentFileManipulator;
     private final FileCollector fileCollector;
+    private final DocumentTypeCalculator documentTypeCalculator;
 
     public Mono<Void> downloadDocument(final DocumentSourceItem documentSourceItem) {
         final URL documentLocation = documentSourceItem.getDocumentLocation();
-
-        final DocumentType documentType = Arrays.stream(DocumentType.values())
-                .filter(type -> documentLocation.getPath().endsWith("." + type.getFileExtension()))
-                .findFirst()
+        final DocumentType documentType = documentTypeCalculator.calculate(documentLocation)
                 .orElseThrow(() -> new RuntimeException("Unable to find valid document type for document: "
                         + documentLocation));
 
@@ -51,7 +50,7 @@ public class DocumentDownloader {
                                 .thenReturn(documentFileLocation)
                         )
                         .filter(File::exists)
-                        .flatMap((File archivingContext) -> documentFileManipulator.moveToVault(
+                        .flatMap(archivingContext -> documentFileManipulator.moveToVault(
                                 ArchivingContext.builder()
                                         .location(documentLocation.toString())
                                         .source(documentSourceItem.getSourceName())
