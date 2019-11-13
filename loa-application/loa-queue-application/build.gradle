@@ -1,3 +1,5 @@
+apply plugin: 'org.springframework.boot'
+
 dependencies {
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-artemis'
 

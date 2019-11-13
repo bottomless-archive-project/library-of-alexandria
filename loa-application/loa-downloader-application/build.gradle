@@ -7,14 +7,9 @@ dependencies {
 
     compile project(':loa-service:loa-document-location-service')
     compile project(':loa-service:loa-document-parser-service')
-    compile project(':loa-service:loa-source-commoncrawl-service')
-    compile project(':loa-service:loa-source-file-service')
-    compile project(':loa-service:loa-source-folder-service')
+    compile project(':loa-service:loa-source-service')
     compile project(':loa-service:loa-stage-service')
     compile project(':loa-service:loa-vault-client-service')
-    compile project(':loa-service:loa-checksum-service')
-
-    compile group: 'commons-io', name: 'commons-io', version: '2.6'
 
     implementation 'org.hibernate.validator:hibernate-validator:6.0.17.Final'
 }
