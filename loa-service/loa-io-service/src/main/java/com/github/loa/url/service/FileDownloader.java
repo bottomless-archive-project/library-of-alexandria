@@ -35,12 +35,12 @@ public class FileDownloader {
                     .retrieve()
                     .bodyToFlux(DataBuffer.class);
 
-            DataBufferUtils.write(inputStream, resultLocation.toPath())
-                    .block();
+            return DataBufferUtils.write(inputStream, resultLocation.toPath())
+                    .thenReturn(resultLocation);
         } catch (Exception e) {
             log.debug("Failed to download document from location: {}.", downloadTarget, e);
-        }
 
-        return Mono.just(resultLocation);
+            return Mono.empty();
+        }
     }
 }

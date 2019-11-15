@@ -12,7 +12,6 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-import java.io.File;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -30,20 +29,14 @@ public class VaultClientService {
     private final WebClient vaultWebClient;
 
     public Mono<Void> archiveDocument(final ArchivingContext documentStageLocation) {
-        vaultWebClient.post()
+        return vaultWebClient.post()
                 .uri(URI.create("http://" + vaultClientConfigurationProperties.getHost() + ":"
                         + vaultClientConfigurationProperties.getPort() + "/document"))
-                //.header("Content-Type", "application/json")
-                .body(
-                        BodyInserters.fromMultipartData("contents", new FileSystemResource(documentStageLocation.getContents()))
-                                .with("document", documentStageLocation)
+                .body(BodyInserters.fromMultipartData("contents", new FileSystemResource(
+                        documentStageLocation.getContents())).with("document", documentStageLocation)
                 )
-                //.body(BodyInserters.fromResource(new FileSystemResource(documentStageLocation)))
                 .retrieve()
                 .bodyToMono(Void.class)
-                .block();
-
-        return Mono.empty()
                 .then();
     }
 

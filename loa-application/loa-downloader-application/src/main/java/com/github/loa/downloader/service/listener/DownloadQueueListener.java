@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.messaging.Message;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 @Slf4j
 @Service
@@ -40,6 +41,10 @@ public class DownloadQueueListener {
                 .filter(exists -> !exists)
                 .map(exists -> documentSourceItem)
                 .flatMap(documentDownloader::downloadDocument)
+                .onErrorResume(error -> Mono.just(error)
+                        .doOnNext(throwable -> log.debug("Error downloading a document: {}!", throwable.getMessage()))
+                        .then()
+                )
                 .block();
     }
 }
