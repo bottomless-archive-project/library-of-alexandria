@@ -1,7 +1,6 @@
 package com.github.loa.downloader.download.service.file;
 
 import com.github.loa.vault.client.service.domain.ArchivingContext;
-import com.github.loa.stage.service.StageLocationFactory;
 import com.github.loa.vault.client.service.VaultClientService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +18,6 @@ import java.io.File;
 @RequiredArgsConstructor
 public class DocumentFileManipulator {
 
-    private final StageLocationFactory stageLocationFactory;
     private final VaultClientService vaultClientService;
 
     /**
