@@ -1,11 +1,11 @@
-package com.github.loa.downloader.download.service.document;
+package com.github.loa.downloader.service.document;
 
 import com.github.loa.document.service.DocumentTypeCalculator;
 import com.github.loa.document.service.domain.DocumentType;
+import com.github.loa.downloader.service.file.DocumentFileManipulator;
+import com.github.loa.downloader.service.file.DocumentFileValidator;
+import com.github.loa.downloader.service.file.FileCollector;
 import com.github.loa.location.service.id.factory.DocumentLocationIdFactory;
-import com.github.loa.downloader.download.service.file.DocumentFileManipulator;
-import com.github.loa.downloader.download.service.file.DocumentFileValidator;
-import com.github.loa.downloader.download.service.file.FileCollector;
 import com.github.loa.source.domain.DocumentSourceItem;
 import com.github.loa.stage.service.StageLocationFactory;
 import com.github.loa.vault.client.service.domain.ArchivingContext;
@@ -16,7 +16,6 @@ import reactor.core.publisher.Mono;
 
 import java.io.File;
 import java.net.URL;
-import java.util.Arrays;
 
 /**
  * This service is responsible for downloading documents.

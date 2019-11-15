@@ -1,4 +1,4 @@
-package com.github.loa.downloader.download.service.file;
+package com.github.loa.downloader.service.file;
 
 import com.github.loa.url.service.FileDownloader;
 import lombok.RequiredArgsConstructor;

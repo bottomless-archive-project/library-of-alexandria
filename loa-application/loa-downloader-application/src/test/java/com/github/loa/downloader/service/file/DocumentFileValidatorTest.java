@@ -1,4 +1,4 @@
-package com.github.loa.downloader.download.service.file;
+package com.github.loa.downloader.service.file;
 
 import com.github.loa.document.service.domain.DocumentType;
 import com.github.loa.downloader.configuration.DownloaderConfigurationProperties;

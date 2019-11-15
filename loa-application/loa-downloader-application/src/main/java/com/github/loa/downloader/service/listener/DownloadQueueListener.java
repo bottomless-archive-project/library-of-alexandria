@@ -1,7 +1,7 @@
 package com.github.loa.downloader.service.listener;
 
 import com.github.loa.downloader.configuration.DownloaderConfigurationProperties;
-import com.github.loa.downloader.download.service.document.DocumentDownloader;
+import com.github.loa.downloader.service.document.DocumentDownloader;
 import com.github.loa.location.service.factory.DocumentLocationEntityFactory;
 import com.github.loa.location.service.factory.domain.DocumentLocationCreationContext;
 import com.github.loa.location.service.id.factory.DocumentLocationIdFactory;

@@ -1,4 +1,4 @@
-package com.github.loa.downloader.download.service.file.domain;
+package com.github.loa.downloader.service.file.domain;
 
 public class FailedToArchiveException extends RuntimeException {
 
