@@ -36,8 +36,7 @@ public class VaultClientService {
                         documentStageLocation.getContents())).with("document", documentStageLocation)
                 )
                 .retrieve()
-                .bodyToMono(Void.class)
-                .then();
+                .bodyToMono(Void.class);
     }
 
     public Mono<byte[]> queryDocument(final DocumentEntity documentEntity) {
