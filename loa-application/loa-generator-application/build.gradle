@@ -10,5 +10,5 @@ dependencies {
     compile project(':loa-service:loa-source-file-service')
     compile project(':loa-service:loa-source-folder-service')
 
-    compile 'org.hibernate.validator:hibernate-validator:6.0.17.Final'
+    compile group: 'org.hibernate.validator', name: 'hibernate-validator', version: '6.1.0.Final'
 }
