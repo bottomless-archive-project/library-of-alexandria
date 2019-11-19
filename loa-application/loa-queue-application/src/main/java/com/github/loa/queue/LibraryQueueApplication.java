@@ -3,6 +3,9 @@ package com.github.loa.queue;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+/**
+ * An application that is an intermediate between the Generator and the Downloader Application.
+ */
 @SpringBootApplication(scanBasePackages = "com.github.loa")
 public class LibraryQueueApplication {
 
