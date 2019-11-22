@@ -10,6 +10,7 @@ import com.github.pemistahl.lingua.api.LanguageDetectorBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tika.exception.TikaException;
+import org.apache.tika.io.TikaInputStream;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.metadata.PagedText;
 import org.apache.tika.metadata.TikaCoreProperties;
@@ -24,6 +25,7 @@ import reactor.core.publisher.Mono;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Optional;
 
 @Slf4j
@@ -41,15 +43,21 @@ public class DocumentDataParser {
                 .onErrorContinue((throwable, document) -> log.debug("Failed to parse document!", throwable));
     }
 
+    //TODO: Can we remove this somehow? Loading the full document contents to the memory is not always necessary.
     public DocumentMetadata parseDocumentMetadata(final String documentId, final DocumentType documentType,
             final byte[] documentContents) {
+        return parseDocumentMetadata(documentId, documentType, new ByteArrayInputStream(documentContents));
+    }
+
+    public DocumentMetadata parseDocumentMetadata(final String documentId, final DocumentType documentType,
+            final InputStream documentContents) {
         final Parser parser = new AutoDetectParser();
         final ContentHandler handler = new BodyContentHandler(-1);
         final Metadata metadata = new Metadata();
         final ParseContext context = new ParseContext();
 
         try {
-            parser.parse(new ByteArrayInputStream(documentContents), handler, metadata, context);
+            parser.parse(TikaInputStream.get(documentContents), handler, metadata, context);
         } catch (IOException | SAXException | TikaException e) {
             throw new RuntimeException(e);
         }

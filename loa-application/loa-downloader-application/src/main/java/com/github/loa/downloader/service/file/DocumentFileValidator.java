@@ -44,8 +44,7 @@ public class DocumentFileValidator {
                     }
 
                     try (final InputStream inputStream = new FileInputStream(stageFileLocation.toFile())) {
-                        documentDataParser.parseDocumentMetadata(documentId, documentType,
-                                inputStream.readAllBytes());
+                        documentDataParser.parseDocumentMetadata(documentId, documentType, inputStream);
                     } catch (Exception e) {
                         log.info("Non-parsable document: {}!", documentId);
 
