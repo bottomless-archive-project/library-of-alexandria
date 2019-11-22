@@ -9,9 +9,9 @@ import com.github.pemistahl.lingua.api.LanguageDetector;
 import com.github.pemistahl.lingua.api.LanguageDetectorBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.metadata.Metadata;
+import org.apache.tika.metadata.PagedText;
 import org.apache.tika.metadata.TikaCoreProperties;
 import org.apache.tika.parser.AutoDetectParser;
 import org.apache.tika.parser.ParseContext;
@@ -24,6 +24,7 @@ import reactor.core.publisher.Mono;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -53,15 +54,7 @@ public class DocumentDataParser {
             throw new RuntimeException(e);
         }
 
-        int pageCount = 0;
-        if (documentType == DocumentType.PDF) {
-            try (final PDDocument pdDocument = PDDocument.load(documentContents)) {
-                pageCount = pdDocument.getNumberOfPages();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
+        final int pageCount = Optional.ofNullable(metadata.getInt(PagedText.N_PAGES)).orElse(0);
         final Language language = languageDetector.detectLanguageOf(handler.toString());
 
         return DocumentMetadata.builder()

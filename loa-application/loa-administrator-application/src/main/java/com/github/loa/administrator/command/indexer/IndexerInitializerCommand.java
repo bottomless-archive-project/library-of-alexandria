@@ -52,6 +52,8 @@ public class IndexerInitializerCommand implements CommandLineRunner {
                 );
 
         restHighLevelClient.indices().create(createIndexRequest, RequestOptions.DEFAULT);
+
+        log.info("Finished initializing the search database!");
     }
 
     private String loadMappingConfiguration() throws IOException {
