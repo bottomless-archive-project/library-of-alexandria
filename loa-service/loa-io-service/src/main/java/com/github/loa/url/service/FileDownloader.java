@@ -36,6 +36,7 @@ public class FileDownloader {
                     .bodyToFlux(DataBuffer.class);
 
             return DataBufferUtils.write(inputStream, resultLocation.toPath())
+                    .doOnError(error -> resultLocation.delete())
                     .thenReturn(resultLocation);
         } catch (Exception e) {
             log.debug("Failed to download document from location: {}.", downloadTarget, e);
