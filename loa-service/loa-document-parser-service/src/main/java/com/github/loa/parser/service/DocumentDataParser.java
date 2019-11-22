@@ -6,7 +6,6 @@ import com.github.loa.parser.domain.DocumentMetadata;
 import com.github.loa.vault.client.service.VaultClientService;
 import com.github.pemistahl.lingua.api.Language;
 import com.github.pemistahl.lingua.api.LanguageDetector;
-import com.github.pemistahl.lingua.api.LanguageDetectorBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tika.exception.TikaException;
@@ -14,7 +13,6 @@ import org.apache.tika.io.TikaInputStream;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.metadata.PagedText;
 import org.apache.tika.metadata.TikaCoreProperties;
-import org.apache.tika.parser.AutoDetectParser;
 import org.apache.tika.parser.ParseContext;
 import org.apache.tika.parser.Parser;
 import org.apache.tika.sax.BodyContentHandler;
@@ -33,9 +31,9 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class DocumentDataParser {
 
+    private final Parser documentParser;
+    private final LanguageDetector languageDetector;
     private final VaultClientService vaultClientService;
-    //TODO: This should come from a config!
-    private final LanguageDetector languageDetector = LanguageDetectorBuilder.fromAllBuiltInLanguages().build();
 
     public Mono<DocumentMetadata> parseDocumentData(final DocumentEntity documentEntity) {
         return vaultClientService.queryDocument(documentEntity)
@@ -51,13 +49,12 @@ public class DocumentDataParser {
 
     public DocumentMetadata parseDocumentMetadata(final String documentId, final DocumentType documentType,
             final InputStream documentContents) {
-        final Parser parser = new AutoDetectParser();
         final ContentHandler handler = new BodyContentHandler(-1);
         final Metadata metadata = new Metadata();
         final ParseContext context = new ParseContext();
 
         try {
-            parser.parse(TikaInputStream.get(documentContents), handler, metadata, context);
+            documentParser.parse(TikaInputStream.get(documentContents), handler, metadata, context);
         } catch (IOException | SAXException | TikaException e) {
             throw new RuntimeException(e);
         }
