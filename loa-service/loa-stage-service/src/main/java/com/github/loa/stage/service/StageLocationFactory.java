@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import java.io.File;
+import java.nio.file.Path;
 
 /**
  * A factory that creates {@link java.io.File} instances in the staging area. These files could be used to save the
@@ -20,24 +21,14 @@ public class StageLocationFactory {
     private final StageConfigurationProperties stageConfigurationProperties;
 
     /**
-     * Return a file in the staging area that's uniquely generated for the provided document.
-     *
-     * @param documentEntity the document that we need to create the location for
-     * @return the location created in the staging area
-     */
-    public Mono<File> getLocation(final DocumentEntity documentEntity) {
-        return getLocation(documentEntity.getId(), documentEntity.getType());
-    }
-
-    /**
-     * Return a file in the staging area that's uniquely generated for the provided document id.
+     * Return a path in the staging area that's uniquely generated for the provided document id.
      *
      * @param documentId   the document's id that we need to create the location for
      * @param documentType the type of the document that we need to create the location for
      * @return the location created in the staging area
      */
-    public Mono<File> getLocation(final String documentId, final DocumentType documentType) {
-        return Mono.just(new File(stageConfigurationProperties.getLocation(), documentId + "."
+    public Mono<Path> getLocation(final String documentId, final DocumentType documentType) {
+        return Mono.just(Path.of(stageConfigurationProperties.getLocation(), documentId + "."
                 + documentType.getFileExtension()));
     }
 }

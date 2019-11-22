@@ -12,10 +12,12 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+//TODO: Re-enable this!
 @Disabled
 class DocumentFileValidatorTest {
 
@@ -39,10 +41,8 @@ class DocumentFileValidatorTest {
 
     @Test
     void testIsValidDocumentWhenDocumentIsTooSmall() {
-        final File documentFile = mock(File.class);
+        final Path documentFile = mock(Path.class);
 
-        when(documentFile.length())
-                .thenReturn(123L);
         when(stageLocationFactory.getLocation(DOCUMENT_ID, DOCUMENT_TYPE))
                 .thenReturn(Mono.just(documentFile));
 
@@ -55,10 +55,8 @@ class DocumentFileValidatorTest {
 
     @Test
     void testIsValidDocumentWhenDocumentIsTooBig() {
-        final File documentFile = mock(File.class);
+        final Path documentFile = mock(Path.class);
 
-        when(documentFile.length())
-                .thenReturn(8589934593L);
         when(stageLocationFactory.getLocation(DOCUMENT_ID, DOCUMENT_TYPE))
                 .thenReturn(Mono.just(documentFile));
 
@@ -71,10 +69,8 @@ class DocumentFileValidatorTest {
 
     @Test
     void testIsValidDocumentWhenDocumentIsGood() {
-        final File documentFile = mock(File.class);
+        final Path documentFile = mock(Path.class);
 
-        when(documentFile.length())
-                .thenReturn(2000L);
         when(stageLocationFactory.getLocation(DOCUMENT_ID, DOCUMENT_TYPE))
                 .thenReturn(Mono.just(documentFile));
 

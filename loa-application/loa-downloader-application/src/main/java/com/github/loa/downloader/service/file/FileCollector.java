@@ -7,6 +7,7 @@ import reactor.core.publisher.Mono;
 
 import java.io.File;
 import java.net.URL;
+import java.nio.file.Path;
 
 /**
  * 0this device is responsible to acquire a file from the an {@link URL}.
@@ -17,7 +18,7 @@ public class FileCollector {
 
     private final FileDownloader fileDownloader;
 
-    public Mono<File> acquireFile(final URL fileLocation, final File resultLocation) {
+    public Mono<Path> acquireFile(final URL fileLocation, final Path resultLocation) {
         final String protocol = fileLocation.getProtocol();
 
         if ("http".equals(protocol) || "https".equals(protocol)) {

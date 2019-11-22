@@ -48,7 +48,7 @@ public class DocumentDownloader {
                                 .flatMap(validationResult -> documentFileManipulator.cleanup(documentFileLocation))
                                 .thenReturn(documentFileLocation)
                         )
-                        .filter(File::exists)
+                        .filter(stageFileLocation -> stageFileLocation.toFile().exists())
                         .flatMap(archivingContext -> documentFileManipulator.moveToVault(
                                 ArchivingContext.builder()
                                         .location(documentLocation.toString())

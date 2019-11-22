@@ -7,7 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import java.io.File;
+import java.nio.file.Path;
 
 /**
  * This service is responsible for the manipulating of document files. For example moving them to the vault or removing
@@ -24,7 +24,7 @@ public class DocumentFileManipulator {
      * Move a document's file from the staging area to the vault. The document's metadata is not updated by this method!
      */
     public Mono<Void> moveToVault(final ArchivingContext archivingContext) {
-        log.info("Moving document to vault {}!", archivingContext.getContents().getName());
+        log.info("Moving document to vault {}!", archivingContext.getContents().getFileName());
 
         return Mono.just(archivingContext)
                 .flatMap(documentLocation -> vaultClientService.archiveDocument(documentLocation)
@@ -37,11 +37,11 @@ public class DocumentFileManipulator {
     /**
      * Clean up after a document's download by removing all the staging information belonging to that document.
      */
-    public Mono<Void> cleanup(final File documentFileLocation) {
-        log.debug("Cleaning up staging for document {}.", documentFileLocation.getName());
+    public Mono<Void> cleanup(final Path documentFileLocation) {
+        log.debug("Cleaning up staging for document {}.", documentFileLocation.getFileName());
 
         return Mono.just(documentFileLocation)
-                .map(File::delete)
+                .map(stageFileLocation -> documentFileLocation.toFile().delete())
                 .then();
     }
 }
