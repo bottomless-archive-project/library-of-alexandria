@@ -1,7 +1,6 @@
 apply plugin: 'org.springframework.boot'
 
 dependencies {
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-webflux'
 
     compile project(':loa-service:loa-vault-service')
