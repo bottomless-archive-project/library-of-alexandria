@@ -15,6 +15,7 @@ import org.apache.activemq.artemis.api.core.client.ClientSession;
 import org.apache.activemq.artemis.api.core.client.ClientSessionFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.net.MalformedURLException;
@@ -31,40 +32,49 @@ public class DownloadQueueListener implements CommandLineRunner {
     private final DownloaderConfigurationProperties downloaderConfigurationProperties;
     private final ClientSessionFactory clientSessionFactory;
 
-    public void run(String... args) throws ActiveMQException, MalformedURLException {
+    @Override
+    public void run(String... args) throws ActiveMQException {
         final ClientSession clientSession = clientSessionFactory.createSession();
 
         ClientConsumer consumer = clientSession.createConsumer("loa-document-location");
 
         clientSession.start();
 
-        while (true) {
-            ClientMessage msgReceived = consumer.receive();
+        Flux.<DocumentSourceItem>generate((synchronousSink) -> {
+            try {
+                ClientMessage msgReceived = consumer.receive();
 
-            final DocumentSourceItem documentSourceItem = DocumentSourceItem.builder()
-                    .sourceName(msgReceived.getBodyBuffer().readString())
-                    .documentLocation(new URL(msgReceived.getBodyBuffer().readString()))
-                    .build();
+                final DocumentSourceItem documentSourceItem = DocumentSourceItem.builder()
+                        .sourceName(msgReceived.getBodyBuffer().readString())
+                        .documentLocation(new URL(msgReceived.getBodyBuffer().readString()))
+                        .build();
 
-            final String documentId = documentLocationIdFactory.newDocumentId(documentSourceItem.getDocumentLocation());
+                synchronousSink.next(documentSourceItem);
+            } catch (ActiveMQException | MalformedURLException e) {
+                throw new RuntimeException(e);
+            }
+        })
+                .flatMap(documentSourceItem -> {
+                    final String documentId = documentLocationIdFactory.newDocumentId(documentSourceItem.getDocumentLocation());
 
-            final DocumentLocationCreationContext documentLocationCreationContext =
-                    DocumentLocationCreationContext.builder()
-                            .id(documentId)
-                            .url(documentSourceItem.getDocumentLocation().toString())
-                            .source(documentSourceItem.getSourceName())
-                            .downloaderVersion(downloaderConfigurationProperties.getVersionNumber())
-                            .build();
+                    final DocumentLocationCreationContext documentLocationCreationContext =
+                            DocumentLocationCreationContext.builder()
+                                    .id(documentId)
+                                    .url(documentSourceItem.getDocumentLocation().toString())
+                                    .source(documentSourceItem.getSourceName())
+                                    .downloaderVersion(downloaderConfigurationProperties.getVersionNumber())
+                                    .build();
 
-            documentLocationEntityFactory.isDocumentLocationExistsOrCreate(documentLocationCreationContext)
-                    .filter(exists -> !exists)
-                    .map(exists -> documentSourceItem)
-                    .flatMap(documentDownloader::downloadDocument)
-                    .onErrorResume(error -> Mono.just(error)
-                            .doOnNext(throwable -> log.debug("Error downloading a document: {}!", throwable.getMessage()))
-                            .then()
-                    )
-                    .block();
-        }
+                    return documentLocationEntityFactory.isDocumentLocationExistsOrCreate(documentLocationCreationContext)
+                            .filter(exists -> !exists)
+                            .thenReturn(documentSourceItem);
+                })
+                .flatMap(documentSourceItem1 -> documentDownloader.downloadDocument(documentSourceItem1)
+                        .onErrorResume(error -> Mono.just(error)
+                                .doOnNext(throwable -> log.debug("Error downloading a document: {}!", throwable.getMessage()))
+                                .then()
+                        )
+                )
+                .subscribe();
     }
 }
