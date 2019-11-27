@@ -75,6 +75,13 @@ public class DownloadQueueListener implements CommandLineRunner {
                                 .then()
                         )
                 )
+                .doOnComplete(() -> {
+                    try {
+                        clientSession.close();
+                    } catch (ActiveMQException e) {
+                        e.printStackTrace();
+                    }
+                })
                 .subscribe();
     }
 }
