@@ -35,9 +35,9 @@ public class ServerConfigurationFactory {
         configuration.addConnectorConfiguration("netty-connector", new TransportConfiguration(
                 NettyConnectorFactory.class.getName()));
         configuration.addAcceptorConfiguration(new TransportConfiguration(NettyAcceptorFactory.class.getName()));
-        configuration.setJournalDirectory(queueConfigurationProperties + "/journal");
-        configuration.setBindingsDirectory(queueConfigurationProperties + "/bindings");
-        configuration.setLargeMessagesDirectory(queueConfigurationProperties + "/largemessages");
+        configuration.setJournalDirectory(queueConfigurationProperties.getDataDirectory() + "/journal");
+        configuration.setBindingsDirectory(queueConfigurationProperties.getDataDirectory() + "/bindings");
+        configuration.setLargeMessagesDirectory(queueConfigurationProperties.getDataDirectory() + "/largemessages");
 
         return configuration;
     }
