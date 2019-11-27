@@ -1,50 +1,75 @@
 package com.github.loa.downloader.service.listener;
 
-import com.github.loa.downloader.configuration.DownloaderConfigurationProperties;
+import com.github.loa.downloader.service.DocumentLocationCreationContextFactory;
 import com.github.loa.downloader.service.document.DocumentDownloader;
+import com.github.loa.downloader.service.file.DocumentFileManipulator;
 import com.github.loa.location.service.factory.DocumentLocationEntityFactory;
 import com.github.loa.location.service.factory.domain.DocumentLocationCreationContext;
-import com.github.loa.location.service.id.factory.DocumentLocationIdFactory;
 import com.github.loa.source.domain.DocumentSourceItem;
+import com.github.loa.vault.client.service.domain.ArchivingContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.jms.annotation.JmsListener;
-import org.springframework.messaging.Message;
+import org.apache.activemq.artemis.api.core.ActiveMQException;
+import org.apache.activemq.artemis.api.core.client.ClientSession;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.publisher.SignalType;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class DownloadQueueListener {
+public class DownloadQueueListener implements CommandLineRunner {
 
+    private final ClientSession clientSession;
     private final DocumentDownloader documentDownloader;
-    private final DocumentLocationIdFactory documentLocationIdFactory;
     private final DocumentLocationEntityFactory documentLocationEntityFactory;
-    private final DownloaderConfigurationProperties downloaderConfigurationProperties;
+    private final DownloaderQueueConsumer downloaderQueueConsumer;
+    private final DocumentFileManipulator documentFileManipulator;
+    private final DocumentLocationCreationContextFactory documentLocationCreationContextFactory;
 
-    @JmsListener(destination = "loa.downloader", concurrency = "10-100")
-    public void receive(final Message<DocumentSourceItem> message) {
-        final DocumentSourceItem documentSourceItem = message.getPayload();
+    @Override
+    public void run(String... args) {
+        Flux.generate(downloaderQueueConsumer)
+                .doFirst(this::initializeProcessing)
+                .flatMap(this::evaluateDocumentLocation)
+                .flatMap(this::downloadDocument)
+                .flatMap(this::archiveDocument)
+                .doFinally(this::finishProcessing)
+                .subscribe();
+    }
 
-        final String documentId = documentLocationIdFactory.newDocumentId(documentSourceItem.getDocumentLocation());
-
+    private Mono<DocumentSourceItem> evaluateDocumentLocation(final DocumentSourceItem documentSourceItem) {
         final DocumentLocationCreationContext documentLocationCreationContext =
-                DocumentLocationCreationContext.builder()
-                        .id(documentId)
-                        .url(documentSourceItem.getDocumentLocation().toString())
-                        .source(documentSourceItem.getSourceName())
-                        .downloaderVersion(downloaderConfigurationProperties.getVersionNumber())
-                        .build();
+                documentLocationCreationContextFactory.newCreatingContext(documentSourceItem);
 
-        documentLocationEntityFactory.isDocumentLocationExistsOrCreate(documentLocationCreationContext)
+        return documentLocationEntityFactory.isDocumentLocationExistsOrCreate(documentLocationCreationContext)
                 .filter(exists -> !exists)
-                .map(exists -> documentSourceItem)
-                .flatMap(documentDownloader::downloadDocument)
-                .onErrorResume(error -> Mono.just(error)
-                        .doOnNext(throwable -> log.debug("Error downloading a document: {}!", throwable.getMessage()))
-                        .then()
-                )
-                .block();
+                .thenReturn(documentSourceItem);
+    }
+
+    private Mono<ArchivingContext> downloadDocument(final DocumentSourceItem documentSourceItem) {
+        return documentDownloader.downloadDocument(documentSourceItem);
+    }
+
+    private Mono<Void> archiveDocument(final ArchivingContext archivingContext) {
+        return documentFileManipulator.moveToVault(archivingContext);
+    }
+
+    private void initializeProcessing() {
+        try {
+            clientSession.start();
+        } catch (ActiveMQException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void finishProcessing(final SignalType signalType) {
+        try {
+            clientSession.close();
+        } catch (ActiveMQException e) {
+            e.printStackTrace();
+        }
     }
 }
