@@ -5,7 +5,6 @@ import com.github.loa.document.service.domain.DocumentType;
 import com.github.loa.downloader.service.file.DocumentFileManipulator;
 import com.github.loa.downloader.service.file.DocumentFileValidator;
 import com.github.loa.downloader.service.file.FileCollector;
-import com.github.loa.location.service.id.factory.DocumentLocationIdFactory;
 import com.github.loa.source.domain.DocumentSourceItem;
 import com.github.loa.stage.service.StageLocationFactory;
 import com.github.loa.vault.client.service.domain.ArchivingContext;
@@ -14,8 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import java.io.File;
 import java.net.URL;
+import java.util.UUID;
 
 /**
  * This service is responsible for downloading documents.
@@ -25,7 +24,6 @@ import java.net.URL;
 @RequiredArgsConstructor
 public class DocumentDownloader {
 
-    private final DocumentLocationIdFactory documentLocationIdFactory;
     private final StageLocationFactory stageLocationFactory;
     private final DocumentFileValidator documentFileValidator;
     private final DocumentFileManipulator documentFileManipulator;
@@ -40,7 +38,7 @@ public class DocumentDownloader {
 
         log.debug("Starting to download document {}.", documentLocation);
 
-        return Mono.just(documentLocationIdFactory.newDocumentId(documentLocation))
+        return Mono.just(UUID.randomUUID().toString())
                 .flatMap(documentId -> stageLocationFactory.getLocation(documentId, documentType)
                         .flatMap(stageFileLocation -> fileCollector.acquireFile(documentLocation, stageFileLocation))
                         .flatMap(documentFileLocation -> documentFileValidator.isValidDocument(documentId, documentType)
