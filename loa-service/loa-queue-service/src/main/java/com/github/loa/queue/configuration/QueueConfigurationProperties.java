@@ -11,4 +11,5 @@ public class QueueConfigurationProperties {
 
     private String host;
     private int port;
+    private String dataDirectory;
 }

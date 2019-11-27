@@ -1,3 +1,4 @@
 dependencies {
     compile group: 'org.apache.activemq', name: 'artemis-core-client', version: '2.10.1'
+    compileOnly group: 'org.apache.activemq', name: 'artemis-server', version: '2.10.1'
 }
