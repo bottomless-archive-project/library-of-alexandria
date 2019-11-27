@@ -20,7 +20,6 @@ import java.net.URL;
 /**
  * This service is responsible for downloading documents.
  */
-//TODO: This class is responsible for downloading AND (!!!) archiving the document. This is suboptimal.
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -33,7 +32,7 @@ public class DocumentDownloader {
     private final FileCollector fileCollector;
     private final DocumentTypeCalculator documentTypeCalculator;
 
-    public Mono<Void> downloadDocument(final DocumentSourceItem documentSourceItem) {
+    public Mono<ArchivingContext> downloadDocument(final DocumentSourceItem documentSourceItem) {
         final URL documentLocation = documentSourceItem.getDocumentLocation();
         final DocumentType documentType = documentTypeCalculator.calculate(documentLocation)
                 .orElseThrow(() -> new RuntimeException("Unable to find valid document type for document: "
@@ -50,14 +49,20 @@ public class DocumentDownloader {
                                 .thenReturn(documentFileLocation)
                         )
                         .filter(stageFileLocation -> stageFileLocation.toFile().exists())
-                        .flatMap(archivingContext -> documentFileManipulator.moveToVault(
+                        .flatMap(stageFileLocation -> Mono.just(
                                 ArchivingContext.builder()
                                         .location(documentLocation.toString())
                                         .source(documentSourceItem.getSourceName())
                                         .type(documentType)
-                                        .contents(archivingContext)
+                                        .contents(stageFileLocation)
                                         .build()
-                        ))
+                                )
+                        )
+                        .onErrorResume(error -> {
+                            log.debug("Error downloading a document: {}!", error.getMessage());
+
+                            return Mono.empty();
+                        })
                 );
     }
 }

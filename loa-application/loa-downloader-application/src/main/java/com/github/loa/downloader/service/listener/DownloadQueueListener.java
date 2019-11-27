@@ -2,9 +2,11 @@ package com.github.loa.downloader.service.listener;
 
 import com.github.loa.downloader.service.DocumentLocationCreationContextFactory;
 import com.github.loa.downloader.service.document.DocumentDownloader;
+import com.github.loa.downloader.service.file.DocumentFileManipulator;
 import com.github.loa.location.service.factory.DocumentLocationEntityFactory;
 import com.github.loa.location.service.factory.domain.DocumentLocationCreationContext;
 import com.github.loa.source.domain.DocumentSourceItem;
+import com.github.loa.vault.client.service.domain.ArchivingContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.artemis.api.core.ActiveMQException;
@@ -20,10 +22,11 @@ import reactor.core.publisher.SignalType;
 @RequiredArgsConstructor
 public class DownloadQueueListener implements CommandLineRunner {
 
+    private final ClientSession clientSession;
     private final DocumentDownloader documentDownloader;
     private final DocumentLocationEntityFactory documentLocationEntityFactory;
-    private final ClientSession clientSession;
     private final DownloaderQueueConsumer downloaderQueueConsumer;
+    private final DocumentFileManipulator documentFileManipulator;
     private final DocumentLocationCreationContextFactory documentLocationCreationContextFactory;
 
     @Override
@@ -32,7 +35,7 @@ public class DownloadQueueListener implements CommandLineRunner {
                 .doFirst(this::initializeProcessing)
                 .flatMap(this::evaluateDocumentLocation)
                 .flatMap(this::downloadDocument)
-                //TODO: Move the archiving logic here out from the document downloader!
+                .flatMap(this::archiveDocument)
                 .doFinally(this::finishProcessing)
                 .subscribe();
     }
@@ -46,12 +49,12 @@ public class DownloadQueueListener implements CommandLineRunner {
                 .thenReturn(documentSourceItem);
     }
 
-    private Mono<Void> downloadDocument(final DocumentSourceItem documentSourceItem) {
-        return documentDownloader.downloadDocument(documentSourceItem)
-                .onErrorResume(error -> Mono.just(error)
-                        .doOnNext(throwable -> log.debug("Error downloading a document: {}!", throwable.getMessage()))
-                        .then()
-                );
+    private Mono<ArchivingContext> downloadDocument(final DocumentSourceItem documentSourceItem) {
+        return documentDownloader.downloadDocument(documentSourceItem);
+    }
+
+    private Mono<Void> archiveDocument(final ArchivingContext archivingContext) {
+        return documentFileManipulator.moveToVault(archivingContext);
     }
 
     private void initializeProcessing() {
