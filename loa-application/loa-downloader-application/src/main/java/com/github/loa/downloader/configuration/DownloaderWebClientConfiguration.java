@@ -8,7 +8,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.client.HttpClient;
 
 @Configuration
-public class DownloaderConfiguration {
+public class DownloaderWebClientConfiguration {
 
     @Bean
     public WebClient downloaderWebClient(final ClientHttpConnector clientHttpConnector) {

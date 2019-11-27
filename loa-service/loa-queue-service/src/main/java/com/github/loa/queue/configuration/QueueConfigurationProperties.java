@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 @Data
 @Component
 @ConfigurationProperties("loa.queue")
-public class DownloaderQueueConfigurationProperties {
+public class QueueConfigurationProperties {
 
     private String host;
     private int port;

@@ -20,6 +20,7 @@ import java.net.URL;
 /**
  * This service is responsible for downloading documents.
  */
+//TODO: This class is responsible for downloading AND (!!!) archiving the document. This is suboptimal.
 @Slf4j
 @Service
 @RequiredArgsConstructor

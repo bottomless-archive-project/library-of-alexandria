@@ -14,12 +14,12 @@ import java.util.Map;
 
 @Configuration
 @RequiredArgsConstructor
-public class DownloaderQueueConfiguration {
+public class QueueConfiguration {
 
-    private final DownloaderQueueConfigurationProperties downloaderQueueConfigurationProperties;
+    private final QueueConfigurationProperties queueConfigurationProperties;
 
     @Bean
-    public ClientSessionFactory clientSession(final ServerLocator serverLocator) throws Exception {
+    public ClientSessionFactory clientSessionFactory(final ServerLocator serverLocator) throws Exception {
         return serverLocator.createSessionFactory();
     }
 
@@ -32,8 +32,8 @@ public class DownloaderQueueConfiguration {
     protected TransportConfiguration serverTransportConfiguration() {
         return new TransportConfiguration(NettyConnectorFactory.class.getName(),
                 Map.of(
-                        TransportConstants.HOST_PROP_NAME, downloaderQueueConfigurationProperties.getHost(),
-                        TransportConstants.PORT_PROP_NAME, downloaderQueueConfigurationProperties.getPort()
+                        TransportConstants.HOST_PROP_NAME, queueConfigurationProperties.getHost(),
+                        TransportConstants.PORT_PROP_NAME, queueConfigurationProperties.getPort()
                 )
         );
     }
