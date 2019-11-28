@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 /**
  * Provide access to the content of the documents in the vault.
@@ -46,28 +47,34 @@ public class VaultDocumentManager {
     public Mono<DocumentEntity> archiveDocument(final DocumentArchivingContext documentArchivingContext) {
         final String documentId = UUID.randomUUID().toString();
 
-        try {
-            final byte[] documentContents = documentArchivingContext.getContents().getInputStream().readAllBytes();
+        return Mono.fromSupplier(supplyBytes(documentArchivingContext.getContents()))
+                .flatMap(documentContents -> checksumProvider.checksum(documentId, documentContents)
+                        .flatMap(checksum -> documentEntityFactory.newDocumentEntity(
+                                DocumentCreationContext.builder()
+                                        .id(documentId)
+                                        .type(documentArchivingContext.getType())
+                                        .status(DocumentStatus.DOWNLOADED)
+                                        .location(documentArchivingContext.getLocation())
+                                        .source(documentArchivingContext.getSource())
+                                        .versionNumber(vaultConfigurationProperties.getVersionNumber())
+                                        .compression(compressionConfigurationProperties.getAlgorithm())
+                                        .checksum(checksum)
+                                        .fileSize(documentContents.length)
+                                        .build()
+                                )
+                        )
+                        .flatMap(documentEntity -> saveDocument(documentEntity, documentContents))
+                );
+    }
 
-            return checksumProvider.checksum(documentId, documentContents)
-                    .flatMap(checksum -> documentEntityFactory.newDocumentEntity(
-                            DocumentCreationContext.builder()
-                                    .id(documentId)
-                                    .type(documentArchivingContext.getType())
-                                    .status(DocumentStatus.DOWNLOADED)
-                                    .location(documentArchivingContext.getLocation())
-                                    .source(documentArchivingContext.getSource())
-                                    .versionNumber(vaultConfigurationProperties.getVersionNumber())
-                                    .compression(compressionConfigurationProperties.getAlgorithm())
-                                    .checksum(checksum)
-                                    .fileSize(documentContents.length)
-                                    .build()
-                            )
-                    )
-                    .flatMap(documentEntity -> saveDocument(documentEntity, documentContents));
-        } catch (IOException e) {
-            throw new VaultAccessException("Unable to move document to the vault!", e);
-        }
+    private Supplier<byte[]> supplyBytes(final Resource resource) {
+        return () -> {
+            try {
+                return resource.getInputStream().readAllBytes();
+            } catch (IOException e) {
+                throw new VaultAccessException("Unable to move document to the vault!", e);
+            }
+        };
     }
 
     public Mono<DocumentEntity> saveDocument(final DocumentEntity documentEntity, final byte[] documentContents) {

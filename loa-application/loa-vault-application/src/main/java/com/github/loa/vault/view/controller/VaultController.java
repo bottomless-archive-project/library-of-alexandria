@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 @RestController
 @RequiredArgsConstructor
@@ -33,16 +34,18 @@ public class VaultController {
      * @return the document entity that the content was updated for
      */
     @PostMapping("/document")
-    public Mono<DocumentEntity> archiveDocument(@RequestPart(value = "document") final ArchiveDocumentRequest archiveDocumentRequest,
-            @RequestPart(value = "contents") Resource documentContents) {
-        return vaultDocumentManager.archiveDocument(
-                DocumentArchivingContext.builder()
-                        .type(archiveDocumentRequest.getType())
-                        .location(archiveDocumentRequest.getLocation())
-                        .source(archiveDocumentRequest.getSource())
-                        .contents(documentContents)
-                        .build()
-        );
+    public Mono<DocumentEntity> archiveDocument(
+            @RequestPart(value = "document") final ArchiveDocumentRequest archiveDocumentRequest,
+            @RequestPart(value = "contents") final Resource documentContents) {
+        final DocumentArchivingContext documentArchivingContext = DocumentArchivingContext.builder()
+                .type(archiveDocumentRequest.getType())
+                .location(archiveDocumentRequest.getLocation())
+                .source(archiveDocumentRequest.getSource())
+                .contents(documentContents)
+                .build();
+
+        return vaultDocumentManager.archiveDocument(documentArchivingContext)
+                .subscribeOn(Schedulers.parallel());
     }
 
     /**
