@@ -63,7 +63,8 @@ public class VaultDocumentManager {
                                         .build()
                                 )
                         )
-                        .flatMap(documentEntity -> saveDocument(documentEntity, documentContents))
+                        .flatMap(documentEntity -> Mono.fromSupplier(
+                                () -> saveDocument(documentEntity, documentContents)))
                 );
     }
 
@@ -77,7 +78,7 @@ public class VaultDocumentManager {
         };
     }
 
-    public Mono<DocumentEntity> saveDocument(final DocumentEntity documentEntity, final byte[] documentContents) {
+    public DocumentEntity saveDocument(final DocumentEntity documentEntity, final byte[] documentContents) {
         try (final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentEntity)) {
             if (!documentEntity.isCompressed()) {
                 try (final OutputStream outputStream = vaultLocation.destination()) {
@@ -94,7 +95,7 @@ public class VaultDocumentManager {
                     + " to the vault!", e);
         }
 
-        return Mono.just(documentEntity);
+        return documentEntity;
     }
 
     /**

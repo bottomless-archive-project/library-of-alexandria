@@ -45,7 +45,7 @@ public class VaultController {
                 .build();
 
         return vaultDocumentManager.archiveDocument(documentArchivingContext)
-                .subscribeOn(Schedulers.parallel());
+                .subscribeOn(Schedulers.boundedElastic());
     }
 
     /**

@@ -30,12 +30,12 @@ public class FileDownloader {
      */
     public Mono<Path> downloadFile(final URL downloadTarget, final Path resultLocation) {
         try {
-            final Flux<DataBuffer> inputStream = downloaderWebClient.get()
+            final Flux<DataBuffer> dataBufferFlux = downloaderWebClient.get()
                     .uri(downloadTarget.toURI())
                     .retrieve()
                     .bodyToFlux(DataBuffer.class);
 
-            return DataBufferUtils.write(inputStream, resultLocation)
+            return DataBufferUtils.write(dataBufferFlux, resultLocation)
                     .doOnError(error -> resultLocation.toFile().delete())
                     .thenReturn(resultLocation);
         } catch (Exception e) {
