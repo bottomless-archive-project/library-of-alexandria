@@ -3,21 +3,29 @@ package com.github.loa.vault.view.controller;
 import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.document.service.entity.factory.DocumentEntityFactory;
 import com.github.loa.document.view.service.MediaTypeCalculator;
+import com.github.loa.stage.service.StageLocationFactory;
 import com.github.loa.vault.service.RecompressorService;
 import com.github.loa.vault.service.VaultDocumentManager;
 import com.github.loa.vault.service.domain.DocumentArchivingContext;
 import com.github.loa.vault.view.request.ArchiveDocumentRequest;
 import com.github.loa.vault.view.request.domain.RecompressRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.UUID;
+
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 public class VaultController {
@@ -26,6 +34,7 @@ public class VaultController {
     private final VaultDocumentManager vaultDocumentManager;
     private final RecompressorService recompressorService;
     private final MediaTypeCalculator mediaTypeCalculator;
+    private final StageLocationFactory stageLocationFactory;
 
     /**
      * Saves a document's content to the vault.
@@ -36,15 +45,29 @@ public class VaultController {
     @PostMapping("/document")
     public Mono<DocumentEntity> archiveDocument(
             @RequestPart(value = "document") final ArchiveDocumentRequest archiveDocumentRequest,
-            @RequestPart(value = "contents") final Resource documentContents) {
-        final DocumentArchivingContext documentArchivingContext = DocumentArchivingContext.builder()
-                .type(archiveDocumentRequest.getType())
-                .location(archiveDocumentRequest.getLocation())
-                .source(archiveDocumentRequest.getSource())
-                .contents(documentContents)
-                .build();
+            @RequestPart(value = "contents") final FilePart documentContents) {
+        final String documentId = UUID.randomUUID().toString();
 
-        return vaultDocumentManager.archiveDocument(documentArchivingContext)
+        return stageLocationFactory.getLocation(documentId, archiveDocumentRequest.getType())
+                .doOnNext(stageDocumentLocation -> documentContents.transferTo(stageDocumentLocation)
+                        .thenReturn(stageDocumentLocation)
+                )
+                .map(stageDocumentLocation -> DocumentArchivingContext.builder()
+                        .type(archiveDocumentRequest.getType())
+                        .location(archiveDocumentRequest.getLocation())
+                        .source(archiveDocumentRequest.getSource())
+                        .contents(stageDocumentLocation)
+                        .build()
+                )
+                .flatMap(documentArchivingContext -> vaultDocumentManager.archiveDocument(documentArchivingContext)
+                        .doOnTerminate(() -> {
+                            try {
+                                Files.delete(documentArchivingContext.getContents());
+                            } catch (IOException e) {
+                                log.error("Unable to delete staged vault document!", e);
+                            }
+                        })
+                )
                 .subscribeOn(Schedulers.boundedElastic());
     }
 

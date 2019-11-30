@@ -12,6 +12,7 @@ import com.github.loa.vault.domain.exception.VaultAccessException;
 import com.github.loa.vault.service.domain.DocumentArchivingContext;
 import com.github.loa.vault.service.location.VaultLocation;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
@@ -19,16 +20,17 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.UUID;
-import java.util.function.Supplier;
 
 /**
  * Provide access to the content of the documents in the vault.
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class VaultDocumentManager {
@@ -47,8 +49,8 @@ public class VaultDocumentManager {
     public Mono<DocumentEntity> archiveDocument(final DocumentArchivingContext documentArchivingContext) {
         final String documentId = UUID.randomUUID().toString();
 
-        return Mono.fromSupplier(supplyBytes(documentArchivingContext.getContents()))
-                .flatMap(documentContents -> checksumProvider.checksum(documentId, documentContents)
+        return Mono.just(documentArchivingContext)
+                .flatMap(documentContents -> checksumProvider.checksum(documentId, documentContents.getContents())
                         .flatMap(checksum -> documentEntityFactory.newDocumentEntity(
                                 DocumentCreationContext.builder()
                                         .id(documentId)
@@ -59,43 +61,39 @@ public class VaultDocumentManager {
                                         .versionNumber(vaultConfigurationProperties.getVersionNumber())
                                         .compression(compressionConfigurationProperties.getAlgorithm())
                                         .checksum(checksum)
-                                        .fileSize(documentContents.length)
+                                        .fileSize(documentContents.getContents().toFile().length())
                                         .build()
                                 )
                         )
                         .flatMap(documentEntity -> Mono.fromSupplier(
-                                () -> saveDocument(documentEntity, documentContents)))
+                                () -> saveDocument(documentEntity, documentContents.getContents())))
                 );
     }
 
-    private Supplier<byte[]> supplyBytes(final Resource resource) {
-        return () -> {
-            try {
-                return resource.getInputStream().readAllBytes();
-            } catch (IOException e) {
-                throw new VaultAccessException("Unable to move document to the vault!", e);
-            }
-        };
-    }
-
-    public DocumentEntity saveDocument(final DocumentEntity documentEntity, final byte[] documentContents) {
-        try (final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentEntity)) {
-            if (!documentEntity.isCompressed()) {
-                try (final OutputStream outputStream = vaultLocation.destination()) {
-                    IOUtils.copy(new ByteArrayInputStream(documentContents), outputStream);
-                }
-            } else {
-                try (final OutputStream outputStream = compressionServiceProvider
-                        .getCompressionService(documentEntity.getCompression()).compress(vaultLocation.destination())) {
-                    IOUtils.copy(new ByteArrayInputStream(documentContents), outputStream);
-                }
-            }
+    public DocumentEntity saveDocument(final DocumentEntity documentEntity, final Path documentContents) {
+        try (final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentEntity);
+             final InputStream documentInputStream = Files.newInputStream(documentContents)) {
+            saveDocumentContents(documentEntity, documentInputStream, vaultLocation);
         } catch (IOException e) {
             throw new VaultAccessException("Unable to move document with id " + documentEntity.getId()
                     + " to the vault!", e);
         }
 
         return documentEntity;
+    }
+
+    public void saveDocumentContents(final DocumentEntity documentEntity, final InputStream documentContents,
+            final VaultLocation vaultLocation) throws IOException {
+        if (!documentEntity.isCompressed()) {
+            try (final OutputStream outputStream = vaultLocation.destination()) {
+                IOUtils.copy(documentContents, outputStream);
+            }
+        } else {
+            try (final OutputStream outputStream = compressionServiceProvider
+                    .getCompressionService(documentEntity.getCompression()).compress(vaultLocation.destination())) {
+                IOUtils.copy(documentContents, outputStream);
+            }
+        }
     }
 
     /**

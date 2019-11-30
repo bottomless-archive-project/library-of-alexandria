@@ -4,11 +4,12 @@ import com.github.loa.compression.configuration.CompressionConfigurationProperti
 import com.github.loa.compression.domain.DocumentCompression;
 import com.github.loa.document.service.DocumentManipulator;
 import com.github.loa.document.service.domain.DocumentEntity;
+import com.github.loa.vault.service.location.VaultLocation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Mono;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -19,6 +20,7 @@ public class RecompressorService {
 
     private final VaultDocumentManager vaultDocumentManager;
     private final DocumentManipulator documentManipulator;
+    private final VaultLocationFactory vaultLocationFactory;
     private final CompressionConfigurationProperties compressionConfigurationProperties;
 
     public void recompress(final DocumentEntity documentEntity, final DocumentCompression documentCompression) {
@@ -31,8 +33,14 @@ public class RecompressorService {
             final byte[] documentContent = documentContentInputStream.readAllBytes();
 
             vaultDocumentManager.removeDocument(documentEntity)
-                    .flatMap(documentEntity1 -> Mono.fromSupplier(
-                            () -> vaultDocumentManager.saveDocument(documentEntity1, documentContent)))
+                    .doOnNext(documentEntity1 -> {
+                        try (final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentEntity)) {
+                            vaultDocumentManager.saveDocumentContents(documentEntity1,
+                                    new ByteArrayInputStream(documentContent), vaultLocation);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
                     .subscribe();
 
             documentManipulator.updateCompression(documentEntity.getId(), documentCompression).subscribe();
