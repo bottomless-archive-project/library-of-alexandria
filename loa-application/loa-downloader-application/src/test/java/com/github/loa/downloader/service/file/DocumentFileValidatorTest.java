@@ -4,6 +4,7 @@ import com.github.loa.document.service.domain.DocumentType;
 import com.github.loa.downloader.configuration.DownloaderConfigurationProperties;
 import com.github.loa.parser.service.DocumentDataParser;
 import com.github.loa.stage.service.StageLocationFactory;
+import com.github.loa.stage.service.domain.StageLocation;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -44,7 +45,11 @@ class DocumentFileValidatorTest {
         final Path documentFile = mock(Path.class);
 
         when(stageLocationFactory.getLocation(DOCUMENT_ID, DOCUMENT_TYPE))
-                .thenReturn(Mono.just(documentFile));
+                .thenReturn(Mono.just(
+                        StageLocation.builder()
+                                .path(documentFile)
+                                .build()
+                ));
 
         final Mono<Boolean> result = underTest.isValidDocument(DOCUMENT_ID, DOCUMENT_TYPE);
 
@@ -58,7 +63,11 @@ class DocumentFileValidatorTest {
         final Path documentFile = mock(Path.class);
 
         when(stageLocationFactory.getLocation(DOCUMENT_ID, DOCUMENT_TYPE))
-                .thenReturn(Mono.just(documentFile));
+                .thenReturn(Mono.just(
+                        StageLocation.builder()
+                                .path(documentFile)
+                                .build()
+                ));
 
         final Mono<Boolean> result = underTest.isValidDocument(DOCUMENT_ID, DOCUMENT_TYPE);
 
@@ -72,7 +81,11 @@ class DocumentFileValidatorTest {
         final Path documentFile = mock(Path.class);
 
         when(stageLocationFactory.getLocation(DOCUMENT_ID, DOCUMENT_TYPE))
-                .thenReturn(Mono.just(documentFile));
+                .thenReturn(Mono.just(
+                        StageLocation.builder()
+                                .path(documentFile)
+                                .build()
+                ));
 
         final Mono<Boolean> result = underTest.isValidDocument(DOCUMENT_ID, DOCUMENT_TYPE);
 

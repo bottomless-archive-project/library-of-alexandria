@@ -36,14 +36,14 @@ public class DocumentFileValidator {
     public Mono<Boolean> isValidDocument(final String documentId, final DocumentType documentType) {
         return stageLocationFactory.getLocation(documentId, documentType)
                 .map(stageFileLocation -> {
-                    final long stageFileLocationSize = stageFileLocation.toFile().length();
+                    final long stageFileLocationSize = stageFileLocation.size();
 
                     if (stageFileLocationSize < MINIMUM_FILE_LENGTH
                             || stageFileLocationSize > downloaderConfigurationProperties.getMaximumArchiveSize()) {
                         return false;
                     }
 
-                    try (final InputStream inputStream = new FileInputStream(stageFileLocation.toFile())) {
+                    try (final InputStream inputStream = stageFileLocation.openStream()) {
                         documentDataParser.parseDocumentMetadata(documentId, documentType, inputStream);
                     } catch (Exception e) {
                         log.info("Non-parsable document: {}!", documentId);

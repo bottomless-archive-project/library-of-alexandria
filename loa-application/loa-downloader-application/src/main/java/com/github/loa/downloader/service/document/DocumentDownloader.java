@@ -7,6 +7,7 @@ import com.github.loa.downloader.service.file.DocumentFileValidator;
 import com.github.loa.downloader.service.file.FileCollector;
 import com.github.loa.source.domain.DocumentSourceItem;
 import com.github.loa.stage.service.StageLocationFactory;
+import com.github.loa.stage.service.domain.StageLocation;
 import com.github.loa.vault.client.service.domain.ArchivingContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,19 +41,19 @@ public class DocumentDownloader {
 
         return Mono.just(UUID.randomUUID().toString())
                 .flatMap(documentId -> stageLocationFactory.getLocation(documentId, documentType)
-                        .flatMap(stageFileLocation -> fileCollector.acquireFile(documentLocation, stageFileLocation))
+                        .flatMap(stageFileLocation -> acquireFile(documentLocation, stageFileLocation))
                         .flatMap(documentFileLocation -> documentFileValidator.isValidDocument(documentId, documentType)
                                 .filter(validationResult -> !validationResult)
-                                .flatMap(validationResult -> documentFileManipulator.cleanup(documentFileLocation))
                                 .thenReturn(documentFileLocation)
+                                .doOnNext(StageLocation::cleanup)
                         )
-                        .filter(stageFileLocation -> stageFileLocation.toFile().exists())
-                        .flatMap(stageFileLocation -> Mono.just(
+                        .filter(StageLocation::exists)
+                        .flatMap(stageLocation -> Mono.just(
                                 ArchivingContext.builder()
                                         .location(documentLocation.toString())
                                         .source(documentSourceItem.getSourceName())
                                         .type(documentType)
-                                        .contents(stageFileLocation)
+                                        .contents(stageLocation.getPath())
                                         .build()
                                 )
                         )
@@ -62,5 +63,10 @@ public class DocumentDownloader {
                             return Mono.empty();
                         })
                 );
+    }
+
+    private Mono<StageLocation> acquireFile(final URL documentLocation, final StageLocation stageLocation) {
+        return fileCollector.acquireFile(documentLocation, stageLocation.getPath())
+                .thenReturn(stageLocation);
     }
 }
