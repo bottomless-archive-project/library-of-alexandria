@@ -2,7 +2,6 @@ package com.github.loa.downloader.service.document;
 
 import com.github.loa.document.service.DocumentTypeCalculator;
 import com.github.loa.document.service.domain.DocumentType;
-import com.github.loa.downloader.service.file.DocumentFileManipulator;
 import com.github.loa.downloader.service.file.DocumentFileValidator;
 import com.github.loa.downloader.service.file.FileCollector;
 import com.github.loa.source.domain.DocumentSourceItem;
@@ -27,7 +26,6 @@ public class DocumentDownloader {
 
     private final StageLocationFactory stageLocationFactory;
     private final DocumentFileValidator documentFileValidator;
-    private final DocumentFileManipulator documentFileManipulator;
     private final FileCollector fileCollector;
     private final DocumentTypeCalculator documentTypeCalculator;
 
@@ -44,8 +42,8 @@ public class DocumentDownloader {
                         .flatMap(stageFileLocation -> acquireFile(documentLocation, stageFileLocation))
                         .flatMap(documentFileLocation -> documentFileValidator.isValidDocument(documentId, documentType)
                                 .filter(validationResult -> !validationResult)
+                                .doOnNext(validationResult -> documentFileLocation.cleanup())
                                 .thenReturn(documentFileLocation)
-                                .doOnNext(StageLocation::cleanup)
                         )
                         .filter(StageLocation::exists)
                         .flatMap(stageLocation -> Mono.just(

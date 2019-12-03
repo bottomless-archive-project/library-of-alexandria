@@ -1,13 +1,14 @@
 package com.github.loa.vault.view.controller;
 
-import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.document.service.entity.factory.DocumentEntityFactory;
+import com.github.loa.document.view.response.domain.DocumentResponse;
+import com.github.loa.document.view.response.service.DocumentResponseTransformer;
 import com.github.loa.document.view.service.MediaTypeCalculator;
 import com.github.loa.stage.service.StageLocationFactory;
 import com.github.loa.vault.service.RecompressorService;
 import com.github.loa.vault.service.VaultDocumentManager;
 import com.github.loa.vault.service.domain.DocumentArchivingContext;
-import com.github.loa.vault.view.request.ArchiveDocumentRequest;
+import com.github.loa.vault.view.request.domain.ArchiveDocumentRequest;
 import com.github.loa.vault.view.request.domain.RecompressRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +34,7 @@ public class VaultController {
     private final RecompressorService recompressorService;
     private final MediaTypeCalculator mediaTypeCalculator;
     private final StageLocationFactory stageLocationFactory;
+    private final DocumentResponseTransformer documentResponseTransformer;
 
     /**
      * Saves a document's content to the vault.
@@ -41,7 +43,7 @@ public class VaultController {
      * @return the document entity that the content was updated for
      */
     @PostMapping("/document")
-    public Mono<DocumentEntity> archiveDocument(
+    public Mono<DocumentResponse> archiveDocument(
             @RequestPart(value = "document") final ArchiveDocumentRequest archiveDocumentRequest,
             @RequestPart(value = "contents") final FilePart documentContents) {
         final String documentId = UUID.randomUUID().toString();
@@ -58,6 +60,7 @@ public class VaultController {
                         .flatMap(vaultDocumentManager::archiveDocument)
                         .doOnTerminate(stageLocation::cleanup)
                 )
+                .map(documentResponseTransformer::transform)
                 .subscribeOn(Schedulers.boundedElastic());
     }
 
@@ -90,11 +93,12 @@ public class VaultController {
      * @return the document entity that the content was recompressed
      */
     @PostMapping("/document/{documentId}/recompress")
-    public Mono<DocumentEntity> recompressDocument(@PathVariable final String documentId,
+    public Mono<DocumentResponse> recompressDocument(@PathVariable final String documentId,
             @RequestBody final RecompressRequest recompressRequest) {
         return documentEntityFactory.getDocumentEntity(documentId)
                 .doOnNext(documentEntity ->
                         recompressorService.recompress(documentEntity, recompressRequest.getCompression()))
+                .map(documentResponseTransformer::transform)
                 .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Document not found with id " + documentId + "!")));
     }

@@ -1,4 +1,4 @@
-package com.github.loa.vault.view.request;
+package com.github.loa.vault.view.request.domain;
 
 import com.github.loa.document.service.domain.DocumentType;
 import lombok.Data;

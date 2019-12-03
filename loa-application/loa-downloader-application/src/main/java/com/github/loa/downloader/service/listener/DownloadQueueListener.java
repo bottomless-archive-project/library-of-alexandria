@@ -61,7 +61,7 @@ public class DownloadQueueListener implements CommandLineRunner {
         try {
             clientSession.start();
         } catch (ActiveMQException e) {
-            e.printStackTrace();
+            log.error("Connection error with the Queue Application!", e);
         }
     }
 
@@ -69,7 +69,7 @@ public class DownloadQueueListener implements CommandLineRunner {
         try {
             clientSession.close();
         } catch (ActiveMQException e) {
-            e.printStackTrace();
+            log.error("Connection error with the Queue Application!", e);
         }
     }
 }
