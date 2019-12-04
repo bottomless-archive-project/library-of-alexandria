@@ -4,6 +4,5 @@ dependencies {
     compile project(':loa-service:loa-document-location-service')
     compile project(':loa-service:loa-source-commoncrawl-service')
     compile project(':loa-service:loa-source-file-service')
-    compile project(':loa-service:loa-source-folder-service')
     compile project(':loa-service:loa-queue-service')
 }
