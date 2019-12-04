@@ -8,6 +8,4 @@ dependencies {
     compile project(':loa-service:loa-source-file-service')
     compile project(':loa-service:loa-source-folder-service')
     compile project(':loa-service:loa-queue-service')
-
-    compile group: 'org.hibernate.validator', name: 'hibernate-validator', version: '6.1.0.Final'
 }
