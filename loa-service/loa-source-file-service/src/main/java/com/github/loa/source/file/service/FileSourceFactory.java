@@ -1,24 +1,26 @@
 package com.github.loa.source.file.service;
 
-import com.github.loa.source.file.configuration.FileDocumentSourceConfiguration;
+import com.github.loa.source.file.configuration.FileDocumentSourceConfigurationProperties;
 import com.github.loa.source.file.service.domain.FileEncodingType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.zip.GZIPInputStream;
 
 @Service
 @RequiredArgsConstructor
 public class FileSourceFactory {
 
-    private final FileDocumentSourceConfiguration fileDocumentSourceConfiguration;
+    private final FileDocumentSourceConfigurationProperties fileDocumentSourceConfigurationProperties;
 
-    public InputStream newInputStream(final String fileLocation) {
+    public InputStream newInputStream(final Path fileLocation) {
         try {
-            final InputStream fileStream = new FileInputStream(fileLocation);
+            final InputStream fileStream = Files.newInputStream(fileLocation);
 
-            if (fileDocumentSourceConfiguration.getEncoding() == FileEncodingType.GZIP) {
+            if (fileDocumentSourceConfigurationProperties.getEncoding() == FileEncodingType.GZIP) {
                 return new GZIPInputStream(fileStream);
             }
 

@@ -1,6 +1,6 @@
 package com.github.loa.generator.command;
 
-import com.github.loa.generator.command.batch.DocumentLocationFactory;
+import com.github.loa.source.service.DocumentLocationFactory;
 import com.github.loa.generator.configuration.GeneratorConfiguration;
 import com.github.loa.location.service.DocumentLocationValidator;
 import com.github.loa.source.domain.DocumentSourceItem;

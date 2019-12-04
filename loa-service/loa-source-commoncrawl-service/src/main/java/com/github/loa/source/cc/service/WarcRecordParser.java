@@ -1,4 +1,4 @@
-package com.github.loa.generator.command.batch.commoncrawl.warc;
+package com.github.loa.source.cc.service;
 
 import com.morethanheroic.warc.service.content.response.domain.ResponseContentBlock;
 import com.morethanheroic.warc.service.record.domain.WarcRecord;

@@ -1,4 +1,4 @@
-package com.github.loa.generator.command.batch.commoncrawl.warc;
+package com.github.loa.source.cc.service;
 
 import com.github.loa.url.service.URLConverter;
 import lombok.RequiredArgsConstructor;

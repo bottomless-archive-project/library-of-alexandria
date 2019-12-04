@@ -1,9 +1,5 @@
 dependencies {
     compile project(':loa-service:loa-io-service')
 
-    compile group: 'com.github.laxika', name: 'java-warc', version: '47c81f03e6'
-
-    compile group: 'com.github.davidmoten', name: 'io-extras', version: '0.1'
-
     compile group: 'org.jsoup', name: 'jsoup', version: '1.12.1'
 }
