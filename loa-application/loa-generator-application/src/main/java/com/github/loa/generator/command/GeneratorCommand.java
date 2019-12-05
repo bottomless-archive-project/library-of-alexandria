@@ -35,6 +35,8 @@ public class GeneratorCommand implements CommandLineRunner {
                 SimpleString.toSimpleString(GeneratorConfiguration.QUEUE_NAME));
 
         if (!queueQuery.isExists()) {
+            log.info("Creating the queue because it doesn't exists.");
+
             clientSession.createQueue(GeneratorConfiguration.QUEUE_ADDRESS, RoutingType.ANYCAST,
                     GeneratorConfiguration.QUEUE_NAME, true);
         }
