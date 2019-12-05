@@ -20,6 +20,7 @@ public class CommonCrawlConfiguration {
         return WebClient.create();
     }
 
+    @Bean
     @ConditionalOnProperty(name = "loa.source.type", havingValue = "common-crawl")
     public DocumentLocationFactory warcDocumentLocationFactory(final WarcDownloader warcDownloader,
             final WarcRecordParser warcRecordParser, final WarcPathFactory warcPathFactory,
