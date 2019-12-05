@@ -8,6 +8,7 @@ import org.apache.activemq.artemis.core.config.impl.ConfigurationImpl;
 import org.apache.activemq.artemis.core.remoting.impl.netty.NettyAcceptorFactory;
 import org.apache.activemq.artemis.core.remoting.impl.netty.NettyConnectorFactory;
 import org.apache.activemq.artemis.core.remoting.impl.netty.TransportConstants;
+import org.apache.activemq.artemis.core.server.JournalType;
 import org.apache.activemq.artemis.core.server.embedded.EmbeddedActiveMQ;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
@@ -39,6 +40,9 @@ public class ServerConfigurationFactory {
                 NettyConnectorFactory.class.getName()));
         configuration.addAcceptorConfiguration(new TransportConfiguration(NettyAcceptorFactory.class.getName(),
                 Map.of(TransportConstants.HOST_PROP_NAME, "0.0.0.0")));
+        configuration.setJournalType(JournalType.MAPPED);
+        configuration.setJournalSyncTransactional(false);
+        configuration.setJournalSyncNonTransactional(false);
         configuration.setJournalDirectory(queueConfigurationProperties.getDataDirectory() + "/journal");
         configuration.setBindingsDirectory(queueConfigurationProperties.getDataDirectory() + "/bindings");
         configuration.setLargeMessagesDirectory(queueConfigurationProperties.getDataDirectory() + "/largemessages");
