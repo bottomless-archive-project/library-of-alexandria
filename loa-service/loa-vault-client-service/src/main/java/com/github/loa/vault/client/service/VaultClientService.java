@@ -43,8 +43,7 @@ public class VaultClientService {
         return vaultWebClient.get()
                 .uri("/document/" + documentEntity.getId())
                 .retrieve()
-                .bodyToMono(byte[].class)
-                .timeout(Duration.ofMinutes(5));
+                .bodyToMono(byte[].class);
     }
 
     public void recompressDocument(final DocumentEntity documentEntity, final DocumentCompression documentCompression) {
