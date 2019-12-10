@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import java.nio.file.Path;
+import java.time.Duration;
 
 /**
  * This service is responsible for the manipulating of document files. For example moving them to the vault or removing
@@ -31,6 +32,13 @@ public class DocumentFileManipulator {
                         .thenReturn(documentLocation))
                 .map(ArchivingContext::getContents)
                 .flatMap(this::cleanup)
+                .onErrorResume(error -> {
+                    log.error("Error archiving a document: {}!", error.getMessage(), error);
+
+                    return Mono.empty();
+                })
+                .timeout(Duration.ofMinutes(1))
+                .retry(3)
                 .then();
     }
 
