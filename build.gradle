@@ -59,7 +59,8 @@ subprojects {
         compile('org.springframework.boot:spring-boot-starter')
 
         // Configuration
-        annotationProcessor('org.springframework.boot:spring-boot-configuration-processor')
+        compileOnly group: 'org.springframework.boot', name: 'spring-boot-configuration-processor'
+        annotationProcessor group: 'org.springframework.boot', name: 'spring-boot-configuration-processor'
 
         // Lombok
         compileOnly('org.projectlombok:lombok')
