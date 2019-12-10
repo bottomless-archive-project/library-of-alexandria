@@ -6,42 +6,50 @@ import io.netty.handler.timeout.WriteTimeoutHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.client.reactive.ClientHttpConnector;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.client.HttpClient;
 import reactor.netty.tcp.TcpClient;
 
+import java.util.concurrent.TimeUnit;
+
 @Configuration
 @RequiredArgsConstructor
 public class VaultClientConfiguration {
 
+    private static final int VAULT_CLIENT_TIMEOUT = 120000;
+
     private final VaultClientConfigurationProperties vaultClientConfigurationProperties;
 
     @Bean
-    public WebClient vaultWebClient(final TcpClient vaultTcpClient) {
+    public WebClient vaultWebClient(final ClientHttpConnector clientHttpConnector) {
         return WebClient.builder()
                 .baseUrl("http://" + vaultClientConfigurationProperties.getHost() + ":"
                         + vaultClientConfigurationProperties.getPort())
-                .clientConnector(new ReactorClientHttpConnector(
-                        HttpClient.from(vaultTcpClient)
-                                .compress(true)
-                ))
-                .exchangeStrategies(
-                        ExchangeStrategies.builder()
-                                .codecs(configurer -> configurer.defaultCodecs()
-                                        .maxInMemorySize(-1)
-                                )
-                                .build()
-                )
+                .clientConnector(clientHttpConnector)
                 .build();
+    }
+
+    @Bean
+    protected ClientHttpConnector clientHttpConnector(final HttpClient httpClient) {
+        return new ReactorClientHttpConnector(httpClient);
+    }
+
+    @Bean
+    protected HttpClient httpCLient(final TcpClient tcpClient) {
+        return HttpClient.from(tcpClient)
+                .compress(true);
     }
 
     @Bean
     protected TcpClient vaultTcpClient() {
         return TcpClient.create()
-                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 60000)
-                .doOnConnected(c -> c.addHandlerLast(new ReadTimeoutHandler(60))
-                        .addHandlerLast(new WriteTimeoutHandler(60)));
+                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, VAULT_CLIENT_TIMEOUT)
+                .doOnConnected(connection -> connection
+                        .addHandlerLast(new ReadTimeoutHandler(VAULT_CLIENT_TIMEOUT, TimeUnit.MILLISECONDS))
+                        .addHandlerLast(new WriteTimeoutHandler(VAULT_CLIENT_TIMEOUT, TimeUnit.MILLISECONDS))
+                );
     }
 }
