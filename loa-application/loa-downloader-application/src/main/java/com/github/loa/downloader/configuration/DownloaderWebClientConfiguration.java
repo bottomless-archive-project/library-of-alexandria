@@ -19,25 +19,25 @@ public class DownloaderWebClientConfiguration {
     private static final int DOWNLOADER_CLIENT_TIMEOUT = 30000;
 
     @Bean
-    public WebClient downloaderWebClient(final ClientHttpConnector clientHttpConnector) {
+    public WebClient downloaderWebClient(final ClientHttpConnector downloaderClientHttpConnector) {
         return WebClient.builder()
-                .clientConnector(clientHttpConnector)
+                .clientConnector(downloaderClientHttpConnector)
                 .build();
     }
 
     @Bean
-    protected ClientHttpConnector clientHttpConnector(final HttpClient httpClient) {
-        return new ReactorClientHttpConnector(httpClient);
+    protected ClientHttpConnector downloaderClientHttpConnector(final HttpClient downloaderHttpClient) {
+        return new ReactorClientHttpConnector(downloaderHttpClient);
     }
 
     @Bean
-    protected HttpClient httpClient(final TcpClient tcpClient) {
-        return HttpClient.from(tcpClient)
+    protected HttpClient downloaderHttpClient(final TcpClient downloaderTcpClient) {
+        return HttpClient.from(downloaderTcpClient)
                 .followRedirect(true);
     }
 
     @Bean
-    protected TcpClient tcpClient() {
+    protected TcpClient downloaderTcpClient() {
         return TcpClient.create()
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, DOWNLOADER_CLIENT_TIMEOUT)
                 .doOnConnected(connection -> connection

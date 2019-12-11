@@ -23,22 +23,22 @@ public class VaultClientConfiguration {
     private final VaultClientConfigurationProperties vaultClientConfigurationProperties;
 
     @Bean
-    public WebClient vaultWebClient(final ClientHttpConnector clientHttpConnector) {
+    public WebClient vaultWebClient(final ClientHttpConnector vaultClientHttpConnector) {
         return WebClient.builder()
                 .baseUrl("http://" + vaultClientConfigurationProperties.getHost() + ":"
                         + vaultClientConfigurationProperties.getPort())
-                .clientConnector(clientHttpConnector)
+                .clientConnector(vaultClientHttpConnector)
                 .build();
     }
 
     @Bean
-    protected ClientHttpConnector clientHttpConnector(final HttpClient httpClient) {
-        return new ReactorClientHttpConnector(httpClient);
+    protected ClientHttpConnector vaultClientHttpConnector(final HttpClient vaultHttpClient) {
+        return new ReactorClientHttpConnector(vaultHttpClient);
     }
 
     @Bean
-    protected HttpClient httpCLient(final TcpClient tcpClient) {
-        return HttpClient.from(tcpClient)
+    protected HttpClient vaultHttpClient(final TcpClient vaultTcpClient) {
+        return HttpClient.from(vaultTcpClient)
                 .compress(true);
     }
 
