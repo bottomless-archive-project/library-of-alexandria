@@ -4,6 +4,7 @@ import io.netty.channel.ChannelOption;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.handler.timeout.WriteTimeoutHandler;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.reactive.ClientHttpConnector;
@@ -23,7 +24,8 @@ public class VaultClientConfiguration {
     private final VaultClientConfigurationProperties vaultClientConfigurationProperties;
 
     @Bean
-    public WebClient vaultWebClient(final ClientHttpConnector vaultClientHttpConnector) {
+    public WebClient vaultWebClient(
+            @Qualifier("vaultClientHttpConnector") final ClientHttpConnector vaultClientHttpConnector) {
         return WebClient.builder()
                 .baseUrl("http://" + vaultClientConfigurationProperties.getHost() + ":"
                         + vaultClientConfigurationProperties.getPort())
@@ -32,12 +34,14 @@ public class VaultClientConfiguration {
     }
 
     @Bean
-    protected ClientHttpConnector vaultClientHttpConnector(final HttpClient vaultHttpClient) {
+    protected ClientHttpConnector vaultClientHttpConnector(
+            @Qualifier("vaultHttpClient") final HttpClient vaultHttpClient) {
         return new ReactorClientHttpConnector(vaultHttpClient);
     }
 
     @Bean
-    protected HttpClient vaultHttpClient(final TcpClient vaultTcpClient) {
+    protected HttpClient vaultHttpClient(
+            @Qualifier("vaultTcpClient") final TcpClient vaultTcpClient) {
         return HttpClient.from(vaultTcpClient)
                 .compress(true);
     }

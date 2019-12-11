@@ -3,6 +3,7 @@ package com.github.loa.downloader.configuration;
 import io.netty.channel.ChannelOption;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.handler.timeout.WriteTimeoutHandler;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.reactive.ClientHttpConnector;
@@ -19,19 +20,22 @@ public class DownloaderWebClientConfiguration {
     private static final int DOWNLOADER_CLIENT_TIMEOUT = 30000;
 
     @Bean
-    public WebClient downloaderWebClient(final ClientHttpConnector downloaderClientHttpConnector) {
+    public WebClient downloaderWebClient(
+            @Qualifier("downloaderClientHttpConnector") final ClientHttpConnector downloaderClientHttpConnector) {
         return WebClient.builder()
                 .clientConnector(downloaderClientHttpConnector)
                 .build();
     }
 
     @Bean
-    protected ClientHttpConnector downloaderClientHttpConnector(final HttpClient downloaderHttpClient) {
+    protected ClientHttpConnector downloaderClientHttpConnector(
+            @Qualifier("downloaderHttpClient") final HttpClient downloaderHttpClient) {
         return new ReactorClientHttpConnector(downloaderHttpClient);
     }
 
     @Bean
-    protected HttpClient downloaderHttpClient(final TcpClient downloaderTcpClient) {
+    protected HttpClient downloaderHttpClient(
+            @Qualifier("downloaderTcpClient") final TcpClient downloaderTcpClient) {
         return HttpClient.from(downloaderTcpClient)
                 .followRedirect(true);
     }
