@@ -1,14 +1,13 @@
 package com.github.loa.downloader.service.file;
 
-import com.github.loa.vault.client.service.domain.ArchivingContext;
 import com.github.loa.vault.client.service.VaultClientService;
+import com.github.loa.vault.client.service.domain.ArchivingContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import java.nio.file.Path;
-import java.time.Duration;
 
 /**
  * This service is responsible for the manipulating of document files. For example moving them to the vault or removing
@@ -35,7 +34,9 @@ public class DocumentFileManipulator {
                 .onErrorResume(error -> {
                     log.error("Error archiving a document: {}!", error.getMessage(), error);
 
-                    return Mono.empty();
+                    return Mono.just(archivingContext.getContents())
+                            .doOnNext(this::cleanup)
+                            .then();
                 })
                 .retry(3)
                 .then();
