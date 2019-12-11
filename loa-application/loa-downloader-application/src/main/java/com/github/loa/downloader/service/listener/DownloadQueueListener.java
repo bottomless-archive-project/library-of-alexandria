@@ -17,6 +17,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.SignalType;
 
+import java.time.Duration;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -30,12 +32,16 @@ public class DownloadQueueListener implements CommandLineRunner {
     private final DocumentLocationCreationContextFactory documentLocationCreationContextFactory;
 
     @Override
-    public void run(String... args) {
+    public void run(final String... args) {
         Flux.generate(downloaderQueueConsumer)
                 .doFirst(this::initializeProcessing)
                 .flatMap(this::evaluateDocumentLocation)
-                .flatMap(this::downloadDocument)
-                .flatMap(this::archiveDocument)
+                .groupBy(this::parseDocumentDomain)
+                .flatMap(documentSourceItem1 -> documentSourceItem1
+                        .delayElements(Duration.ofSeconds(3))
+                        .flatMap(this::downloadDocument)
+                        .flatMap(this::archiveDocument)
+                )
                 .doFinally(this::finishProcessing)
                 .subscribe();
     }
@@ -47,6 +53,10 @@ public class DownloadQueueListener implements CommandLineRunner {
         return documentLocationEntityFactory.isDocumentLocationExistsOrCreate(documentLocationCreationContext)
                 .filter(exists -> !exists)
                 .thenReturn(documentSourceItem);
+    }
+
+    private String parseDocumentDomain(final DocumentSourceItem documentSourceItem) {
+        return documentSourceItem.getDocumentLocation().getHost();
     }
 
     private Mono<ArchivingContext> downloadDocument(final DocumentSourceItem documentSourceItem) {
