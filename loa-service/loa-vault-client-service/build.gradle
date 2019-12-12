@@ -1,5 +1,8 @@
 dependencies {
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-webflux'
 
+    compile group: 'io.github.resilience4j', name: 'resilience4j-circuitbreaker', version: '1.2.0'
+    compile group: 'io.github.resilience4j', name: 'resilience4j-reactor', version: '1.2.0'
+
     compile project(':loa-service:loa-document-service')
 }

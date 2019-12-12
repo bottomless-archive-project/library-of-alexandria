@@ -4,8 +4,11 @@ import com.github.loa.compression.domain.DocumentCompression;
 import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.vault.client.configuration.VaultClientConfigurationProperties;
 import com.github.loa.vault.client.service.domain.ArchivingContext;
+import io.github.resilience4j.circuitbreaker.CircuitBreaker;
+import io.github.resilience4j.reactor.circuitbreaker.operator.CircuitBreakerOperator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
@@ -25,6 +28,8 @@ import static java.net.http.HttpRequest.BodyPublishers.ofString;
 public class VaultClientService {
 
     private final VaultClientConfigurationProperties vaultClientConfigurationProperties;
+    @Qualifier("vaultCircuitBreaker")
+    private final CircuitBreaker circuitBreaker;
     private final WebClient vaultWebClient;
 
     public Mono<Void> archiveDocument(final ArchivingContext documentStageLocation) {
@@ -35,14 +40,16 @@ public class VaultClientService {
                         documentStageLocation.getContents())).with("document", documentStageLocation)
                 )
                 .retrieve()
-                .bodyToMono(Void.class);
+                .bodyToMono(Void.class)
+                .transform(CircuitBreakerOperator.of(circuitBreaker));
     }
 
     public Mono<byte[]> queryDocument(final DocumentEntity documentEntity) {
         return vaultWebClient.get()
                 .uri("/document/" + documentEntity.getId())
                 .retrieve()
-                .bodyToMono(byte[].class);
+                .bodyToMono(byte[].class)
+                .transform(CircuitBreakerOperator.of(circuitBreaker));
     }
 
     public void recompressDocument(final DocumentEntity documentEntity, final DocumentCompression documentCompression) {
