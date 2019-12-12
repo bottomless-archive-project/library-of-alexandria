@@ -34,6 +34,9 @@ public class GeneratorCommand implements CommandLineRunner {
         final ClientSession.QueueQuery queueQuery = clientSession.queueQuery(
                 SimpleString.toSimpleString(GeneratorConfiguration.QUEUE_NAME));
 
+        log.info("Initialized queue processing! There are {} messages available in the queue!",
+                queueQuery.getMessageCount());
+
         if (!queueQuery.isExists()) {
             log.info("Creating the queue because it doesn't exists.");
 

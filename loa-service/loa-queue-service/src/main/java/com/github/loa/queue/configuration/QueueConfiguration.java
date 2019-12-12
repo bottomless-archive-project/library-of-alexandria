@@ -27,7 +27,8 @@ public class QueueConfiguration {
 
     @Bean
     protected ServerLocator serverLocator(final TransportConfiguration transportConfiguration) {
-        return ActiveMQClient.createServerLocatorWithoutHA(transportConfiguration);
+        return ActiveMQClient.createServerLocatorWithoutHA(transportConfiguration)
+                .setPreAcknowledge(true);
     }
 
     @Bean
