@@ -10,6 +10,7 @@ import com.github.loa.vault.client.service.domain.ArchivingContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.artemis.api.core.ActiveMQException;
+import org.apache.activemq.artemis.api.core.SimpleString;
 import org.apache.activemq.artemis.api.core.client.ClientSession;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ import reactor.core.publisher.Mono;
 import reactor.core.publisher.SignalType;
 
 import java.time.Duration;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Slf4j
 @Service
@@ -30,20 +32,46 @@ public class DownloadQueueListener implements CommandLineRunner {
     private final DownloaderQueueConsumer downloaderQueueConsumer;
     private final DocumentFileManipulator documentFileManipulator;
     private final DocumentLocationCreationContextFactory documentLocationCreationContextFactory;
+    private final AtomicLong processedCount = new AtomicLong();
+    private final AtomicLong archivedCount = new AtomicLong();
 
     @Override
-    public void run(final String... args) {
+    public void run(final String... args) throws ActiveMQException {
+        final ClientSession.QueueQuery queueQuery = clientSession.queueQuery(
+                SimpleString.toSimpleString("loa-document-location"));
+
+        log.info("Initialized queue processing! There are {} messages available in the queue!",
+                queueQuery.getMessageCount());
+
         Flux.generate(downloaderQueueConsumer)
                 .doFirst(this::initializeProcessing)
                 .flatMap(this::evaluateDocumentLocation)
-                .groupBy(this::parseDocumentDomain)
+                .groupBy(this::parseDocumentDomain, 1000)
                 .flatMap(documentSourceItem1 -> documentSourceItem1
-                        .delayElements(Duration.ofSeconds(3))
+                        .delayElements(Duration.ofSeconds(1))
+                        .doOnNext(this::incrementProcessedCount)
                         .flatMap(this::downloadDocument)
                         .flatMap(this::archiveDocument)
+                        .doOnNext(this::incrementArchivedCount)
                 )
                 .doFinally(this::finishProcessing)
                 .subscribe();
+    }
+
+    private void incrementProcessedCount(final DocumentSourceItem documentSourceItem) {
+        final long result = processedCount.incrementAndGet();
+
+        if (result % 100 == 0) {
+            log.info("Processed {} urls!", result);
+        }
+    }
+
+    private void incrementArchivedCount(final Void documentSourceItem) {
+        final long result = archivedCount.incrementAndGet();
+
+        if (result % 10 == 0) {
+            log.info("Archived {} urls!", result);
+        }
     }
 
     private Mono<DocumentSourceItem> evaluateDocumentLocation(final DocumentSourceItem documentSourceItem) {
