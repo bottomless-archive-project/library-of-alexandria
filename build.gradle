@@ -71,7 +71,7 @@ subprojects {
         testCompile group: 'org.hamcrest', name: 'hamcrest', version: '2.1'
 
         testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test'
-        testCompile group: 'io.projectreactor', name: 'reactor-test', version: '3.3.0.RELEASE'
+        testCompile group: 'io.projectreactor', name: 'reactor-test'
     }
 
     apply plugin: "com.github.ben-manes.versions"
