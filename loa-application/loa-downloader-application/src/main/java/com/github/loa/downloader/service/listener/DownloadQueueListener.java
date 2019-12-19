@@ -8,11 +8,13 @@ import com.github.loa.location.service.factory.DocumentLocationEntityFactory;
 import com.github.loa.location.service.factory.domain.DocumentLocationCreationContext;
 import com.github.loa.source.domain.DocumentSourceItem;
 import com.github.loa.vault.client.service.domain.ArchivingContext;
+import io.micrometer.core.instrument.Counter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.artemis.api.core.ActiveMQException;
 import org.apache.activemq.artemis.api.core.SimpleString;
 import org.apache.activemq.artemis.api.core.client.ClientSession;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -20,7 +22,6 @@ import reactor.core.publisher.Mono;
 import reactor.core.publisher.SignalType;
 
 import java.time.Duration;
-import java.util.concurrent.atomic.AtomicLong;
 
 @Slf4j
 @Service
@@ -34,8 +35,8 @@ public class DownloadQueueListener implements CommandLineRunner {
     private final DownloaderQueueConsumer downloaderQueueConsumer;
     private final DocumentFileManipulator documentFileManipulator;
     private final DocumentLocationCreationContextFactory documentLocationCreationContextFactory;
-    private final AtomicLong processedCount = new AtomicLong();
-    private final AtomicLong archivedCount = new AtomicLong();
+    @Qualifier("processedDocumentCount")
+    private final Counter processedDocumentCount;
 
     @Override
     public void run(final String... args) throws ActiveMQException {
@@ -54,26 +55,13 @@ public class DownloadQueueListener implements CommandLineRunner {
                         .doOnNext(this::incrementProcessedCount)
                         .flatMap(this::downloadDocument)
                         .flatMap(this::archiveDocument)
-                        .doOnNext(this::incrementArchivedCount)
                 )
                 .doFinally(this::finishProcessing)
                 .subscribe();
     }
 
     private void incrementProcessedCount(final DocumentSourceItem documentSourceItem) {
-        final long result = processedCount.incrementAndGet();
-
-        if (result % 100 == 0) {
-            log.info("Processed {} document locations!", result);
-        }
-    }
-
-    private void incrementArchivedCount(final Void documentSourceItem) {
-        final long result = archivedCount.incrementAndGet();
-
-        if (result % 10 == 0) {
-            log.info("Archived {} documents!", result);
-        }
+        processedDocumentCount.increment();
     }
 
     private Mono<DocumentSourceItem> evaluateDocumentLocation(final DocumentSourceItem documentSourceItem) {

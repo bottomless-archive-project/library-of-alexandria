@@ -25,4 +25,5 @@ include 'loa-service:loa-compression-service'
 include 'loa-service:loa-vault-client-service'
 include 'loa-service:loa-document-parser-service'
 include 'loa-service:loa-queue-service'
+include 'loa-service:loa-statistics-service'
 

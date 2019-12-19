@@ -27,7 +27,7 @@ public class DownloaderConfigurationProperties {
      * to small and the domains in the queue are the same then the application will use only one thread to download the
      * documents (and because of this slow down).
      */
-    private int maximumPrefetchSize = 1000;
+    private int maximumPrefetchSize = 10000;
 
     /**
      * The delay in milliseconds that we should use when downloading items from the same domains.

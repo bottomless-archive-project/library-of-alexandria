@@ -2,12 +2,12 @@ package com.github.loa.downloader.service.file;
 
 import com.github.loa.vault.client.service.VaultClientService;
 import com.github.loa.vault.client.service.domain.ArchivingContext;
+import io.micrometer.core.instrument.Counter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
-
-import java.nio.file.Path;
 
 /**
  * This service is responsible for the manipulating of document files. For example moving them to the vault or removing
@@ -19,6 +19,8 @@ import java.nio.file.Path;
 public class DocumentFileManipulator {
 
     private final VaultClientService vaultClientService;
+    @Qualifier("archivedDocumentCount")
+    private final Counter archivedDocumentCount;
 
     /**
      * Move a document's file from the staging area to the vault. The document's metadata is not updated by this method!
@@ -27,29 +29,35 @@ public class DocumentFileManipulator {
         log.info("Moving document to vault {}!", archivingContext.getContents().getFileName());
 
         return Mono.just(archivingContext)
-                .flatMap(documentLocation -> vaultClientService.archiveDocument(documentLocation)
-                        .thenReturn(documentLocation))
-                .map(ArchivingContext::getContents)
+                .flatMap(this::archiveDocument)
+                .doOnNext(this::incrementArchivedCount)
                 .flatMap(this::cleanup)
                 .onErrorResume(error -> {
                     log.error("Error archiving a document: {}!", error.getMessage(), error);
 
-                    return Mono.just(archivingContext.getContents())
-                            .doOnNext(this::cleanup)
-                            .then();
+                    return cleanup(archivingContext);
                 })
                 .retry(3)
                 .then();
     }
 
+    private Mono<ArchivingContext> archiveDocument(final ArchivingContext archivingContext) {
+        return vaultClientService.archiveDocument(archivingContext)
+                .thenReturn(archivingContext);
+    }
+
+    private void incrementArchivedCount(final ArchivingContext archivingContext) {
+        archivedDocumentCount.increment();
+    }
+
     /**
      * Clean up after a document's download by removing all the staging information belonging to that document.
      */
-    public Mono<Void> cleanup(final Path documentFileLocation) {
-        log.debug("Cleaning up staging for document {}.", documentFileLocation.getFileName());
+    private Mono<Void> cleanup(final ArchivingContext archivingContext) {
+        log.debug("Cleaning up staging for document {}.", archivingContext.getContents().getFileName());
 
-        return Mono.just(documentFileLocation)
-                .map(stageFileLocation -> documentFileLocation.toFile().delete())
+        return Mono.just(archivingContext)
+                .map(stageFileLocation -> archivingContext.getContents().toFile().delete())
                 .then();
     }
 }
