@@ -1,5 +1,6 @@
 package com.github.loa.downloader.service.listener;
 
+import com.github.loa.downloader.configuration.DownloaderConfigurationProperties;
 import com.github.loa.downloader.service.DocumentLocationCreationContextFactory;
 import com.github.loa.downloader.service.document.DocumentDownloader;
 import com.github.loa.downloader.service.file.DocumentFileManipulator;
@@ -28,6 +29,7 @@ public class DownloadQueueListener implements CommandLineRunner {
 
     private final ClientSession clientSession;
     private final DocumentDownloader documentDownloader;
+    private final DownloaderConfigurationProperties downloaderConfigurationProperties;
     private final DocumentLocationEntityFactory documentLocationEntityFactory;
     private final DownloaderQueueConsumer downloaderQueueConsumer;
     private final DocumentFileManipulator documentFileManipulator;
@@ -46,9 +48,9 @@ public class DownloadQueueListener implements CommandLineRunner {
         Flux.generate(downloaderQueueConsumer)
                 .doFirst(this::initializeProcessing)
                 .flatMap(this::evaluateDocumentLocation)
-                .groupBy(this::parseDocumentDomain, 1000)
+                .groupBy(this::parseDocumentDomain, downloaderConfigurationProperties.getMaximumPrefetchSize())
                 .flatMap(documentSourceItem1 -> documentSourceItem1
-                        .delayElements(Duration.ofSeconds(1))
+                        .delayElements(Duration.ofMillis(downloaderConfigurationProperties.getSameDomainDownloadDelay()))
                         .doOnNext(this::incrementProcessedCount)
                         .flatMap(this::downloadDocument)
                         .flatMap(this::archiveDocument)
