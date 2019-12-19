@@ -64,7 +64,7 @@ public class DownloadQueueListener implements CommandLineRunner {
         final long result = processedCount.incrementAndGet();
 
         if (result % 100 == 0) {
-            log.info("Processed {} urls!", result);
+            log.info("Processed {} document locations!", result);
         }
     }
 
@@ -72,7 +72,7 @@ public class DownloadQueueListener implements CommandLineRunner {
         final long result = archivedCount.incrementAndGet();
 
         if (result % 10 == 0) {
-            log.info("Archived {} urls!", result);
+            log.info("Archived {} documents!", result);
         }
     }
 
