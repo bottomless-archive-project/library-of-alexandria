@@ -18,9 +18,9 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class DocumentFileManipulator {
 
-    private final VaultClientService vaultClientService;
     @Qualifier("archivedDocumentCount")
     private final Counter archivedDocumentCount;
+    private final VaultClientService vaultClientService;
 
     /**
      * Move a document's file from the staging area to the vault. The document's metadata is not updated by this method!
@@ -31,33 +31,32 @@ public class DocumentFileManipulator {
         return Mono.just(archivingContext)
                 .flatMap(this::archiveDocument)
                 .doOnNext(this::incrementArchivedCount)
-                .flatMap(this::cleanup)
-                .onErrorResume(error -> {
-                    log.error("Error archiving a document: {}!", error.getMessage(), error);
+                .doFinally((s) -> cleanup(archivingContext))
+                .onErrorResume(this::handleError)
+                .retry(3);
+    }
 
-                    return cleanup(archivingContext);
-                })
-                .retry(3)
+    private Mono<Void> archiveDocument(final ArchivingContext archivingContext) {
+        return vaultClientService.archiveDocument(archivingContext)
                 .then();
     }
 
-    private Mono<ArchivingContext> archiveDocument(final ArchivingContext archivingContext) {
-        return vaultClientService.archiveDocument(archivingContext)
-                .thenReturn(archivingContext);
+    private Mono<Void> handleError(final Throwable error) {
+        log.error("Error archiving a document: {}!", error.getMessage(), error);
+
+        return Mono.empty();
     }
 
-    private void incrementArchivedCount(final ArchivingContext archivingContext) {
+    private void incrementArchivedCount(final Void _void) {
         archivedDocumentCount.increment();
     }
 
     /**
      * Clean up after a document's download by removing all the staging information belonging to that document.
      */
-    private Mono<Void> cleanup(final ArchivingContext archivingContext) {
+    private void cleanup(final ArchivingContext archivingContext) {
         log.debug("Cleaning up staging for document {}.", archivingContext.getContents().getFileName());
 
-        return Mono.just(archivingContext)
-                .map(stageFileLocation -> archivingContext.getContents().toFile().delete())
-                .then();
+        archivingContext.getContents().toFile().delete();
     }
 }
