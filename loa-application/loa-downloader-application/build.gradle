@@ -4,7 +4,7 @@ dependencies {
     compile project(':loa-service:loa-document-location-service')
     compile project(':loa-service:loa-document-parser-service')
     compile project(':loa-service:loa-source-service')
-    compile project(':loa-service:loa-queue-service')
+    compile project(':loa-service:loa-queue-artemis-service')
     compile project(':loa-service:loa-stage-service')
     compile project(':loa-service:loa-vault-client-service')
     compile project(':loa-service:loa-statistics-service')

@@ -1,4 +1,4 @@
-package com.github.loa.queue.service;
+package com.github.loa.queue.artemis.configuration;
 
 import com.github.loa.queue.configuration.QueueConfigurationProperties;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +18,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 @ConditionalOnClass(EmbeddedActiveMQ.class)
 @org.springframework.context.annotation.Configuration
-public class ServerConfigurationFactory {
+public class QueueServerConfiguration {
 
     private final QueueConfigurationProperties queueConfigurationProperties;
 
@@ -32,7 +32,7 @@ public class ServerConfigurationFactory {
     }
 
     @Bean
-    protected Configuration queueServerConfiguration() {
+    protected Configuration artemisServerConfiguration() {
         final Configuration configuration = new ConfigurationImpl();
 
         configuration.setSecurityEnabled(false);

@@ -1,5 +1,6 @@
-package com.github.loa.queue.configuration;
+package com.github.loa.queue.artemis.configuration;
 
+import com.github.loa.queue.configuration.QueueConfigurationProperties;
 import lombok.RequiredArgsConstructor;
 import org.apache.activemq.artemis.api.core.TransportConfiguration;
 import org.apache.activemq.artemis.api.core.client.ActiveMQClient;
@@ -16,7 +17,7 @@ import java.util.Map;
 @Configuration
 @RequiredArgsConstructor
 @ConditionalOnMissingClass("org.apache.activemq.artemis.core.server.embedded.EmbeddedActiveMQ")
-public class QueueConfiguration {
+public class QueueClientConfiguration {
 
     private final QueueConfigurationProperties queueConfigurationProperties;
 
