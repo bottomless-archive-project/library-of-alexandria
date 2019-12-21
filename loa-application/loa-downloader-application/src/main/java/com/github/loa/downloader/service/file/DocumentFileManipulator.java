@@ -29,8 +29,8 @@ public class DocumentFileManipulator {
         log.info("Moving document to vault {}!", archivingContext.getContents().getFileName());
 
         return Mono.just(archivingContext)
-                .flatMap(this::archiveDocument)
                 .doOnNext(this::incrementArchivedCount)
+                .flatMap(this::archiveDocument)
                 .doFinally((s) -> cleanup(archivingContext))
                 .onErrorResume(this::handleError)
                 .retry(3);
@@ -47,7 +47,7 @@ public class DocumentFileManipulator {
         return Mono.empty();
     }
 
-    private void incrementArchivedCount(final Void _void) {
+    private void incrementArchivedCount(final ArchivingContext archivingContext) {
         archivedDocumentCount.increment();
     }
 
