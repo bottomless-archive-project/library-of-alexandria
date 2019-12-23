@@ -32,6 +32,7 @@ public class CommonCrawlDocumentLocationFactory implements DocumentLocationFacto
                 .flatMap(warcDownloader::downloadWarcFile)
                 .flatMap(warcFluxFactory::buildWarcRecordFlux)
                 .flatMap(warcRecordParser::parseUrlsFromRecord)
-                .flatMap(urlConverter::convert);
+                .flatMap(urlConverter::convert)
+                .retry();
     }
 }
