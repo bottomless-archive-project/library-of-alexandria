@@ -76,6 +76,8 @@ public class DownloadQueueListener implements CommandLineRunner {
     }
 
     private void initializeProcessing() {
+        log.info("Initialized processing!");
+
         try {
             clientSession.start();
         } catch (ActiveMQException e) {
@@ -84,6 +86,8 @@ public class DownloadQueueListener implements CommandLineRunner {
     }
 
     private void finishProcessing(final SignalType signalType) {
+        log.info("Finished processing!");
+
         try {
             clientSession.close();
         } catch (ActiveMQException e) {
