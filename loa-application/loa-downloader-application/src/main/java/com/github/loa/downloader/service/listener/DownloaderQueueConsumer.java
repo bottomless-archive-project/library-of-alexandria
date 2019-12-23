@@ -21,7 +21,7 @@ public class DownloaderQueueConsumer implements Consumer<SynchronousSink<Documen
     private final ClientConsumer clientConsumer;
 
     @Override
-    public void accept(SynchronousSink<DocumentSourceItem> documentSourceItemSynchronousSink) {
+    public void accept(final SynchronousSink<DocumentSourceItem> documentSourceItemSynchronousSink) {
         try {
             final DocumentSourceItem documentSourceItem = transform(clientConsumer.receive());
 
@@ -31,6 +31,8 @@ public class DownloaderQueueConsumer implements Consumer<SynchronousSink<Documen
 
             documentSourceItemSynchronousSink.error(e);
         } catch (MalformedURLException e) {
+            log.error("Bad URL from the Queue Application!", e);
+
             documentSourceItemSynchronousSink.error(e);
         }
     }
