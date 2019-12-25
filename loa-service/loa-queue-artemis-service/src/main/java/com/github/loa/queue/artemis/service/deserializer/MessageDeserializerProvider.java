@@ -1,6 +1,8 @@
 package com.github.loa.queue.artemis.service.deserializer;
 
+import com.github.loa.queue.artemis.configuration.QueueServerConfiguration;
 import com.github.loa.queue.service.domain.Queue;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -10,6 +12,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
+@ConditionalOnMissingBean(QueueServerConfiguration.class)
 public class MessageDeserializerProvider {
 
     private final Map<Queue, MessageDeserializer<?>> messageDeserializers;

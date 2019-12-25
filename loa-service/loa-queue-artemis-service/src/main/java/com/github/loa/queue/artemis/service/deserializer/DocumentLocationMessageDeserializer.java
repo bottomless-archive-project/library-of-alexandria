@@ -1,11 +1,14 @@
 package com.github.loa.queue.artemis.service.deserializer;
 
+import com.github.loa.queue.artemis.configuration.QueueServerConfiguration;
 import com.github.loa.queue.service.domain.Queue;
 import com.github.loa.queue.service.domain.message.DocumentLocationMessage;
 import org.apache.activemq.artemis.api.core.client.ClientMessage;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Service;
 
 @Service
+@ConditionalOnMissingBean(QueueServerConfiguration.class)
 public class DocumentLocationMessageDeserializer implements MessageDeserializer<DocumentLocationMessage> {
 
     public DocumentLocationMessage deserialize(final ClientMessage clientMessage) {

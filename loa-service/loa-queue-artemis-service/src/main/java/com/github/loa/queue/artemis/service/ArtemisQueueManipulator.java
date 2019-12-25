@@ -11,7 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.artemis.api.core.ActiveMQException;
 import org.apache.activemq.artemis.api.core.RoutingType;
 import org.apache.activemq.artemis.api.core.SimpleString;
-import org.apache.activemq.artemis.api.core.client.ClientConsumer;
 import org.apache.activemq.artemis.api.core.client.ClientMessage;
 import org.apache.activemq.artemis.api.core.client.ClientSession;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -29,7 +28,7 @@ import org.springframework.stereotype.Service;
 public class ArtemisQueueManipulator implements QueueManipulator {
 
     private final ClientSession clientSession;
-    private final ClientConsumer clientConsumer;
+    private final ClientConsumerProvider clientConsumerProvider;
     private final ClientProducerProvider clientProducerProvider;
     private final MessageSerializerProvider messageSerializerProvider;
     private final MessageDeserializerProvider messageDeserializerProvider;
@@ -120,7 +119,7 @@ public class ArtemisQueueManipulator implements QueueManipulator {
     @Override
     public Object readMessage(final Queue queue) {
         try {
-            final ClientMessage clientMessage = clientConsumer.receive();
+            final ClientMessage clientMessage = clientConsumerProvider.getClientConsumer(queue).receive();
 
             return messageDeserializerProvider.getDeserializer(queue)
                     .orElseThrow(() -> new QueueException("No deserializer found for queue: " + queue.getName() + "!"))

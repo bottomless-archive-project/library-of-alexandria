@@ -1,14 +1,17 @@
 package com.github.loa.queue.artemis.service.serialize;
 
+import com.github.loa.queue.artemis.configuration.QueueServerConfiguration;
 import com.github.loa.queue.service.domain.Queue;
 import com.github.loa.queue.service.domain.message.DocumentLocationMessage;
 import lombok.RequiredArgsConstructor;
 import org.apache.activemq.artemis.api.core.client.ClientMessage;
 import org.apache.activemq.artemis.api.core.client.ClientSession;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@ConditionalOnMissingBean(QueueServerConfiguration.class)
 public class DocumentLocationMessageSerializer implements MessageSerializer<DocumentLocationMessage> {
 
     private final ClientSession clientSession;

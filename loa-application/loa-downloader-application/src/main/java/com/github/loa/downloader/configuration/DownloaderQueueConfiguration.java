@@ -1,5 +1,7 @@
 package com.github.loa.downloader.configuration;
 
+import com.github.loa.queue.artemis.service.domain.ClientConsumerRegistryBean;
+import com.github.loa.queue.service.domain.Queue;
 import org.apache.activemq.artemis.api.core.ActiveMQException;
 import org.apache.activemq.artemis.api.core.client.ClientConsumer;
 import org.apache.activemq.artemis.api.core.client.ClientSession;
@@ -11,12 +13,17 @@ import org.springframework.context.annotation.Configuration;
 public class DownloaderQueueConfiguration {
 
     @Bean
-    public ClientConsumer clientConsumer(final ClientSession clientSession) throws ActiveMQException {
-        return clientSession.createConsumer("loa-document-location");
+    public ClientSession clientSession(final ClientSessionFactory clientSessionFactory) throws ActiveMQException {
+        return clientSessionFactory.createSession();
     }
 
     @Bean
-    public ClientSession clientSession(final ClientSessionFactory clientSessionFactory) throws ActiveMQException {
-        return clientSessionFactory.createSession();
+    public ClientConsumerRegistryBean clientConsumer(final ClientSession clientSession) throws ActiveMQException {
+        final ClientConsumer clientConsumer = clientSession.createConsumer(Queue.DOCUMENT_LOCATION_QUEUE.getAddress());
+
+        return ClientConsumerRegistryBean.builder()
+                .queue(Queue.DOCUMENT_LOCATION_QUEUE)
+                .clientConsumer(clientConsumer)
+                .build();
     }
 }

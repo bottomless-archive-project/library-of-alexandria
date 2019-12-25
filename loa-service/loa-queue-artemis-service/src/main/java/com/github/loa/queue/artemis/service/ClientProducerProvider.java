@@ -13,7 +13,6 @@ import java.util.Map;
 
 @Service
 @ConditionalOnMissingBean(QueueServerConfiguration.class)
-
 public class ClientProducerProvider {
 
     private final Map<Queue, ClientProducer> clientProducerMap = new EnumMap<>(Queue.class);
