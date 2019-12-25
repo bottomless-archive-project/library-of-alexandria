@@ -17,6 +17,6 @@ public class WarcDownloader {
 
     public Mono<URL> downloadWarcFile(final String warcLocation) {
         return urlConverter.convertOrThrow("https://commoncrawl.s3.amazonaws.com/" + warcLocation)
-                .doOnNext(warcUrl -> log.debug("Started to download warc file at location: {}!", warcUrl));
+                .doOnNext(warcUrl -> log.info("Started to download warc file at location: {}!", warcUrl));
     }
 }
