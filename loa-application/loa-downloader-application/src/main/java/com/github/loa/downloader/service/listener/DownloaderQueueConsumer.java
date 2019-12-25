@@ -1,11 +1,11 @@
 package com.github.loa.downloader.service.listener;
 
+import com.github.loa.queue.service.QueueManipulator;
+import com.github.loa.queue.service.domain.Queue;
+import com.github.loa.queue.service.domain.message.DocumentLocationMessage;
 import com.github.loa.source.domain.DocumentSourceItem;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.activemq.artemis.api.core.ActiveMQException;
-import org.apache.activemq.artemis.api.core.client.ClientConsumer;
-import org.apache.activemq.artemis.api.core.client.ClientMessage;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.SynchronousSink;
 
@@ -18,29 +18,24 @@ import java.util.function.Consumer;
 @RequiredArgsConstructor
 public class DownloaderQueueConsumer implements Consumer<SynchronousSink<DocumentSourceItem>> {
 
-    private final ClientConsumer clientConsumer;
+    private final QueueManipulator queueManipulator;
 
     @Override
     public void accept(final SynchronousSink<DocumentSourceItem> documentSourceItemSynchronousSink) {
+        final DocumentLocationMessage documentLocationMessage =
+                (DocumentLocationMessage) queueManipulator.readMessage(Queue.DOCUMENT_LOCATION_QUEUE);
+
         try {
-            final DocumentSourceItem documentSourceItem = transform(clientConsumer.receive());
-
-            documentSourceItemSynchronousSink.next(documentSourceItem);
-        } catch (ActiveMQException e) {
-            log.error("Connection error with the Queue Application!", e);
-
-            documentSourceItemSynchronousSink.error(e);
+            documentSourceItemSynchronousSink.next(
+                    DocumentSourceItem.builder()
+                            .sourceName(documentLocationMessage.getSourceName())
+                            .documentLocation(new URL(documentLocationMessage.getDocumentLocation()))
+                            .build()
+            );
         } catch (MalformedURLException e) {
-            log.error("Bad URL from the Queue Application!", e);
+            log.error("Failed to convert document location: " + documentLocationMessage.getDocumentLocation());
 
             documentSourceItemSynchronousSink.error(e);
         }
-    }
-
-    private DocumentSourceItem transform(final ClientMessage clientMessage) throws MalformedURLException {
-        return DocumentSourceItem.builder()
-                .sourceName(clientMessage.getBodyBuffer().readString())
-                .documentLocation(new URL(clientMessage.getBodyBuffer().readString()))
-                .build();
     }
 }

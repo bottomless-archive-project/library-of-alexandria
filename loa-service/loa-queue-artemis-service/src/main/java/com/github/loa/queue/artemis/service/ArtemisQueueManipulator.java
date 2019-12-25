@@ -1,6 +1,7 @@
 package com.github.loa.queue.artemis.service;
 
 import com.github.loa.queue.artemis.configuration.QueueServerConfiguration;
+import com.github.loa.queue.artemis.service.deserializer.MessageDeserializerProvider;
 import com.github.loa.queue.artemis.service.domain.ArtemisQueueMessage;
 import com.github.loa.queue.service.domain.Queue;
 import com.github.loa.queue.service.QueueManipulator;
@@ -11,6 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.artemis.api.core.ActiveMQException;
 import org.apache.activemq.artemis.api.core.RoutingType;
 import org.apache.activemq.artemis.api.core.SimpleString;
+import org.apache.activemq.artemis.api.core.client.ClientConsumer;
+import org.apache.activemq.artemis.api.core.client.ClientMessage;
 import org.apache.activemq.artemis.api.core.client.ClientSession;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Service;
@@ -27,7 +30,9 @@ import org.springframework.stereotype.Service;
 public class ArtemisQueueManipulator implements QueueManipulator {
 
     private final ClientSession clientSession;
+    private final ClientConsumer clientConsumer;
     private final ClientProducerProvider clientProducerProvider;
+    private final MessageDeserializerProvider messageDeserializerProvider;
 
     /**
      * Initialize the queue in the Queue Application if it does not exists. If the queue already exist it does nothing.
@@ -92,6 +97,7 @@ public class ArtemisQueueManipulator implements QueueManipulator {
      * @param queueMessage the message to send
      * @throws QueueException when an error happens while trying to send the message
      */
+    //TODO: This should simply send the message without converting it in an upper layer! The conversion should be here!
     @Override
     public void sendMessage(final Queue queue, final QueueMessage queueMessage) {
         try {
@@ -99,6 +105,26 @@ public class ArtemisQueueManipulator implements QueueManipulator {
                     .send(((ArtemisQueueMessage) queueMessage).getClientMessage());
         } catch (ActiveMQException e) {
             throw new QueueException("Unable to send message to the " + queue.getName() + " queue!", e);
+        }
+    }
+
+    /**
+     * Reads a message from the provided queue.
+     *
+     * @param queue the queue to read the message from
+     * @return the message that's being read
+     * @throws QueueException when an error happens while trying to read the message
+     */
+    @Override
+    public Object readMessage(final Queue queue) {
+        try {
+            final ClientMessage clientMessage = clientConsumer.receive();
+
+            return messageDeserializerProvider.getDeserializer(queue)
+                    .orElseThrow(() -> new QueueException("No deserializer found for queue: " + queue.getName() + "!"))
+                    .deserialize(clientMessage);
+        } catch (ActiveMQException e) {
+            throw new QueueException("Unable to read message from the " + queue.getName() + " queue!", e);
         }
     }
 }
