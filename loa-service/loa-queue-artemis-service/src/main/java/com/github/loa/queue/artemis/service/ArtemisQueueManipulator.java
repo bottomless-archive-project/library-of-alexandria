@@ -2,11 +2,10 @@ package com.github.loa.queue.artemis.service;
 
 import com.github.loa.queue.artemis.configuration.QueueServerConfiguration;
 import com.github.loa.queue.artemis.service.deserializer.MessageDeserializerProvider;
-import com.github.loa.queue.artemis.service.domain.ArtemisQueueMessage;
-import com.github.loa.queue.service.domain.Queue;
+import com.github.loa.queue.artemis.service.serialize.MessageSerializerProvider;
 import com.github.loa.queue.service.QueueManipulator;
+import com.github.loa.queue.service.domain.Queue;
 import com.github.loa.queue.service.domain.QueueException;
-import com.github.loa.queue.service.domain.message.QueueMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.artemis.api.core.ActiveMQException;
@@ -32,6 +31,7 @@ public class ArtemisQueueManipulator implements QueueManipulator {
     private final ClientSession clientSession;
     private final ClientConsumer clientConsumer;
     private final ClientProducerProvider clientProducerProvider;
+    private final MessageSerializerProvider messageSerializerProvider;
     private final MessageDeserializerProvider messageDeserializerProvider;
 
     /**
@@ -93,16 +93,18 @@ public class ArtemisQueueManipulator implements QueueManipulator {
     /**
      * Sends the provided message to the provided queue.
      *
-     * @param queue        the queue to send the message to
-     * @param queueMessage the message to send
+     * @param queue   the queue to send the message to
+     * @param message the message to send
      * @throws QueueException when an error happens while trying to send the message
      */
-    //TODO: This should simply send the message without converting it in an upper layer! The conversion should be here!
     @Override
-    public void sendMessage(final Queue queue, final QueueMessage queueMessage) {
+    public void sendMessage(final Queue queue, final Object message) {
         try {
-            clientProducerProvider.getClientProducer(queue)
-                    .send(((ArtemisQueueMessage) queueMessage).getClientMessage());
+            final ClientMessage clientMessage = messageSerializerProvider.getSerializer(queue)
+                    .orElseThrow(() -> new QueueException("No serializer found for queue: " + queue.getName() + "!"))
+                    .serialize(message);
+
+            clientProducerProvider.getClientProducer(queue).send(clientMessage);
         } catch (ActiveMQException e) {
             throw new QueueException("Unable to send message to the " + queue.getName() + " queue!", e);
         }

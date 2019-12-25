@@ -34,11 +34,11 @@ public interface QueueManipulator {
     /**
      * Sends the provided message to the provided queue.
      *
-     * @param queue        the queue to send the message to
-     * @param queueMessage the message to send
+     * @param queue   the queue to send the message to
+     * @param message the message to send
      * @throws QueueException when an error happens while trying to send the message
      */
-    void sendMessage(final Queue queue, final QueueMessage queueMessage);
+    void sendMessage(final Queue queue, final Object message);
 
     /**
      * Reads a message from the provided queue.

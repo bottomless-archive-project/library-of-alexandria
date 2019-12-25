@@ -1,12 +1,9 @@
 package com.github.loa.generator.command;
 
 import com.github.loa.location.service.DocumentLocationValidator;
-import com.github.loa.queue.service.domain.Queue;
 import com.github.loa.queue.artemis.service.ArtemisQueueManipulator;
-import com.github.loa.queue.artemis.service.ArtemisQueueMessageFactory;
+import com.github.loa.queue.service.domain.Queue;
 import com.github.loa.queue.service.domain.message.DocumentLocationMessage;
-import com.github.loa.queue.service.domain.message.QueueMessage;
-import com.github.loa.source.domain.DocumentSourceItem;
 import com.github.loa.source.service.DocumentLocationFactory;
 import com.github.loa.source.service.DocumentSourceItemFactory;
 import com.github.loa.url.service.UrlEncoder;
@@ -25,7 +22,6 @@ public class GeneratorCommand implements CommandLineRunner {
     private final DocumentSourceItemFactory documentSourceItemFactory;
     private final UrlEncoder urlEncoder;
     private final ArtemisQueueManipulator artemisQueueManipulator;
-    private final ArtemisQueueMessageFactory queueMessageFactory;
 
     @Override
     public void run(final String... args) {
@@ -38,22 +34,18 @@ public class GeneratorCommand implements CommandLineRunner {
         documentLocationFactory.streamLocations()
                 .filter(documentLocationValidator::validDocumentLocation)
                 .flatMap(urlEncoder::encode)
+                //TODO: We don't need to double convert!
                 .map(documentSourceItemFactory::newDocumentSourceItem)
-                .map(this::buildMessage)
+                .map(documentSourceItem -> DocumentLocationMessage.builder()
+                        .sourceName(documentSourceItem.getSourceName())
+                        .documentLocation(documentSourceItem.getDocumentLocation().toString())
+                        .build()
+                )
                 .doOnNext(this::sendMessage)
                 .subscribe();
     }
 
-    private QueueMessage buildMessage(final DocumentSourceItem documentSourceItem) {
-        return queueMessageFactory.newDocumentLocationQueueMessage(
-                DocumentLocationMessage.builder()
-                        .sourceName(documentSourceItem.getSourceName())
-                        .documentLocation(documentSourceItem.getDocumentLocation().toString())
-                        .build()
-        );
-    }
-
-    private void sendMessage(final QueueMessage queueMessage) {
-        artemisQueueManipulator.sendMessage(Queue.DOCUMENT_LOCATION_QUEUE, queueMessage);
+    private void sendMessage(final DocumentLocationMessage documentLocationMessage) {
+        artemisQueueManipulator.sendMessage(Queue.DOCUMENT_LOCATION_QUEUE, documentLocationMessage);
     }
 }
