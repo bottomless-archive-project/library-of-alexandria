@@ -35,6 +35,7 @@ public class ArtemisQueueManipulator implements QueueManipulator {
      * @param queue the queue to initialize
      * @throws QueueException when an error happens while trying to create the queue
      */
+    @Override
     public void silentlyInitializeQueue(final Queue queue) {
         try {
             final ClientSession.QueueQuery queueQuery = clientSession.queueQuery(
@@ -54,6 +55,7 @@ public class ArtemisQueueManipulator implements QueueManipulator {
      * @param queue the queue to initialize
      * @throws QueueException when an error happens while trying to create the queue
      */
+    @Override
     public void initializeQueue(final Queue queue) {
         log.info("Creating the {} queue because it doesn't exists.", queue.getName());
 
@@ -71,6 +73,7 @@ public class ArtemisQueueManipulator implements QueueManipulator {
      * @return the message count in the queue
      * @throws QueueException when an error happens while trying to create the queue
      */
+    @Override
     public long getMessageCount(final Queue queue) {
         try {
             final ClientSession.QueueQuery queueQuery = clientSession.queueQuery(
@@ -89,6 +92,7 @@ public class ArtemisQueueManipulator implements QueueManipulator {
      * @param queueMessage the message to send
      * @throws QueueException when an error happens while trying to send the message
      */
+    @Override
     public void sendMessage(final Queue queue, final QueueMessage queueMessage) {
         try {
             clientProducerProvider.getClientProducer(queue)
