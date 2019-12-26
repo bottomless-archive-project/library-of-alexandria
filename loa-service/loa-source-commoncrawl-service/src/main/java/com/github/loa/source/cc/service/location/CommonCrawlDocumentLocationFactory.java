@@ -8,6 +8,7 @@ import com.github.loa.url.service.URLConverter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.net.URL;
 import java.util.List;
@@ -29,10 +30,14 @@ public class CommonCrawlDocumentLocationFactory implements DocumentLocationFacto
     @Override
     public Flux<URL> streamLocations() {
         return Flux.fromIterable(paths)
-                .flatMap(warcDownloader::downloadWarcFile)
-                .flatMap(warcFluxFactory::buildWarcRecordFlux)
-                .flatMap(warcRecordParser::parseUrlsFromRecord)
-                .flatMap(urlConverter::convert)
-                .retry();
+                .flatMap(warcLocation ->
+                        Mono.just(warcLocation)
+                                .flatMap(warcDownloader::downloadWarcFile)
+                                .flatMapMany(warcFluxFactory::buildWarcRecordFlux)
+                                .flatMap(warcRecordParser::parseUrlsFromRecord)
+                                .flatMap(urlConverter::convert)
+                                .doOnError(error -> log.error("Failed to download WARC location {}!", warcLocation, error))
+                                .retry()
+                );
     }
 }
