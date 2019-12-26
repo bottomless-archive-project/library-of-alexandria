@@ -15,14 +15,14 @@ import java.util.stream.Collectors;
 @ConditionalOnMissingBean(QueueServerConfiguration.class)
 public class MessageSerializerProvider {
 
-    private final Map<Queue, MessageSerializer<Object>> messageSerializers;
+    private final Map<Queue, MessageSerializer<?>> messageSerializers;
 
-    public MessageSerializerProvider(final List<MessageSerializer> serializers) {
+    public MessageSerializerProvider(final List<MessageSerializer<?>> serializers) {
         messageSerializers = serializers.stream()
                 .collect(Collectors.toMap(MessageSerializer::supports, Function.identity()));
     }
 
-    public Optional<MessageSerializer<Object>> getSerializer(final Queue queue) {
+    public Optional<MessageSerializer<?>> getSerializer(final Queue queue) {
         return Optional.ofNullable(messageSerializers.get(queue));
     }
 }

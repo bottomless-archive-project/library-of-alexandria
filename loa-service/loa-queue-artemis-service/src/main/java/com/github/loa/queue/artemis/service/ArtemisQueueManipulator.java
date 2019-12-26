@@ -2,6 +2,7 @@ package com.github.loa.queue.artemis.service;
 
 import com.github.loa.queue.artemis.configuration.QueueServerConfiguration;
 import com.github.loa.queue.artemis.service.deserializer.MessageDeserializerProvider;
+import com.github.loa.queue.artemis.service.serialize.MessageSerializer;
 import com.github.loa.queue.artemis.service.serialize.MessageSerializerProvider;
 import com.github.loa.queue.service.QueueManipulator;
 import com.github.loa.queue.service.domain.Queue;
@@ -99,9 +100,11 @@ public class ArtemisQueueManipulator implements QueueManipulator {
     @Override
     public void sendMessage(final Queue queue, final Object message) {
         try {
-            final ClientMessage clientMessage = messageSerializerProvider.getSerializer(queue)
-                    .orElseThrow(() -> new QueueException("No serializer found for queue: " + queue.getName() + "!"))
-                    .serialize(message);
+            final MessageSerializer<Object> messageSerializer = (MessageSerializer<Object>) messageSerializerProvider
+                    .getSerializer(queue)
+                    .orElseThrow(() -> new QueueException("No serializer found for queue: " + queue.getName() + "!"));
+
+            final ClientMessage clientMessage = messageSerializer.serialize(message);
 
             clientProducerProvider.getClientProducer(queue).send(clientMessage);
         } catch (ActiveMQException e) {
