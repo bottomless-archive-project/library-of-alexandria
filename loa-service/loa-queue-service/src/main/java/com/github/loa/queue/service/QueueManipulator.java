@@ -2,7 +2,6 @@ package com.github.loa.queue.service;
 
 import com.github.loa.queue.service.domain.Queue;
 import com.github.loa.queue.service.domain.QueueException;
-import com.github.loa.queue.service.domain.message.QueueMessage;
 
 public interface QueueManipulator {
 

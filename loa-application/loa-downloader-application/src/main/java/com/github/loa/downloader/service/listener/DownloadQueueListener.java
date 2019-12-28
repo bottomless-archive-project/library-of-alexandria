@@ -1,6 +1,5 @@
 package com.github.loa.downloader.service.listener;
 
-import com.github.loa.downloader.configuration.DownloaderConfigurationProperties;
 import com.github.loa.downloader.service.DocumentLocationCreationContextFactory;
 import com.github.loa.downloader.service.document.DocumentDownloader;
 import com.github.loa.downloader.service.file.DocumentFileManipulator;
@@ -19,7 +18,6 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.publisher.SignalType;
 
 @Slf4j
 @Service
@@ -28,7 +26,6 @@ public class DownloadQueueListener implements CommandLineRunner {
 
     private final ClientSession clientSession;
     private final DocumentDownloader documentDownloader;
-    private final DownloaderConfigurationProperties downloaderConfigurationProperties;
     private final DocumentLocationEntityFactory documentLocationEntityFactory;
     private final DownloaderQueueConsumer downloaderQueueConsumer;
     private final DocumentFileManipulator documentFileManipulator;
@@ -45,12 +42,10 @@ public class DownloadQueueListener implements CommandLineRunner {
                 queueQuery.getMessageCount());
 
         Flux.generate(downloaderQueueConsumer)
-                .doFirst(this::initializeProcessing)
                 .flatMap(this::evaluateDocumentLocation)
                 .doOnNext(this::incrementProcessedCount)
                 .flatMap(this::downloadDocument)
                 .flatMap(this::archiveDocument)
-                .doFinally(this::finishProcessing)
                 .subscribe();
     }
 
@@ -73,25 +68,5 @@ public class DownloadQueueListener implements CommandLineRunner {
 
     private Mono<Void> archiveDocument(final ArchivingContext archivingContext) {
         return documentFileManipulator.moveToVault(archivingContext);
-    }
-
-    private void initializeProcessing() {
-        log.info("Initialized processing!");
-
-        try {
-            clientSession.start();
-        } catch (ActiveMQException e) {
-            log.error("Connection error with the Queue Application!", e);
-        }
-    }
-
-    private void finishProcessing(final SignalType signalType) {
-        log.info("Finished processing!");
-
-        try {
-            clientSession.close();
-        } catch (ActiveMQException e) {
-            log.error("Connection error with the Queue Application!", e);
-        }
     }
 }
