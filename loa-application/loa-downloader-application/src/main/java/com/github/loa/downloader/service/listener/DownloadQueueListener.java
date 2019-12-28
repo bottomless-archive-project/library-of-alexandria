@@ -5,14 +5,13 @@ import com.github.loa.downloader.service.document.DocumentDownloader;
 import com.github.loa.downloader.service.file.DocumentFileManipulator;
 import com.github.loa.location.service.factory.DocumentLocationEntityFactory;
 import com.github.loa.location.service.factory.domain.DocumentLocationCreationContext;
+import com.github.loa.queue.service.QueueManipulator;
+import com.github.loa.queue.service.domain.Queue;
 import com.github.loa.source.domain.DocumentSourceItem;
 import com.github.loa.vault.client.service.domain.ArchivingContext;
 import io.micrometer.core.instrument.Counter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.activemq.artemis.api.core.ActiveMQException;
-import org.apache.activemq.artemis.api.core.SimpleString;
-import org.apache.activemq.artemis.api.core.client.ClientSession;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Service;
@@ -24,22 +23,19 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class DownloadQueueListener implements CommandLineRunner {
 
-    private final ClientSession clientSession;
     private final DocumentDownloader documentDownloader;
     private final DocumentLocationEntityFactory documentLocationEntityFactory;
     private final DownloaderQueueConsumer downloaderQueueConsumer;
     private final DocumentFileManipulator documentFileManipulator;
     private final DocumentLocationCreationContextFactory documentLocationCreationContextFactory;
+    private final QueueManipulator queueManipulator;
     @Qualifier("processedDocumentCount")
     private final Counter processedDocumentCount;
 
     @Override
-    public void run(final String... args) throws ActiveMQException {
-        final ClientSession.QueueQuery queueQuery = clientSession.queueQuery(
-                SimpleString.toSimpleString("loa-document-location"));
-
+    public void run(final String... args) {
         log.info("Initialized queue processing! There are {} messages available in the queue!",
-                queueQuery.getMessageCount());
+                queueManipulator.getMessageCount(Queue.DOCUMENT_LOCATION_QUEUE));
 
         Flux.generate(downloaderQueueConsumer)
                 .flatMap(this::evaluateDocumentLocation)
