@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.net.URL;
 import java.util.UUID;
@@ -40,11 +41,13 @@ public class DocumentDownloader {
         return Mono.just(UUID.randomUUID().toString())
                 .flatMap(documentId -> stageLocationFactory.getLocation(documentId, documentType)
                         .flatMap(stageFileLocation -> acquireFile(documentLocation, stageFileLocation))
+                        .publishOn(Schedulers.parallel())
                         .flatMap(documentFileLocation -> documentFileValidator.isValidDocument(documentId, documentType)
                                 .filter(validationResult -> !validationResult)
                                 .doOnNext(validationResult -> documentFileLocation.cleanup())
                                 .thenReturn(documentFileLocation)
                         )
+                        .publishOn(Schedulers.boundedElastic())
                         .filter(StageLocation::exists)
                         .flatMap(stageLocation -> Mono.just(
                                 ArchivingContext.builder()

@@ -17,6 +17,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 @Slf4j
 @Service
@@ -38,6 +39,7 @@ public class DownloadQueueListener implements CommandLineRunner {
                 queueManipulator.getMessageCount(Queue.DOCUMENT_LOCATION_QUEUE));
 
         Flux.generate(downloaderQueueConsumer)
+                .publishOn(Schedulers.boundedElastic())
                 .flatMap(this::evaluateDocumentLocation)
                 .doOnNext(this::incrementProcessedCount)
                 .flatMap(this::downloadDocument)

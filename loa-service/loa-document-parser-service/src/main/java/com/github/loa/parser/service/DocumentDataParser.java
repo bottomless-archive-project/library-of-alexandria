@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -37,6 +38,7 @@ public class DocumentDataParser {
 
     public Mono<DocumentMetadata> parseDocumentData(final DocumentEntity documentEntity) {
         return vaultClientService.queryDocument(documentEntity)
+                .publishOn(Schedulers.parallel())
                 .map(documentContent -> parseDocumentMetadata(documentEntity.getId(), documentEntity.getType(), documentContent))
                 .onErrorContinue((throwable, document) -> log.debug("Failed to parse document!", throwable));
     }

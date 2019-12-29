@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 @Slf4j
 @Component
@@ -33,6 +34,7 @@ public class IndexerCommand implements CommandLineRunner {
 
     private Mono<Void> processDocument(final DocumentEntity documentEntity) {
         return documentDataParser.parseDocumentData(documentEntity)
+                .publishOn(Schedulers.boundedElastic())
                 .doOnNext(indexerService::indexDocuments)
                 .then();
     }
