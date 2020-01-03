@@ -1,11 +1,10 @@
 package com.github.loa.downloader.service.file;
 
-import com.github.loa.url.service.FileDownloader;
+import com.github.loa.url.service.downloader.FileDownloadManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import java.io.File;
 import java.net.URL;
 import java.nio.file.Path;
 
@@ -16,13 +15,13 @@ import java.nio.file.Path;
 @RequiredArgsConstructor
 public class FileCollector {
 
-    private final FileDownloader fileDownloader;
+    private final FileDownloadManager fileDownloadManager;
 
     public Mono<Path> acquireFile(final URL fileLocation, final Path resultLocation) {
         final String protocol = fileLocation.getProtocol();
 
         if ("http".equals(protocol) || "https".equals(protocol)) {
-            return fileDownloader.downloadFile(fileLocation, resultLocation);
+            return fileDownloadManager.downloadFile(fileLocation, resultLocation);
         }
 
         return Mono.empty();

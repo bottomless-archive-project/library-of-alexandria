@@ -1,11 +1,10 @@
-package com.github.loa.url.service;
+package com.github.loa.url.service.downloader;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -18,9 +17,9 @@ import java.nio.file.Path;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class FileDownloader {
+public class FileDownloadManager {
 
-    private final WebClient downloaderWebClient;
+    private final FileDownloadRequestFactory fileDownloadRequestFactory;
 
     /**
      * Download a file from the provided url to the provided file location.
@@ -30,15 +29,13 @@ public class FileDownloader {
      */
     public Mono<Path> downloadFile(final URL downloadTarget, final Path resultLocation) {
         try {
-            final Flux<DataBuffer> dataBufferFlux = downloaderWebClient.get()
-                    .uri(downloadTarget.toURI())
-                    .retrieve()
-                    .bodyToFlux(DataBuffer.class);
+            final Flux<DataBuffer> dataBufferFlux =
+                    fileDownloadRequestFactory.newDownloadRequest(downloadTarget.toURI());
 
             return DataBufferUtils.write(dataBufferFlux, resultLocation)
                     .doOnError(error -> resultLocation.toFile().delete())
                     .thenReturn(resultLocation);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             log.debug("Failed to download document from location: {}.", downloadTarget, e);
 
             return Mono.empty();
