@@ -42,7 +42,7 @@ public class FileDownloadRequestFactory {
 
     private Mono<ClientResponse> validateResponse(final URI downloadTarget, final ClientResponse clientResponse) {
         if (clientResponse.statusCode() == HttpStatus.TOO_MANY_REQUESTS) {
-            log.info("Too many requests for location: {}. Retrying!", downloadTarget);
+            log.debug("Too many requests for location: {}. Retrying!", downloadTarget);
 
             return Mono.error(new RetryableException());
         }
@@ -54,7 +54,7 @@ public class FileDownloadRequestFactory {
         return Retry.anyOf(RetryableException.class)
                 .jitter(Jitter.random())
                 .backoff(Backoff.exponential(Duration.ofSeconds(5), Duration.ofMinutes(2), 2, true))
-                .retryMax(10);
+                .retryMax(3);
     }
 
     private Flux<DataBuffer> convertResponse(final ClientResponse clientResponse) {
