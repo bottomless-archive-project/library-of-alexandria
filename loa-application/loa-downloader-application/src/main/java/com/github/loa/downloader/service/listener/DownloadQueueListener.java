@@ -23,6 +23,7 @@ import reactor.core.scheduler.Schedulers;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 @Slf4j
 @Service
@@ -54,7 +55,7 @@ public class DownloadQueueListener implements CommandLineRunner {
                 .doOnNext(this::incrementProcessedCount)
                 .flatMap(this::downloadDocument)
                 .doOnNext(this::archiveDocument)
-                .doOnNext(this::cleanup)
+                .flatMap(this::cleanup)
                 .subscribe();
     }
 
@@ -76,14 +77,14 @@ public class DownloadQueueListener implements CommandLineRunner {
     }
 
     private void archiveDocument(final DocumentArchivingContext documentArchivingContext) {
-        try {
+        try (final InputStream documentContent = new FileInputStream(documentArchivingContext.getContents().toFile())) {
             archivedDocumentCount.increment();
 
             queueManipulator.sendMessage(Queue.DOCUMENT_ARCHIVING_QUEUE,
                     DocumentArchivingMessage.builder()
                             .type(documentArchivingContext.getType().toString())
                             .source(documentArchivingContext.getSource())
-                            .content(new FileInputStream(documentArchivingContext.getContents().toFile()).readAllBytes())
+                            .content(documentContent.readAllBytes())
                             .build()
             );
         } catch (IOException e) {
@@ -91,9 +92,9 @@ public class DownloadQueueListener implements CommandLineRunner {
         }
     }
 
-    private void cleanup(final DocumentArchivingContext documentArchivingContext) {
-        stageLocationFactory.getLocation(documentArchivingContext.getId(), documentArchivingContext.getType())
+    private Mono<Void> cleanup(final DocumentArchivingContext documentArchivingContext) {
+        return stageLocationFactory.getLocation(documentArchivingContext.getId(), documentArchivingContext.getType())
                 .doOnNext(StageLocation::cleanup)
-                .subscribe();
+                .then();
     }
 }
