@@ -2,7 +2,6 @@ package com.github.loa.downloader.service.listener;
 
 import com.github.loa.downloader.service.DocumentLocationCreationContextFactory;
 import com.github.loa.downloader.service.document.DocumentDownloader;
-import com.github.loa.downloader.service.file.DocumentFileManipulator;
 import com.github.loa.location.service.factory.DocumentLocationEntityFactory;
 import com.github.loa.location.service.factory.domain.DocumentLocationCreationContext;
 import com.github.loa.queue.service.QueueManipulator;
@@ -21,7 +20,6 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 @Slf4j
@@ -32,9 +30,9 @@ public class DownloadQueueListener implements CommandLineRunner {
     private final DocumentDownloader documentDownloader;
     private final DocumentLocationEntityFactory documentLocationEntityFactory;
     private final DownloaderQueueConsumer downloaderQueueConsumer;
-    private final DocumentFileManipulator documentFileManipulator;
     private final DocumentLocationCreationContextFactory documentLocationCreationContextFactory;
     private final QueueManipulator queueManipulator;
+
     @Qualifier("processedDocumentCount")
     private final Counter processedDocumentCount;
     @Qualifier("archivedDocumentCount")
@@ -88,6 +86,5 @@ public class DownloadQueueListener implements CommandLineRunner {
         } catch (IOException e) {
             throw new RuntimeException("Failed to send document for archiving!", e);
         }
-        //return documentFileManipulator.moveToVault(archivingContext);
     }
 }
