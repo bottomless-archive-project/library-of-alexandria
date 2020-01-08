@@ -8,8 +8,9 @@ import java.nio.file.Path;
 
 @Getter
 @Builder
-public class ArchivingContext {
+public class DocumentArchivingContext {
 
+    private String id;
     private DocumentType type;
     private String source;
     private Path contents;

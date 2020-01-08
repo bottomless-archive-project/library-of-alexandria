@@ -7,7 +7,7 @@ import com.github.loa.downloader.service.file.FileCollector;
 import com.github.loa.source.domain.DocumentSourceItem;
 import com.github.loa.stage.service.StageLocationFactory;
 import com.github.loa.stage.service.domain.StageLocation;
-import com.github.loa.vault.client.service.domain.ArchivingContext;
+import com.github.loa.vault.client.service.domain.DocumentArchivingContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -30,7 +30,7 @@ public class DocumentDownloader {
     private final FileCollector fileCollector;
     private final DocumentTypeCalculator documentTypeCalculator;
 
-    public Mono<ArchivingContext> downloadDocument(final DocumentSourceItem documentSourceItem) {
+    public Mono<DocumentArchivingContext> downloadDocument(final DocumentSourceItem documentSourceItem) {
         final URL documentLocation = documentSourceItem.getDocumentLocation();
         final DocumentType documentType = documentTypeCalculator.calculate(documentLocation)
                 .orElseThrow(() -> new RuntimeException("Unable to find valid document type for document: "
@@ -50,7 +50,8 @@ public class DocumentDownloader {
                         .publishOn(Schedulers.boundedElastic())
                         .filter(StageLocation::exists)
                         .flatMap(stageLocation -> Mono.just(
-                                ArchivingContext.builder()
+                                DocumentArchivingContext.builder()
+                                        .id(documentId)
                                         .source(documentSourceItem.getSourceName())
                                         .type(documentType)
                                         .contents(stageLocation.getPath())
