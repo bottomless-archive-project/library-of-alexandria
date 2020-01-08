@@ -27,7 +27,6 @@ public class VaultQueueConsumer implements Consumer<SynchronousSink<DocumentArch
         documentSourceItemSynchronousSink.next(
                 DocumentArchivingContext.builder()
                         .type(DocumentType.valueOf(documentArchivingMessage.getType()))
-                        .location(documentArchivingMessage.getLocation())
                         .source(documentArchivingMessage.getSource())
                         .content(documentArchivingMessage.getContent())
                         .build()

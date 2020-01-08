@@ -11,7 +11,6 @@ import java.nio.file.Path;
 public class ArchivingContext {
 
     private DocumentType type;
-    private String location;
     private String source;
     private Path contents;
 }

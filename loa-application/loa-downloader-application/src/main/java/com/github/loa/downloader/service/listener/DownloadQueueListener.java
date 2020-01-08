@@ -78,7 +78,6 @@ public class DownloadQueueListener implements CommandLineRunner {
             queueManipulator.sendMessage(Queue.DOCUMENT_ARCHIVING_QUEUE,
                     DocumentArchivingMessage.builder()
                             .type(archivingContext.getType().toString())
-                            .location(archivingContext.getLocation())
                             .source(archivingContext.getSource())
                             .content(new FileInputStream(archivingContext.getContents().toFile()).readAllBytes())
                             .build()

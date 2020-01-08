@@ -11,7 +11,6 @@ import java.io.OutputStream;
 public class DocumentArchivingMessage {
 
     private String type;
-    private String location;
     private String source;
     private byte[] content;
 }

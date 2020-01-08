@@ -23,7 +23,6 @@ public class DocumentArchivingMessageDeserializer implements MessageDeserializer
 
         return DocumentArchivingMessage.builder()
                 .type(clientMessage.getBodyBuffer().readString())
-                .location(clientMessage.getBodyBuffer().readString())
                 .source(clientMessage.getBodyBuffer().readString())
                 .content(documentContent)
                 .build();

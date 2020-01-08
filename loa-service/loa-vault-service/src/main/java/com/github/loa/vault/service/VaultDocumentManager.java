@@ -57,7 +57,6 @@ public class VaultDocumentManager {
                                         .id(documentId)
                                         .type(documentArchivingContext.getType())
                                         .status(DocumentStatus.DOWNLOADED)
-                                        .location(documentArchivingContext.getLocation())
                                         .source(documentArchivingContext.getSource())
                                         .versionNumber(vaultConfigurationProperties.getVersionNumber())
                                         .compression(compressionConfigurationProperties.getAlgorithm())

@@ -51,7 +51,6 @@ public class DocumentDownloader {
                         .filter(StageLocation::exists)
                         .flatMap(stageLocation -> Mono.just(
                                 ArchivingContext.builder()
-                                        .location(documentLocation.toString())
                                         .source(documentSourceItem.getSourceName())
                                         .type(documentType)
                                         .contents(stageLocation.getPath())
