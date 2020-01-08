@@ -22,6 +22,7 @@ import reactor.core.scheduler.Schedulers;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 
 @Slf4j
 @Service
@@ -81,10 +82,10 @@ public class DownloadQueueListener implements CommandLineRunner {
                             .type(archivingContext.getType().toString())
                             .location(archivingContext.getLocation())
                             .source(archivingContext.getSource())
-                            .build(),
-                    new FileInputStream(archivingContext.getContents().toFile())
+                            .content(new FileInputStream(archivingContext.getContents().toFile()).readAllBytes())
+                            .build()
             );
-        } catch (FileNotFoundException e) {
+        } catch (IOException e) {
             throw new RuntimeException("Failed to send document for archiving!", e);
         }
         //return documentFileManipulator.moveToVault(archivingContext);

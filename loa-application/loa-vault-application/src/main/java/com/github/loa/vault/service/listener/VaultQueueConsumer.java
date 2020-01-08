@@ -24,17 +24,20 @@ public class VaultQueueConsumer implements Consumer<SynchronousSink<ArchivingCon
 
     @Override
     public void accept(final SynchronousSink<ArchivingContext> documentSourceItemSynchronousSink) {
-        final ByteArrayOutputStream contentOutputStream = new ByteArrayOutputStream();
         final DocumentArchivingMessage documentArchivingMessage = (DocumentArchivingMessage)
-                queueManipulator.readMessage(Queue.DOCUMENT_ARCHIVING_QUEUE, contentOutputStream);
+                queueManipulator.readMessage(Queue.DOCUMENT_ARCHIVING_QUEUE);
 
         try {
+            //TODO: Why???
+            final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            byteArrayOutputStream.writeBytes(documentArchivingMessage.getContent());
+
             documentSourceItemSynchronousSink.next(
                     ArchivingContext.builder()
                             .type(DocumentType.valueOf(documentArchivingMessage.getType()))
                             .location(new URL(documentArchivingMessage.getLocation()))
                             .source(documentArchivingMessage.getSource())
-                            .content(contentOutputStream)
+                            .content(byteArrayOutputStream)
                             .build()
             );
         } catch (MalformedURLException e) {

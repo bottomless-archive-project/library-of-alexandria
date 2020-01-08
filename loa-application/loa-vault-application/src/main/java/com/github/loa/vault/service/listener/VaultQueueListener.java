@@ -4,6 +4,7 @@ import com.github.loa.stage.service.StageLocationFactory;
 import com.github.loa.vault.service.VaultDocumentManager;
 import com.github.loa.vault.service.domain.DocumentArchivingContext;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -16,6 +17,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class VaultQueueListener implements CommandLineRunner {
@@ -29,6 +31,8 @@ public class VaultQueueListener implements CommandLineRunner {
         Flux.generate(vaultQueueConsumer)
                 .flatMap(archivingContext -> {
                     final String documentId = UUID.randomUUID().toString();
+
+                    log.info("Archiving document with id: {}.", documentId);
 
                     return stageLocationFactory.getLocation(documentId, archivingContext.getType())
                             .flatMap(documentLocation -> {

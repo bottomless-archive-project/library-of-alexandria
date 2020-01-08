@@ -115,23 +115,6 @@ public class ArtemisQueueManipulator implements QueueManipulator {
         }
     }
 
-    @Override
-    public void sendMessage(final Queue queue, final Object message, final InputStream inputStream) {
-        try {
-            final MessageSerializer<Object> messageSerializer = (MessageSerializer<Object>) messageSerializerProvider
-                    .getSerializer(queue)
-                    .orElseThrow(() -> new QueueException("No serializer found for queue: " + queue.getName() + "!"));
-
-            final ClientMessage clientMessage = messageSerializer.serialize(message);
-
-            clientMessage.setBodyInputStream(inputStream);
-
-            clientProducerProvider.getClientProducer(queue).send(clientMessage);
-        } catch (ActiveMQException e) {
-            throw new QueueException("Unable to send message to the " + queue.getName() + " queue!", e);
-        }
-    }
-
     /**
      * Reads a message from the provided queue.
      *
@@ -143,21 +126,6 @@ public class ArtemisQueueManipulator implements QueueManipulator {
     public Object readMessage(final Queue queue) {
         try {
             final ClientMessage clientMessage = clientConsumerProvider.getClientConsumer(queue).receive();
-
-            return messageDeserializerProvider.getDeserializer(queue)
-                    .orElseThrow(() -> new QueueException("No deserializer found for queue: " + queue.getName() + "!"))
-                    .deserialize(clientMessage);
-        } catch (ActiveMQException e) {
-            throw new QueueException("Unable to read message from the " + queue.getName() + " queue!", e);
-        }
-    }
-
-    @Override
-    public Object readMessage(final Queue queue, final OutputStream outputStream) {
-        try {
-            final ClientMessage clientMessage = clientConsumerProvider.getClientConsumer(queue).receive();
-
-            clientMessage.setOutputStream(outputStream);
 
             return messageDeserializerProvider.getDeserializer(queue)
                     .orElseThrow(() -> new QueueException("No deserializer found for queue: " + queue.getName() + "!"))

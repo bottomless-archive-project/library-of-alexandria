@@ -16,10 +16,16 @@ public class DocumentArchivingMessageDeserializer implements MessageDeserializer
 
     @Override
     public DocumentArchivingMessage deserialize(final ClientMessage clientMessage) {
+        final int documentContentLength = clientMessage.getBodyBuffer().readInt();
+
+        final byte[] documentContent = new byte[documentContentLength];
+        clientMessage.getBodyBuffer().readBytes(documentContent);
+
         return DocumentArchivingMessage.builder()
                 .type(clientMessage.getBodyBuffer().readString())
                 .location(clientMessage.getBodyBuffer().readString())
                 .source(clientMessage.getBodyBuffer().readString())
+                .content(documentContent)
                 .build();
     }
 

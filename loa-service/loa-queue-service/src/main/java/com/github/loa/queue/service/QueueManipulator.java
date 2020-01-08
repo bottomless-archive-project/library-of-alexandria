@@ -42,8 +42,6 @@ public interface QueueManipulator {
      */
     void sendMessage(final Queue queue, final Object message);
 
-    void sendMessage(final Queue queue, final Object message, final InputStream inputStream);
-
     /**
      * Reads a message from the provided queue.
      *
@@ -52,6 +50,4 @@ public interface QueueManipulator {
      * @throws QueueException when an error happens while trying to read the message
      */
     Object readMessage(final Queue queue);
-
-    Object readMessage(final Queue queue, final OutputStream outputStream);
 }

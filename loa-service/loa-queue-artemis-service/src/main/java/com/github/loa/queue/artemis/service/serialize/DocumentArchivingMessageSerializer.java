@@ -20,6 +20,8 @@ public class DocumentArchivingMessageSerializer implements MessageSerializer<Doc
     public ClientMessage serialize(final DocumentArchivingMessage message) {
         final ClientMessage clientMessage = clientSession.createMessage(true);
 
+        clientMessage.getBodyBuffer().writeInt(message.getContent().length);
+        clientMessage.getBodyBuffer().writeBytes(message.getContent());
         clientMessage.getBodyBuffer().writeString(message.getType());
         clientMessage.getBodyBuffer().writeString(message.getLocation());
         clientMessage.getBodyBuffer().writeString(message.getSource());
