@@ -8,8 +8,10 @@ import com.github.loa.source.domain.DocumentSourceItem;
 import com.github.loa.stage.service.StageLocationFactory;
 import com.github.loa.stage.service.domain.StageLocation;
 import com.github.loa.vault.client.service.domain.DocumentArchivingContext;
+import io.micrometer.core.instrument.Counter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -30,7 +32,12 @@ public class DocumentDownloader {
     private final FileCollector fileCollector;
     private final DocumentTypeCalculator documentTypeCalculator;
 
+    @Qualifier("processedDocumentCount")
+    private final Counter processedDocumentCount;
+
     public Mono<DocumentArchivingContext> downloadDocument(final DocumentSourceItem documentSourceItem) {
+        processedDocumentCount.increment();
+
         final URL documentLocation = documentSourceItem.getDocumentLocation();
         final DocumentType documentType = documentTypeCalculator.calculate(documentLocation)
                 .orElseThrow(() -> new RuntimeException("Unable to find valid document type for document: "
