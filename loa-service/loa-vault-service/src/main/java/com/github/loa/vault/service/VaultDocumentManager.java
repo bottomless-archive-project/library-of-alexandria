@@ -20,11 +20,10 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.UUID;
 
 /**
@@ -49,8 +48,10 @@ public class VaultDocumentManager {
     public Mono<DocumentEntity> archiveDocument(final DocumentArchivingContext documentArchivingContext) {
         final String documentId = UUID.randomUUID().toString();
 
+        log.info("Archiving document with id: {}.", documentId);
+
         return Mono.just(documentArchivingContext)
-                .flatMap(documentContents -> checksumProvider.checksum(documentId, documentContents.getContents())
+                .flatMap(documentContents -> checksumProvider.checksum(documentId, documentContents.getContent())
                         .flatMap(checksum -> documentEntityFactory.newDocumentEntity(
                                 DocumentCreationContext.builder()
                                         .id(documentId)
@@ -61,18 +62,18 @@ public class VaultDocumentManager {
                                         .versionNumber(vaultConfigurationProperties.getVersionNumber())
                                         .compression(compressionConfigurationProperties.getAlgorithm())
                                         .checksum(checksum)
-                                        .fileSize(documentContents.getContents().toFile().length())
+                                        .fileSize(documentContents.getContent().length)
                                         .build()
                                 )
                         )
                         .flatMap(documentEntity -> Mono.fromSupplier(
-                                () -> saveDocument(documentEntity, documentContents.getContents())))
+                                () -> saveDocument(documentEntity, documentContents.getContent())))
                 );
     }
 
-    public DocumentEntity saveDocument(final DocumentEntity documentEntity, final Path documentContents) {
+    public DocumentEntity saveDocument(final DocumentEntity documentEntity, final byte[] documentContents) {
         try (final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentEntity);
-             final InputStream documentInputStream = Files.newInputStream(documentContents)) {
+             final InputStream documentInputStream = new ByteArrayInputStream(documentContents)) {
             saveDocumentContents(documentEntity, documentInputStream, vaultLocation);
         } catch (IOException e) {
             throw new VaultAccessException("Unable to move document with id " + documentEntity.getId()

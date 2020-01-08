@@ -4,11 +4,8 @@ import com.github.loa.document.service.entity.factory.DocumentEntityFactory;
 import com.github.loa.document.view.response.domain.DocumentResponse;
 import com.github.loa.document.view.response.service.DocumentResponseTransformer;
 import com.github.loa.document.view.service.MediaTypeCalculator;
-import com.github.loa.stage.service.StageLocationFactory;
 import com.github.loa.vault.service.RecompressorService;
 import com.github.loa.vault.service.VaultDocumentManager;
-import com.github.loa.vault.service.domain.DocumentArchivingContext;
-import com.github.loa.vault.view.request.domain.ArchiveDocumentRequest;
 import com.github.loa.vault.view.request.domain.RecompressRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,13 +13,9 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
-
-import java.util.UUID;
 
 @Slf4j
 @RestController
@@ -33,37 +26,7 @@ public class VaultController {
     private final VaultDocumentManager vaultDocumentManager;
     private final RecompressorService recompressorService;
     private final MediaTypeCalculator mediaTypeCalculator;
-    private final StageLocationFactory stageLocationFactory;
     private final DocumentResponseTransformer documentResponseTransformer;
-
-    /**
-     * Saves a document's content to the vault.
-     *
-     * @param archiveDocumentRequest the content to save
-     * @return the document entity that the content was updated for
-     */
-    @PostMapping("/document")
-    public Mono<DocumentResponse> archiveDocument(
-            @RequestPart(value = "document") final ArchiveDocumentRequest archiveDocumentRequest,
-            @RequestPart(value = "contents") final FilePart documentContents) {
-        final String documentId = UUID.randomUUID().toString();
-
-        return stageLocationFactory.getLocation(documentId, archiveDocumentRequest.getType())
-                .flatMap(stageLocation -> documentContents.transferTo(stageLocation.getPath())
-                        .thenReturn(stageLocation)
-                        .map(fileLocation -> DocumentArchivingContext.builder()
-                                .type(archiveDocumentRequest.getType())
-                                .location(archiveDocumentRequest.getLocation())
-                                .source(archiveDocumentRequest.getSource())
-                                .contents(fileLocation.getPath())
-                                .build()
-                        )
-                        .flatMap(vaultDocumentManager::archiveDocument)
-                        .doOnTerminate(stageLocation::cleanup)
-                )
-                .map(documentResponseTransformer::transform)
-                .subscribeOn(Schedulers.boundedElastic());
-    }
 
     /**
      * Return a document's content from the vault, based on the provided document id.
