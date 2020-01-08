@@ -36,6 +36,8 @@ public class DownloadQueueListener implements CommandLineRunner {
     private final QueueManipulator queueManipulator;
     @Qualifier("processedDocumentCount")
     private final Counter processedDocumentCount;
+    @Qualifier("archivedDocumentCount")
+    private final Counter archivedDocumentCount;
 
     @Override
     public void run(final String... args) {
@@ -72,11 +74,15 @@ public class DownloadQueueListener implements CommandLineRunner {
 
     private void archiveDocument(final ArchivingContext archivingContext) {
         try {
-            queueManipulator.sendMessage(Queue.DOCUMENT_ARCHIVING_QUEUE, DocumentArchivingMessage.builder()
-                    .type(archivingContext.getType().toString())
-                    .location(archivingContext.getLocation())
-                    .source(archivingContext.getSource())
-                    .contents(new FileInputStream(archivingContext.getContents().toFile()))
+            archivedDocumentCount.increment();
+
+            queueManipulator.sendMessage(Queue.DOCUMENT_ARCHIVING_QUEUE,
+                    DocumentArchivingMessage.builder()
+                            .type(archivingContext.getType().toString())
+                            .location(archivingContext.getLocation())
+                            .source(archivingContext.getSource())
+                            .build(),
+                    new FileInputStream(archivingContext.getContents().toFile())
             );
         } catch (FileNotFoundException e) {
             throw new RuntimeException("Failed to send document for archiving!", e);

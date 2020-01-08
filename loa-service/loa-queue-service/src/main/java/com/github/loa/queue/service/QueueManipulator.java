@@ -3,6 +3,9 @@ package com.github.loa.queue.service;
 import com.github.loa.queue.service.domain.Queue;
 import com.github.loa.queue.service.domain.QueueException;
 
+import java.io.InputStream;
+import java.io.OutputStream;
+
 public interface QueueManipulator {
 
     /**
@@ -39,6 +42,8 @@ public interface QueueManipulator {
      */
     void sendMessage(final Queue queue, final Object message);
 
+    void sendMessage(final Queue queue, final Object message, final InputStream inputStream);
+
     /**
      * Reads a message from the provided queue.
      *
@@ -47,4 +52,6 @@ public interface QueueManipulator {
      * @throws QueueException when an error happens while trying to read the message
      */
     Object readMessage(final Queue queue);
+
+    Object readMessage(final Queue queue, final OutputStream outputStream);
 }

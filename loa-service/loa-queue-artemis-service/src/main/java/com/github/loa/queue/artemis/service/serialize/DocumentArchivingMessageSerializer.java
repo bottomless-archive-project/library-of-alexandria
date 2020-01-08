@@ -23,7 +23,6 @@ public class DocumentArchivingMessageSerializer implements MessageSerializer<Doc
         clientMessage.getBodyBuffer().writeString(message.getType());
         clientMessage.getBodyBuffer().writeString(message.getLocation());
         clientMessage.getBodyBuffer().writeString(message.getSource());
-        clientMessage.setBodyInputStream(message.getContents());
 
         return clientMessage;
     }

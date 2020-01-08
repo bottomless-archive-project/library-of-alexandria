@@ -13,6 +13,4 @@ public class DocumentArchivingMessage {
     private String type;
     private String location;
     private String source;
-    private InputStream contents;
-    private OutputStream incomingContents;
 }
