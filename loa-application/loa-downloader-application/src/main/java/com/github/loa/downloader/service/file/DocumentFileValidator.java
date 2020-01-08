@@ -9,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import java.io.FileInputStream;
 import java.io.InputStream;
 
 /**
@@ -36,16 +35,13 @@ public class DocumentFileValidator {
     public Mono<Boolean> isValidDocument(final String documentId, final DocumentType documentType) {
         return stageLocationFactory.getLocation(documentId, documentType)
                 .map(stageFileLocation -> {
-                    final long stageFileLocationSize = stageFileLocation.size();
-
-                    if (stageFileLocationSize < MINIMUM_FILE_LENGTH
-                            || stageFileLocationSize > downloaderConfigurationProperties.getMaximumArchiveSize()) {
+                    if (!isValidFileSize(stageFileLocation.size())) {
                         return false;
                     }
 
                     try (final InputStream inputStream = stageFileLocation.openStream()) {
                         documentDataParser.parseDocumentMetadata(documentId, documentType, inputStream);
-                    } catch (Exception e) {
+                    } catch (final Exception e) {
                         log.info("Non-parsable document: {}!", documentId);
 
                         return false;
@@ -53,5 +49,10 @@ public class DocumentFileValidator {
 
                     return true;
                 });
+    }
+
+    private boolean isValidFileSize(final long stageFileSize) {
+        return stageFileSize > MINIMUM_FILE_LENGTH
+                && stageFileSize < downloaderConfigurationProperties.getMaximumArchiveSize();
     }
 }
