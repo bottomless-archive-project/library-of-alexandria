@@ -44,10 +44,13 @@ public class DownloadQueueListener implements CommandLineRunner {
 
     @Override
     public void run(final String... args) {
-        log.info("Initialized queue processing! There are {} messages available in the queue!",
+        queueManipulator.silentlyInitializeQueue(Queue.DOCUMENT_LOCATION_QUEUE);
+        log.info("Initialized queue processing! There are {} messages available in the location queue!",
                 queueManipulator.getMessageCount(Queue.DOCUMENT_LOCATION_QUEUE));
 
         queueManipulator.silentlyInitializeQueue(Queue.DOCUMENT_ARCHIVING_QUEUE);
+        log.info("Initialized queue processing! There are {} messages available in the archiving queue!",
+                queueManipulator.getMessageCount(Queue.DOCUMENT_LOCATION_QUEUE));
 
         Flux.generate(downloaderQueueConsumer)
                 .publishOn(Schedulers.boundedElastic())
