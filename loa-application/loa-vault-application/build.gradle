@@ -5,4 +5,5 @@ dependencies {
 
     compile project(':loa-service:loa-vault-service')
     compile project(':loa-service:loa-document-view')
+    compile project(':loa-service:loa-queue-artemis-service')
 }

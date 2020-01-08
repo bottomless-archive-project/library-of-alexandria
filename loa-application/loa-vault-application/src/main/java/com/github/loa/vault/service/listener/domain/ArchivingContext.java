@@ -1,17 +1,17 @@
-package com.github.loa.vault.client.service.domain;
+package com.github.loa.vault.service.listener.domain;
 
 import com.github.loa.document.service.domain.DocumentType;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.nio.file.Path;
+import java.net.URL;
 
 @Getter
 @Builder
 public class ArchivingContext {
 
     private DocumentType type;
-    private String location;
+    private URL location;
     private String source;
-    private Path contents;
+    private byte[] content;
 }

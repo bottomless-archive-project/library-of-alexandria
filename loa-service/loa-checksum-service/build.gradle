@@ -1,5 +1,5 @@
 dependencies {
-    compile group: 'commons-codec', name: 'commons-codec', version: '1.12'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-reactor-netty'
 
-    compile project(':loa-service:loa-stage-service')
+    compile group: 'commons-codec', name: 'commons-codec', version: '1.12'
 }

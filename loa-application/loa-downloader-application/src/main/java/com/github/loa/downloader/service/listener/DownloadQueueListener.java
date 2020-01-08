@@ -2,13 +2,15 @@ package com.github.loa.downloader.service.listener;
 
 import com.github.loa.downloader.service.DocumentLocationCreationContextFactory;
 import com.github.loa.downloader.service.document.DocumentDownloader;
-import com.github.loa.downloader.service.file.DocumentFileManipulator;
 import com.github.loa.location.service.factory.DocumentLocationEntityFactory;
 import com.github.loa.location.service.factory.domain.DocumentLocationCreationContext;
 import com.github.loa.queue.service.QueueManipulator;
 import com.github.loa.queue.service.domain.Queue;
+import com.github.loa.queue.service.domain.message.DocumentArchivingMessage;
 import com.github.loa.source.domain.DocumentSourceItem;
-import com.github.loa.vault.client.service.domain.ArchivingContext;
+import com.github.loa.stage.service.StageLocationFactory;
+import com.github.loa.stage.service.domain.StageLocation;
+import com.github.loa.vault.client.service.domain.DocumentArchivingContext;
 import io.micrometer.core.instrument.Counter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,23 +21,35 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class DownloadQueueListener implements CommandLineRunner {
 
     private final DocumentDownloader documentDownloader;
+    private final StageLocationFactory stageLocationFactory;
     private final DocumentLocationEntityFactory documentLocationEntityFactory;
     private final DownloaderQueueConsumer downloaderQueueConsumer;
-    private final DocumentFileManipulator documentFileManipulator;
     private final DocumentLocationCreationContextFactory documentLocationCreationContextFactory;
     private final QueueManipulator queueManipulator;
+
     @Qualifier("processedDocumentCount")
     private final Counter processedDocumentCount;
+    @Qualifier("archivedDocumentCount")
+    private final Counter archivedDocumentCount;
 
     @Override
     public void run(final String... args) {
-        log.info("Initialized queue processing! There are {} messages available in the queue!",
+        queueManipulator.silentlyInitializeQueue(Queue.DOCUMENT_LOCATION_QUEUE);
+        log.info("Initialized queue processing! There are {} messages available in the location queue!",
+                queueManipulator.getMessageCount(Queue.DOCUMENT_LOCATION_QUEUE));
+
+        queueManipulator.silentlyInitializeQueue(Queue.DOCUMENT_ARCHIVING_QUEUE);
+        log.info("Initialized queue processing! There are {} messages available in the archiving queue!",
                 queueManipulator.getMessageCount(Queue.DOCUMENT_LOCATION_QUEUE));
 
         Flux.generate(downloaderQueueConsumer)
@@ -43,7 +57,8 @@ public class DownloadQueueListener implements CommandLineRunner {
                 .flatMap(this::evaluateDocumentLocation)
                 .doOnNext(this::incrementProcessedCount)
                 .flatMap(this::downloadDocument)
-                .flatMap(this::archiveDocument)
+                .doOnNext(this::archiveDocument)
+                .flatMap(this::cleanup)
                 .subscribe();
     }
 
@@ -60,11 +75,29 @@ public class DownloadQueueListener implements CommandLineRunner {
                 .thenReturn(documentSourceItem);
     }
 
-    private Mono<ArchivingContext> downloadDocument(final DocumentSourceItem documentSourceItem) {
+    private Mono<DocumentArchivingContext> downloadDocument(final DocumentSourceItem documentSourceItem) {
         return documentDownloader.downloadDocument(documentSourceItem);
     }
 
-    private Mono<Void> archiveDocument(final ArchivingContext archivingContext) {
-        return documentFileManipulator.moveToVault(archivingContext);
+    private void archiveDocument(final DocumentArchivingContext documentArchivingContext) {
+        try (final InputStream documentContent = new FileInputStream(documentArchivingContext.getContents().toFile())) {
+            archivedDocumentCount.increment();
+
+            queueManipulator.sendMessage(Queue.DOCUMENT_ARCHIVING_QUEUE,
+                    DocumentArchivingMessage.builder()
+                            .type(documentArchivingContext.getType().toString())
+                            .source(documentArchivingContext.getSource())
+                            .content(documentContent.readAllBytes())
+                            .build()
+            );
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to send document for archiving!", e);
+        }
+    }
+
+    private Mono<Void> cleanup(final DocumentArchivingContext documentArchivingContext) {
+        return stageLocationFactory.getLocation(documentArchivingContext.getId(), documentArchivingContext.getType())
+                .doOnNext(StageLocation::cleanup)
+                .then();
     }
 }

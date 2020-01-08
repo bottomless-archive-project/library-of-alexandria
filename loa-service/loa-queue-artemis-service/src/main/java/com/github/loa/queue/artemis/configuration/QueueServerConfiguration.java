@@ -43,6 +43,7 @@ public class QueueServerConfiguration {
         configuration.setJournalType(JournalType.MAPPED);
         configuration.setJournalSyncTransactional(false);
         configuration.setJournalSyncNonTransactional(false);
+        configuration.setMaxDiskUsage(-1);
         configuration.setJournalDirectory(queueConfigurationProperties.getDataDirectory() + "/journal");
         configuration.setBindingsDirectory(queueConfigurationProperties.getDataDirectory() + "/bindings");
         configuration.setLargeMessagesDirectory(queueConfigurationProperties.getDataDirectory() + "/largemessages");

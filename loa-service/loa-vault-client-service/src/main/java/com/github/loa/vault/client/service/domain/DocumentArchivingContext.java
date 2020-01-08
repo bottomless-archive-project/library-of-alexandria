@@ -1,4 +1,4 @@
-package com.github.loa.vault.service.domain;
+package com.github.loa.vault.client.service.domain;
 
 import com.github.loa.document.service.domain.DocumentType;
 import lombok.Builder;
@@ -10,7 +10,8 @@ import java.nio.file.Path;
 @Builder
 public class DocumentArchivingContext {
 
+    private String id;
     private DocumentType type;
     private String source;
-    private byte[] content;
+    private Path contents;
 }

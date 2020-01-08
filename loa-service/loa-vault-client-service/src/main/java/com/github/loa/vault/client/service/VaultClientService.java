@@ -3,7 +3,7 @@ package com.github.loa.vault.client.service;
 import com.github.loa.compression.domain.DocumentCompression;
 import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.vault.client.configuration.VaultClientConfigurationProperties;
-import com.github.loa.vault.client.service.domain.ArchivingContext;
+import com.github.loa.vault.client.service.domain.DocumentArchivingContext;
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.reactor.circuitbreaker.operator.CircuitBreakerOperator;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +32,7 @@ public class VaultClientService {
     private final CircuitBreaker circuitBreaker;
     private final WebClient vaultWebClient;
 
-    public Mono<Void> archiveDocument(final ArchivingContext documentStageLocation) {
+    public Mono<Void> archiveDocument(final DocumentArchivingContext documentStageLocation) {
         return vaultWebClient.post()
                 .uri(URI.create("http://" + vaultClientConfigurationProperties.getHost() + ":"
                         + vaultClientConfigurationProperties.getPort() + "/document"))

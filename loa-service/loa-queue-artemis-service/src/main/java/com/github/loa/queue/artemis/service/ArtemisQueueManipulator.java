@@ -17,6 +17,9 @@ import org.apache.activemq.artemis.api.core.client.ClientSession;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Service;
 
+import java.io.InputStream;
+import java.io.OutputStream;
+
 /**
  * A {@link QueueManipulator} implementation for Apache Artemis.
  *
