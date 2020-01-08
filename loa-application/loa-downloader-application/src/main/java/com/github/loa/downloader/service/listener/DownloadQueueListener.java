@@ -7,6 +7,7 @@ import com.github.loa.location.service.factory.DocumentLocationEntityFactory;
 import com.github.loa.location.service.factory.domain.DocumentLocationCreationContext;
 import com.github.loa.queue.service.QueueManipulator;
 import com.github.loa.queue.service.domain.Queue;
+import com.github.loa.queue.service.domain.message.DocumentArchivingMessage;
 import com.github.loa.source.domain.DocumentSourceItem;
 import com.github.loa.vault.client.service.domain.ArchivingContext;
 import io.micrometer.core.instrument.Counter;
@@ -18,6 +19,9 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 
 @Slf4j
 @Service
@@ -38,12 +42,14 @@ public class DownloadQueueListener implements CommandLineRunner {
         log.info("Initialized queue processing! There are {} messages available in the queue!",
                 queueManipulator.getMessageCount(Queue.DOCUMENT_LOCATION_QUEUE));
 
+        queueManipulator.silentlyInitializeQueue(Queue.DOCUMENT_ARCHIVING_QUEUE);
+
         Flux.generate(downloaderQueueConsumer)
                 .publishOn(Schedulers.boundedElastic())
                 .flatMap(this::evaluateDocumentLocation)
                 .doOnNext(this::incrementProcessedCount)
                 .flatMap(this::downloadDocument)
-                .flatMap(this::archiveDocument)
+                .doOnNext(this::archiveDocument)
                 .subscribe();
     }
 
@@ -64,7 +70,17 @@ public class DownloadQueueListener implements CommandLineRunner {
         return documentDownloader.downloadDocument(documentSourceItem);
     }
 
-    private Mono<Void> archiveDocument(final ArchivingContext archivingContext) {
-        return documentFileManipulator.moveToVault(archivingContext);
+    private void archiveDocument(final ArchivingContext archivingContext) {
+        try {
+            queueManipulator.sendMessage(Queue.DOCUMENT_ARCHIVING_QUEUE, DocumentArchivingMessage.builder()
+                    .type(archivingContext.getType().toString())
+                    .location(archivingContext.getLocation())
+                    .source(archivingContext.getSource())
+                    .contents(new FileInputStream(archivingContext.getContents().toFile()))
+            );
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException("Failed to send document for archiving!", e);
+        }
+        //return documentFileManipulator.moveToVault(archivingContext);
     }
 }

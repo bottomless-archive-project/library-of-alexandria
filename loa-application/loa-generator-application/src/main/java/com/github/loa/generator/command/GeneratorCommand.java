@@ -1,7 +1,7 @@
 package com.github.loa.generator.command;
 
 import com.github.loa.location.service.DocumentLocationValidator;
-import com.github.loa.queue.artemis.service.ArtemisQueueManipulator;
+import com.github.loa.queue.service.QueueManipulator;
 import com.github.loa.queue.service.domain.Queue;
 import com.github.loa.queue.service.domain.message.DocumentLocationMessage;
 import com.github.loa.source.service.DocumentLocationFactory;
@@ -21,15 +21,15 @@ public class GeneratorCommand implements CommandLineRunner {
     private final DocumentLocationValidator documentLocationValidator;
     private final DocumentSourceItemFactory documentSourceItemFactory;
     private final UrlEncoder urlEncoder;
-    private final ArtemisQueueManipulator artemisQueueManipulator;
+    private final QueueManipulator queueManipulator;
 
     @Override
     public void run(final String... args) {
         log.info("Initializing the document location generating.");
         log.info("There are {} messages already available in the queue!",
-                artemisQueueManipulator.getMessageCount(Queue.DOCUMENT_LOCATION_QUEUE));
+                queueManipulator.getMessageCount(Queue.DOCUMENT_LOCATION_QUEUE));
 
-        artemisQueueManipulator.silentlyInitializeQueue(Queue.DOCUMENT_LOCATION_QUEUE);
+        queueManipulator.silentlyInitializeQueue(Queue.DOCUMENT_LOCATION_QUEUE);
 
         documentLocationFactory.streamLocations()
                 .filter(documentLocationValidator::validDocumentLocation)
@@ -46,6 +46,6 @@ public class GeneratorCommand implements CommandLineRunner {
     }
 
     private void sendMessage(final DocumentLocationMessage documentLocationMessage) {
-        artemisQueueManipulator.sendMessage(Queue.DOCUMENT_LOCATION_QUEUE, documentLocationMessage);
+        queueManipulator.sendMessage(Queue.DOCUMENT_LOCATION_QUEUE, documentLocationMessage);
     }
 }
