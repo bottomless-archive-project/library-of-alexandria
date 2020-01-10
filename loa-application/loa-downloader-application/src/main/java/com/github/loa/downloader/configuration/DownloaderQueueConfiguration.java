@@ -11,6 +11,7 @@ import org.apache.activemq.artemis.api.core.client.ClientSession;
 import org.apache.activemq.artemis.api.core.client.ClientSessionFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Scope;
 
 @Slf4j
 @Configuration
@@ -22,7 +23,10 @@ public class DownloaderQueueConfiguration {
     }
 
     @Bean
-    public ClientConsumerRegistryBean clientConsumer(final ClientSession clientSession) throws ActiveMQException {
+    public ClientConsumerRegistryBean clientConsumer(final ClientSessionFactory clientSessionFactory)
+            throws ActiveMQException {
+        final ClientSession clientSession = clientSessionFactory.createSession();
+
         final ClientConsumer clientConsumer = clientSession.createConsumer(Queue.DOCUMENT_LOCATION_QUEUE.getAddress());
 
         try {
@@ -38,7 +42,10 @@ public class DownloaderQueueConfiguration {
     }
 
     @Bean
-    public ClientProducerRegistryBean clientProducer(final ClientSession clientSession) throws ActiveMQException {
+    public ClientProducerRegistryBean clientProducer(final ClientSessionFactory clientSessionFactory)
+            throws ActiveMQException {
+        final ClientSession clientSession = clientSessionFactory.createSession();
+
         final ClientProducer clientProducer = clientSession.createProducer(Queue.DOCUMENT_ARCHIVING_QUEUE.getAddress());
 
         return ClientProducerRegistryBean.builder()

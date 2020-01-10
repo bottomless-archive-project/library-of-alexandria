@@ -25,17 +25,18 @@ import java.util.UUID;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class DocumentDownloader {
+public class DocumentLocationProcessor {
 
     private final StageLocationFactory stageLocationFactory;
     private final DocumentFileValidator documentFileValidator;
     private final FileCollector fileCollector;
+    private final DocumentArchiver documentArchiver;
     private final DocumentTypeCalculator documentTypeCalculator;
 
     @Qualifier("processedDocumentCount")
     private final Counter processedDocumentCount;
 
-    public Mono<DocumentArchivingContext> downloadDocument(final DocumentSourceItem documentSourceItem) {
+    public Mono<Void> processDocumentLocation(final DocumentSourceItem documentSourceItem) {
         processedDocumentCount.increment();
 
         final URL documentLocation = documentSourceItem.getDocumentLocation();
@@ -65,6 +66,8 @@ public class DocumentDownloader {
                                         .build()
                                 )
                         )
+                        .flatMap(documentArchiver::archiveDocument)
+                        .flatMap(this::cleanup)
                         .onErrorResume(error -> {
                             log.debug("Error downloading a document: {}!", error.getMessage());
 
@@ -76,5 +79,11 @@ public class DocumentDownloader {
     private Mono<StageLocation> acquireFile(final URL documentLocation, final StageLocation stageLocation) {
         return fileCollector.acquireFile(documentLocation, stageLocation.getPath())
                 .thenReturn(stageLocation);
+    }
+
+    private Mono<Void> cleanup(final DocumentArchivingContext documentArchivingContext) {
+        return stageLocationFactory.getLocation(documentArchivingContext.getId(), documentArchivingContext.getType())
+                .doOnNext(StageLocation::cleanup)
+                .then();
     }
 }

@@ -14,11 +14,9 @@ import org.apache.activemq.artemis.api.core.RoutingType;
 import org.apache.activemq.artemis.api.core.SimpleString;
 import org.apache.activemq.artemis.api.core.client.ClientMessage;
 import org.apache.activemq.artemis.api.core.client.ClientSession;
+import org.apache.activemq.artemis.api.core.client.ClientSessionFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Service;
-
-import java.io.InputStream;
-import java.io.OutputStream;
 
 /**
  * A {@link QueueManipulator} implementation for Apache Artemis.
@@ -31,7 +29,7 @@ import java.io.OutputStream;
 @ConditionalOnMissingBean(QueueServerConfiguration.class)
 public class ArtemisQueueManipulator implements QueueManipulator {
 
-    private final ClientSession clientSession;
+    private final ClientSessionFactory clientSessionFactory;
     private final ClientConsumerProvider clientConsumerProvider;
     private final ClientProducerProvider clientProducerProvider;
     private final MessageSerializerProvider messageSerializerProvider;
@@ -45,7 +43,7 @@ public class ArtemisQueueManipulator implements QueueManipulator {
      */
     @Override
     public void silentlyInitializeQueue(final Queue queue) {
-        try {
+        try(final ClientSession clientSession = clientSessionFactory.createSession()) {
             final ClientSession.QueueQuery queueQuery = clientSession.queueQuery(
                     SimpleString.toSimpleString(queue.getName()));
 
@@ -67,7 +65,7 @@ public class ArtemisQueueManipulator implements QueueManipulator {
     public void initializeQueue(final Queue queue) {
         log.info("Creating the {} queue because it doesn't exists.", queue.getName());
 
-        try {
+        try(final ClientSession clientSession = clientSessionFactory.createSession()) {
             clientSession.createQueue(queue.getAddress(), RoutingType.ANYCAST, queue.getName(), true);
         } catch (final ActiveMQException e) {
             throw new QueueException("Unable to initialize the " + queue.getName() + " queue!", e);
@@ -83,7 +81,7 @@ public class ArtemisQueueManipulator implements QueueManipulator {
      */
     @Override
     public long getMessageCount(final Queue queue) {
-        try {
+        try(final ClientSession clientSession = clientSessionFactory.createSession()) {
             final ClientSession.QueueQuery queueQuery = clientSession.queueQuery(
                     SimpleString.toSimpleString(queue.getName()));
 

@@ -8,6 +8,7 @@ import io.micrometer.core.instrument.Counter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -22,19 +23,24 @@ public class DocumentArchiver {
     @Qualifier("archivedDocumentCount")
     private final Counter archivedDocumentCount;
 
-    public void archiveDocument(final DocumentArchivingContext documentArchivingContext) {
+    public Mono<DocumentArchivingContext> archiveDocument(final DocumentArchivingContext documentArchivingContext) {
         try (final InputStream documentContent = new FileInputStream(documentArchivingContext.getContents().toFile())) {
             archivedDocumentCount.increment();
 
-            queueManipulator.sendMessage(Queue.DOCUMENT_ARCHIVING_QUEUE,
-                    DocumentArchivingMessage.builder()
-                            .type(documentArchivingContext.getType().toString())
-                            .source(documentArchivingContext.getSource())
-                            .content(documentContent.readAllBytes())
-                            .build()
-            );
+            //TODO: This is a very ugly hack!
+            synchronized (this) {
+                queueManipulator.sendMessage(Queue.DOCUMENT_ARCHIVING_QUEUE,
+                        DocumentArchivingMessage.builder()
+                                .type(documentArchivingContext.getType().toString())
+                                .source(documentArchivingContext.getSource())
+                                .content(documentContent.readAllBytes())
+                                .build()
+                );
+            }
         } catch (IOException e) {
             throw new RuntimeException("Failed to send document for archiving!", e);
         }
+
+        return Mono.just(documentArchivingContext);
     }
 }
