@@ -31,7 +31,7 @@ public class ArtemisQueueManipulator implements QueueManipulator {
 
     private final ClientSessionFactory clientSessionFactory;
     private final ClientConsumerProvider clientConsumerProvider;
-    private final ClientProducerProvider clientProducerProvider;
+    private final ClientProducerExecutor clientProducerExecutor;
     private final MessageSerializerProvider messageSerializerProvider;
     private final MessageDeserializerProvider messageDeserializerProvider;
 
@@ -106,7 +106,7 @@ public class ArtemisQueueManipulator implements QueueManipulator {
 
         final ClientMessage clientMessage = messageSerializer.serialize(message);
 
-        clientProducerProvider.invokeProducer(queue, (clientProducer -> {
+        clientProducerExecutor.invokeProducer(queue, (clientProducer -> {
             try {
                 clientProducer.send(clientMessage);
             } catch (ActiveMQException e) {
