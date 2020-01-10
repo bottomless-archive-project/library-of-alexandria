@@ -67,6 +67,7 @@ public class VaultDocumentManager {
                         )
                         .flatMap(documentEntity -> Mono.fromSupplier(
                                 () -> saveDocument(documentEntity, documentContents.getContent())))
+                        .retry()
                 );
     }
 
