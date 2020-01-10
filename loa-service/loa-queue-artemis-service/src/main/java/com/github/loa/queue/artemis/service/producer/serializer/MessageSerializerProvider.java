@@ -1,4 +1,4 @@
-package com.github.loa.queue.artemis.service.serialize;
+package com.github.loa.queue.artemis.service.producer.serializer;
 
 import com.github.loa.queue.artemis.configuration.QueueServerConfiguration;
 import com.github.loa.queue.service.domain.Queue;

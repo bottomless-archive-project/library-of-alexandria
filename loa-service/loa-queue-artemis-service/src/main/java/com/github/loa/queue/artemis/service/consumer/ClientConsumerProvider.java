@@ -1,4 +1,4 @@
-package com.github.loa.queue.artemis.service;
+package com.github.loa.queue.artemis.service.consumer;
 
 import com.github.loa.queue.artemis.configuration.QueueServerConfiguration;
 import com.github.loa.queue.service.domain.Queue;

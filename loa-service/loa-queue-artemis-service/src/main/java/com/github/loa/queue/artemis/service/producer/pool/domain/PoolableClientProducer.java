@@ -1,4 +1,4 @@
-package com.github.loa.queue.artemis.service.pool.domain;
+package com.github.loa.queue.artemis.service.producer.pool.domain;
 
 import lombok.Getter;
 import org.apache.activemq.artemis.api.core.client.ClientProducer;

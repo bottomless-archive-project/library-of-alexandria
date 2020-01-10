@@ -1,8 +1,8 @@
-package com.github.loa.queue.artemis.service.serialize;
+package com.github.loa.queue.artemis.service.producer.serializer;
 
 import com.github.loa.queue.artemis.configuration.QueueServerConfiguration;
 import com.github.loa.queue.service.domain.Queue;
-import com.github.loa.queue.service.domain.message.DocumentLocationMessage;
+import com.github.loa.queue.service.domain.message.DocumentArchivingMessage;
 import lombok.RequiredArgsConstructor;
 import org.apache.activemq.artemis.api.core.ActiveMQBuffer;
 import org.apache.activemq.artemis.api.core.client.ClientMessage;
@@ -13,29 +13,31 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 @ConditionalOnMissingBean(QueueServerConfiguration.class)
-public class DocumentLocationMessageSerializer implements MessageSerializer<DocumentLocationMessage> {
+public class DocumentArchivingMessageSerializer implements MessageSerializer<DocumentArchivingMessage> {
 
     private final ClientSession clientSession;
 
     @Override
-    public ClientMessage serialize(final DocumentLocationMessage documentLocationMessage) {
+    public ClientMessage serialize(final DocumentArchivingMessage documentArchivingMessage) {
         final ClientMessage clientMessage = clientSession.createMessage(true);
 
-        buildMessageBody(documentLocationMessage, clientMessage);
+        buildMessageBody(documentArchivingMessage, clientMessage);
 
         return clientMessage;
     }
 
     @Override
     public Queue supports() {
-        return Queue.DOCUMENT_LOCATION_QUEUE;
+        return Queue.DOCUMENT_ARCHIVING_QUEUE;
     }
 
-    private void buildMessageBody(final DocumentLocationMessage documentLocationMessage,
+    private void buildMessageBody(final DocumentArchivingMessage documentArchivingMessage,
             final ClientMessage clientMessage) {
         final ActiveMQBuffer bodyBuffer = clientMessage.getBodyBuffer();
 
-        bodyBuffer.writeString(documentLocationMessage.getSourceName());
-        bodyBuffer.writeString(documentLocationMessage.getDocumentLocation());
+        bodyBuffer.writeInt(documentArchivingMessage.getContent().length);
+        bodyBuffer.writeBytes(documentArchivingMessage.getContent());
+        bodyBuffer.writeString(documentArchivingMessage.getType());
+        bodyBuffer.writeString(documentArchivingMessage.getSource());
     }
 }

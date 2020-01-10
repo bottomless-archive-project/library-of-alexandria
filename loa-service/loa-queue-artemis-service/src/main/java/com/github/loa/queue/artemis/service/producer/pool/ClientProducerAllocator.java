@@ -1,6 +1,6 @@
-package com.github.loa.queue.artemis.service.pool;
+package com.github.loa.queue.artemis.service.producer.pool;
 
-import com.github.loa.queue.artemis.service.pool.domain.PoolableClientProducer;
+import com.github.loa.queue.artemis.service.producer.pool.domain.PoolableClientProducer;
 import com.github.loa.queue.service.domain.Queue;
 import com.github.loa.queue.service.domain.QueueException;
 import lombok.RequiredArgsConstructor;

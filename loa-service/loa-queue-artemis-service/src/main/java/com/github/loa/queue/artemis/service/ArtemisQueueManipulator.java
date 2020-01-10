@@ -1,9 +1,11 @@
 package com.github.loa.queue.artemis.service;
 
 import com.github.loa.queue.artemis.configuration.QueueServerConfiguration;
-import com.github.loa.queue.artemis.service.deserializer.MessageDeserializerProvider;
-import com.github.loa.queue.artemis.service.serialize.MessageSerializer;
-import com.github.loa.queue.artemis.service.serialize.MessageSerializerProvider;
+import com.github.loa.queue.artemis.service.consumer.ClientConsumerProvider;
+import com.github.loa.queue.artemis.service.consumer.deserializer.MessageDeserializerProvider;
+import com.github.loa.queue.artemis.service.producer.ClientProducerExecutor;
+import com.github.loa.queue.artemis.service.producer.serializer.MessageSerializer;
+import com.github.loa.queue.artemis.service.producer.serializer.MessageSerializerProvider;
 import com.github.loa.queue.service.QueueManipulator;
 import com.github.loa.queue.service.domain.Queue;
 import com.github.loa.queue.service.domain.QueueException;
