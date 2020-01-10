@@ -100,20 +100,19 @@ public class ArtemisQueueManipulator implements QueueManipulator {
      */
     @Override
     public void sendMessage(final Queue queue, final Object message) {
-        try {
-            final MessageSerializer<Object> messageSerializer = (MessageSerializer<Object>) messageSerializerProvider
-                    .getSerializer(queue)
-                    .orElseThrow(() -> new QueueException("No serializer found for queue: " + queue.getName() + "!"));
+        final MessageSerializer<Object> messageSerializer = (MessageSerializer<Object>) messageSerializerProvider
+                .getSerializer(queue)
+                .orElseThrow(() -> new QueueException("No serializer found for queue: " + queue.getName() + "!"));
 
-            final ClientMessage clientMessage = messageSerializer.serialize(message);
+        final ClientMessage clientMessage = messageSerializer.serialize(message);
 
-            //TODO: This is a very ugly hack!
-            synchronized (this) {
-                clientProducerProvider.getClientProducer(queue).send(clientMessage);
+        clientProducerProvider.invokeProducer(queue, (clientProducer -> {
+            try {
+                clientProducer.send(clientMessage);
+            } catch (ActiveMQException e) {
+                throw new QueueException("Unable to send message to the " + queue.getName() + " queue!", e);
             }
-        } catch (ActiveMQException e) {
-            throw new QueueException("Unable to send message to the " + queue.getName() + " queue!", e);
-        }
+        }));
     }
 
     /**
