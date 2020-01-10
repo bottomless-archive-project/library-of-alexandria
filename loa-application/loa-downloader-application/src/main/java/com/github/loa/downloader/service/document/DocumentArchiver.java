@@ -27,16 +27,13 @@ public class DocumentArchiver {
         try (final InputStream documentContent = new FileInputStream(documentArchivingContext.getContents().toFile())) {
             archivedDocumentCount.increment();
 
-            //TODO: This is a very ugly hack!
-            synchronized (this) {
-                queueManipulator.sendMessage(Queue.DOCUMENT_ARCHIVING_QUEUE,
-                        DocumentArchivingMessage.builder()
-                                .type(documentArchivingContext.getType().toString())
-                                .source(documentArchivingContext.getSource())
-                                .content(documentContent.readAllBytes())
-                                .build()
-                );
-            }
+            queueManipulator.sendMessage(Queue.DOCUMENT_ARCHIVING_QUEUE,
+                    DocumentArchivingMessage.builder()
+                            .type(documentArchivingContext.getType().toString())
+                            .source(documentArchivingContext.getSource())
+                            .content(documentContent.readAllBytes())
+                            .build()
+            );
         } catch (IOException e) {
             throw new RuntimeException("Failed to send document for archiving!", e);
         }
