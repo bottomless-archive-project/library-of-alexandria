@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 @Configuration
 public class DownloaderWebClientConfiguration {
 
-    private static final int DOWNLOADER_CLIENT_TIMEOUT = 30000;
+    private static final int DOWNLOADER_CLIENT_TIMEOUT = 10000;
 
     @Bean
     public WebClient downloaderWebClient(
