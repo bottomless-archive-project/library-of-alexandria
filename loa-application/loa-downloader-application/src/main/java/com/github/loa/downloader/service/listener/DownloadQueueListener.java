@@ -29,7 +29,7 @@ public class DownloadQueueListener implements CommandLineRunner {
 
         queueManipulator.silentlyInitializeQueue(Queue.DOCUMENT_ARCHIVING_QUEUE);
         log.info("Initialized queue processing! There are {} messages available in the archiving queue!",
-                queueManipulator.getMessageCount(Queue.DOCUMENT_LOCATION_QUEUE));
+                queueManipulator.getMessageCount(Queue.DOCUMENT_ARCHIVING_QUEUE));
 
         Flux.generate(downloaderQueueConsumer)
                 .publishOn(Schedulers.boundedElastic())
