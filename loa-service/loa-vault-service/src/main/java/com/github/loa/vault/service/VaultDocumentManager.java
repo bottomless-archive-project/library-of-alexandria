@@ -52,6 +52,7 @@ public class VaultDocumentManager {
 
         return Mono.just(documentArchivingContext)
                 .flatMap(documentContents -> checksumProvider.checksum(documentId, documentContents.getContent())
+                        .filterWhen(checksum -> isDocumentMissing(checksum, documentArchivingContext))
                         .flatMap(checksum -> documentEntityFactory.newDocumentEntity(
                                 DocumentCreationContext.builder()
                                         .id(documentId)
@@ -69,6 +70,17 @@ public class VaultDocumentManager {
                                 () -> saveDocument(documentEntity, documentContents.getContent())))
                         .retry()
                 );
+    }
+
+    public Mono<Boolean> isDocumentMissing(final String checksum,
+            final DocumentArchivingContext documentArchivingContext) {
+        return documentEntityFactory.isDocumentMissing(checksum, documentArchivingContext.getContent().length,
+                documentArchivingContext.getType())
+                .doOnNext(missing -> {
+                    if (!missing) {
+                        log.info("Document with checksum {} are a duplicate.", checksum);
+                    }
+                });
     }
 
     public DocumentEntity saveDocument(final DocumentEntity documentEntity, final byte[] documentContents) {

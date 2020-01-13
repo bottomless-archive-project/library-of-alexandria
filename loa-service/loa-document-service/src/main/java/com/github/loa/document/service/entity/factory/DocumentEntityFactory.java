@@ -32,6 +32,24 @@ public class DocumentEntityFactory {
         return documentRepository.existsByChecksumAndFileSize(checksum, fileSize, type.name());
     }
 
+    /**
+     * Return false if any document exists with the provided checksum and file size.
+     *
+     * @param checksum the checksum to use for the checking
+     * @param fileSize the file size used for the checking
+     * @return return true if a document exist with the provided parameters or false otherwise
+     */
+    public Mono<Boolean> isDocumentMissing(final String checksum, final long fileSize, final DocumentType type) {
+        return isDocumentExists(checksum, fileSize, type)
+                .map(exists -> !exists);
+    }
+
+    /**
+     * Return a document by it's id.
+     *
+     * @param documentId the id of the document
+     * @return the document that belongs to the provided id
+     */
     public Mono<DocumentEntity> getDocumentEntity(final String documentId) {
         return documentRepository.findById(documentId)
                 .map(documentEntityTransformer::transform);
