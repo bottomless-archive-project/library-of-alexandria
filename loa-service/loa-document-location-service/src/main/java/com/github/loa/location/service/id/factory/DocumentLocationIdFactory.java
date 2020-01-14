@@ -13,5 +13,5 @@ public interface DocumentLocationIdFactory {
      * @param documentLocation the location of the document to create the id for
      * @return the id for the document
      */
-    String newDocumentId(final URL documentLocation);
+    String newDocumentLocationId(final URL documentLocation);
 }
