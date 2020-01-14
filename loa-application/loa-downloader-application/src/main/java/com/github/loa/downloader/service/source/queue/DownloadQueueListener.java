@@ -1,4 +1,4 @@
-package com.github.loa.downloader.service.listener;
+package com.github.loa.downloader.service.source.queue;
 
 import com.github.loa.downloader.service.document.DocumentLocationEvaluator;
 import com.github.loa.downloader.service.document.DocumentLocationProcessor;
@@ -7,6 +7,7 @@ import com.github.loa.queue.service.domain.Queue;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Schedulers;
@@ -14,6 +15,7 @@ import reactor.core.scheduler.Schedulers;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@ConditionalOnProperty(value = "loa.downloader.source", havingValue = "queue")
 public class DownloadQueueListener implements CommandLineRunner {
 
     private final QueueManipulator queueManipulator;

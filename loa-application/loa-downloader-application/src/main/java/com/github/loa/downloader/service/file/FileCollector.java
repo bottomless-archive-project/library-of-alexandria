@@ -5,7 +5,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
@@ -22,6 +25,14 @@ public class FileCollector {
 
         if ("http".equals(protocol) || "https".equals(protocol)) {
             return fileDownloadManager.downloadFile(fileLocation, resultLocation);
+        } else if ("file".equals(protocol)) {
+            try {
+                Files.copy(Path.of(fileLocation.toURI()), resultLocation);
+
+                return Mono.just(resultLocation);
+            } catch (URISyntaxException | IOException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         return Mono.empty();

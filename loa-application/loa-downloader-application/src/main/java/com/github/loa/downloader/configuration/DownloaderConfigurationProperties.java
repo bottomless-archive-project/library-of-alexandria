@@ -19,4 +19,8 @@ public class DownloaderConfigurationProperties {
      * Maximum file size to archive to the vault in bytes. Documents bigger than this in size are not archived.
      */
     private long maximumArchiveSize = 8589934592L;
+
+    private SourceLocation source;
+
+    private String folderSourceLocation;
 }
