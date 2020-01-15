@@ -12,6 +12,7 @@ import org.apache.activemq.artemis.api.core.client.ClientProducer;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Service;
 import stormpot.Allocator;
+import stormpot.Expiration;
 import stormpot.Pool;
 import stormpot.Timeout;
 
@@ -40,6 +41,7 @@ public class ClientProducerExecutor {
                 clientProducers.computeIfAbsent(queue,
                         (queue1) -> Pool.from(buildAllocatorForQueue(queue1))
                                 .setSize(10)
+                                .setExpiration(Expiration.never())
                                 .build()
                 );
 
