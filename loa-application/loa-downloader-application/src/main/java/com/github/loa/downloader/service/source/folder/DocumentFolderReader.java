@@ -1,7 +1,6 @@
 package com.github.loa.downloader.service.source.folder;
 
 import com.github.loa.downloader.configuration.DownloaderConfigurationProperties;
-import com.github.loa.downloader.service.document.DocumentLocationEvaluator;
 import com.github.loa.downloader.service.document.DocumentLocationProcessor;
 import com.github.loa.source.domain.DocumentSourceItem;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +20,6 @@ import java.util.Objects;
 public class DocumentFolderReader implements CommandLineRunner {
 
     private final DownloaderConfigurationProperties downloaderConfigurationProperties;
-    private final DocumentLocationEvaluator documentLocationEvaluator;
     private final DocumentLocationProcessor documentLocationProcessor;
 
     @Override
