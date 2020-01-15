@@ -34,7 +34,9 @@ public class ClientProducerFactory {
             final ClientSession clientSession = clientSessionFactory.createSession();
 
             return clientSession.createProducer(queue.getAddress());
-        } catch (ActiveMQException e) {
+        } catch (final ActiveMQException e) {
+            log.error("Error while creating client producer for queue {}!", queue, e);
+
             throw new QueueException("Unable to create client producer for queue: " + queue + "!");
         }
     }

@@ -17,7 +17,7 @@ import java.util.function.Consumer;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-@ConditionalOnProperty(value = "loa.downloader.source", havingValue = "queue")
+@ConditionalOnProperty(value = "loa.downloader.source", havingValue = "queue", matchIfMissing = true)
 public class DownloaderQueueConsumer implements Consumer<SynchronousSink<DocumentSourceItem>> {
 
     private final QueueManipulator queueManipulator;

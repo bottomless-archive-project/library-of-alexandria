@@ -15,7 +15,7 @@ import reactor.core.scheduler.Schedulers;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@ConditionalOnProperty(value = "loa.downloader.source", havingValue = "queue")
+@ConditionalOnProperty(value = "loa.downloader.source", havingValue = "queue", matchIfMissing = true)
 public class DownloadQueueListener implements CommandLineRunner {
 
     private final QueueManipulator queueManipulator;
