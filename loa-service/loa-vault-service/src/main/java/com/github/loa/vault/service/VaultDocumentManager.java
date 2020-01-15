@@ -78,7 +78,7 @@ public class VaultDocumentManager {
                 documentArchivingContext.getType())
                 .doOnNext(missing -> {
                     if (!missing) {
-                        log.info("Document with checksum {} are a duplicate.", checksum);
+                        log.info("Document with checksum {} is a duplicate.", checksum);
                     }
                 });
     }
