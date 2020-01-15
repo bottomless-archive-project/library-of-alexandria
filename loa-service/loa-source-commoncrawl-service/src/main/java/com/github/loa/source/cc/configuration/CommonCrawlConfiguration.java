@@ -4,6 +4,9 @@ import com.github.loa.source.cc.service.*;
 import com.github.loa.source.cc.service.location.CommonCrawlDocumentLocationFactory;
 import com.github.loa.source.service.DocumentLocationFactory;
 import com.github.loa.url.service.URLConverter;
+import io.micrometer.core.instrument.Counter;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,7 +16,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Configuration
+@RequiredArgsConstructor
 public class CommonCrawlConfiguration {
+
+    @Qualifier("processedDocumentLocationCount")
+    private final Counter processedDocumentLocationCount;
 
     @Bean
     public WebClient webClient() {
@@ -32,6 +39,6 @@ public class CommonCrawlConfiguration {
                         .collect(Collectors.toList());
 
         return new CommonCrawlDocumentLocationFactory(warcDownloader, warcRecordParser, warcFluxFactory,
-                urlConverter, paths);
+                urlConverter, paths, processedDocumentLocationCount);
     }
 }

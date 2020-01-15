@@ -10,7 +10,6 @@ import org.springframework.context.annotation.Configuration;
 public class GeneratorStatisticsConfiguration {
 
     @Bean
-    @ConditionalOnProperty(name = "loa.source.type", havingValue = "file")
     public Counter processedDocumentLocationCount(final MeterRegistry meterRegistry) {
         return Counter.builder("generator.processed-document-location-count")
                 .tag("printed-name", "processed document location count")
