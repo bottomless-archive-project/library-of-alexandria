@@ -3,6 +3,7 @@ package com.github.loa.url.service.downloader;
 import com.github.loa.url.service.downloader.domain.RetryableException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ import java.time.Duration;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@ConditionalOnBean(WebClient.class)
 public class FileDownloadRequestFactory {
 
     private final WebClient downloaderWebClient;

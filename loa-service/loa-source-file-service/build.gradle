@@ -1,4 +1,5 @@
 dependencies {
+    compile project(':loa-service:loa-io-service')
     compile project(':loa-service:loa-source-service')
     compile project(':loa-service:loa-statistics-service')
 }
