@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
+import reactor.core.scheduler.Schedulers;
 
 @Slf4j
 @Service
@@ -25,7 +26,9 @@ public class VaultQueueListener implements CommandLineRunner {
                 queueManipulator.getMessageCount(Queue.DOCUMENT_ARCHIVING_QUEUE));
 
         Flux.generate(vaultQueueConsumer)
-                .flatMap(vaultDocumentManager::archiveDocument)
+                .parallel(4)
+                .runOn(Schedulers.boundedElastic())
+                .flatMap(vaultDocumentManager::archiveDocument, false, 10)
                 .subscribe();
     }
 }
