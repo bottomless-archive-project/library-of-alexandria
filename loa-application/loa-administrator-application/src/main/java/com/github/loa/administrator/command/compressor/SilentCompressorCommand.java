@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
-import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
 
 /**
@@ -28,8 +27,6 @@ import reactor.core.scheduler.Schedulers;
 @ConditionalOnProperty("silent-compressor")
 public class SilentCompressorCommand implements CommandLineRunner {
 
-    private final static String SCHEDULER_NAME = "silent-processor-scheduler";
-
     private final DocumentEntityFactory documentEntityFactory;
     private final SilentCompressorConfigurationProperties silentCompressorConfigurationProperties;
     private final VaultClientService vaultClientService;
@@ -46,19 +43,16 @@ public class SilentCompressorCommand implements CommandLineRunner {
         }
 
         documentEntityFactory.getDocumentEntities()
-                .parallel(silentCompressorConfigurationProperties.getParallelismLevel())
-                .runOn(newScheduler())
+                .parallel()
+                .runOn(Schedulers.boundedElastic())
                 .filter(DocumentEntity::isArchived)
                 .filter(this::shouldCompress)
                 .doOnNext(documentEntity -> vaultClientService.recompressDocument(documentEntity,
-                        silentCompressorConfigurationProperties.getAlgorithm()));
+                        silentCompressorConfigurationProperties.getAlgorithm()))
+                .subscribe();
     }
 
     private boolean shouldCompress(final DocumentEntity documentEntity) {
         return documentEntity.getCompression() != silentCompressorConfigurationProperties.getAlgorithm();
-    }
-
-    private Scheduler newScheduler() {
-        return Schedulers.newParallel(SCHEDULER_NAME, silentCompressorConfigurationProperties.getParallelismLevel());
     }
 }
