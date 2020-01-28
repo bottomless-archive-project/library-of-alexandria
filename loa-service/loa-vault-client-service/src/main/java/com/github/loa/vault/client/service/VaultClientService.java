@@ -3,10 +3,8 @@ package com.github.loa.vault.client.service;
 import com.github.loa.compression.domain.DocumentCompression;
 import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.vault.client.configuration.VaultClientConfigurationProperties;
-import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -24,8 +22,6 @@ import static java.net.http.HttpRequest.BodyPublishers.ofString;
 public class VaultClientService {
 
     private final VaultClientConfigurationProperties vaultClientConfigurationProperties;
-    @Qualifier("vaultCircuitBreaker")
-    private final CircuitBreaker circuitBreaker;
     private final WebClient vaultWebClient;
 
     public Mono<byte[]> queryDocument(final DocumentEntity documentEntity) {

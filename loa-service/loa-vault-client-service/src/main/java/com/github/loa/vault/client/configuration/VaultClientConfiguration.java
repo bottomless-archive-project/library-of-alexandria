@@ -1,6 +1,5 @@
 package com.github.loa.vault.client.configuration;
 
-import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.netty.channel.ChannelOption;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.handler.timeout.WriteTimeoutHandler;
@@ -64,10 +63,5 @@ public class VaultClientConfiguration {
                         .addHandlerLast(new ReadTimeoutHandler(VAULT_CLIENT_TIMEOUT, TimeUnit.MILLISECONDS))
                         .addHandlerLast(new WriteTimeoutHandler(VAULT_CLIENT_TIMEOUT, TimeUnit.MILLISECONDS))
                 );
-    }
-
-    @Bean
-    public CircuitBreaker vaultCircuitBreaker() {
-        return CircuitBreaker.ofDefaults("vault-circuit-breaker");
     }
 }
