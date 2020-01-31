@@ -4,7 +4,7 @@ import com.github.loa.document.service.domain.DocumentType;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.nio.file.Path;
+import java.io.InputStream;
 
 @Getter
 @Builder
@@ -12,5 +12,6 @@ public class DocumentArchivingContext {
 
     private DocumentType type;
     private String source;
-    private byte[] content;
+    private int contentLength;
+    private InputStream content;
 }

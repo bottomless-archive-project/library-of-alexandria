@@ -1,7 +1,7 @@
 package com.github.loa.source.cc.service;
 
-import com.morethanheroic.warc.service.content.response.domain.ResponseContentBlock;
-import com.morethanheroic.warc.service.record.domain.WarcRecord;
+import com.github.bottomlessarchive.warc.service.content.response.domain.ResponseContentBlock;
+import com.github.bottomlessarchive.warc.service.record.domain.WarcRecord;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;

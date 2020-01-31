@@ -1,7 +1,7 @@
 package com.github.loa.source.cc.service;
 
-import com.morethanheroic.warc.service.WarcRecordStreamFactory;
-import com.morethanheroic.warc.service.record.domain.WarcRecord;
+import com.github.bottomlessarchive.warc.service.WarcRecordStreamFactory;
+import com.github.bottomlessarchive.warc.service.record.domain.WarcRecord;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 

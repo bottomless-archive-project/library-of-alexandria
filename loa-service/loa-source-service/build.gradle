@@ -1,5 +1,4 @@
 dependencies {
-    compile project(':loa-service:loa-io-service')
-
-    compile group: 'org.jsoup', name: 'jsoup', version: '1.12.1'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-reactor-netty'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-json'
 }

@@ -1,5 +1,10 @@
 dependencies {
-    compile group: 'com.github.laxika', name: 'java-warc', version: 'b4492b35c2'
+    compile group: 'com.github.bottomless-archive-project', name: 'java-warc', version: '1.0.0'
+    compile group: 'com.github.bottomless-archive-project', name: 'common-crawl-client', version: '2943318d20'
+
+    compile group: 'org.jsoup', name: 'jsoup', version: '1.12.1'
 
     compile project(':loa-service:loa-source-service')
+    compile project(':loa-service:loa-statistics-service')
+    compile project(':loa-service:loa-io-service')
 }

@@ -1,4 +1,7 @@
 dependencies {
+    compile group: 'com.github.davidmoten', name: 'io-extras', version: '0.1'
+
     compile project(':loa-service:loa-document-service')
     compile project(':loa-service:loa-checksum-service')
+    compile project(':loa-service:loa-stage-service')
 }

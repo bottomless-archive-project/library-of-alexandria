@@ -2,9 +2,11 @@ package com.github.loa.url.service.downloader;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -17,6 +19,7 @@ import java.nio.file.Path;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@ConditionalOnBean(WebClient.class)
 public class FileDownloadManager {
 
     private final FileDownloadRequestFactory fileDownloadRequestFactory;

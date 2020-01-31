@@ -2,6 +2,7 @@ package com.github.loa.queue.artemis.service;
 
 import com.github.loa.queue.artemis.configuration.QueueServerConfiguration;
 import com.github.loa.queue.artemis.service.consumer.ClientConsumerExecutor;
+import com.github.loa.queue.artemis.service.consumer.ClientConsumerProvider;
 import com.github.loa.queue.artemis.service.consumer.deserializer.MessageDeserializerProvider;
 import com.github.loa.queue.artemis.service.producer.ClientProducerExecutor;
 import com.github.loa.queue.artemis.service.producer.serializer.MessageSerializer;
@@ -14,7 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.artemis.api.core.ActiveMQException;
 import org.apache.activemq.artemis.api.core.RoutingType;
 import org.apache.activemq.artemis.api.core.SimpleString;
-import org.apache.activemq.artemis.api.core.client.ClientConsumer;
 import org.apache.activemq.artemis.api.core.client.ClientMessage;
 import org.apache.activemq.artemis.api.core.client.ClientSession;
 import org.apache.activemq.artemis.api.core.client.ClientSessionFactory;
@@ -127,16 +127,21 @@ public class ArtemisQueueManipulator implements QueueManipulator {
      */
     @Override
     public Object readMessage(final Queue queue) {
-        final ClientMessage clientMessage = clientConsumerExecutor.invokeConsumer(queue, (clientConsumer -> {
-            try {
-                return clientConsumer.receive();
-            } catch (ActiveMQException e) {
-                throw new QueueException("Unable to read message from the " + queue.getName() + " queue!", e);
-            }
-        }));
+        final ClientMessage clientMessage = clientConsumerExecutor.invokeConsumer(queue,
+                (clientConsumer -> {
+                    try {
+                        return clientConsumer.receive();
+                    } catch (ActiveMQException e) {
+                        throw new QueueException("Unable to read message from the " + queue.getName() + " queue!", e);
+                    }
+                }));
 
-        return messageDeserializerProvider.getDeserializer(queue)
-                .orElseThrow(() -> new QueueException("No deserializer found for queue: " + queue.getName() + "!"))
-                .deserialize(clientMessage);
+        try {
+            return messageDeserializerProvider.getDeserializer(queue)
+                    .orElseThrow(() -> new QueueException("No deserializer found for queue: " + queue.getName() + "!"))
+                    .deserialize(clientMessage);
+        } finally {
+            clientMessage.releaseBuffer();
+        }
     }
 }

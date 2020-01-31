@@ -1,6 +1,5 @@
 package com.github.loa.vault.client.configuration;
 
-import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.netty.channel.ChannelOption;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.handler.timeout.WriteTimeoutHandler;
@@ -10,6 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.reactive.ClientHttpConnector;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
+import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.client.HttpClient;
 import reactor.netty.tcp.TcpClient;
@@ -30,6 +30,14 @@ public class VaultClientConfiguration {
         return WebClient.builder()
                 .baseUrl("http://" + vaultClientConfigurationProperties.getHost() + ":"
                         + vaultClientConfigurationProperties.getPort())
+                .exchangeStrategies(
+                        ExchangeStrategies.builder()
+                                .codecs(configurer ->
+                                        configurer.defaultCodecs()
+                                                .maxInMemorySize(-1)
+                                )
+                                .build()
+                )
                 .clientConnector(vaultClientHttpConnector)
                 .build();
     }
@@ -55,10 +63,5 @@ public class VaultClientConfiguration {
                         .addHandlerLast(new ReadTimeoutHandler(VAULT_CLIENT_TIMEOUT, TimeUnit.MILLISECONDS))
                         .addHandlerLast(new WriteTimeoutHandler(VAULT_CLIENT_TIMEOUT, TimeUnit.MILLISECONDS))
                 );
-    }
-
-    @Bean
-    public CircuitBreaker vaultCircuitBreaker() {
-        return CircuitBreaker.ofDefaults("vault-circuit-breaker");
     }
 }

@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 public class SilentCompressorConfigurationProperties {
 
     private DocumentCompression algorithm;
-    private int parallelismLevel = 10;
 
     public boolean hasAlgorithm() {
         return algorithm != null;
