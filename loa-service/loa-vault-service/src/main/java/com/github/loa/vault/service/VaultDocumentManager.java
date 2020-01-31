@@ -53,7 +53,6 @@ public class VaultDocumentManager {
 
         return stageLocationFactory.getLocation(documentId, documentArchivingContext.getType())
                 .map(stageLocation -> {
-                    //TODO: Do we need to close the input stream for the context?
                     try (final OutputStream stageFileOutputStream =
                                  new FileOutputStream(stageLocation.getPath().toFile())) {
                         documentArchivingContext.getContent().transferTo(stageFileOutputStream);
