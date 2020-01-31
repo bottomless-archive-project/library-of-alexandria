@@ -27,9 +27,9 @@ public class VaultQueueListener implements CommandLineRunner {
                 queueManipulator.getMessageCount(Queue.DOCUMENT_ARCHIVING_QUEUE));
 
         Flux.generate(vaultQueueConsumer)
-                .parallel(4)
+                .parallel()
                 .runOn(Schedulers.boundedElastic())
-                .flatMap(vaultDocumentManager::archiveDocument, false, 10)
+                .flatMap(vaultDocumentManager::archiveDocument)
                 .subscribe();
     }
 }
