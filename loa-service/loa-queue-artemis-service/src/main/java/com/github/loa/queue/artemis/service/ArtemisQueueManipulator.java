@@ -143,4 +143,9 @@ public class ArtemisQueueManipulator implements QueueManipulator {
             clientMessage.releaseBuffer();
         }
     }
+
+    @Override
+    public <T> T readMessage(final Queue queue, final Class<T> resultType) {
+        return (T) readMessage(queue);
+    }
 }

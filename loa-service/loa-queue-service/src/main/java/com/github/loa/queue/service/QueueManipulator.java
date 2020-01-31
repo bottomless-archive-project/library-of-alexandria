@@ -50,4 +50,6 @@ public interface QueueManipulator {
      * @throws QueueException when an error happens while trying to read the message
      */
     Object readMessage(final Queue queue);
+
+    <T> T readMessage(final Queue queue, final Class<T> resultType);
 }
