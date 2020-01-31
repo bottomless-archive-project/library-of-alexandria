@@ -1,10 +1,12 @@
 package com.github.loa.queue.artemis.service.producer;
 
+import com.github.loa.queue.artemis.configuration.QueueServerConfiguration;
 import com.github.loa.queue.artemis.service.producer.pool.ClientProducerAllocator;
 import com.github.loa.queue.artemis.service.producer.pool.ClientProducerFactory;
 import com.github.loa.queue.artemis.service.producer.pool.domain.PoolableClientProducer;
 import com.github.loa.queue.service.domain.Queue;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Service;
 import stormpot.Allocator;
 import stormpot.Expiration;
@@ -15,6 +17,7 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
+@ConditionalOnMissingBean(QueueServerConfiguration.class)
 public class PoolableClientProducerPoolFactory {
 
     private final ClientProducerFactory clientProducerFactory;

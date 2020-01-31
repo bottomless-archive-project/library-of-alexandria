@@ -24,12 +24,11 @@ class Sha256ChecksumProviderTest {
     }
 
     @Test
-    void testChecksum() throws URISyntaxException, IOException {
+    void testChecksum() throws URISyntaxException {
         final Path checksumTestFile = Path.of(this.getClass().getClassLoader().getResource("checksum_test.txt")
                 .toURI());
 
-        final Mono<String> result = sha256ChecksumProvider.checksum(DOCUMENT_ID,
-                new FileInputStream(checksumTestFile.toFile()).readAllBytes());
+        final Mono<String> result = sha256ChecksumProvider.checksum(DOCUMENT_ID, checksumTestFile);
 
         StepVerifier.create(result)
                 .assertNext(resultValue -> assertEquals("5be0888bbe2087f962fee5748d9cf52e37e4c6a24af79675ff7e1ca0a1b12739", resultValue))
