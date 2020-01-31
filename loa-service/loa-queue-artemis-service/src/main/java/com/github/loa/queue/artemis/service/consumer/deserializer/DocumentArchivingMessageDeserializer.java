@@ -22,14 +22,14 @@ public class DocumentArchivingMessageDeserializer implements MessageDeserializer
         final String type = contentBuffer.readString();
         final String source = contentBuffer.readString();
 
-        final int documentContentLength = contentBuffer.readInt();
-        final InputStream inputStream = new ArtemisInputStream(documentContentLength, contentBuffer);
+        final int contentLength = contentBuffer.readInt();
+        final InputStream content = new ArtemisInputStream(contentLength, contentBuffer);
 
         return DocumentArchivingMessage.builder()
                 .type(type)
                 .source(source)
-                .contentLength(documentContentLength)
-                .content(inputStream)
+                .contentLength(contentLength)
+                .content(content)
                 .build();
     }
 
