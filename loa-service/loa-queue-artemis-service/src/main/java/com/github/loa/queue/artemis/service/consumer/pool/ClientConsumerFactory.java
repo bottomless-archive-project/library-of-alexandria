@@ -1,5 +1,6 @@
 package com.github.loa.queue.artemis.service.consumer.pool;
 
+import com.github.loa.queue.artemis.configuration.QueueServerConfiguration;
 import com.github.loa.queue.service.domain.Queue;
 import com.github.loa.queue.service.domain.QueueException;
 import lombok.RequiredArgsConstructor;
@@ -8,11 +9,13 @@ import org.apache.activemq.artemis.api.core.ActiveMQException;
 import org.apache.activemq.artemis.api.core.client.ClientConsumer;
 import org.apache.activemq.artemis.api.core.client.ClientSession;
 import org.apache.activemq.artemis.api.core.client.ClientSessionFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@ConditionalOnMissingBean(QueueServerConfiguration.class)
 public class ClientConsumerFactory {
 
     private final ClientSessionFactory clientSessionFactory;

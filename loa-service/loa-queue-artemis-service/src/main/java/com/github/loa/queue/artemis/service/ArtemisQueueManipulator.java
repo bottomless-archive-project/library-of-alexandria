@@ -126,10 +126,12 @@ public class ArtemisQueueManipulator implements QueueManipulator {
      */
     @Override
     public Object readMessage(final Queue queue) {
-        final ClientMessage clientMessage = clientConsumerExecutor.invokeConsumer(queue,
+        final MessageHolder messageHolder = new MessageHolder();
+
+        clientConsumerExecutor.invokeConsumer(queue,
                 (clientConsumer -> {
                     try {
-                        return clientConsumer.receive();
+                        messageHolder.clientMessage = clientConsumer.receive();
                     } catch (ActiveMQException e) {
                         throw new QueueException("Unable to read message from the " + queue.getName() + " queue!", e);
                     }
@@ -138,14 +140,19 @@ public class ArtemisQueueManipulator implements QueueManipulator {
         try {
             return messageDeserializerProvider.getDeserializer(queue)
                     .orElseThrow(() -> new QueueException("No deserializer found for queue: " + queue.getName() + "!"))
-                    .deserialize(clientMessage);
+                    .deserialize(messageHolder.clientMessage);
         } finally {
-            clientMessage.releaseBuffer();
+            messageHolder.clientMessage.releaseBuffer();
         }
     }
 
     @Override
     public <T> T readMessage(final Queue queue, final Class<T> resultType) {
         return (T) readMessage(queue);
+    }
+
+    private static class MessageHolder {
+
+        private ClientMessage clientMessage;
     }
 }
