@@ -5,6 +5,6 @@ dependencies {
 
     compile group: 'com.github.chrisvest', name: 'stormpot', version: '3.0'
 
-    compile group: 'org.apache.activemq', name: 'artemis-core-client', version: '2.10.1'
-    compileOnly group: 'org.apache.activemq', name: 'artemis-server', version: '2.10.1'
+    compile group: 'org.apache.activemq', name: 'artemis-core-client'
+    compileOnly group: 'org.apache.activemq', name: 'artemis-server'
 }

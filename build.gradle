@@ -4,6 +4,7 @@ buildscript {
     ext {
         springBootVersion = '2.2.4.RELEASE'
 
+        set('artemis.version', '2.11.0')
         set('elasticsearch.version', '7.5.0')
     }
     repositories {
