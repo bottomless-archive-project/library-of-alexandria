@@ -76,7 +76,9 @@ subprojects {
         testCompile group: 'org.mockito', name: 'mockito-core'
         testCompile group: 'org.hamcrest', name: 'hamcrest', version: '2.1'
 
-        testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test'
+        testCompile(group: 'org.springframework.boot', name: 'spring-boot-starter-test') {
+            exclude group: 'junit', module: 'junit'
+        }
         testCompile group: 'io.projectreactor', name: 'reactor-test'
     }
 

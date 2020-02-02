@@ -2,54 +2,49 @@ package com.github.loa.downloader.service.file;
 
 import com.github.loa.document.service.domain.DocumentType;
 import com.github.loa.downloader.configuration.DownloaderConfigurationProperties;
+import com.github.loa.parser.domain.DocumentMetadata;
 import com.github.loa.parser.service.DocumentDataParser;
 import com.github.loa.stage.service.StageLocationFactory;
 import com.github.loa.stage.service.domain.StageLocation;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import java.io.File;
-import java.nio.file.Path;
+import java.io.InputStream;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
-//TODO: Re-enable this!
-@Disabled
+@ExtendWith(MockitoExtension.class)
 class DocumentFileValidatorTest {
 
+    private final static long MAX_FILE_SIZE_IN_BYTES = 2048;
     private final static String DOCUMENT_ID = "123";
     private final static DocumentType DOCUMENT_TYPE = DocumentType.DOC;
 
-    private final DownloaderConfigurationProperties downloaderConfigurationProperties =
-            new DownloaderConfigurationProperties();
+    @Mock
+    private DownloaderConfigurationProperties downloaderConfigurationProperties;
 
+    @Mock
     private DocumentDataParser documentDataParser;
+
+    @Mock
     private StageLocationFactory stageLocationFactory;
+
+    @InjectMocks
     private DocumentFileValidator underTest;
-
-    @BeforeEach
-    private void setup() {
-        documentDataParser = mock(DocumentDataParser.class);
-        stageLocationFactory = mock(StageLocationFactory.class);
-
-        underTest = new DocumentFileValidator(documentDataParser, stageLocationFactory, downloaderConfigurationProperties);
-    }
 
     @Test
     void testIsValidDocumentWhenDocumentIsTooSmall() {
-        final Path documentFile = mock(Path.class);
+        final StageLocation stageLocation = mock(StageLocation.class);
 
         when(stageLocationFactory.getLocation(DOCUMENT_ID, DOCUMENT_TYPE))
-                .thenReturn(Mono.just(
-                        StageLocation.builder()
-                                .path(documentFile)
-                                .build()
-                ));
+                .thenReturn(Mono.just(stageLocation));
 
         final Mono<Boolean> result = underTest.isValidDocument(DOCUMENT_ID, DOCUMENT_TYPE);
 
@@ -60,14 +55,12 @@ class DocumentFileValidatorTest {
 
     @Test
     void testIsValidDocumentWhenDocumentIsTooBig() {
-        final Path documentFile = mock(Path.class);
+        final StageLocation stageLocation = mock(StageLocation.class);
 
         when(stageLocationFactory.getLocation(DOCUMENT_ID, DOCUMENT_TYPE))
-                .thenReturn(Mono.just(
-                        StageLocation.builder()
-                                .path(documentFile)
-                                .build()
-                ));
+                .thenReturn(Mono.just(stageLocation));
+        when(stageLocation.size()).thenReturn(MAX_FILE_SIZE_IN_BYTES + 1);
+        when(downloaderConfigurationProperties.getMaximumArchiveSize()).thenReturn(MAX_FILE_SIZE_IN_BYTES);
 
         final Mono<Boolean> result = underTest.isValidDocument(DOCUMENT_ID, DOCUMENT_TYPE);
 
@@ -77,15 +70,43 @@ class DocumentFileValidatorTest {
     }
 
     @Test
-    void testIsValidDocumentWhenDocumentIsGood() {
-        final Path documentFile = mock(Path.class);
+    void testIsValidDocumentWhenDocumentIsntParsable() {
+        final StageLocation stageLocation = mock(StageLocation.class);
 
         when(stageLocationFactory.getLocation(DOCUMENT_ID, DOCUMENT_TYPE))
-                .thenReturn(Mono.just(
-                        StageLocation.builder()
-                                .path(documentFile)
+                .thenReturn(Mono.just(stageLocation));
+        when(stageLocation.size()).thenReturn(MAX_FILE_SIZE_IN_BYTES - 1);
+        when(downloaderConfigurationProperties.getMaximumArchiveSize()).thenReturn(MAX_FILE_SIZE_IN_BYTES);
+
+        final InputStream documentInputStream = mock(InputStream.class);
+        when(stageLocation.openStream()).thenReturn(documentInputStream);
+        when(documentDataParser.parseDocumentMetadata(DOCUMENT_ID, DOCUMENT_TYPE, documentInputStream))
+                .thenThrow(new RuntimeException("Some error!"));
+
+        final Mono<Boolean> result = underTest.isValidDocument(DOCUMENT_ID, DOCUMENT_TYPE);
+
+        StepVerifier.create(result)
+                .consumeNextWith(Assertions::assertFalse)
+                .verifyComplete();
+        verify(documentDataParser).parseDocumentMetadata(DOCUMENT_ID, DOCUMENT_TYPE, documentInputStream);
+    }
+
+    @Test
+    void testIsValidDocumentWhenDocumentIsValid() {
+        final StageLocation stageLocation = mock(StageLocation.class);
+
+        when(stageLocationFactory.getLocation(DOCUMENT_ID, DOCUMENT_TYPE))
+                .thenReturn(Mono.just(stageLocation));
+        when(stageLocation.size()).thenReturn(MAX_FILE_SIZE_IN_BYTES - 1);
+        when(downloaderConfigurationProperties.getMaximumArchiveSize()).thenReturn(MAX_FILE_SIZE_IN_BYTES);
+
+        final InputStream documentInputStream = mock(InputStream.class);
+        when(stageLocation.openStream()).thenReturn(documentInputStream);
+        when(documentDataParser.parseDocumentMetadata(DOCUMENT_ID, DOCUMENT_TYPE, documentInputStream))
+                .thenReturn(
+                        DocumentMetadata.builder()
                                 .build()
-                ));
+                );
 
         final Mono<Boolean> result = underTest.isValidDocument(DOCUMENT_ID, DOCUMENT_TYPE);
 
