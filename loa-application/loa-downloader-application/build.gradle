@@ -9,5 +9,5 @@ dependencies {
     compile project(':loa-service:loa-stage-service')
     compile project(':loa-service:loa-statistics-service')
 
-    compile group: 'org.hibernate.validator', name: 'hibernate-validator', version: '6.1.0.Final'
+    compile group: 'org.hibernate.validator', name: 'hibernate-validator', version: '6.1.2.Final'
 }

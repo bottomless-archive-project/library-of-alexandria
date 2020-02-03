@@ -1,5 +1,5 @@
 dependencies {
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-reactor-netty'
 
-    compile group: 'commons-codec', name: 'commons-codec', version: '1.12'
+    compile group: 'commons-codec', name: 'commons-codec', version: '1.14'
 }
