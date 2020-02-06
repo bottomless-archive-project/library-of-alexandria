@@ -1,7 +1,7 @@
 package com.github.loa.queue.artemis.service;
 
 import com.github.loa.queue.artemis.configuration.QueueServerConfiguration;
-import com.github.loa.queue.artemis.service.consumer.ClientConsumerProvider;
+import com.github.loa.queue.artemis.service.consumer.ClientConsumerExecutor;
 import com.github.loa.queue.artemis.service.consumer.deserializer.MessageDeserializerProvider;
 import com.github.loa.queue.artemis.service.producer.ClientProducerExecutor;
 import com.github.loa.queue.artemis.service.producer.serializer.MessageSerializer;
@@ -32,7 +32,7 @@ import org.springframework.stereotype.Service;
 public class ArtemisQueueManipulator implements QueueManipulator {
 
     private final ClientSessionFactory clientSessionFactory;
-    private final ClientConsumerProvider clientConsumerProvider;
+    private final ClientConsumerExecutor clientConsumerExecutor;
     private final ClientProducerExecutor clientProducerExecutor;
     private final MessageSerializerProvider messageSerializerProvider;
     private final MessageDeserializerProvider messageDeserializerProvider;
@@ -126,18 +126,46 @@ public class ArtemisQueueManipulator implements QueueManipulator {
      */
     @Override
     public Object readMessage(final Queue queue) {
-        try {
-            final ClientMessage clientMessage = clientConsumerProvider.getClientConsumer(queue).receive();
+        final MessageHolder messageHolder = new MessageHolder();
 
-            try {
-                return messageDeserializerProvider.getDeserializer(queue)
-                        .orElseThrow(() -> new QueueException("No deserializer found for queue: " + queue.getName() + "!"))
-                        .deserialize(clientMessage);
-            } finally {
-                clientMessage.releaseBuffer();
-            }
-        } catch (ActiveMQException e) {
-            throw new QueueException("Unable to read message from the " + queue.getName() + " queue!", e);
-        }
+        clientConsumerExecutor.invokeConsumer(queue,
+                (clientConsumer -> {
+                    try {
+                        final ClientMessage clientMessage = clientConsumer.receive();
+
+                        // The deserialization should be done inside the invocation because the message is only
+                        // readable while the consumer is locked (and doesn't read a new message for an other
+                        // thread).
+                        messageHolder.message = messageDeserializerProvider.getDeserializer(queue)
+                                .orElseThrow(() -> new QueueException("No deserializer found for queue: "
+                                        + queue.getName() + "!"))
+                                .deserialize(clientMessage);
+
+                        clientMessage.releaseBuffer();
+                    } catch (ActiveMQException e) {
+                        throw new QueueException("Unable to read message from the " + queue.getName() + " queue!", e);
+                    }
+                }));
+
+        return messageHolder.message;
+    }
+
+
+    /**
+     * Reads a message from the provided queue and cast it to the provided type.
+     *
+     * @param queue      the queue to read the message from
+     * @param resultType the type of the message
+     * @return the message that's being read
+     * @throws QueueException when an error happens while trying to read the message
+     */
+    @Override
+    public <T> T readMessage(final Queue queue, final Class<T> resultType) {
+        return (T) readMessage(queue);
+    }
+
+    private static class MessageHolder {
+
+        private Object message;
     }
 }

@@ -10,9 +10,6 @@ import org.apache.activemq.artemis.api.core.client.ClientSession;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 @Service
 @RequiredArgsConstructor
 @ConditionalOnMissingBean(QueueServerConfiguration.class)
@@ -41,17 +38,6 @@ public class DocumentArchivingMessageSerializer implements MessageSerializer<Doc
         bodyBuffer.writeString(documentArchivingMessage.getType());
         bodyBuffer.writeString(documentArchivingMessage.getSource());
         bodyBuffer.writeInt(documentArchivingMessage.getContentLength());
-
-        final InputStream contentInputStream = documentArchivingMessage.getContent();
-
-        try {
-            while (contentInputStream.available() > 0) {
-                final byte[] part = contentInputStream.readNBytes(1024);
-
-                bodyBuffer.writeBytes(part);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        bodyBuffer.writeBytes(documentArchivingMessage.getContent());
     }
 }

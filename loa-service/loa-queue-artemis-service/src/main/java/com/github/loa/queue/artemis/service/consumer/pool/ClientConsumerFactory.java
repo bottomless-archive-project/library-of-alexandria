@@ -1,9 +1,10 @@
-package com.github.loa.queue.artemis.service.consumer;
+package com.github.loa.queue.artemis.service.consumer.pool;
 
 import com.github.loa.queue.artemis.configuration.QueueServerConfiguration;
 import com.github.loa.queue.service.domain.Queue;
 import com.github.loa.queue.service.domain.QueueException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.artemis.api.core.ActiveMQException;
 import org.apache.activemq.artemis.api.core.client.ClientConsumer;
 import org.apache.activemq.artemis.api.core.client.ClientSession;
@@ -11,22 +12,24 @@ import org.apache.activemq.artemis.api.core.client.ClientSessionFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Service;
 
-import java.util.EnumMap;
-import java.util.Map;
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @ConditionalOnMissingBean(QueueServerConfiguration.class)
-public class ClientConsumerProvider {
+public class ClientConsumerFactory {
 
     private final ClientSessionFactory clientSessionFactory;
-    private final Map<Queue, ClientConsumer> clientConsumerMap = new EnumMap<>(Queue.class);
 
-    public ClientConsumer getClientConsumer(final Queue queue) {
-        return clientConsumerMap.computeIfAbsent(queue, this::createConsumer);
-    }
+    /**
+     * Creates a new {@link ClientConsumer} for a given {@link Queue}. A new Artemis socket is being opened in the
+     * background for this.
+     *
+     * @param queue the queue to create the consumer for
+     * @return the freshly created consumer
+     */
+    public ClientConsumer createConsumer(final Queue queue) {
+        log.info("Creating new consumer for queue: " + queue + "!");
 
-    private ClientConsumer createConsumer(final Queue queue) {
         try {
             final ClientSession clientSession = clientSessionFactory.createSession();
             final ClientConsumer clientConsumer = clientSession.createConsumer(queue.getAddress());

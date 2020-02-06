@@ -35,7 +35,7 @@ public class DocumentArchiver {
                             .type(documentArchivingContext.getType().toString())
                             .source(documentArchivingContext.getSource())
                             .contentLength(content.length)
-                            .content(new ByteArrayInputStream(content))
+                            .content(content)
                             .build()
             );
         } catch (IOException e) {

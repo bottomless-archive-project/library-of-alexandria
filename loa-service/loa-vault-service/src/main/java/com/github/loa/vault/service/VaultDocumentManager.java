@@ -7,7 +7,6 @@ import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.document.service.domain.DocumentStatus;
 import com.github.loa.document.service.entity.factory.DocumentEntityFactory;
 import com.github.loa.document.service.entity.factory.domain.DocumentCreationContext;
-import com.github.loa.stage.service.StageLocationFactory;
 import com.github.loa.vault.configuration.VaultConfigurationProperties;
 import com.github.loa.vault.domain.exception.VaultAccessException;
 import com.github.loa.vault.service.domain.DocumentArchivingContext;
@@ -21,9 +20,10 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.UUID;
 
 /**
@@ -41,7 +41,6 @@ public class VaultDocumentManager {
     private final VaultConfigurationProperties vaultConfigurationProperties;
     private final DocumentEntityFactory documentEntityFactory;
     private final ChecksumProvider checksumProvider;
-    private final StageLocationFactory stageLocationFactory;
 
     /**
      * Archive the content of an input stream as the content of the provided document in the vault.
@@ -51,18 +50,8 @@ public class VaultDocumentManager {
 
         log.info("Archiving document with id: {}.", documentId);
 
-        return stageLocationFactory.getLocation(documentId, documentArchivingContext.getType())
-                .map(stageLocation -> {
-                    try (final OutputStream stageFileOutputStream =
-                                 new FileOutputStream(stageLocation.getPath().toFile())) {
-                        documentArchivingContext.getContent().transferTo(stageFileOutputStream);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-                    return stageLocation;
-                })
-                .flatMap(stageLocation -> checksumProvider.checksum(documentId, stageLocation.getPath())
+        return Mono.just(documentArchivingContext)
+                .flatMap(stageLocation -> checksumProvider.checksum(documentArchivingContext.getContent())
                         .filterWhen(checksum -> isDocumentMissing(checksum, documentArchivingContext))
                         .flatMap(checksum -> documentEntityFactory.newDocumentEntity(
                                 DocumentCreationContext.builder()
@@ -78,7 +67,7 @@ public class VaultDocumentManager {
                                 )
                         )
                         .flatMap(documentEntity -> Mono.fromSupplier(
-                                () -> saveDocument(documentEntity, stageLocation.getPath())))
+                                () -> saveDocument(documentEntity, documentArchivingContext.getContent())))
                         .retry()
                 );
     }
@@ -94,9 +83,9 @@ public class VaultDocumentManager {
                 });
     }
 
-    public DocumentEntity saveDocument(final DocumentEntity documentEntity, final Path documentContents) {
+    public DocumentEntity saveDocument(final DocumentEntity documentEntity, final byte[] documentContents) {
         try (final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentEntity);
-             final InputStream documentInputStream = new FileInputStream(documentContents.toFile())) {
+             final InputStream documentInputStream = new ByteArrayInputStream(documentContents)) {
             saveDocumentContents(documentEntity, documentInputStream, vaultLocation);
         } catch (IOException e) {
             throw new VaultAccessException("Unable to move document with id " + documentEntity.getId()

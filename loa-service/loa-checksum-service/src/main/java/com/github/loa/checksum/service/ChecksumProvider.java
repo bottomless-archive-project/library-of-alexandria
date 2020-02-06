@@ -12,9 +12,8 @@ public interface ChecksumProvider {
     /**
      * Generate a checksum for the provided document.
      *
-     * @param documentId       the id of the document
      * @param documentContents the contents of the document
      * @return the checksum for the document
      */
-    Mono<String> checksum(String documentId, Path documentContents);
+    Mono<String> checksum(byte[] documentContents);
 }

@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,17 +19,12 @@ import java.nio.file.Path;
 public class Sha256ChecksumProvider implements ChecksumProvider {
 
     @Override
-    public Mono<String> checksum(final String documentId, final Path documentContents) {
-        return Mono.fromSupplier(() -> calculateChecksum(documentId, documentContents));
+    public Mono<String> checksum(final byte[] documentContents) {
+        return Mono.fromSupplier(() -> calculateChecksum(documentContents));
     }
 
     @SneakyThrows
-    private String calculateChecksum(final String documentId, final Path documentContents) {
-        try (final InputStream inputStream = new FileInputStream(documentContents.toFile())) {
-            return DigestUtils.sha256Hex(inputStream);
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to load document contents for document " + documentId
-                    + " while calculating the checksum.");
-        }
+    private String calculateChecksum(final byte[] documentContents) {
+        return DigestUtils.sha256Hex(new ByteArrayInputStream(documentContents));
     }
 }
