@@ -33,7 +33,7 @@ public class ClientProducerExecutor {
         final Pool<PoolableClientProducer> clientProducersForQueue = poolableClientProducerPoolFactory.getPool(queue);
 
         try {
-            return clientProducersForQueue.claim(new Timeout(120, TimeUnit.SECONDS));
+            return clientProducersForQueue.claim(new Timeout(Integer.MAX_VALUE, TimeUnit.DAYS));
         } catch (final InterruptedException e) {
             throw new QueueException("Unable to acquire client producer!", e);
         }

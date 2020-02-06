@@ -31,7 +31,7 @@ public class ClientConsumerExecutor {
         final Pool<PoolableClientConsumer> clientConsumersForQueue = poolableClientConsumerPoolFactory.getPool(queue);
 
         try {
-            return clientConsumersForQueue.claim(new Timeout(120, TimeUnit.SECONDS));
+            return clientConsumersForQueue.claim(new Timeout(Integer.MAX_VALUE, TimeUnit.DAYS));
         } catch (final InterruptedException e) {
             throw new QueueException("Unable to acquire client consumer!", e);
         }
