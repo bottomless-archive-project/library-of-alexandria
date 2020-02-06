@@ -5,7 +5,7 @@ buildscript {
         springBootVersion = '2.2.4.RELEASE'
 
         set('artemis.version', '2.11.0')
-        set('elasticsearch.version', '7.5.0')
+        set('elasticsearch.version', '7.5.2')
     }
     repositories {
         mavenCentral()
@@ -17,7 +17,7 @@ buildscript {
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
         classpath "com.adarshr:gradle-test-logger-plugin:1.6.0"
-        classpath "com.github.ben-manes:gradle-versions-plugin:0.21.0"
+        classpath "com.github.ben-manes:gradle-versions-plugin:0.27.0"
     }
 }
 
@@ -74,9 +74,11 @@ subprojects {
 
         // Testing
         testCompile group: 'org.mockito', name: 'mockito-core'
-        testCompile group: 'org.hamcrest', name: 'hamcrest', version: '2.1'
+        testCompile group: 'org.hamcrest', name: 'hamcrest', version: '2.2'
 
-        testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test'
+        testCompile(group: 'org.springframework.boot', name: 'spring-boot-starter-test') {
+            exclude group: 'junit', module: 'junit'
+        }
         testCompile group: 'io.projectreactor', name: 'reactor-test'
     }
 

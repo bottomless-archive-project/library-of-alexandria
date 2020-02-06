@@ -4,6 +4,7 @@ import com.github.loa.document.service.domain.DocumentType;
 import com.github.loa.downloader.configuration.DownloaderConfigurationProperties;
 import com.github.loa.parser.service.DocumentDataParser;
 import com.github.loa.stage.service.StageLocationFactory;
+import com.github.loa.stage.service.domain.StageLocation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -34,25 +35,25 @@ public class DocumentFileValidator {
      */
     public Mono<Boolean> isValidDocument(final String documentId, final DocumentType documentType) {
         return stageLocationFactory.getLocation(documentId, documentType)
-                .map(stageFileLocation -> {
-                    if (!isValidFileSize(stageFileLocation.size())) {
-                        return false;
-                    }
-
-                    try (final InputStream inputStream = stageFileLocation.openStream()) {
-                        documentDataParser.parseDocumentMetadata(documentId, documentType, inputStream);
-                    } catch (final Exception e) {
-                        log.info("Non-parsable document: {}!", documentId);
-
-                        return false;
-                    }
-
-                    return true;
-                });
+                .map(stageFileLocation -> isValidFileSize(stageFileLocation.size())
+                        && isParsable(documentId, documentType, stageFileLocation));
     }
 
     private boolean isValidFileSize(final long stageFileSize) {
         return stageFileSize > MINIMUM_FILE_LENGTH
                 && stageFileSize < downloaderConfigurationProperties.getMaximumArchiveSize();
+    }
+
+    private boolean isParsable(final String documentId, final DocumentType documentType,
+            final StageLocation stageLocation) {
+        try (final InputStream inputStream = stageLocation.openStream()) {
+            documentDataParser.parseDocumentMetadata(documentId, documentType, inputStream);
+
+            return true;
+        } catch (final Exception e) {
+            log.info("Non-parsable document: {}!", documentId);
+
+            return false;
+        }
     }
 }

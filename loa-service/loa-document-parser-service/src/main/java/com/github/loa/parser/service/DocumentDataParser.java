@@ -70,7 +70,7 @@ public class DocumentDataParser {
                 .author(metadata.get(TikaCoreProperties.CREATOR))
                 .date(metadata.get(TikaCoreProperties.CREATED))
                 .content(handler.toString())
-                .language(language.getIsoCode())
+                .language(language.getIsoCode639_1().toString())
                 .type(documentType)
                 .pageCount(pageCount)
                 .build();

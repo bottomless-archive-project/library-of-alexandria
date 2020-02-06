@@ -39,7 +39,12 @@ public class QueueServerConfiguration {
         configuration.addConnectorConfiguration("netty-connector", new TransportConfiguration(
                 NettyConnectorFactory.class.getName()));
         configuration.addAcceptorConfiguration(new TransportConfiguration(NettyAcceptorFactory.class.getName(),
-                Map.of(TransportConstants.HOST_PROP_NAME, "0.0.0.0")));
+                        Map.of(
+                                TransportConstants.HOST_PROP_NAME, "0.0.0.0",
+                                TransportConstants.PORT_PROP_NAME, queueConfigurationProperties.getPort()
+                        )
+                )
+        );
         configuration.setJournalType(JournalType.MAPPED);
         configuration.setJournalSyncTransactional(false);
         configuration.setJournalSyncNonTransactional(false);
