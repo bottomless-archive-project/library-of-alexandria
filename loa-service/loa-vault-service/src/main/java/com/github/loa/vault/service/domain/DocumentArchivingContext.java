@@ -13,5 +13,5 @@ public class DocumentArchivingContext {
     private DocumentType type;
     private String source;
     private int contentLength;
-    private InputStream content;
+    private byte[] content;
 }

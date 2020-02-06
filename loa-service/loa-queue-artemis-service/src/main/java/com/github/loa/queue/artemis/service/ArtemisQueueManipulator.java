@@ -131,21 +131,34 @@ public class ArtemisQueueManipulator implements QueueManipulator {
         clientConsumerExecutor.invokeConsumer(queue,
                 (clientConsumer -> {
                     try {
-                        messageHolder.clientMessage = clientConsumer.receive();
+                        final ClientMessage clientMessage = clientConsumer.receive();
+
+                        // The deserialization should be done inside the invocation because the message is only
+                        // readable while the consumer is locked (and doesn't read a new message for an other
+                        // thread).
+                        messageHolder.message = messageDeserializerProvider.getDeserializer(queue)
+                                .orElseThrow(() -> new QueueException("No deserializer found for queue: "
+                                        + queue.getName() + "!"))
+                                .deserialize(clientMessage);
+
+                        clientMessage.releaseBuffer();
                     } catch (ActiveMQException e) {
                         throw new QueueException("Unable to read message from the " + queue.getName() + " queue!", e);
                     }
                 }));
 
-        try {
-            return messageDeserializerProvider.getDeserializer(queue)
-                    .orElseThrow(() -> new QueueException("No deserializer found for queue: " + queue.getName() + "!"))
-                    .deserialize(messageHolder.clientMessage);
-        } finally {
-            messageHolder.clientMessage.releaseBuffer();
-        }
+        return messageHolder.message;
     }
 
+
+    /**
+     * Reads a message from the provided queue and cast it to the provided type.
+     *
+     * @param queue      the queue to read the message from
+     * @param resultType the type of the message
+     * @return the message that's being read
+     * @throws QueueException when an error happens while trying to read the message
+     */
     @Override
     public <T> T readMessage(final Queue queue, final Class<T> resultType) {
         return (T) readMessage(queue);
@@ -153,6 +166,6 @@ public class ArtemisQueueManipulator implements QueueManipulator {
 
     private static class MessageHolder {
 
-        private ClientMessage clientMessage;
+        private Object message;
     }
 }
