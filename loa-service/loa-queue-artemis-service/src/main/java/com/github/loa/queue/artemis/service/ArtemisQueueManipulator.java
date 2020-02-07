@@ -140,8 +140,6 @@ public class ArtemisQueueManipulator implements QueueManipulator {
                                 .orElseThrow(() -> new QueueException("No deserializer found for queue: "
                                         + queue.getName() + "!"))
                                 .deserialize(clientMessage);
-
-                        clientMessage.releaseBuffer();
                     } catch (ActiveMQException e) {
                         throw new QueueException("Unable to read message from the " + queue.getName() + " queue!", e);
                     }
