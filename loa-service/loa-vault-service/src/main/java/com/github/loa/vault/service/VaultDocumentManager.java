@@ -52,6 +52,7 @@ public class VaultDocumentManager {
 
         return Mono.just(documentArchivingContext)
                 .flatMap(stageLocation -> checksumProvider.checksum(documentArchivingContext.getContent())
+                        //TODO: This could happen more than once?
                         .filterWhen(checksum -> isDocumentMissing(checksum, documentArchivingContext))
                         .flatMap(checksum -> documentEntityFactory.newDocumentEntity(
                                 DocumentCreationContext.builder()
@@ -68,6 +69,7 @@ public class VaultDocumentManager {
                         )
                         .flatMap(documentEntity -> Mono.fromSupplier(
                                 () -> saveDocument(documentEntity, documentArchivingContext.getContent())))
+                        .doOnError(throwable -> log.error("Failed to save document!", throwable))
                         .retry()
                 );
     }
