@@ -31,20 +31,20 @@ public class VaultQueueListener implements CommandLineRunner {
                 .repeat()
                 .parallel()
                 .runOn(Schedulers.boundedElastic())
-                .flatMap(random -> readDocument())
+                .map(random -> readDocument())
                 .flatMap(vaultDocumentManager::archiveDocument)
                 .subscribe();
     }
 
-    private Mono<DocumentArchivingContext> readDocument() {
-        return Mono.fromSupplier(this::readDocumentArchivingMessage)
-                .map(documentArchivingMessage -> DocumentArchivingContext.builder()
-                        .type(DocumentType.valueOf(documentArchivingMessage.getType()))
-                        .source(documentArchivingMessage.getSource())
-                        .contentLength(documentArchivingMessage.getContentLength())
-                        .content(documentArchivingMessage.getContent())
-                        .build()
-                );
+    private DocumentArchivingContext readDocument() {
+        final DocumentArchivingMessage documentArchivingMessage = readDocumentArchivingMessage();
+
+        return DocumentArchivingContext.builder()
+                .type(DocumentType.valueOf(documentArchivingMessage.getType()))
+                .source(documentArchivingMessage.getSource())
+                .contentLength(documentArchivingMessage.getContentLength())
+                .content(documentArchivingMessage.getContent())
+                .build();
     }
 
     private DocumentArchivingMessage readDocumentArchivingMessage() {

@@ -46,6 +46,8 @@ public class VaultDocumentManager {
      * Archive the content of an input stream as the content of the provided document in the vault.
      */
     public Mono<DocumentEntity> archiveDocument(final DocumentArchivingContext documentArchivingContext) {
+        //TODO: We need to have one ID for a document generated at download time. Just to make logging etc more
+        // convenient.
         final String documentId = UUID.randomUUID().toString();
 
         log.info("Archiving document with id: {}.", documentId);
