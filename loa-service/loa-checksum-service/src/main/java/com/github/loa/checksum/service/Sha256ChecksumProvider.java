@@ -7,8 +7,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import java.io.ByteArrayInputStream;
-
 @Service
 @RequiredArgsConstructor
 @ConditionalOnProperty(name = "loa.checksum.type", havingValue = "sha256")
@@ -21,6 +19,6 @@ public class Sha256ChecksumProvider implements ChecksumProvider {
 
     @SneakyThrows
     private String calculateChecksum(final byte[] documentContents) {
-        return DigestUtils.sha256Hex(new ByteArrayInputStream(documentContents));
+        return DigestUtils.sha256Hex(documentContents);
     }
 }
