@@ -12,7 +12,7 @@ import stormpot.Pool;
 import stormpot.Timeout;
 
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
+import java.util.function.Function;
 
 @Service
 @RequiredArgsConstructor
@@ -21,9 +21,9 @@ public class ClientConsumerExecutor {
 
     private final PoolableClientConsumerPoolFactory poolableClientConsumerPoolFactory;
 
-    public void invokeConsumer(final Queue queue, final Consumer<ClientConsumer> clientConsumerConsumer) {
+    public <T> T invokeConsumer(final Queue queue, final Function<ClientConsumer, T> clientConsumerConsumer) {
         try (final PoolableClientConsumer poolableClientConsumer = claimClientConsumer(queue)) {
-            clientConsumerConsumer.accept(poolableClientConsumer.getClientConsumer());
+            return clientConsumerConsumer.apply(poolableClientConsumer.getClientConsumer());
         }
     }
 
