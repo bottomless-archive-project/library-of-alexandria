@@ -17,6 +17,7 @@ import org.apache.commons.io.IOUtils;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -54,8 +55,6 @@ public class VaultDocumentManager {
 
         return Mono.just(documentArchivingContext)
                 .flatMap(stageLocation -> checksumProvider.checksum(documentArchivingContext.getContent())
-                        //TODO: This could happen more than once?
-                        .filterWhen(checksum -> isDocumentMissing(checksum, documentArchivingContext))
                         .flatMap(checksum -> documentEntityFactory.newDocumentEntity(
                                 DocumentCreationContext.builder()
                                         .id(documentId)
@@ -71,20 +70,16 @@ public class VaultDocumentManager {
                         )
                         .flatMap(documentEntity -> Mono.fromSupplier(
                                 () -> saveDocument(documentEntity, documentArchivingContext.getContent())))
-                        .doOnError(throwable -> log.error("Failed to save document!", throwable))
-                        .retry()
-                );
-    }
-
-    public Mono<Boolean> isDocumentMissing(final String checksum,
-            final DocumentArchivingContext documentArchivingContext) {
-        return documentEntityFactory.isDocumentMissing(checksum, documentArchivingContext.getContentLength(),
-                documentArchivingContext.getType())
-                .doOnNext(missing -> {
-                    if (!missing) {
-                        log.info("Document with checksum {} is a duplicate.", checksum);
-                    }
-                });
+                        .doOnError(throwable -> {
+                            if (!(throwable instanceof DuplicateKeyException)) {
+                                log.error("Failed to save document!", throwable);
+                            } else {
+                                log.info("Document with id {} is a duplicate.", documentId);
+                            }
+                        })
+                        .retry(throwable -> !(throwable instanceof DuplicateKeyException))
+                )
+                .onErrorResume(error -> Mono.empty());
     }
 
     public DocumentEntity saveDocument(final DocumentEntity documentEntity, final byte[] documentContents) {

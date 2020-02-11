@@ -4,7 +4,6 @@ import com.github.loa.document.repository.DocumentRepository;
 import com.github.loa.document.repository.domain.DocumentDatabaseEntity;
 import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.document.service.domain.DocumentStatus;
-import com.github.loa.document.service.domain.DocumentType;
 import com.github.loa.document.service.entity.factory.domain.DocumentCreationContext;
 import com.github.loa.document.service.entity.transformer.DocumentEntityTransformer;
 import lombok.RequiredArgsConstructor;
@@ -20,29 +19,6 @@ public class DocumentEntityFactory {
 
     private final DocumentRepository documentRepository;
     private final DocumentEntityTransformer documentEntityTransformer;
-
-    /**
-     * Return true if any document exists with the provided checksum and file size.
-     *
-     * @param checksum the checksum to use for the checking
-     * @param fileSize the file size used for the checking
-     * @return return true if a document exist with the provided parameters or false otherwise
-     */
-    public Mono<Boolean> isDocumentExists(final String checksum, final long fileSize, final DocumentType type) {
-        return documentRepository.existsByChecksumAndFileSize(checksum, fileSize, type.name());
-    }
-
-    /**
-     * Return false if any document exists with the provided checksum and file size.
-     *
-     * @param checksum the checksum to use for the checking
-     * @param fileSize the file size used for the checking
-     * @return return true if a document exist with the provided parameters or false otherwise
-     */
-    public Mono<Boolean> isDocumentMissing(final String checksum, final long fileSize, final DocumentType type) {
-        return isDocumentExists(checksum, fileSize, type)
-                .map(exists -> !exists);
-    }
 
     /**
      * Return a document by it's id.

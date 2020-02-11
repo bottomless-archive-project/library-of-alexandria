@@ -14,7 +14,7 @@ public class MongoClientConfiguration {
         return clientSettingsBuilder -> clientSettingsBuilder
                 .applyToConnectionPoolSettings(connectionPoolSettings -> {
                     connectionPoolSettings.maxWaitTime(10, TimeUnit.MINUTES);
-                    connectionPoolSettings.maxWaitQueueSize(10000);
+                    connectionPoolSettings.maxWaitQueueSize(500);
                 });
     }
 }
