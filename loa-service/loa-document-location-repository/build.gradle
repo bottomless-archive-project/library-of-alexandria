@@ -1,3 +1,4 @@
 dependencies {
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-mongodb-reactive'
+    compile group: 'org.mongodb', name: 'mongodb-driver-reactivestreams'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-reactor-netty'
 }
