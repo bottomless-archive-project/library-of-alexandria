@@ -1,23 +1,34 @@
 package com.github.loa.document.repository.configuration;
 
+import com.github.loa.document.repository.domain.DocumentDatabaseEntity;
+import com.mongodb.client.model.IndexOptions;
+import com.mongodb.client.model.Indexes;
+import com.mongodb.reactivestreams.client.MongoCollection;
+import com.mongodb.reactivestreams.client.MongoDatabase;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.mongodb.MongoDbFactory;
-import org.springframework.data.mongodb.core.convert.DefaultDbRefResolver;
-import org.springframework.data.mongodb.core.convert.DefaultMongoTypeMapper;
-import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
-import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
+import reactor.core.publisher.Mono;
 
 @Configuration
 public class MongoConfiguration {
 
     @Bean
-    public MappingMongoConverter mappingMongoConverter(final MongoDbFactory mongoDbFactory, final MongoMappingContext context) {
-        final MappingMongoConverter converter = new MappingMongoConverter(
-                new DefaultDbRefResolver(mongoDbFactory), context);
+    public MongoCollection<DocumentDatabaseEntity> documentDatabaseEntityMongoCollection(
+            final MongoDatabase mongoDatabase) {
+        final MongoCollection<DocumentDatabaseEntity> documentDatabaseEntityMongoCollection =
+                mongoDatabase.getCollection("document", DocumentDatabaseEntity.class);
 
-        converter.setTypeMapper(new DefaultMongoTypeMapper(null));
+        final IndexOptions statusIndexOptions = new IndexOptions();
+        statusIndexOptions.name("status_index");
+        Mono.from(documentDatabaseEntityMongoCollection.createIndex(Indexes.ascending("status"),
+                statusIndexOptions)).subscribe();
 
-        return converter;
+        final IndexOptions uniqueFileIndexOptions = new IndexOptions();
+        uniqueFileIndexOptions.name("unique_file");
+        uniqueFileIndexOptions.unique(true);
+        Mono.from(documentDatabaseEntityMongoCollection.createIndex(Indexes.ascending(
+                "checksum", "fileSize", "type"), uniqueFileIndexOptions)).subscribe();
+
+        return documentDatabaseEntityMongoCollection;
     }
 }

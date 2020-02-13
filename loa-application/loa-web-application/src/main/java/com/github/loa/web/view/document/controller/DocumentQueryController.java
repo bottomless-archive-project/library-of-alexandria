@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 
+import java.util.UUID;
+
 /**
  * A controller that provides access to the documents available in the vault.
  */
@@ -33,7 +35,7 @@ public class DocumentQueryController {
      */
     @GetMapping("/document/{documentId}")
     public Mono<ResponseEntity<ByteArrayResource>> queryDocument(@PathVariable final String documentId) {
-        return documentEntityFactory.getDocumentEntity(documentId)
+        return documentEntityFactory.getDocumentEntity(UUID.fromString(documentId))
                 .zipWhen(vaultClientService::queryDocument)
                 .map(documentEntity -> ResponseEntity.ok()
                         .contentType(mediaTypeCalculator.calculateMediaType(documentEntity.getT1().getType()))

@@ -1,74 +1,53 @@
 package com.github.loa.document.repository;
 
 import com.github.loa.document.repository.domain.DocumentDatabaseEntity;
+import com.mongodb.reactivestreams.client.MongoCollection;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.UUID;
+
+import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Updates.set;
 
 @Component
 @RequiredArgsConstructor
 public class DocumentRepository {
 
-    private final ReactiveMongoTemplate mongoTemplate;
+    private final MongoCollection<DocumentDatabaseEntity> documentDatabaseEntityMongoCollection;
 
     public Mono<DocumentDatabaseEntity> insertDocument(final DocumentDatabaseEntity documentDatabaseEntity) {
-        return mongoTemplate.insert(documentDatabaseEntity);
+        return Mono.from(documentDatabaseEntityMongoCollection.insertOne(documentDatabaseEntity))
+                .thenReturn(documentDatabaseEntity);
     }
 
-    public Mono<DocumentDatabaseEntity> findById(final String documentId) {
-        return mongoTemplate.findById(documentId, DocumentDatabaseEntity.class);
+    public Mono<DocumentDatabaseEntity> findById(final UUID documentId) {
+        return Mono.from(documentDatabaseEntityMongoCollection.find(eq("_id", documentId)));
     }
 
     public Flux<DocumentDatabaseEntity> findByStatus(final String status) {
-        final Query query = Query
-                .query(
-                        Criteria.where("status").is(status)
-                );
-
-        return mongoTemplate.find(query, DocumentDatabaseEntity.class);
+        return Flux.from(documentDatabaseEntityMongoCollection.find(eq("status", status)));
     }
 
-    public Mono<Void> updateStatus(final String documentId, final String status) {
-        final Query query = Query
-                .query(
-                        Criteria.where("id").is(documentId)
-                );
-
-        return mongoTemplate.updateFirst(query, Update.update("status", status), DocumentDatabaseEntity.class).then();
-    }
-
-    public Mono<Void> updateCompression(final String documentId, final String compression) {
-        final Query query = Query
-                .query(
-                        Criteria.where("id").is(documentId)
-                );
-
-        return mongoTemplate.updateFirst(query, Update.update("compression", compression), DocumentDatabaseEntity.class)
+    public Mono<Void> updateStatus(final UUID documentId, final String status) {
+        return Mono.from(documentDatabaseEntityMongoCollection
+                .updateOne(eq("_id", documentId), set("status", status)))
                 .then();
     }
 
-    public Mono<Boolean> existsByChecksumAndFileSize(final String checksum, final long fileSize,
-            final String type) {
-        final Query query = Query
-                .query(
-                        Criteria.where("checksum").is(checksum)
-                                .and("fileSize").is(fileSize)
-                                .and("type").is(type)
-                );
-
-        return mongoTemplate.exists(query, DocumentDatabaseEntity.class);
+    public Mono<Void> updateCompression(final UUID documentId, final String compression) {
+        return Mono.from(documentDatabaseEntityMongoCollection
+                .updateOne(eq("_id", documentId), set("compression", compression)))
+                .then();
     }
 
     public Flux<DocumentDatabaseEntity> findAll() {
-        return mongoTemplate.findAll(DocumentDatabaseEntity.class);
+        return Flux.from(documentDatabaseEntityMongoCollection.find());
     }
 
     public Mono<Long> count() {
-        return mongoTemplate.count(Query.query(new Criteria()), DocumentDatabaseEntity.class);
+        return Mono.from(documentDatabaseEntityMongoCollection.countDocuments());
     }
 }

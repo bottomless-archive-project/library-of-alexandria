@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import java.io.InputStream;
+import java.util.UUID;
 
 /**
  * Validates a document after it's downloaded to the staging area.
@@ -47,7 +48,7 @@ public class DocumentFileValidator {
     private boolean isParsable(final String documentId, final DocumentType documentType,
             final StageLocation stageLocation) {
         try (final InputStream inputStream = stageLocation.openStream()) {
-            documentDataParser.parseDocumentMetadata(documentId, documentType, inputStream);
+            documentDataParser.parseDocumentMetadata(UUID.fromString(documentId), documentType, inputStream);
 
             return true;
         } catch (final Exception e) {

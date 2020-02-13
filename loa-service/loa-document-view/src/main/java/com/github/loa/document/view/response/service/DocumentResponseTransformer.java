@@ -9,7 +9,7 @@ public class DocumentResponseTransformer {
 
     public DocumentResponse transform(final DocumentEntity documentEntity) {
         return DocumentResponse.builder()
-                .id(documentEntity.getId())
+                .id(documentEntity.getId().toString())
                 .status(documentEntity.getStatus())
                 .type(documentEntity.getType())
                 .checksum(documentEntity.getChecksum())

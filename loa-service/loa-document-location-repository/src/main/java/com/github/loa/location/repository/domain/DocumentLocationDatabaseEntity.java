@@ -2,16 +2,14 @@ package com.github.loa.location.repository.domain;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import org.bson.codecs.pojo.annotations.BsonId;
 
 @Getter
 @Setter
-@Document("documentLocation")
 public class DocumentLocationDatabaseEntity {
 
-    @Id
-    private String id;
+    @BsonId
+    private byte[] id;
     private String url;
     private String source;
     private int downloaderVersion;

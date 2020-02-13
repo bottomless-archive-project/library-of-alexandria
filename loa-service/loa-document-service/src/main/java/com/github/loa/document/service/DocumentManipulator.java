@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.util.UUID;
+
 /**
  * This service contains methods to manipulating documents.
  */
@@ -21,7 +23,7 @@ public class DocumentManipulator {
      *
      * @param documentId the id of the document to mark as indexer
      */
-    public Mono<Void> markIndexed(final String documentId) {
+    public Mono<Void> markIndexed(final UUID documentId) {
         return updateStatus(documentId, DocumentStatus.INDEXED);
     }
 
@@ -30,7 +32,7 @@ public class DocumentManipulator {
      *
      * @param documentId the id of the document to mark as indexer
      */
-    public Mono<Void> markIndexFailure(final String documentId) {
+    public Mono<Void> markIndexFailure(final UUID documentId) {
         return updateStatus(documentId, DocumentStatus.INDEXING_FAILURE);
     }
 
@@ -40,7 +42,7 @@ public class DocumentManipulator {
      * @param documentId     the id of the document to update the status for
      * @param documentStatus the new status of the document
      */
-    public Mono<Void> updateStatus(final String documentId, final DocumentStatus documentStatus) {
+    public Mono<Void> updateStatus(final UUID documentId, final DocumentStatus documentStatus) {
         return documentRepository.updateStatus(documentId, documentStatus.toString());
     }
 
@@ -50,7 +52,7 @@ public class DocumentManipulator {
      * @param documentId          the id of the document to update the status for
      * @param documentCompression the new compression of the document
      */
-    public Mono<Void> updateCompression(final String documentId, final DocumentCompression documentCompression) {
+    public Mono<Void> updateCompression(final UUID documentId, final DocumentCompression documentCompression) {
         return documentRepository.updateCompression(documentId, documentCompression.toString());
     }
 }

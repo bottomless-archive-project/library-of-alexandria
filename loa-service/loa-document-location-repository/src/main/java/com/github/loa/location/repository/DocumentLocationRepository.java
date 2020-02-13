@@ -1,11 +1,10 @@
 package com.github.loa.location.repository;
 
 import com.github.loa.location.repository.domain.DocumentLocationDatabaseEntity;
+import com.mongodb.DuplicateKeyException;
+import com.mongodb.reactivestreams.client.MongoCollection;
+import com.mongodb.reactivestreams.client.MongoDatabase;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
@@ -13,22 +12,14 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class DocumentLocationRepository {
 
-    private final ReactiveMongoTemplate mongoTemplate;
+    private final MongoDatabase mongoDatabase;
 
-    public Mono<Boolean> existsOrInsert(
-            final DocumentLocationDatabaseEntity documentLocationDatabaseEntity) {
-        final Query query = Query
-                .query(
-                        Criteria.where("_id").is(documentLocationDatabaseEntity.getId())
-                );
+    public Mono<Boolean> existsOrInsert(final DocumentLocationDatabaseEntity documentLocationDatabaseEntity) {
+        final MongoCollection<DocumentLocationDatabaseEntity> documentLocationCollection =
+                mongoDatabase.getCollection("documentLocation", DocumentLocationDatabaseEntity.class);
 
-        final Update update = new Update()
-                .setOnInsert("_id", documentLocationDatabaseEntity.getId())
-                .setOnInsert("url", documentLocationDatabaseEntity.getUrl())
-                .setOnInsert("source", documentLocationDatabaseEntity.getSource())
-                .setOnInsert("downloaderVersion", documentLocationDatabaseEntity.getDownloaderVersion());
-
-        return mongoTemplate.upsert(query, update, DocumentLocationDatabaseEntity.class)
-                .map(updateResult -> updateResult.getMatchedCount() != 0);
+        return Mono.from(documentLocationCollection.insertOne(documentLocationDatabaseEntity))
+                .map(result -> Boolean.FALSE)
+                .onErrorReturn(DuplicateKeyException.class, Boolean.TRUE);
     }
 }
