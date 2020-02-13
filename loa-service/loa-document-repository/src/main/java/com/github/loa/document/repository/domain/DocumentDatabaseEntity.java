@@ -17,7 +17,7 @@ public class DocumentDatabaseEntity {
     private String status;
     private String source;
     private String compression;
-    private String checksum;
+    private byte[] checksum;
     private long fileSize;
     private Instant downloadDate;
     private int downloaderVersion;

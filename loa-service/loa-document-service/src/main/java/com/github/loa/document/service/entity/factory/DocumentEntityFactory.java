@@ -6,6 +6,7 @@ import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.document.service.domain.DocumentStatus;
 import com.github.loa.document.service.entity.factory.domain.DocumentCreationContext;
 import com.github.loa.document.service.entity.transformer.DocumentEntityTransformer;
+import com.github.loa.repository.service.HexConverter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -18,6 +19,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class DocumentEntityFactory {
 
+    private final HexConverter hexConverter;
     private final DocumentRepository documentRepository;
     private final DocumentEntityTransformer documentEntityTransformer;
 
@@ -69,7 +71,7 @@ public class DocumentEntityFactory {
         documentDatabaseEntity.setId(documentCreationContext.getId());
         documentDatabaseEntity.setType(documentCreationContext.getType().toString());
         documentDatabaseEntity.setStatus(documentCreationContext.getStatus().toString());
-        documentDatabaseEntity.setChecksum(documentCreationContext.getChecksum());
+        documentDatabaseEntity.setChecksum(hexConverter.decode(documentCreationContext.getChecksum()));
         documentDatabaseEntity.setFileSize(documentCreationContext.getFileSize());
         documentDatabaseEntity.setDownloaderVersion(documentCreationContext.getVersionNumber());
         documentDatabaseEntity.setCompression(documentCreationContext.getCompression().name());
