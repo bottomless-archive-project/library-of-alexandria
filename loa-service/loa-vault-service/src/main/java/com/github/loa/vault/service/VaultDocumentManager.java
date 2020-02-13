@@ -11,6 +11,7 @@ import com.github.loa.vault.configuration.VaultConfigurationProperties;
 import com.github.loa.vault.domain.exception.VaultAccessException;
 import com.github.loa.vault.service.domain.DocumentArchivingContext;
 import com.github.loa.vault.service.location.VaultLocation;
+import com.mongodb.MongoWaitQueueFullException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
@@ -71,10 +72,15 @@ public class VaultDocumentManager {
                         .flatMap(documentEntity -> Mono.fromSupplier(
                                 () -> saveDocument(documentEntity, documentArchivingContext.getContent())))
                         .doOnError(throwable -> {
-                            if (!(throwable instanceof DuplicateKeyException)) {
-                                log.error("Failed to save document!", throwable);
-                            } else {
+                            // Ignoring MongoWaitQueueFullException. It will be retried.
+                            if((throwable.getCause() instanceof MongoWaitQueueFullException)) {
+                                return;
+                            }
+
+                            if (throwable instanceof DuplicateKeyException) {
                                 log.info("Document with id {} is a duplicate.", documentId);
+                            } else {
+                                log.error("Failed to save document!", throwable);
                             }
                         })
                         .retry(throwable -> !(throwable instanceof DuplicateKeyException))
