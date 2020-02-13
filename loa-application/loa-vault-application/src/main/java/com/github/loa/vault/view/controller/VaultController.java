@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 
+import java.util.UUID;
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -36,7 +38,7 @@ public class VaultController {
      */
     @GetMapping("/document/{documentId}")
     public Mono<ResponseEntity<Resource>> queryDocument(@PathVariable final String documentId) {
-        return documentEntityFactory.getDocumentEntity(documentId)
+        return documentEntityFactory.getDocumentEntity(UUID.fromString(documentId))
                 .map(documentEntity -> {
                     final Resource resource = vaultDocumentManager.readDocument(documentEntity);
 
@@ -59,7 +61,7 @@ public class VaultController {
     @PostMapping("/document/{documentId}/recompress")
     public Mono<DocumentResponse> recompressDocument(@PathVariable final String documentId,
             @RequestBody final RecompressRequest recompressRequest) {
-        return documentEntityFactory.getDocumentEntity(documentId)
+        return documentEntityFactory.getDocumentEntity(UUID.fromString(documentId))
                 .doOnNext(documentEntity ->
                         recompressorService.recompress(documentEntity, recompressRequest.getCompression()))
                 .map(documentResponseTransformer::transform)

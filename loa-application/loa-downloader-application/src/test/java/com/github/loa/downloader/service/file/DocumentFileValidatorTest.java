@@ -7,7 +7,6 @@ import com.github.loa.parser.service.DocumentDataParser;
 import com.github.loa.stage.service.StageLocationFactory;
 import com.github.loa.stage.service.domain.StageLocation;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -17,6 +16,7 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.io.InputStream;
+import java.util.UUID;
 
 import static org.mockito.Mockito.*;
 
@@ -24,7 +24,7 @@ import static org.mockito.Mockito.*;
 class DocumentFileValidatorTest {
 
     private final static long MAX_FILE_SIZE_IN_BYTES = 2048;
-    private final static String DOCUMENT_ID = "123";
+    private final static UUID DOCUMENT_ID = UUID.fromString("123e4567-e89b-12d3-a456-556642440000");
     private final static DocumentType DOCUMENT_TYPE = DocumentType.DOC;
 
     @Mock
@@ -43,10 +43,10 @@ class DocumentFileValidatorTest {
     void testIsValidDocumentWhenDocumentIsTooSmall() {
         final StageLocation stageLocation = mock(StageLocation.class);
 
-        when(stageLocationFactory.getLocation(DOCUMENT_ID, DOCUMENT_TYPE))
+        when(stageLocationFactory.getLocation(DOCUMENT_ID.toString(), DOCUMENT_TYPE))
                 .thenReturn(Mono.just(stageLocation));
 
-        final Mono<Boolean> result = underTest.isValidDocument(DOCUMENT_ID, DOCUMENT_TYPE);
+        final Mono<Boolean> result = underTest.isValidDocument(DOCUMENT_ID.toString(), DOCUMENT_TYPE);
 
         StepVerifier.create(result)
                 .consumeNextWith(Assertions::assertFalse)
@@ -57,12 +57,12 @@ class DocumentFileValidatorTest {
     void testIsValidDocumentWhenDocumentIsTooBig() {
         final StageLocation stageLocation = mock(StageLocation.class);
 
-        when(stageLocationFactory.getLocation(DOCUMENT_ID, DOCUMENT_TYPE))
+        when(stageLocationFactory.getLocation(DOCUMENT_ID.toString(), DOCUMENT_TYPE))
                 .thenReturn(Mono.just(stageLocation));
         when(stageLocation.size()).thenReturn(MAX_FILE_SIZE_IN_BYTES + 1);
         when(downloaderConfigurationProperties.getMaximumArchiveSize()).thenReturn(MAX_FILE_SIZE_IN_BYTES);
 
-        final Mono<Boolean> result = underTest.isValidDocument(DOCUMENT_ID, DOCUMENT_TYPE);
+        final Mono<Boolean> result = underTest.isValidDocument(DOCUMENT_ID.toString(), DOCUMENT_TYPE);
 
         StepVerifier.create(result)
                 .consumeNextWith(Assertions::assertFalse)
@@ -73,7 +73,7 @@ class DocumentFileValidatorTest {
     void testIsValidDocumentWhenDocumentIsntParsable() {
         final StageLocation stageLocation = mock(StageLocation.class);
 
-        when(stageLocationFactory.getLocation(DOCUMENT_ID, DOCUMENT_TYPE))
+        when(stageLocationFactory.getLocation(DOCUMENT_ID.toString(), DOCUMENT_TYPE))
                 .thenReturn(Mono.just(stageLocation));
         when(stageLocation.size()).thenReturn(MAX_FILE_SIZE_IN_BYTES - 1);
         when(downloaderConfigurationProperties.getMaximumArchiveSize()).thenReturn(MAX_FILE_SIZE_IN_BYTES);
@@ -83,7 +83,7 @@ class DocumentFileValidatorTest {
         when(documentDataParser.parseDocumentMetadata(DOCUMENT_ID, DOCUMENT_TYPE, documentInputStream))
                 .thenThrow(new RuntimeException("Some error!"));
 
-        final Mono<Boolean> result = underTest.isValidDocument(DOCUMENT_ID, DOCUMENT_TYPE);
+        final Mono<Boolean> result = underTest.isValidDocument(DOCUMENT_ID.toString(), DOCUMENT_TYPE);
 
         StepVerifier.create(result)
                 .consumeNextWith(Assertions::assertFalse)
@@ -95,7 +95,7 @@ class DocumentFileValidatorTest {
     void testIsValidDocumentWhenDocumentIsValid() {
         final StageLocation stageLocation = mock(StageLocation.class);
 
-        when(stageLocationFactory.getLocation(DOCUMENT_ID, DOCUMENT_TYPE))
+        when(stageLocationFactory.getLocation(DOCUMENT_ID.toString(), DOCUMENT_TYPE))
                 .thenReturn(Mono.just(stageLocation));
         when(stageLocation.size()).thenReturn(MAX_FILE_SIZE_IN_BYTES - 1);
         when(downloaderConfigurationProperties.getMaximumArchiveSize()).thenReturn(MAX_FILE_SIZE_IN_BYTES);
@@ -108,7 +108,7 @@ class DocumentFileValidatorTest {
                                 .build()
                 );
 
-        final Mono<Boolean> result = underTest.isValidDocument(DOCUMENT_ID, DOCUMENT_TYPE);
+        final Mono<Boolean> result = underTest.isValidDocument(DOCUMENT_ID.toString(), DOCUMENT_TYPE);
 
         StepVerifier.create(result)
                 .consumeNextWith(Assertions::assertTrue)

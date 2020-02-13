@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.ToString;
 
 import java.time.Instant;
+import java.util.UUID;
 
 @Getter
 @Builder
@@ -13,7 +14,7 @@ import java.time.Instant;
 public class DocumentEntity {
 
     @ToString.Include
-    private final String id;
+    private final UUID id;
     @ToString.Include
     private final DocumentType type;
     private final DocumentStatus status;

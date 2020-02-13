@@ -10,6 +10,7 @@ import org.elasticsearch.client.RestHighLevelClient;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -28,11 +29,11 @@ public class IndexerService {
                     try {
                         restHighLevelClient.index(indexRequest, RequestOptions.DEFAULT);
 
-                        documentManipulator.markIndexed(documentId).subscribe();
+                        documentManipulator.markIndexed(UUID.fromString(documentId)).subscribe();
                     } catch (IOException | ElasticsearchException e) {
                         log.info("Failed to index document " + documentId + "! Cause: '" + e.getMessage() + "'.");
 
-                        documentManipulator.markIndexFailure(documentId).subscribe();
+                        documentManipulator.markIndexFailure(UUID.fromString(documentId)).subscribe();
                     }
                 });
     }

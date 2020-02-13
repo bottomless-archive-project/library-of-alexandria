@@ -12,13 +12,13 @@ import com.github.loa.vault.domain.exception.VaultAccessException;
 import com.github.loa.vault.service.domain.DocumentArchivingContext;
 import com.github.loa.vault.service.location.VaultLocation;
 import com.mongodb.MongoWaitQueueFullException;
+import com.mongodb.MongoWriteException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -50,7 +50,7 @@ public class VaultDocumentManager {
     public Mono<DocumentEntity> archiveDocument(final DocumentArchivingContext documentArchivingContext) {
         //TODO: We need to have one ID for a document generated at download time. Just to make logging etc more
         // convenient.
-        final String documentId = UUID.randomUUID().toString();
+        final UUID documentId = UUID.randomUUID();
 
         log.info("Archiving document with id: {}.", documentId);
 
@@ -73,19 +73,24 @@ public class VaultDocumentManager {
                                 () -> saveDocument(documentEntity, documentArchivingContext.getContent())))
                         .doOnError(throwable -> {
                             // Ignoring MongoWaitQueueFullException. It will be retried.
-                            if((throwable.getCause() instanceof MongoWaitQueueFullException)) {
+                            if ((throwable.getCause() instanceof MongoWaitQueueFullException)) {
                                 return;
                             }
 
-                            if (throwable instanceof DuplicateKeyException) {
+                            if (isDuplicateIndexError(throwable)) {
                                 log.info("Document with id {} is a duplicate.", documentId);
                             } else {
                                 log.error("Failed to save document!", throwable);
                             }
                         })
-                        .retry(throwable -> !(throwable instanceof DuplicateKeyException))
+                        .retry(throwable -> !isDuplicateIndexError(throwable))
                 )
                 .onErrorResume(error -> Mono.empty());
+    }
+
+    private boolean isDuplicateIndexError(final Throwable throwable) {
+        return throwable instanceof MongoWriteException
+                && throwable.getMessage().startsWith("E11000 duplicate key error");
     }
 
     public DocumentEntity saveDocument(final DocumentEntity documentEntity, final byte[] documentContents) {

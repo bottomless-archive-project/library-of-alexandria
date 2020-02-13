@@ -12,6 +12,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.Instant;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -26,7 +27,7 @@ public class DocumentEntityFactory {
      * @param documentId the id of the document
      * @return the document that belongs to the provided id
      */
-    public Mono<DocumentEntity> getDocumentEntity(final String documentId) {
+    public Mono<DocumentEntity> getDocumentEntity(final UUID documentId) {
         return documentRepository.findById(documentId)
                 .map(documentEntityTransformer::transform);
     }

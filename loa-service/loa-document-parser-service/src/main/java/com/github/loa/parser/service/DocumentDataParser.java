@@ -26,6 +26,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Optional;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -44,12 +45,12 @@ public class DocumentDataParser {
     }
 
     //TODO: Can we remove this somehow? Loading the full document contents to the memory is not always necessary.
-    public DocumentMetadata parseDocumentMetadata(final String documentId, final DocumentType documentType,
+    public DocumentMetadata parseDocumentMetadata(final UUID documentId, final DocumentType documentType,
             final byte[] documentContents) {
         return parseDocumentMetadata(documentId, documentType, new ByteArrayInputStream(documentContents));
     }
 
-    public DocumentMetadata parseDocumentMetadata(final String documentId, final DocumentType documentType,
+    public DocumentMetadata parseDocumentMetadata(final UUID documentId, final DocumentType documentType,
             final InputStream documentContents) {
         final ContentHandler handler = new BodyContentHandler(-1);
         final Metadata metadata = new Metadata();
@@ -65,7 +66,7 @@ public class DocumentDataParser {
         final Language language = languageDetector.detectLanguageOf(handler.toString());
 
         return DocumentMetadata.builder()
-                .id(documentId)
+                .id(documentId.toString())
                 .title(metadata.get(TikaCoreProperties.TITLE))
                 .author(metadata.get(TikaCoreProperties.CREATOR))
                 .date(metadata.get(TikaCoreProperties.CREATED))
