@@ -73,7 +73,7 @@ public class VaultDocumentManager {
                                 () -> saveDocument(documentEntity, documentArchivingContext.getContent())))
                         .doOnError(throwable -> {
                             // Ignoring MongoWaitQueueFullException. It will be retried.
-                            if ((throwable.getCause() instanceof MongoWaitQueueFullException)) {
+                            if ((throwable instanceof MongoWaitQueueFullException)) {
                                 return;
                             }
 
