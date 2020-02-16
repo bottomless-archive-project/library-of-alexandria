@@ -1,4 +1,4 @@
-package com.github.loa.vault.service;
+package com.github.loa.vault.service.transformer;
 
 import com.github.loa.document.service.domain.DocumentType;
 import com.github.loa.queue.service.domain.message.DocumentArchivingMessage;

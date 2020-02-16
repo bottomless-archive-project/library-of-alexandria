@@ -3,7 +3,7 @@ package com.github.loa.vault.service.listener;
 import com.github.loa.queue.service.QueueManipulator;
 import com.github.loa.queue.service.domain.Queue;
 import com.github.loa.queue.service.domain.message.DocumentArchivingMessage;
-import com.github.loa.vault.service.DocumentArchivingContextTransformer;
+import com.github.loa.vault.service.transformer.DocumentArchivingContextTransformer;
 import com.github.loa.vault.service.VaultDocumentManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
