@@ -1,11 +1,10 @@
 package com.github.loa.vault.service.listener;
 
-import com.github.loa.document.service.domain.DocumentType;
 import com.github.loa.queue.service.QueueManipulator;
 import com.github.loa.queue.service.domain.Queue;
 import com.github.loa.queue.service.domain.message.DocumentArchivingMessage;
+import com.github.loa.vault.service.transformer.DocumentArchivingContextTransformer;
 import com.github.loa.vault.service.VaultDocumentManager;
-import com.github.loa.vault.service.domain.DocumentArchivingContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
@@ -20,6 +19,7 @@ public class VaultQueueListener implements CommandLineRunner {
 
     private final QueueManipulator queueManipulator;
     private final VaultDocumentManager vaultDocumentManager;
+    private final DocumentArchivingContextTransformer documentArchivingContextTransformer;
 
     @Override
     public void run(final String... args) {
@@ -31,20 +31,10 @@ public class VaultQueueListener implements CommandLineRunner {
                 .repeat()
                 .parallel()
                 .runOn(Schedulers.boundedElastic())
-                .map(random -> readDocument())
+                .map(random -> readDocumentArchivingMessage())
+                .map(documentArchivingContextTransformer::transform)
                 .flatMap(vaultDocumentManager::archiveDocument)
                 .subscribe();
-    }
-
-    private DocumentArchivingContext readDocument() {
-        final DocumentArchivingMessage documentArchivingMessage = readDocumentArchivingMessage();
-
-        return DocumentArchivingContext.builder()
-                .type(DocumentType.valueOf(documentArchivingMessage.getType()))
-                .source(documentArchivingMessage.getSource())
-                .contentLength(documentArchivingMessage.getContentLength())
-                .content(documentArchivingMessage.getContent())
-                .build();
     }
 
     private DocumentArchivingMessage readDocumentArchivingMessage() {
