@@ -5,7 +5,7 @@ buildscript {
         springBootVersion = '2.2.4.RELEASE'
 
         set('artemis.version', '2.11.0')
-        set('elasticsearch.version', '7.5.2')
+        set('elasticsearch.version', '7.6.0')
         set('mongodb.version', '3.12.1')
         set('mongo-driver-reactivestreams.version', '1.13.0')
     }
