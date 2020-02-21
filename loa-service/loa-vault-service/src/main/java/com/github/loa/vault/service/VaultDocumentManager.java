@@ -11,7 +11,6 @@ import com.github.loa.vault.configuration.VaultConfigurationProperties;
 import com.github.loa.vault.domain.exception.VaultAccessException;
 import com.github.loa.vault.service.domain.DocumentArchivingContext;
 import com.github.loa.vault.service.location.VaultLocation;
-import com.mongodb.MongoWaitQueueFullException;
 import com.mongodb.MongoWriteException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +25,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.UUID;
 
 /**
  * Provide access to the content of the documents in the vault.
@@ -68,11 +66,6 @@ public class VaultDocumentManager {
                         .flatMap(documentEntity -> Mono.fromSupplier(
                                 () -> saveDocument(documentEntity, documentArchivingContext.getContent())))
                         .doOnError(throwable -> {
-                            // Ignoring MongoWaitQueueFullException. It will be retried.
-                            if ((throwable.getCause() instanceof MongoWaitQueueFullException)) {
-                                return;
-                            }
-
                             if (isDuplicateIndexError(throwable)) {
                                 log.info("Document with id {} is a duplicate.", documentArchivingContext.getId());
                             } else {

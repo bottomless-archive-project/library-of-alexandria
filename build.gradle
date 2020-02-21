@@ -6,8 +6,8 @@ buildscript {
 
         set('artemis.version', '2.11.0')
         set('elasticsearch.version', '7.6.0')
-        set('mongodb.version', '3.12.1')
-        set('mongo-driver-reactivestreams.version', '1.13.0')
+        set('mongodb.version', '4.0.0-rc0')
+        set('mongo-driver-reactivestreams.version', '4.0.0-rc0')
     }
     repositories {
         mavenCentral()
@@ -71,8 +71,8 @@ subprojects {
         annotationProcessor group: 'org.springframework.boot', name: 'spring-boot-configuration-processor'
 
         // Lombok
-        compileOnly('org.projectlombok:lombok')
-        annotationProcessor('org.projectlombok:lombok')
+        compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.12'
+        annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.12'
 
         // Testing
         testCompile group: 'org.mockito', name: 'mockito-core'

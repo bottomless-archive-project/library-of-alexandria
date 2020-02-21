@@ -16,7 +16,6 @@ public class MongoClientConfiguration {
                     connectionPoolSettings.maxSize(100);
                     connectionPoolSettings.minSize(100);
                     connectionPoolSettings.maxWaitTime(10, TimeUnit.MINUTES);
-                    connectionPoolSettings.maxWaitQueueSize(500);
                 });
     }
 }

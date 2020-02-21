@@ -6,6 +6,7 @@ import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoClients;
 import com.mongodb.reactivestreams.client.MongoDatabase;
 import lombok.RequiredArgsConstructor;
+import org.bson.UuidRepresentation;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
 import org.springframework.context.annotation.Bean;
@@ -39,6 +40,7 @@ public class RepositoryConfiguration {
                         builder.hosts(List.of(new ServerAddress(repositoryConfigurationProperties.getHost(),
                                 repositoryConfigurationProperties.getPort()))))
                 .codecRegistry(codecRegistry)
+                .uuidRepresentation(UuidRepresentation.JAVA_LEGACY)
                 .build();
     }
 
