@@ -10,10 +10,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 
 @Service
 @RequiredArgsConstructor
@@ -25,13 +24,14 @@ public class DocumentArchiver {
     private final Counter archivedDocumentCount;
 
     public Mono<DocumentArchivingContext> archiveDocument(final DocumentArchivingContext documentArchivingContext) {
-        try (final InputStream documentContent = new FileInputStream(documentArchivingContext.getContents().toFile())) {
+        try (final InputStream documentContent = Files.newInputStream(documentArchivingContext.getContents())) {
             archivedDocumentCount.increment();
 
             final byte[] content = documentContent.readAllBytes();
 
             queueManipulator.sendMessage(Queue.DOCUMENT_ARCHIVING_QUEUE,
                     DocumentArchivingMessage.builder()
+                            .id(documentArchivingContext.getId().toString())
                             .type(documentArchivingContext.getType().toString())
                             .source(documentArchivingContext.getSource())
                             .contentLength(content.length)

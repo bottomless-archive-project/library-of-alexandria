@@ -48,17 +48,13 @@ public class VaultDocumentManager {
      * Archive the content of an input stream as the content of the provided document in the vault.
      */
     public Mono<DocumentEntity> archiveDocument(final DocumentArchivingContext documentArchivingContext) {
-        //TODO: We need to have one ID for a document generated at download time. Just to make logging etc more
-        // convenient.
-        final UUID documentId = UUID.randomUUID();
-
-        log.info("Archiving document with id: {}.", documentId);
+        log.info("Archiving document with id: {}.", documentArchivingContext.getId());
 
         return Mono.just(documentArchivingContext)
                 .flatMap(stageLocation -> checksumProvider.checksum(documentArchivingContext.getContent())
                         .flatMap(checksum -> documentEntityFactory.newDocumentEntity(
                                 DocumentCreationContext.builder()
-                                        .id(documentId)
+                                        .id(documentArchivingContext.getId())
                                         .type(documentArchivingContext.getType())
                                         .status(DocumentStatus.DOWNLOADED)
                                         .source(documentArchivingContext.getSource())
@@ -78,7 +74,7 @@ public class VaultDocumentManager {
                             }
 
                             if (isDuplicateIndexError(throwable)) {
-                                log.info("Document with id {} is a duplicate.", documentId);
+                                log.info("Document with id {} is a duplicate.", documentArchivingContext.getId());
                             } else {
                                 log.error("Failed to save document!", throwable);
                             }
