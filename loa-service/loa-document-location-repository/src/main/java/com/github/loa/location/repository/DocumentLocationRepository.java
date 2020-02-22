@@ -1,7 +1,7 @@
 package com.github.loa.location.repository;
 
 import com.github.loa.location.repository.domain.DocumentLocationDatabaseEntity;
-import com.mongodb.DuplicateKeyException;
+import com.mongodb.MongoWriteException;
 import com.mongodb.reactivestreams.client.MongoCollection;
 import com.mongodb.reactivestreams.client.MongoDatabase;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +20,7 @@ public class DocumentLocationRepository {
 
         return Mono.from(documentLocationCollection.insertOne(documentLocationDatabaseEntity))
                 .map(result -> Boolean.FALSE)
-                .onErrorReturn(DuplicateKeyException.class, Boolean.TRUE);
+                .onErrorReturn((throwable -> throwable instanceof MongoWriteException
+                        && throwable.getMessage().startsWith("E11000 duplicate key error")), Boolean.TRUE);
     }
 }

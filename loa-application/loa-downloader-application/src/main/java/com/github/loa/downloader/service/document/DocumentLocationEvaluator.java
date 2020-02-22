@@ -21,6 +21,6 @@ public class DocumentLocationEvaluator {
 
         return documentLocationEntityFactory.isDocumentLocationExistsOrCreate(documentLocationCreationContext)
                 .filter(exists -> !exists)
-                .thenReturn(documentSourceItem);
+                .map(result -> documentSourceItem);
     }
 }
