@@ -16,7 +16,12 @@ public class FileSourceFactory {
 
     private final FileDocumentSourceConfigurationProperties fileDocumentSourceConfigurationProperties;
 
-    public InputStream newInputStream(final Path fileLocation) {
+    public BufferedReader newSourceReader() {
+        return new BufferedReader(new InputStreamReader(newInputStream(
+                Path.of(fileDocumentSourceConfigurationProperties.getLocation()))));
+    }
+
+    private InputStream newInputStream(final Path fileLocation) {
         try {
             final InputStream fileStream = Files.newInputStream(fileLocation);
 
