@@ -1,13 +1,8 @@
 package com.github.loa.vault.service;
 
-import com.github.loa.checksum.service.ChecksumProvider;
-import com.github.loa.compression.configuration.CompressionConfigurationProperties;
 import com.github.loa.compression.service.provider.CompressionServiceProvider;
 import com.github.loa.document.service.domain.DocumentEntity;
-import com.github.loa.document.service.domain.DocumentStatus;
 import com.github.loa.document.service.entity.factory.DocumentEntityFactory;
-import com.github.loa.document.service.entity.factory.domain.DocumentCreationContext;
-import com.github.loa.vault.configuration.VaultConfigurationProperties;
 import com.github.loa.vault.domain.exception.VaultAccessException;
 import com.github.loa.vault.service.domain.DocumentArchivingContext;
 import com.github.loa.vault.service.location.VaultLocation;
@@ -37,10 +32,8 @@ public class VaultDocumentManager {
     private final ResourceLoader resourceLoader;
     private final VaultLocationFactory vaultLocationFactory;
     private final CompressionServiceProvider compressionServiceProvider;
-    private final CompressionConfigurationProperties compressionConfigurationProperties;
-    private final VaultConfigurationProperties vaultConfigurationProperties;
     private final DocumentEntityFactory documentEntityFactory;
-    private final ChecksumProvider checksumProvider;
+    private final DocumentCreationContextFactory documentCreationContextFactory;
 
     /**
      * Archive the content of an input stream as the content of the provided document in the vault.
@@ -49,20 +42,8 @@ public class VaultDocumentManager {
         log.info("Archiving document with id: {}.", documentArchivingContext.getId());
 
         return Mono.just(documentArchivingContext)
-                .flatMap(stageLocation -> checksumProvider.checksum(documentArchivingContext.getContent())
-                        .flatMap(checksum -> documentEntityFactory.newDocumentEntity(
-                                DocumentCreationContext.builder()
-                                        .id(documentArchivingContext.getId())
-                                        .type(documentArchivingContext.getType())
-                                        .status(DocumentStatus.DOWNLOADED)
-                                        .source(documentArchivingContext.getSource())
-                                        .versionNumber(vaultConfigurationProperties.getVersionNumber())
-                                        .compression(compressionConfigurationProperties.getAlgorithm())
-                                        .checksum(checksum)
-                                        .fileSize(documentArchivingContext.getContentLength())
-                                        .build()
-                                )
-                        )
+                .flatMap(archivingContext -> documentCreationContextFactory.newContext(archivingContext)
+                        .flatMap(documentEntityFactory::newDocumentEntity)
                         .flatMap(documentEntity -> Mono.fromSupplier(
                                 () -> saveDocument(documentEntity, documentArchivingContext.getContent())))
                         .doOnError(throwable -> {
