@@ -36,7 +36,7 @@ public class VaultDocumentManager {
     private final DocumentCreationContextFactory documentCreationContextFactory;
 
     /**
-     * Archive the content of an input stream as the content of the provided document in the vault.
+     * Archive the document provided in the context.
      */
     public Mono<DocumentEntity> archiveDocument(final DocumentArchivingContext documentArchivingContext) {
         log.info("Archiving document with id: {}.", documentArchivingContext.getId());
@@ -46,16 +46,18 @@ public class VaultDocumentManager {
                         .flatMap(documentEntityFactory::newDocumentEntity)
                         .flatMap(documentEntity -> Mono.fromSupplier(
                                 () -> saveDocument(documentEntity, documentArchivingContext.getContent())))
-                        .doOnError(throwable -> {
-                            if (isDuplicateIndexError(throwable)) {
-                                log.info("Document with id {} is a duplicate.", documentArchivingContext.getId());
-                            } else {
-                                log.error("Failed to save document!", throwable);
-                            }
-                        })
+                        .doOnError(throwable -> handleError(throwable, documentArchivingContext))
                         .retry(throwable -> !isDuplicateIndexError(throwable))
                 )
                 .onErrorResume(error -> Mono.empty());
+    }
+
+    private void handleError(final Throwable throwable, final DocumentArchivingContext documentArchivingContext) {
+        if (isDuplicateIndexError(throwable)) {
+            log.info("Document with id {} is a duplicate.", documentArchivingContext.getId());
+        } else {
+            log.error("Failed to save document!", throwable);
+        }
     }
 
     private boolean isDuplicateIndexError(final Throwable throwable) {
