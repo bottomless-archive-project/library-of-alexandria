@@ -4,6 +4,7 @@ import com.github.loa.compression.configuration.CompressionConfigurationProperti
 import com.github.loa.compression.domain.DocumentCompression;
 import com.github.loa.document.service.DocumentManipulator;
 import com.github.loa.document.service.domain.DocumentEntity;
+import com.github.loa.vault.service.backend.service.VaultDocumentStorage;
 import com.github.loa.vault.service.location.VaultLocation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,12 +22,12 @@ public class RecompressorService {
     private final VaultDocumentManager vaultDocumentManager;
     private final DocumentManipulator documentManipulator;
     private final VaultLocationFactory vaultLocationFactory;
+    private final VaultDocumentStorage vaultDocumentStorage;
     private final CompressionConfigurationProperties compressionConfigurationProperties;
 
     public void recompress(final DocumentEntity documentEntity, final DocumentCompression documentCompression) {
-        log.info("Migrating archived document " + documentEntity.getId() + " from "
-                + documentEntity.getCompression() + " compression to "
-                + compressionConfigurationProperties.getAlgorithm() + ".");
+        log.info("Migrating archived document " + documentEntity.getId() + " from " + documentEntity.getCompression()
+                + " compression to " + compressionConfigurationProperties.getAlgorithm() + ".");
 
         try (final InputStream documentContentInputStream = vaultDocumentManager.readDocument(documentEntity)
                 .getInputStream()) {
@@ -35,7 +36,7 @@ public class RecompressorService {
             vaultDocumentManager.removeDocument(documentEntity)
                     .doOnNext(documentEntity1 -> {
                         try (final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentEntity)) {
-                            vaultDocumentManager.saveDocumentContents(documentEntity1,
+                            vaultDocumentStorage.persistDocument(documentEntity1,
                                     new ByteArrayInputStream(documentContent), vaultLocation);
                         } catch (IOException e) {
                             throw new RuntimeException(e);
