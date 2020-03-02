@@ -1,4 +1,4 @@
-package com.github.loa.vault.service;
+package com.github.loa.vault.service.archive;
 
 import com.github.loa.checksum.service.ChecksumProvider;
 import com.github.loa.compression.configuration.CompressionConfigurationProperties;
