@@ -1,8 +1,7 @@
-package com.github.loa.vault.service;
+package com.github.loa.vault.service.location;
 
 import com.github.loa.compression.domain.DocumentCompression;
 import com.github.loa.document.service.domain.DocumentEntity;
-import com.github.loa.vault.service.location.VaultLocation;
 
 /**
  * A factory that creates {@link VaultLocation} instances for documents.

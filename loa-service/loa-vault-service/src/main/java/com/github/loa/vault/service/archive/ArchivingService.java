@@ -1,4 +1,4 @@
-package com.github.loa.vault.service;
+package com.github.loa.vault.service.archive;
 
 import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.document.service.entity.factory.DocumentEntityFactory;

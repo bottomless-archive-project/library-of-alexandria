@@ -2,8 +2,10 @@ package com.github.loa.vault.service;
 
 import com.github.loa.compression.service.provider.CompressionServiceProvider;
 import com.github.loa.document.service.domain.DocumentEntity;
+import com.github.loa.vault.service.archive.ArchivingService;
 import com.github.loa.vault.service.domain.DocumentArchivingContext;
 import com.github.loa.vault.service.location.VaultLocation;
+import com.github.loa.vault.service.location.VaultLocationFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.InputStreamResource;

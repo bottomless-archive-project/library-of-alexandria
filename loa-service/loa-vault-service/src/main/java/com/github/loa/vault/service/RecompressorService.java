@@ -6,6 +6,7 @@ import com.github.loa.document.service.DocumentManipulator;
 import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.vault.service.backend.service.VaultDocumentStorage;
 import com.github.loa.vault.service.location.VaultLocation;
+import com.github.loa.vault.service.location.VaultLocationFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

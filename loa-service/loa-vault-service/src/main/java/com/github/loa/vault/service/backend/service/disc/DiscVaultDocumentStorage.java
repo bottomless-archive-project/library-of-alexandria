@@ -3,7 +3,7 @@ package com.github.loa.vault.service.backend.service.disc;
 import com.github.loa.compression.service.provider.CompressionServiceProvider;
 import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.vault.domain.exception.VaultAccessException;
-import com.github.loa.vault.service.VaultLocationFactory;
+import com.github.loa.vault.service.location.VaultLocationFactory;
 import com.github.loa.vault.service.backend.domain.VaultPersistenceException;
 import com.github.loa.vault.service.backend.service.VaultDocumentStorage;
 import com.github.loa.vault.service.location.VaultLocation;
