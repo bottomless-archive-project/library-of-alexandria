@@ -56,24 +56,24 @@ public class DocumentDataParser {
         final Metadata metadata = new Metadata();
         final ParseContext context = new ParseContext();
 
-        try {
-            documentParser.parse(TikaInputStream.get(documentContents), handler, metadata, context);
-        } catch (IOException | SAXException | TikaException e) {
+        try (final InputStream inputStream = TikaInputStream.get(documentContents)) {
+            documentParser.parse(inputStream, handler, metadata, context);
+
+            final int pageCount = Optional.ofNullable(metadata.getInt(PagedText.N_PAGES)).orElse(0);
+            final Language language = languageDetector.detectLanguageOf(handler.toString());
+
+            return DocumentMetadata.builder()
+                    .id(documentId.toString())
+                    .title(metadata.get(TikaCoreProperties.TITLE))
+                    .author(metadata.get(TikaCoreProperties.CREATOR))
+                    .date(metadata.get(TikaCoreProperties.CREATED))
+                    .content(handler.toString())
+                    .language(language.getIsoCode639_1().toString())
+                    .type(documentType)
+                    .pageCount(pageCount)
+                    .build();
+        } catch (final IOException | SAXException | TikaException e) {
             throw new RuntimeException(e);
         }
-
-        final int pageCount = Optional.ofNullable(metadata.getInt(PagedText.N_PAGES)).orElse(0);
-        final Language language = languageDetector.detectLanguageOf(handler.toString());
-
-        return DocumentMetadata.builder()
-                .id(documentId.toString())
-                .title(metadata.get(TikaCoreProperties.TITLE))
-                .author(metadata.get(TikaCoreProperties.CREATOR))
-                .date(metadata.get(TikaCoreProperties.CREATED))
-                .content(handler.toString())
-                .language(language.getIsoCode639_1().toString())
-                .type(documentType)
-                .pageCount(pageCount)
-                .build();
     }
 }
