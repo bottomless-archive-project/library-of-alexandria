@@ -2,11 +2,8 @@ package com.github.loa.vault.service;
 
 import com.github.loa.compression.service.provider.CompressionServiceProvider;
 import com.github.loa.document.service.domain.DocumentEntity;
-import com.github.loa.document.service.entity.factory.DocumentEntityFactory;
-import com.github.loa.vault.service.backend.service.VaultDocumentStorage;
 import com.github.loa.vault.service.domain.DocumentArchivingContext;
 import com.github.loa.vault.service.location.VaultLocation;
-import com.mongodb.MongoWriteException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.InputStreamResource;
@@ -15,7 +12,6 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
 /**
@@ -26,12 +22,10 @@ import java.io.InputStream;
 @RequiredArgsConstructor
 public class VaultDocumentManager {
 
+    private final ArchivingService archivingService;
     private final ResourceLoader resourceLoader;
     private final VaultLocationFactory vaultLocationFactory;
     private final CompressionServiceProvider compressionServiceProvider;
-    private final DocumentEntityFactory documentEntityFactory;
-    private final DocumentCreationContextFactory documentCreationContextFactory;
-    private final VaultDocumentStorage vaultDocumentStorage;
 
     /**
      * Archive the document provided in the context.
@@ -40,27 +34,8 @@ public class VaultDocumentManager {
         log.info("Archiving document with id: {}.", documentArchivingContext.getId());
 
         return Mono.just(documentArchivingContext)
-                .flatMap(archivingContext -> documentCreationContextFactory.newContext(archivingContext)
-                        .flatMap(documentEntityFactory::newDocumentEntity)
-                        .doOnNext(documentEntity -> vaultDocumentStorage.persistDocument(documentEntity,
-                                new ByteArrayInputStream(documentArchivingContext.getContent())))
-                        .doOnError(throwable -> handleError(throwable, documentArchivingContext))
-                        .retry(throwable -> !isDuplicateIndexError(throwable))
-                )
+                .flatMap(archivingService::archiveDocument)
                 .onErrorResume(error -> Mono.empty());
-    }
-
-    private void handleError(final Throwable throwable, final DocumentArchivingContext documentArchivingContext) {
-        if (isDuplicateIndexError(throwable)) {
-            log.info("Document with id {} is a duplicate.", documentArchivingContext.getId());
-        } else {
-            log.error("Failed to save document!", throwable);
-        }
-    }
-
-    private boolean isDuplicateIndexError(final Throwable throwable) {
-        return throwable instanceof MongoWriteException
-                && throwable.getMessage().startsWith("E11000 duplicate key error");
     }
 
     /**
