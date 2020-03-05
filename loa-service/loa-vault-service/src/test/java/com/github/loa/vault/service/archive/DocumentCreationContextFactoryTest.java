@@ -7,7 +7,6 @@ import com.github.loa.document.service.domain.DocumentStatus;
 import com.github.loa.document.service.domain.DocumentType;
 import com.github.loa.document.service.entity.factory.domain.DocumentCreationContext;
 import com.github.loa.vault.configuration.VaultConfigurationProperties;
-import com.github.loa.vault.service.archive.DocumentCreationContextFactory;
 import com.github.loa.vault.service.domain.DocumentArchivingContext;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

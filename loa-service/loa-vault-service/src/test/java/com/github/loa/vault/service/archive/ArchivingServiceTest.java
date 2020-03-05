@@ -8,11 +8,16 @@ import com.github.loa.vault.service.domain.DocumentArchivingContext;
 import com.mongodb.MongoWriteException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -21,6 +26,8 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ArchivingServiceTest {
+
+    private final byte[] CONTENT = new byte[]{1, 2, 3, 4, 5};
 
     @Mock
     private DocumentEntityFactory documentEntityFactory;
@@ -31,11 +38,14 @@ class ArchivingServiceTest {
     @Mock
     private VaultDocumentStorage vaultDocumentStorage;
 
+    @Captor
+    private ArgumentCaptor<InputStream> documentContent;
+
     @InjectMocks
     private ArchivingService underTest;
 
     @Test
-    void testWhenPersistingAValidDocument() {
+    void testWhenPersistingAValidDocument() throws IOException {
         final DocumentArchivingContext documentArchivingContext = createDocumentArchivingContext();
         final DocumentCreationContext documentCreationContext = DocumentCreationContext.builder()
                 .build();
@@ -52,6 +62,8 @@ class ArchivingServiceTest {
                 .consumeNextWith(documentEntity1 -> assertThat(documentEntity1, is(documentEntity)))
                 .verifyComplete();
 
+        verify(vaultDocumentStorage).persistDocument(eq(documentEntity), documentContent.capture());
+        assertThat(documentContent.getValue().readAllBytes(), is(CONTENT));
         verify(documentCreationContextFactory).newContext(documentArchivingContext);
         verify(documentEntityFactory).newDocumentEntity(documentCreationContext);
     }
@@ -83,7 +95,7 @@ class ArchivingServiceTest {
 
     private DocumentArchivingContext createDocumentArchivingContext() {
         return DocumentArchivingContext.builder()
-                .content(new byte[]{})
+                .content(CONTENT)
                 .build();
     }
 }
