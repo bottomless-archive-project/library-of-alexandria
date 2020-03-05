@@ -14,6 +14,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -33,10 +35,30 @@ class ArchivingServiceTest {
     private ArchivingService underTest;
 
     @Test
-    void testRetryWhenErrorHappensWhilePersisting() {
-        final DocumentArchivingContext documentArchivingContext = DocumentArchivingContext.builder()
-                .content(new byte[]{})
+    void testWhenPersistingAValidDocument() {
+        final DocumentArchivingContext documentArchivingContext = createDocumentArchivingContext();
+        final DocumentCreationContext documentCreationContext = DocumentCreationContext.builder()
                 .build();
+        when(documentCreationContextFactory.newContext(documentArchivingContext))
+                .thenReturn(Mono.just(documentCreationContext));
+        final DocumentEntity documentEntity = DocumentEntity.builder()
+                .build();
+        when(documentEntityFactory.newDocumentEntity(documentCreationContext))
+                .thenReturn(Mono.just(documentEntity));
+
+        final Mono<DocumentEntity> result = underTest.archiveDocument(documentArchivingContext);
+
+        StepVerifier.create(result)
+                .consumeNextWith(documentEntity1 -> assertThat(documentEntity1, is(documentEntity)))
+                .verifyComplete();
+
+        verify(documentCreationContextFactory).newContext(documentArchivingContext);
+        verify(documentEntityFactory).newDocumentEntity(documentCreationContext);
+    }
+
+    @Test
+    void testRetryWhenErrorHappensWhilePersisting() {
+        final DocumentArchivingContext documentArchivingContext = createDocumentArchivingContext();
         final DocumentCreationContext documentCreationContext = DocumentCreationContext.builder()
                 .build();
         when(documentCreationContextFactory.newContext(documentArchivingContext))
@@ -55,6 +77,13 @@ class ArchivingServiceTest {
 
         StepVerifier.create(result)
                 .verifyError(MongoWriteException.class);
+
         verify(vaultDocumentStorage, times(2)).persistDocument(any(), any());
+    }
+
+    private DocumentArchivingContext createDocumentArchivingContext() {
+        return DocumentArchivingContext.builder()
+                .content(new byte[]{})
+                .build();
     }
 }
