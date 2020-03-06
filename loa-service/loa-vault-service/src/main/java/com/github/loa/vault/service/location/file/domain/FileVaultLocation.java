@@ -36,14 +36,9 @@ public class FileVaultLocation implements VaultLocation {
     public InputStream content() {
         try {
             return new FileInputStream(vaultLocation);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new VaultAccessException("Unable to get the content of a vault location!", e);
         }
-    }
-
-    @Override
-    public File file() {
-        return vaultLocation;
     }
 
     @Override

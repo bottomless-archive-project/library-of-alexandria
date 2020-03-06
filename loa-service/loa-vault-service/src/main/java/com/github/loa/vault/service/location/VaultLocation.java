@@ -1,14 +1,13 @@
 package com.github.loa.vault.service.location;
 
-import java.io.Closeable;
-import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
  * A location on the storage media where a document's contents are stored.
  */
-public interface VaultLocation extends Closeable {
+public interface VaultLocation extends AutoCloseable {
 
     /**
      * Return an output stream that points to the space on the storage media where the document's content are archived.
@@ -28,14 +27,10 @@ public interface VaultLocation extends Closeable {
     InputStream content();
 
     /**
-     * Get the content of the location as a {@link File}.
-     *
-     * @return the content of the location
-     */
-    File file();
-
-    /**
      * Removes any previously stored data from the location.
      */
     void clear();
+
+    @Override
+    void close() throws IOException;
 }

@@ -5,7 +5,6 @@ import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.document.service.domain.DocumentType;
 import com.github.loa.vault.configuration.location.file.FileConfigurationProperties;
 import com.github.loa.vault.service.location.VaultLocation;
-import com.github.loa.vault.service.location.file.domain.FileVaultLocation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,12 +12,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.io.File;
 import java.util.UUID;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class FileVaultLocationFactoryTest {
@@ -30,6 +29,9 @@ class FileVaultLocationFactoryTest {
             .type(DocumentType.EPUB)
             .compression(DocumentCompression.LZMA)
             .build();
+
+    @Mock
+    private FileFactory fileFactory;
 
     @Mock
     private FileConfigurationProperties fileConfigurationProperties;
@@ -47,23 +49,24 @@ class FileVaultLocationFactoryTest {
     void testGetLocationWhenNoCompression() {
         final VaultLocation result = underTest.getLocation(DOCUMENT_ENTITY, DocumentCompression.NONE);
 
-        assertThat(result.file().getPath(), is("testpath" + File.separator
-                + "123e4567-e89b-12d3-a456-556642440000.epub"));
+        assertThat(result, is(notNullValue()));
+        verify(fileFactory).newFile("testpath", "123e4567-e89b-12d3-a456-556642440000.epub");
     }
 
     @Test
     void testGetLocationWhenCompressionAreProvided() {
         final VaultLocation result = underTest.getLocation(DOCUMENT_ENTITY, DocumentCompression.GZIP);
 
-        assertThat(result.file().getPath(), is("testpath" + File.separator
-                + "123e4567-e89b-12d3-a456-556642440000.epub.gz"));
+        assertThat(result, is(notNullValue()));
+        verify(fileFactory).newFile("testpath", "123e4567-e89b-12d3-a456-556642440000.epub.gz");
     }
 
     @Test
     void testGetLocationWhenDocumentEntityProvidesTheCompression() {
         final VaultLocation result = underTest.getLocation(DOCUMENT_ENTITY);
 
-        assertThat(result.file().getPath(), is("testpath" + File.separator
-                + "123e4567-e89b-12d3-a456-556642440000.epub.lzma"));
+        assertThat(result, is(notNullValue()));
+        verify(fileFactory,atMostOnce()).newFile(any(), any());
+        verify(fileFactory).newFile("testpath", "123e4567-e89b-12d3-a456-556642440000.epub.lzma");
     }
 }

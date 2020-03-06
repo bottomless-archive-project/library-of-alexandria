@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -25,7 +24,6 @@ import java.io.InputStream;
 public class VaultDocumentManager {
 
     private final ArchivingService archivingService;
-    private final ResourceLoader resourceLoader;
     private final VaultLocationFactory vaultLocationFactory;
     private final CompressionServiceProvider compressionServiceProvider;
 
@@ -52,12 +50,12 @@ public class VaultDocumentManager {
         // The non-compressed entries will be served via a zero-copy response
         // See: https://developer.ibm.com/articles/j-zerocopy/
         if (documentEntity.isCompressed()) {
-            final InputStream decompressedInputStream = compressionServiceProvider
-                    .getCompressionService(documentEntity.getCompression()).decompress(vaultLocation.content());
+            final InputStream decompressedInputStream = compressionServiceProvider.getCompressionService(
+                    documentEntity.getCompression()).decompress(vaultLocation.content());
 
             return new InputStreamResource(decompressedInputStream);
         } else {
-            return resourceLoader.getResource("file:/" + vaultLocation.file().getPath());
+            return new InputStreamResource(vaultLocation.content());
         }
     }
 

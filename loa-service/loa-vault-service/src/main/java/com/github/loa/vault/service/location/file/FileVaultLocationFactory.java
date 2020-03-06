@@ -18,6 +18,7 @@ import java.io.File;
 @RequiredArgsConstructor
 public class FileVaultLocationFactory implements VaultLocationFactory {
 
+    private final FileFactory fileFactory;
     private final FileConfigurationProperties fileConfigurationProperties;
 
     /**
@@ -40,11 +41,12 @@ public class FileVaultLocationFactory implements VaultLocationFactory {
      */
     public VaultLocation getLocation(final DocumentEntity documentEntity, final DocumentCompression compression) {
         if (compression == DocumentCompression.NONE) {
-            return new FileVaultLocation(new File(fileConfigurationProperties.getPath(), documentEntity.getId() + "."
-                    + documentEntity.getType().getFileExtension()));
+            return new FileVaultLocation(fileFactory.newFile(fileConfigurationProperties.getPath(),
+                    documentEntity.getId() + "." + documentEntity.getType().getFileExtension()));
         } else {
-            return new FileVaultLocation(new File(fileConfigurationProperties.getPath(), documentEntity.getId() + "."
-                    + documentEntity.getType().getFileExtension() + "." + compression.getFileExtension()));
+            return new FileVaultLocation(fileFactory.newFile(fileConfigurationProperties.getPath(),
+                    documentEntity.getId() + "." + documentEntity.getType().getFileExtension() + "."
+                            + compression.getFileExtension()));
         }
     }
 }

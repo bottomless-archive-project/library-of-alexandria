@@ -38,14 +38,16 @@ public class DiscVaultDocumentStorage implements VaultDocumentStorage {
             try (final OutputStream outputStream = vaultLocation.destination()) {
                 IOUtils.copy(documentContents, outputStream);
             } catch (final IOException e) {
-                throw new VaultPersistenceException("Failed to persist entity to the vault.", e);
+                throw new VaultPersistenceException("Unable to move document with id " + documentEntity.getId()
+                        + " to the vault!", e);
             }
         } else {
             try (final OutputStream outputStream = compressionServiceProvider
                     .getCompressionService(documentEntity.getCompression()).compress(vaultLocation.destination())) {
                 IOUtils.copy(documentContents, outputStream);
             } catch (final IOException e) {
-                throw new VaultPersistenceException("Failed to persist entity to the vault.", e);
+                throw new VaultPersistenceException("Unable to move document with id " + documentEntity.getId()
+                        + " to the vault!", e);
             }
         }
     }
