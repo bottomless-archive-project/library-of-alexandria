@@ -4,6 +4,7 @@ import com.github.loa.compression.domain.DocumentCompression;
 import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.document.service.domain.DocumentType;
 import com.github.loa.vault.configuration.location.file.FileConfigurationProperties;
+import com.github.loa.vault.service.location.VaultLocation;
 import com.github.loa.vault.service.location.file.domain.FileVaultLocation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -44,7 +45,7 @@ class FileVaultLocationFactoryTest {
 
     @Test
     void testGetLocationWhenNoCompression() {
-        final FileVaultLocation result = underTest.getLocation(DOCUMENT_ENTITY, DocumentCompression.NONE);
+        final VaultLocation result = underTest.getLocation(DOCUMENT_ENTITY, DocumentCompression.NONE);
 
         assertThat(result.file().getPath(), is("testpath" + File.separator
                 + "123e4567-e89b-12d3-a456-556642440000.epub"));
@@ -52,7 +53,7 @@ class FileVaultLocationFactoryTest {
 
     @Test
     void testGetLocationWhenCompressionAreProvided() {
-        final FileVaultLocation result = underTest.getLocation(DOCUMENT_ENTITY, DocumentCompression.GZIP);
+        final VaultLocation result = underTest.getLocation(DOCUMENT_ENTITY, DocumentCompression.GZIP);
 
         assertThat(result.file().getPath(), is("testpath" + File.separator
                 + "123e4567-e89b-12d3-a456-556642440000.epub.gz"));
@@ -60,7 +61,7 @@ class FileVaultLocationFactoryTest {
 
     @Test
     void testGetLocationWhenDocumentEntityProvidesTheCompression() {
-        final FileVaultLocation result = underTest.getLocation(DOCUMENT_ENTITY);
+        final VaultLocation result = underTest.getLocation(DOCUMENT_ENTITY);
 
         assertThat(result.file().getPath(), is("testpath" + File.separator
                 + "123e4567-e89b-12d3-a456-556642440000.epub.lzma"));
