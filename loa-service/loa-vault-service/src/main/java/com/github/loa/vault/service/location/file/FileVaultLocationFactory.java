@@ -3,13 +3,11 @@ package com.github.loa.vault.service.location.file;
 import com.github.loa.compression.domain.DocumentCompression;
 import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.vault.configuration.location.file.FileConfigurationProperties;
-import com.github.loa.vault.service.location.VaultLocationFactory;
 import com.github.loa.vault.service.location.VaultLocation;
+import com.github.loa.vault.service.location.VaultLocationFactory;
 import com.github.loa.vault.service.location.file.domain.FileVaultLocation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.io.File;
 
 /**
  * A factory that create a local disc backed {@link VaultLocation} instances for documents.
