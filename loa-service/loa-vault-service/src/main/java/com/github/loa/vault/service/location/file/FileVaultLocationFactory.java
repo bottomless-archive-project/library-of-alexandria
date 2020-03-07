@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @RequiredArgsConstructor
-@ConditionalOnProperty(value = "loa.vault.location.type", havingValue = "disc", matchIfMissing = true)
+@ConditionalOnProperty(value = "loa.vault.location.type", havingValue = "file", matchIfMissing = true)
 public class FileVaultLocationFactory implements VaultLocationFactory {
 
     private final FileFactory fileFactory;

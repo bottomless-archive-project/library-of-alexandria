@@ -2,6 +2,9 @@ package com.github.loa.vault.service.location.s3.domain;
 
 import com.github.loa.vault.service.location.VaultLocation;
 import lombok.RequiredArgsConstructor;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
@@ -14,6 +17,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.time.Duration;
 
@@ -27,7 +32,13 @@ public class S3VaultLocation implements VaultLocation {
     @Override
     public OutputStream destination() {
         //TODO: The S3Presigner should be injected!
-        try (S3Presigner presigner = S3Presigner.create()) {
+        try (S3Presigner presigner = S3Presigner.builder()
+                .endpointOverride(new URI("http://127.0.0.1:9000/"))
+                .region(Region.US_EAST_1)
+                .credentialsProvider(StaticCredentialsProvider.create(
+                        AwsBasicCredentials.create("minioadmin", "minioadmin")))
+                .build()
+        ) {
             final PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                     .bucket(bucketName)
                     .key(fileName)
@@ -52,6 +63,8 @@ public class S3VaultLocation implements VaultLocation {
                 //TODO!
                 throw new RuntimeException(e);
             }
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
         }
     }
 

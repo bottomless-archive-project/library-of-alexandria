@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 
 @Service
-@ConditionalOnProperty(value = "loa.vault.location.type", havingValue = "disc", matchIfMissing = true)
+@ConditionalOnProperty(value = "loa.vault.location.type", havingValue = "file", matchIfMissing = true)
 public class FileFactory {
 
     public File newFile(final String filePath, final String fileName) {
