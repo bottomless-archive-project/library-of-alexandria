@@ -2,14 +2,10 @@ package com.github.loa.vault.service.location.s3.domain;
 
 import com.github.loa.vault.service.location.VaultLocation;
 import lombok.RequiredArgsConstructor;
-import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
-import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.core.sync.RequestBody;
-import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
@@ -19,8 +15,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.time.Duration;
 
 @RequiredArgsConstructor
@@ -29,27 +23,17 @@ public class S3VaultLocation implements VaultLocation {
     private final String bucketName;
     private final String fileName;
     private final String contentType;
+    private final S3Client s3Client;
 
     @Override
     public void upload(final byte[] documentContents) {
-        //TODO: The S3Client should be injected!
-        try (S3Client s3Client = S3Client.builder()
-                .endpointOverride(new URI("http://127.0.0.1:9000/"))
-                .region(Region.US_EAST_1)
-                .credentialsProvider(StaticCredentialsProvider.create(
-                        AwsBasicCredentials.create("minioadmin", "minioadmin")))
-                .build()
-        ) {
-            final PutObjectRequest putObjectRequest = PutObjectRequest.builder()
-                    .bucket(bucketName)
-                    .key(fileName)
-                    .contentType(contentType)
-                    .build();
+        final PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+                .bucket(bucketName)
+                .key(fileName)
+                .contentType(contentType)
+                .build();
 
-            s3Client.putObject(putObjectRequest, RequestBody.fromBytes(documentContents));
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
+        s3Client.putObject(putObjectRequest, RequestBody.fromBytes(documentContents));
     }
 
     @Override
