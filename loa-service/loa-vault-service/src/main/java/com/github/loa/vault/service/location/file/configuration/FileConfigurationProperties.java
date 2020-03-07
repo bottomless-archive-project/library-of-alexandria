@@ -1,4 +1,4 @@
-package com.github.loa.vault.configuration.location.file;
+package com.github.loa.vault.service.location.file.configuration;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

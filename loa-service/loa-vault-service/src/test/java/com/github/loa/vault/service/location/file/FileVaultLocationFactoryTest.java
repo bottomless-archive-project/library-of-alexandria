@@ -3,7 +3,7 @@ package com.github.loa.vault.service.location.file;
 import com.github.loa.compression.domain.DocumentCompression;
 import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.document.service.domain.DocumentType;
-import com.github.loa.vault.configuration.location.file.FileConfigurationProperties;
+import com.github.loa.vault.service.location.file.configuration.FileConfigurationProperties;
 import com.github.loa.vault.service.location.VaultLocation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

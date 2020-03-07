@@ -1,4 +1,4 @@
-package com.github.loa.vault.configuration;
+package com.github.loa.vault.service.location.configuration;
 
 import com.github.loa.vault.domain.VaultType;
 import lombok.Data;

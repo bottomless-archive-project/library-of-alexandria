@@ -2,11 +2,12 @@ package com.github.loa.vault.service.location.file;
 
 import com.github.loa.compression.domain.DocumentCompression;
 import com.github.loa.document.service.domain.DocumentEntity;
-import com.github.loa.vault.configuration.location.file.FileConfigurationProperties;
+import com.github.loa.vault.service.location.file.configuration.FileConfigurationProperties;
 import com.github.loa.vault.service.location.VaultLocation;
 import com.github.loa.vault.service.location.VaultLocationFactory;
 import com.github.loa.vault.service.location.file.domain.FileVaultLocation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 /**
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @RequiredArgsConstructor
+@ConditionalOnProperty(value = "loa.vault.location.type", havingValue = "disc", matchIfMissing = true)
 public class FileVaultLocationFactory implements VaultLocationFactory {
 
     private final FileFactory fileFactory;

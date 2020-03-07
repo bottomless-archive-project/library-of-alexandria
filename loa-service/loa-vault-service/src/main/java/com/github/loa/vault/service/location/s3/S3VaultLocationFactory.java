@@ -5,9 +5,11 @@ import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.vault.service.location.VaultLocation;
 import com.github.loa.vault.service.location.VaultLocationFactory;
 import com.github.loa.vault.service.location.s3.domain.S3VaultLocation;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 @Service
+@ConditionalOnProperty(value = "loa.vault.location.type", havingValue = "s3")
 public class S3VaultLocationFactory implements VaultLocationFactory {
 
     //TODO: We should be able to configure this from a config property!
