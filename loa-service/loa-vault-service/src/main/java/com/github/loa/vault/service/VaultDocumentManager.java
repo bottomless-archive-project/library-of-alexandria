@@ -2,6 +2,7 @@ package com.github.loa.vault.service;
 
 import com.github.loa.compression.service.provider.CompressionServiceProvider;
 import com.github.loa.document.service.domain.DocumentEntity;
+import com.github.loa.vault.domain.exception.VaultAccessException;
 import com.github.loa.vault.service.archive.ArchivingService;
 import com.github.loa.vault.service.domain.DocumentArchivingContext;
 import com.github.loa.vault.service.location.VaultLocation;
@@ -13,6 +14,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 /**
@@ -49,13 +51,17 @@ public class VaultDocumentManager {
 
         // The non-compressed entries will be served via a zero-copy response
         // See: https://developer.ibm.com/articles/j-zerocopy/
-        if (documentEntity.isCompressed()) {
-            final InputStream decompressedInputStream = compressionServiceProvider.getCompressionService(
-                    documentEntity.getCompression()).decompress(vaultLocation.content());
+        try (InputStream documentContentsInputStream = vaultLocation.download()) {
+            if (documentEntity.isCompressed()) {
+                final InputStream decompressedInputStream = compressionServiceProvider.getCompressionService(
+                        documentEntity.getCompression()).decompress(documentContentsInputStream);
 
-            return new InputStreamResource(decompressedInputStream);
-        } else {
-            return new InputStreamResource(vaultLocation.content());
+                return new InputStreamResource(decompressedInputStream);
+            } else {
+                return new InputStreamResource(documentContentsInputStream);
+            }
+        } catch (final IOException e) {
+            throw new VaultAccessException("Unable to download document!", e);
         }
     }
 

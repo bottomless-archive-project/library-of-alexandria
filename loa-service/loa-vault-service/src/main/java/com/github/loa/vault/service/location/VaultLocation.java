@@ -14,12 +14,11 @@ public interface VaultLocation extends AutoCloseable {
     void upload(final byte[] documentContents) throws IOException;
 
     /**
-     * Get the content of the location as an input stream. The caller of this method is responsible for closing the
-     * returned stream.
+     * Get the content of the location.
      *
      * @return the content of the location
      */
-    InputStream content();
+    InputStream download();
 
     /**
      * Removes any previously stored data from the location.

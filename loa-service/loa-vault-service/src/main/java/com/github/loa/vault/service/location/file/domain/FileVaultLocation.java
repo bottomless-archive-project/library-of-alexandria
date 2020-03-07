@@ -33,7 +33,7 @@ public class FileVaultLocation implements VaultLocation {
      * @return the content of the file
      */
     @Override
-    public InputStream content() {
+    public InputStream download() {
         try {
             return new FileInputStream(vaultLocation);
         } catch (final IOException e) {
