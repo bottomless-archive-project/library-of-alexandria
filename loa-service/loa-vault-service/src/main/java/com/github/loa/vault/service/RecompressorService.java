@@ -35,11 +35,9 @@ public class RecompressorService {
 
             vaultDocumentManager.removeDocument(documentEntity)
                     .doOnNext(documentEntity1 -> {
-                        try (final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentEntity)) {
-                            vaultDocumentStorage.persistDocument(documentEntity1, documentContent, vaultLocation);
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
+                        final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentEntity);
+
+                        vaultDocumentStorage.persistDocument(documentEntity1, documentContent, vaultLocation);
                     })
                     .subscribe();
 

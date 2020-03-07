@@ -2,16 +2,13 @@ package com.github.loa.vault.service.backend.service;
 
 import com.github.loa.compression.service.provider.CompressionServiceProvider;
 import com.github.loa.document.service.domain.DocumentEntity;
-import com.github.loa.vault.domain.exception.VaultAccessException;
 import com.github.loa.vault.service.backend.domain.VaultPersistenceException;
 import com.github.loa.vault.service.location.VaultLocation;
 import com.github.loa.vault.service.location.VaultLocationFactory;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.io.IOUtils;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.io.OutputStream;
 
 /**
  * The document storage is responsible to store and later retrieve the content of a document.
@@ -30,12 +27,9 @@ public class VaultDocumentStorage {
      * @param documentContents the contents of the document
      */
     public void persistDocument(final DocumentEntity documentEntity, final byte[] documentContents) {
-        try (final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentEntity)) {
-            persistDocument(documentEntity, documentContents, vaultLocation);
-        } catch (final IOException e) {
-            throw new VaultAccessException("Unable to move document with id " + documentEntity.getId()
-                    + " to the vault!", e);
-        }
+        final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentEntity);
+
+        persistDocument(documentEntity, documentContents, vaultLocation);
     }
 
     /**
