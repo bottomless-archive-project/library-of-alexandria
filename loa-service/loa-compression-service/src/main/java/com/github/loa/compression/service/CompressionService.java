@@ -13,7 +13,7 @@ public interface CompressionService {
      *
      * @param compressedData the output stream to write the compressed data to
      */
-    OutputStream compress(OutputStream compressedData);
+    byte[] compress(byte[] compressedData);
 
     /**
      * Decompress the data provided on the input stream and write it to the provided output stream.

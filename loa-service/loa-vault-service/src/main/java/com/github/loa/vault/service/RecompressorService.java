@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -37,8 +36,7 @@ public class RecompressorService {
             vaultDocumentManager.removeDocument(documentEntity)
                     .doOnNext(documentEntity1 -> {
                         try (final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentEntity)) {
-                            vaultDocumentStorage.persistDocument(documentEntity1,
-                                    new ByteArrayInputStream(documentContent), vaultLocation);
+                            vaultDocumentStorage.persistDocument(documentEntity1, documentContent, vaultLocation);
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }

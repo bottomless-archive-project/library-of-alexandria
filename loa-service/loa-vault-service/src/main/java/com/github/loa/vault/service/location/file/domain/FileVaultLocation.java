@@ -3,6 +3,7 @@ package com.github.loa.vault.service.location.file.domain;
 import com.github.loa.vault.domain.exception.VaultAccessException;
 import com.github.loa.vault.service.location.VaultLocation;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.io.IOUtils;
 
 import java.io.*;
 
@@ -15,14 +16,13 @@ public class FileVaultLocation implements VaultLocation {
      * Return an output stream that points to the space where the document's content are archived. Should be used if
      * you want to modify the content of the document.
      *
-     * @return the location for the document's content
      * @throws VaultAccessException when unable to create the destination file
      */
     @Override
-    public OutputStream destination() {
-        try {
-            return new FileOutputStream(vaultLocation);
-        } catch (FileNotFoundException e) {
+    public void upload(final byte[] documentContents) {
+        try (final OutputStream outputStream = new FileOutputStream(vaultLocation)) {
+            IOUtils.copy(new ByteArrayInputStream(documentContents), outputStream);
+        } catch (final IOException e) {
             throw new VaultAccessException("Unable to create file in vault!", e);
         }
     }

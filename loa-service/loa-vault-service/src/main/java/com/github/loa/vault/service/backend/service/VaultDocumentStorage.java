@@ -3,15 +3,14 @@ package com.github.loa.vault.service.backend.service;
 import com.github.loa.compression.service.provider.CompressionServiceProvider;
 import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.vault.domain.exception.VaultAccessException;
-import com.github.loa.vault.service.location.VaultLocationFactory;
 import com.github.loa.vault.service.backend.domain.VaultPersistenceException;
 import com.github.loa.vault.service.location.VaultLocation;
+import com.github.loa.vault.service.location.VaultLocationFactory;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
@@ -30,7 +29,7 @@ public class VaultDocumentStorage {
      * @param documentEntity   the document to store the contents for
      * @param documentContents the contents of the document
      */
-    public void persistDocument(final DocumentEntity documentEntity, final InputStream documentContents) {
+    public void persistDocument(final DocumentEntity documentEntity, final byte[] documentContents) {
         try (final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentEntity)) {
             persistDocument(documentEntity, documentContents, vaultLocation);
         } catch (final IOException e) {
@@ -46,19 +45,21 @@ public class VaultDocumentStorage {
      * @param documentContents the contents of the document
      * @param vaultLocation    the vault location where the document's contents should be stored
      */
-    public void persistDocument(final DocumentEntity documentEntity, final InputStream documentContents,
+    public void persistDocument(final DocumentEntity documentEntity, final byte[] documentContents,
             final VaultLocation vaultLocation) {
         if (!documentEntity.isCompressed()) {
-            try (final OutputStream outputStream = vaultLocation.destination()) {
-                IOUtils.copy(documentContents, outputStream);
+            try {
+                vaultLocation.upload(documentContents);
             } catch (final IOException e) {
                 throw new VaultPersistenceException("Unable to move document with id " + documentEntity.getId()
                         + " to the vault!", e);
             }
         } else {
-            try (final OutputStream outputStream = compressionServiceProvider
-                    .getCompressionService(documentEntity.getCompression()).compress(vaultLocation.destination())) {
-                IOUtils.copy(documentContents, outputStream);
+            final byte[] compressedDocumentContents = compressionServiceProvider.getCompressionService(
+                    documentEntity.getCompression()).compress(documentContents);
+
+            try {
+                vaultLocation.upload(compressedDocumentContents);
             } catch (final IOException e) {
                 throw new VaultPersistenceException("Unable to move document with id " + documentEntity.getId()
                         + " to the vault!", e);

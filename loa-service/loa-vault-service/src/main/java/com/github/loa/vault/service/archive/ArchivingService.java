@@ -10,8 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import java.io.ByteArrayInputStream;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -25,7 +23,7 @@ public class ArchivingService {
         return documentCreationContextFactory.newContext(documentArchivingContext)
                 .flatMap(documentEntityFactory::newDocumentEntity)
                 .doOnNext(documentEntity -> vaultDocumentStorage.persistDocument(documentEntity,
-                        new ByteArrayInputStream(documentArchivingContext.getContent())))
+                        documentArchivingContext.getContent()))
                 .doOnError(throwable -> handleError(throwable, documentArchivingContext))
                 .retry(throwable -> !isDuplicateIndexError(throwable));
     }

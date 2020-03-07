@@ -16,9 +16,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -39,13 +36,13 @@ class ArchivingServiceTest {
     private VaultDocumentStorage vaultDocumentStorage;
 
     @Captor
-    private ArgumentCaptor<InputStream> documentContent;
+    private ArgumentCaptor<byte[]> documentContent;
 
     @InjectMocks
     private ArchivingService underTest;
 
     @Test
-    void testWhenPersistingAValidDocument() throws IOException {
+    void testWhenPersistingAValidDocument() {
         final DocumentArchivingContext documentArchivingContext = createDocumentArchivingContext();
         final DocumentCreationContext documentCreationContext = DocumentCreationContext.builder()
                 .build();
@@ -63,7 +60,7 @@ class ArchivingServiceTest {
                 .verifyComplete();
 
         verify(vaultDocumentStorage).persistDocument(eq(documentEntity), documentContent.capture());
-        assertThat(documentContent.getValue().readAllBytes(), is(CONTENT));
+        assertThat(documentContent.getValue(), is(CONTENT));
         verify(documentCreationContextFactory).newContext(documentArchivingContext);
         verify(documentEntityFactory).newDocumentEntity(documentCreationContext);
     }

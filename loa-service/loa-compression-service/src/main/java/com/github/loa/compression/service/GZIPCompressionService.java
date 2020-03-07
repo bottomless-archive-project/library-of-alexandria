@@ -4,18 +4,24 @@ import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 
 @Service
 public class GZIPCompressionService implements CompressionService {
 
     @Override
-    public OutputStream compress(final OutputStream compressedDocumentContent) {
+    public byte[] compress(final byte[] compressedDocumentContent) {
         try {
-            return new GzipCompressorOutputStream(compressedDocumentContent);
-        } catch (IOException e) {
+            final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            final GzipCompressorOutputStream gzipOutputStream = new GzipCompressorOutputStream(byteArrayOutputStream);
+
+            gzipOutputStream.write(compressedDocumentContent);
+            gzipOutputStream.close();
+
+            return byteArrayOutputStream.toByteArray();
+        } catch (final IOException e) {
             throw new RuntimeException("Error while compressing document!", e);
         }
     }
@@ -24,7 +30,7 @@ public class GZIPCompressionService implements CompressionService {
     public InputStream decompress(final InputStream compressedDocumentContent) {
         try {
             return new GzipCompressorInputStream(compressedDocumentContent);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new RuntimeException("Error while decompressing document!", e);
         }
     }

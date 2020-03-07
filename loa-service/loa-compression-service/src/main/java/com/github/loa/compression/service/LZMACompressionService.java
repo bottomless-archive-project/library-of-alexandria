@@ -4,18 +4,24 @@ import org.apache.commons.compress.compressors.lzma.LZMACompressorInputStream;
 import org.apache.commons.compress.compressors.lzma.LZMACompressorOutputStream;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 
 @Service
 public class LZMACompressionService implements CompressionService {
 
     @Override
-    public OutputStream compress(OutputStream compressedDocumentContent) {
+    public byte[] compress(final byte[] compressedDocumentContent) {
         try {
-            return new LZMACompressorOutputStream(compressedDocumentContent);
-        } catch (IOException e) {
+            final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            final LZMACompressorOutputStream gzipOutputStream = new LZMACompressorOutputStream(byteArrayOutputStream);
+
+            gzipOutputStream.write(compressedDocumentContent);
+            gzipOutputStream.close();
+
+            return byteArrayOutputStream.toByteArray();
+        } catch (final IOException e) {
             throw new RuntimeException("Error while compressing document!", e);
         }
     }
@@ -24,7 +30,7 @@ public class LZMACompressionService implements CompressionService {
     public InputStream decompress(final InputStream compressedDocumentContent) {
         try {
             return new LZMACompressorInputStream(compressedDocumentContent);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new RuntimeException("Error while decompressing document!", e);
         }
     }

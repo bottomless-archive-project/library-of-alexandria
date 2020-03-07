@@ -4,13 +4,15 @@ import com.github.loa.vault.service.location.VaultLocation;
 import lombok.RequiredArgsConstructor;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
-import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
 import software.amazon.awssdk.utils.IoUtils;
 
 import java.io.IOException;
@@ -19,7 +21,6 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.time.Duration;
 
 @RequiredArgsConstructor
@@ -30,9 +31,9 @@ public class S3VaultLocation implements VaultLocation {
     private final String contentType;
 
     @Override
-    public OutputStream destination() {
-        //TODO: The S3Presigner should be injected!
-        try (S3Presigner presigner = S3Presigner.builder()
+    public void upload(final byte[] documentContents) {
+        //TODO: The S3Client should be injected!
+        try (S3Client s3Client = S3Client.builder()
                 .endpointOverride(new URI("http://127.0.0.1:9000/"))
                 .region(Region.US_EAST_1)
                 .credentialsProvider(StaticCredentialsProvider.create(
@@ -42,27 +43,10 @@ public class S3VaultLocation implements VaultLocation {
             final PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                     .bucket(bucketName)
                     .key(fileName)
+                    .contentType(contentType)
                     .build();
 
-            final PutObjectPresignRequest putObjectPresignRequest = PutObjectPresignRequest.builder()
-                    .signatureDuration(Duration.ofMinutes(10))
-                    .putObjectRequest(putObjectRequest)
-                    .build();
-
-            final URL url = presigner.presignPutObject(putObjectPresignRequest).url();
-
-            try {
-                final HttpURLConnection connection;
-                connection = (HttpURLConnection) url.openConnection();
-                connection.setDoOutput(true);
-                connection.setRequestProperty("Content-Type", contentType);
-                connection.setRequestMethod("PUT");
-
-                return connection.getOutputStream();
-            } catch (IOException e) {
-                //TODO!
-                throw new RuntimeException(e);
-            }
+            s3Client.putObject(putObjectRequest, RequestBody.fromBytes(documentContents));
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
