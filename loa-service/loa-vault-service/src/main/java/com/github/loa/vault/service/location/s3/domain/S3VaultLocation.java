@@ -45,9 +45,4 @@ public class S3VaultLocation implements VaultLocation {
     public void clear() {
 
     }
-
-    @Override
-    public void close() {
-
-    }
 }

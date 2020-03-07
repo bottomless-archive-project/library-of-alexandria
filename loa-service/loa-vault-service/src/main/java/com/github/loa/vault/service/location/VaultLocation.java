@@ -6,7 +6,7 @@ import java.io.InputStream;
 /**
  * A location on the storage media where a document's contents are stored.
  */
-public interface VaultLocation extends AutoCloseable {
+public interface VaultLocation {
 
     /**
      * Insert/replace the contents of the document located under this location.
@@ -24,7 +24,4 @@ public interface VaultLocation extends AutoCloseable {
      * Removes any previously stored data from the location.
      */
     void clear();
-
-    @Override
-    void close() throws IOException;
 }
