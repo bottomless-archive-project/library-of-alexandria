@@ -1,6 +1,5 @@
 package com.github.loa.vault.service.location;
 
-import java.io.IOException;
 import java.io.InputStream;
 
 /**
@@ -11,7 +10,7 @@ public interface VaultLocation {
     /**
      * Insert/replace the contents of the document located under this location.
      */
-    void upload(final byte[] documentContents) throws IOException;
+    void upload(final byte[] documentContents);
 
     /**
      * Get the content of the location.

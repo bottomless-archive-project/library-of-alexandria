@@ -8,8 +8,6 @@ import com.github.loa.vault.service.location.VaultLocationFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-
 /**
  * The document storage is responsible to store and later retrieve the content of a document.
  */
@@ -41,23 +39,14 @@ public class VaultDocumentStorage {
      */
     public void persistDocument(final DocumentEntity documentEntity, final byte[] documentContents,
             final VaultLocation vaultLocation) {
-        if (!documentEntity.isCompressed()) {
-            try {
-                vaultLocation.upload(documentContents);
-            } catch (final IOException e) {
-                throw new VaultPersistenceException("Unable to move document with id " + documentEntity.getId()
-                        + " to the vault!", e);
-            }
-        } else {
-            final byte[] compressedDocumentContents = compressionServiceProvider.getCompressionService(
-                    documentEntity.getCompression()).compress(documentContents);
+        final byte[] contentToSave = documentEntity.isCompressed() ? compressionServiceProvider.getCompressionService(
+                documentEntity.getCompression()).compress(documentContents) : documentContents;
 
-            try {
-                vaultLocation.upload(compressedDocumentContents);
-            } catch (final IOException e) {
-                throw new VaultPersistenceException("Unable to move document with id " + documentEntity.getId()
-                        + " to the vault!", e);
-            }
+        try {
+            vaultLocation.upload(contentToSave);
+        } catch (final Exception e) {
+            throw new VaultPersistenceException("Unable to move document with id " + documentEntity.getId()
+                    + " to the vault!", e);
         }
     }
 }
