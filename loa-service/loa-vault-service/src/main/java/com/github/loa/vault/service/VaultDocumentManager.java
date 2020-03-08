@@ -41,7 +41,7 @@ public class VaultDocumentManager {
     }
 
     /**
-     * Return the content of a document as an {@link InputStream}.
+     * Return the content of a document as a {@link Resource}.
      *
      * @param documentEntity the document to return the content for
      * @return the content of the document
@@ -51,17 +51,15 @@ public class VaultDocumentManager {
 
         // The non-compressed entries will be served via a zero-copy response
         // See: https://developer.ibm.com/articles/j-zerocopy/
-        try (InputStream documentContentsInputStream = vaultLocation.download()) {
-            if (documentEntity.isCompressed()) {
-                final InputStream decompressedInputStream = compressionServiceProvider.getCompressionService(
-                        documentEntity.getCompression()).decompress(documentContentsInputStream);
+        final InputStream documentContentsInputStream = vaultLocation.download();
 
-                return new InputStreamResource(decompressedInputStream);
-            } else {
-                return new InputStreamResource(documentContentsInputStream);
-            }
-        } catch (final IOException e) {
-            throw new VaultAccessException("Unable to download document!", e);
+        if (documentEntity.isCompressed()) {
+            final InputStream decompressedInputStream = compressionServiceProvider.getCompressionService(
+                    documentEntity.getCompression()).decompress(documentContentsInputStream);
+
+            return new InputStreamResource(decompressedInputStream);
+        } else {
+            return new InputStreamResource(documentContentsInputStream);
         }
     }
 
