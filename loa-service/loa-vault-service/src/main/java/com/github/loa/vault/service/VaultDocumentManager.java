@@ -2,7 +2,6 @@ package com.github.loa.vault.service;
 
 import com.github.loa.compression.service.provider.CompressionServiceProvider;
 import com.github.loa.document.service.domain.DocumentEntity;
-import com.github.loa.vault.domain.exception.VaultAccessException;
 import com.github.loa.vault.service.archive.ArchivingService;
 import com.github.loa.vault.service.domain.DocumentArchivingContext;
 import com.github.loa.vault.service.location.VaultLocation;
@@ -14,7 +13,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import java.io.IOException;
 import java.io.InputStream;
 
 /**
