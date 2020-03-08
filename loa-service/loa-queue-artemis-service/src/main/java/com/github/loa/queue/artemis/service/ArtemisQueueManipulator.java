@@ -52,7 +52,7 @@ public class ArtemisQueueManipulator implements QueueManipulator {
             if (!queueQuery.isExists()) {
                 initializeQueue(queue);
             }
-        } catch (ActiveMQException e) {
+        } catch (final ActiveMQException e) {
             throw new QueueException("Unable to initialize the " + queue.getName() + " queue!", e);
         }
     }
@@ -88,7 +88,7 @@ public class ArtemisQueueManipulator implements QueueManipulator {
                     SimpleString.toSimpleString(queue.getName()));
 
             return queueQuery.getMessageCount();
-        } catch (ActiveMQException e) {
+        } catch (final ActiveMQException e) {
             throw new QueueException("Unable to query the " + queue.getName() + " queue!", e);
         }
     }
@@ -111,7 +111,7 @@ public class ArtemisQueueManipulator implements QueueManipulator {
         clientProducerExecutor.invokeProducer(queue, (clientProducer -> {
             try {
                 clientProducer.send(clientMessage);
-            } catch (ActiveMQException e) {
+            } catch (final ActiveMQException e) {
                 throw new QueueException("Unable to send message to the " + queue.getName() + " queue!", e);
             }
         }));
@@ -137,7 +137,7 @@ public class ArtemisQueueManipulator implements QueueManipulator {
                         .orElseThrow(() -> new QueueException("No deserializer found for queue: "
                                 + queue.getName() + "!"))
                         .deserialize(clientMessage);
-            } catch (ActiveMQException e) {
+            } catch (final ActiveMQException e) {
                 throw new QueueException("Unable to read message from the " + queue.getName() + " queue!", e);
             }
         }));
