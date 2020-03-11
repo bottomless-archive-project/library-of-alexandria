@@ -1,0 +1,60 @@
+package com.github.loa.vault.service.location.s3.domain;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.StorageClass;
+
+import java.io.IOException;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.verify;
+
+@ExtendWith(MockitoExtension.class)
+class S3VaultLocationTest {
+
+    private final String BUCKET_NAME = "test-bucket";
+    private final String FILE_NAME = "example.pdf";
+    private final String CONTENT_TYPE = "application/pdf";
+    private final byte[] CONTENT = {1, 2, 3, 4, 5};
+
+    @Mock
+    private S3Client s3Client;
+
+    @Captor
+    private ArgumentCaptor<PutObjectRequest> putObjectRequestArgumentCaptor;
+
+    @Captor
+    private ArgumentCaptor<RequestBody> requestBodyArgumentCaptor;
+
+    private S3VaultLocation underTest;
+
+    @BeforeEach
+    void setup() {
+        underTest = new S3VaultLocation(BUCKET_NAME, FILE_NAME, CONTENT_TYPE, s3Client);
+    }
+
+    @Test
+    void testUpload() throws IOException {
+        underTest.upload(CONTENT);
+
+        verify(s3Client).putObject(putObjectRequestArgumentCaptor.capture(), requestBodyArgumentCaptor.capture());
+
+        final PutObjectRequest putObjectRequest = putObjectRequestArgumentCaptor.getValue();
+        assertThat(putObjectRequest.bucket(), is(BUCKET_NAME));
+        assertThat(putObjectRequest.key(), is(FILE_NAME));
+        assertThat(putObjectRequest.contentType(), is(CONTENT_TYPE));
+        assertThat(putObjectRequest.storageClass(), is(StorageClass.REDUCED_REDUNDANCY));
+
+        final RequestBody requestBody = requestBodyArgumentCaptor.getValue();
+        assertThat(requestBody.contentStreamProvider().newStream().readAllBytes(), is(CONTENT));
+    }
+}
