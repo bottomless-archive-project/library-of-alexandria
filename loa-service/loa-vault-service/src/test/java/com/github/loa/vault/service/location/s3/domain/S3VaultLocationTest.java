@@ -8,15 +8,19 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.core.sync.ResponseTransformer;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.StorageClass;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.verify;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class S3VaultLocationTest {
@@ -31,6 +35,9 @@ class S3VaultLocationTest {
 
     @Captor
     private ArgumentCaptor<PutObjectRequest> putObjectRequestArgumentCaptor;
+
+    @Captor
+    private ArgumentCaptor<GetObjectRequest> getObjectRequestArgumentCaptor;
 
     @Captor
     private ArgumentCaptor<RequestBody> requestBodyArgumentCaptor;
@@ -56,5 +63,22 @@ class S3VaultLocationTest {
 
         final RequestBody requestBody = requestBodyArgumentCaptor.getValue();
         assertThat(requestBody.contentStreamProvider().newStream().readAllBytes(), is(CONTENT));
+    }
+
+    @Test
+    void testDownload() {
+        final InputStream downloadResult = mock(InputStream.class);
+        when(s3Client.getObject(any(GetObjectRequest.class), any(ResponseTransformer.class)))
+                .thenReturn(downloadResult);
+
+        final InputStream result = underTest.download();
+
+        verify(s3Client).getObject(getObjectRequestArgumentCaptor.capture(), any(ResponseTransformer.class));
+
+        final GetObjectRequest getObjectRequest = getObjectRequestArgumentCaptor.getValue();
+        assertThat(getObjectRequest.bucket(), is(BUCKET_NAME));
+        assertThat(getObjectRequest.key(), is(FILE_NAME));
+
+        assertThat(result, is(downloadResult));
     }
 }
