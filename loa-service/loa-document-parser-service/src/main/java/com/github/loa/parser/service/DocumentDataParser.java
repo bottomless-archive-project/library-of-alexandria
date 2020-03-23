@@ -41,8 +41,7 @@ public class DocumentDataParser {
     public Mono<DocumentMetadata> parseDocumentData(final DocumentEntity documentEntity) {
         return vaultClientService.queryDocument(documentEntity)
                 .publishOn(Schedulers.parallel())
-                .map(documentContent -> parseDocumentMetadata(documentEntity.getId(), documentEntity.getType(), documentContent))
-                .onErrorContinue((throwable, document) -> log.debug("Failed to parse document!", throwable));
+                .map(documentContent -> parseDocumentMetadata(documentEntity.getId(), documentEntity.getType(), documentContent));
     }
 
     public DocumentMetadata parseDocumentMetadata(final UUID documentId, final DocumentType documentType,
