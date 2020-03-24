@@ -1,5 +1,6 @@
 package com.github.loa.indexer.command;
 
+import com.github.loa.document.service.DocumentManipulator;
 import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.document.service.domain.DocumentStatus;
 import com.github.loa.document.service.entity.factory.DocumentEntityFactory;
@@ -21,6 +22,7 @@ public class IndexerCommand implements CommandLineRunner {
     private final IndexerConfigurationProperties indexerConfigurationProperties;
     private final IndexerService indexerService;
     private final DocumentDataParser documentDataParser;
+    private final DocumentManipulator documentManipulator;
 
     @Override
     public void run(final String... args) {
@@ -33,8 +35,11 @@ public class IndexerCommand implements CommandLineRunner {
 
     private Mono<Void> processDocument(final DocumentEntity documentEntity) {
         return documentDataParser.parseDocumentData(documentEntity)
-                .onErrorContinue((throwable, document) -> log.info(
-                        "Failed to parse document with id: {}!", documentEntity.getId()))
+                .onErrorContinue((throwable, document) -> {
+                    documentManipulator.markIndexFailure(documentEntity.getId()).subscribe();
+
+                    log.info("Failed to parse document with id: {}!", documentEntity.getId());
+                })
                 .doOnNext(indexerService::indexDocuments)
                 .then();
     }
