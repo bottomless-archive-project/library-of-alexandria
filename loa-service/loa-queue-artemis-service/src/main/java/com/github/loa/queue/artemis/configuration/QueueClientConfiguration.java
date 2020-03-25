@@ -39,6 +39,8 @@ public class QueueClientConfiguration {
     @Bean
     protected ServerLocator serverLocator(final TransportConfiguration transportConfiguration) {
         return ActiveMQClient.createServerLocatorWithoutHA(transportConfiguration)
+                .setReconnectAttempts(-1)
+                .setConfirmationWindowSize(134217728)
                 .setPreAcknowledge(true);
     }
 

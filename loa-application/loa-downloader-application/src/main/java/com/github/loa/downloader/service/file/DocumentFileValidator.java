@@ -52,7 +52,7 @@ public class DocumentFileValidator {
 
             return true;
         } catch (final Exception e) {
-            log.info("Non-parsable document: {}!", documentId);
+            log.debug("Non-parsable document: {}!", documentId);
 
             return false;
         }

@@ -17,7 +17,7 @@ import java.util.function.Consumer;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-@ConditionalOnProperty(value = "loa.downloader.source", havingValue = "queue", matchIfMissing = true)
+@ConditionalOnProperty(value = "loa.downloader.source", havingValue = "queue")
 public class DownloaderQueueConsumer implements Consumer<SynchronousSink<DocumentSourceItem>> {
 
     private final QueueManipulator queueManipulator;
@@ -25,7 +25,7 @@ public class DownloaderQueueConsumer implements Consumer<SynchronousSink<Documen
     @Override
     public void accept(final SynchronousSink<DocumentSourceItem> documentSourceItemSynchronousSink) {
         final DocumentLocationMessage documentLocationMessage =
-                (DocumentLocationMessage) queueManipulator.readMessage(Queue.DOCUMENT_LOCATION_QUEUE);
+                queueManipulator.readMessage(Queue.DOCUMENT_LOCATION_QUEUE, DocumentLocationMessage.class);
 
         try {
             documentSourceItemSynchronousSink.next(
