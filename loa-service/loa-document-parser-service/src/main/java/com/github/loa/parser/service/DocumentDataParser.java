@@ -53,7 +53,7 @@ public class DocumentDataParser {
             final InputStream documentContents) {
         if (!isParsableType(documentType)) {
             return DocumentMetadata.builder()
-                    .id(documentId.toString())
+                    .id(documentId)
                     .type(documentType)
                     .build();
         }
@@ -69,7 +69,7 @@ public class DocumentDataParser {
             final String language = detectLanguage(contentHandler);
 
             return DocumentMetadata.builder()
-                    .id(documentId.toString())
+                    .id(documentId)
                     .title(metadata.get(TikaCoreProperties.TITLE))
                     .author(metadata.get(TikaCoreProperties.CREATOR))
                     .date(metadata.get(TikaCoreProperties.CREATED))

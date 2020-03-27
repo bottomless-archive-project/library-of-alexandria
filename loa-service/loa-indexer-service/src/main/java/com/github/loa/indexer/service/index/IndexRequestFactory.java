@@ -17,6 +17,10 @@ public class IndexRequestFactory {
     public Mono<IndexRequest> newIndexRequest(final DocumentMetadata documentMetadata) {
         final Map<String, Object> sourceContent = new HashMap<>();
 
+        if (documentMetadata.getContent() == null) {
+            return Mono.empty();
+        }
+
         sourceContent.put("content", documentMetadata.getContent().trim());
 
         if (documentMetadata.getTitle() != null && !documentMetadata.getTitle().isBlank()) {
@@ -40,7 +44,7 @@ public class IndexRequestFactory {
 
         return Mono.just(
                 new IndexRequest("vault_documents")
-                        .id(documentMetadata.getId())
+                        .id(documentMetadata.getId().toString())
                         .source(sourceContent)
                         .timeout(TimeValue.timeValueMinutes(30))
         );
