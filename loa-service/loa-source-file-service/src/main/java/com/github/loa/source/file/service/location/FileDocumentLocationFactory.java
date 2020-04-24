@@ -30,7 +30,6 @@ public class FileDocumentLocationFactory implements DocumentLocationFactory {
 
         return Flux.fromStream(reader.lines())
                 .doOnNext(line -> processedDocumentLocationCount.increment())
-                .skip(2147483647)
                 .flatMap(urlConverter::convert);
     }
 }
