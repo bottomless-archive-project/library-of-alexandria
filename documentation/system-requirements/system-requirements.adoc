@@ -1,0 +1,10 @@
+= System Requirements
+
+It's important to mention the hardware requirements of collecting and handling documents. If you only want to gather a few million documents then that could be done on a home PC. However, if you want to collect & store a massive amount, then purpose-built hardware is necessary. This hardware is not necessarily expensive. Also if you want to collect 24/7 then having a machine that doesn't consume a lot of wattages is recommended where electricity prices are high.
+
+Collecting and indexing have quite different requirements as well so we split the hardware requirements section into two separate chapters.
+
+The requirements mentioned here could be built from used/commodity hardware if necessary.
+
+include::system-requirements-collecting.adoc[leveloffset=+1]
+include::system-requirements-indexing.adoc[leveloffset=+1]

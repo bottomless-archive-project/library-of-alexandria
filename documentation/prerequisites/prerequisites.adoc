@@ -1,0 +1,12 @@
+= Prerequisites
+
+Special emphasis was placed on to keep the prerequisites of the project to the minimum. This is because one of the main goals of the project is to make it easy to start archiving even with limited technical knowledge and resources.
+
+List of the required software to start archiving:
+
+- https://www.oracle.com/technetwork/java/javase/downloads/index.html[Java 13]
+- https://www.mongodb.com/download-center/community[MongoDB 4.2]
+
+List of the required software to be able to search the archived documents:
+
+- https://www.elastic.co/downloads/past-releases/elasticsearch-7-5-0[Elasticsearch 7.5.0]

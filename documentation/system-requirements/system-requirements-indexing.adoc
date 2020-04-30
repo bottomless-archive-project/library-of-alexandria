@@ -1,0 +1,25 @@
+= Indexing
+
+== Recommended hardware
+
+Indexing is much more memory intensive than collecting but requires a lot less disk space. Indexing should either be run on a different machine than collecting or the memory and disc requirements should be added together.
+
+You can do the indexing on any machine that has sufficient memory requirements, but without a proper CPU, your indexing speed could be slow.
+
+=== Indexing small amounts (1 - 25 million)
+
+* **CPU**: http://www.cpu-world.com/CPUs/Zen/AMD-Ryzen%205%203600.html[AMD Ryzen 5 3600] or similar
+* **Memory**: 64 GB
+* **Disc space**: 256-512 GB (SSD preferred)
+
+=== Indexing medium amounts (25 - 100 million)
+
+* **CPU**: 2 x http://www.cpu-world.com/CPUs/Xeon/Intel-Xeon%20E5-2680.html[Intel Xeon E5-2680 v2] or similar
+* **Memory**: 256 GB
+* **Disc space**: 1 TB (SSD preferred)
+
+=== Indexing massive amounts (100 - 500+ million)
+
+* **CPU**: 2 x http://www.cpu-world.com/CPUs/Xeon/Intel-Xeon%20E5-2680.html[Intel Xeon E5-2680 v2] or similar
+* **Memory**: 512 GB
+* **Disc space**: 4 TB (SSD preferred)
