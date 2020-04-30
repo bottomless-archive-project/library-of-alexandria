@@ -1,0 +1,11 @@
+= Running the Downloader Application
+
+You can download the downloader application files at our https://github.com/bottomless-archive-project/library-of-alexandria/releases[release page]. Please take care to choose a non "pre-release" version!
+
+After the download is complete run the application via the following command:
+
+....
+java -jar loa-downloader-application-{release-number}.jar ...
+....
+
+In the place of the ... you should write the various parameters. For the available parameters check the parameter list under the Downloader Application.

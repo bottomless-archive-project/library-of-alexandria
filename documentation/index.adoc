@@ -14,3 +14,4 @@ This project aims to support this noble goal in a scalable way. We want to make 
 
 include::prerequisites/prerequisites.adoc[leveloffset=+1]
 include::system-requirements/system-requirements.adoc[leveloffset=+1]
+include::installation/installation.adoc[leveloffset=+1]
