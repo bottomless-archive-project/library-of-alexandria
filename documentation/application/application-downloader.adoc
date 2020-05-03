@@ -1,0 +1,31 @@
+= Downloader Application
+
+== Workflow
+
+This application is responsible for reading out the document locations from the Queue Application and downloading its contents.
+
+.Parameters
+|===
+| Parameter | Description
+
+| **loa.queue.port**
+| The port of the queue where the application should connect and the document locations should be sent. *(Default value: 61616)*
+
+| **loa.queue.host**
+| The host of the queue where the application should connect and the document locations should be sent. *(Default value: localhost)*
+
+| **loa.downloader.executor.thread-count**
+| How many downloads should run simultaneously. Usually, this number should be set according to your network or storage device (HDD/SSD) speed. If you want to tune the collecting speed of documents then increase this as long as one of them is fully saturated. However Be careful, if you have a subpar router or networking infrastructure then many simultaneous requests could cause timeouts, overheating on routers and thus making the tuning of this parameter counter-intuitive. *(Default value: 250)*
+
+| **loa.downloader.executor.queue-length**
+| How many locations do we want to pre-calculate. This queue are fed by the source subsystem with URL locations to crawl and is being consumed by the downloader subsystem. If you set this parameter too high it could cause out of memory errors while if it is set to too low then most of the download threads could idle. The suggested value is between 1000 - 50000 depending on the available memory. *(Default value: 1000)*
+
+| **loa.stage.location**
+| The location where the document files are first downloaded. After some validation and occasionally modification (compression etc) it is moved to the vault.
+
+| **loa.database.host**
+| The host location of the MongoDB database server. *(Default value: localhost)*
+
+| **loa.database.port**
+| The port open for the MongoDB database server. *(Default value: 27017)*
+|===

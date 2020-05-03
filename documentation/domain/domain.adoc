@@ -1,0 +1,29 @@
+= Domain Language
+
+WIP!!!
+
+.Language elements
+|===
+| Name | Description
+
+| **Vault**
+| The location where the collected documents are archived.
+
+| **Document**
+| A document collected from the internet.
+
+| **Document content**
+| ...
+
+| **Staging area**
+| A temporary location where the collected documents placed for post processing before going to the archive.
+
+| **Source**
+| ...
+
+| **Failure rate**
+| How many documents fail to download compared to the successfully downloaded ones.
+
+| **Archiving**
+|Moving a document from the staging area to the vault.
+|===

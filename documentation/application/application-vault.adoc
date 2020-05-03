@@ -1,0 +1,49 @@
+= Vault Application
+
+Responsible for storing documents and making them available via web endpoints.
+
+== Workflow
+
+The Vault Application connects to the Queue Application, asks for new documents that should be archived (these were inserted by the Downloader Application to the queue previously).
+
+Once a new document is acquired then it will be moved into a staging area. A checksum will be generated from the staging copy and checked for duplicates using the data available in the MongoDB database.
+
+If the application is not a duplicate then the staging file's contents will be moved to the archive and a new entry will be created for the document in the database.
+
+.Parameters
+|===
+| Parameter | Description
+
+| **loa.vault.location.type**
+| Describes the type of the vault's location. At the moment it could be `file` only but in the future, we plan to support more location types. When it's set to `file` then the vault will be located on the local filesystem. *(Default value: file)*
+
+| **loa.vault.location.file.path**
+| Used only when `loa.vault.location.type` is set to `file`. Path to the location of the vault on the filesystem.
+
+| **loa.database.host**
+| The host location of the MongoDB database server. *(Default value: localhost)*
+
+| **loa.database.port**
+| The port open for the MongoDB database server. *(Default value: 27017)*
+
+| **loa.queue.host**
+| The ip address of the Queue Application.
+
+| **loa.queue.port**
+| The port where the Queue Application is listening for new connections. *(Default value: 61616)*
+
+| **loa.stage.location**
+| The location where the document files are first moved. After the checksum calculation and duplicate detection, they are moved to the vault.
+
+| **server.port**
+| The port where the vault should publish it's web endpoints.
+
+| **loa.vault.version-number**
+| This version number will be saved to the database for every document that has been archived. Later on, if it will be necessary to run cleanup or fixing database tasks that are specific to a given version will be checked by the value of this version number. This way it will be easier to fix bugs or database inconsistencies introduced by a specific application version. Please do not change this otherwise the official migration/fixer utilities are not going to be usable.
+
+| **loa.compression.algorithm**
+| This property describes what compression algorithm should be used while saving documents to the vault. The available values are `lzma`, `gzip`, `none`. [LZMA](https://en.wikipedia.org/wiki/Lempel%E2%80%93Ziv%E2%80%93Markov_chain_algorithm) have the best compression ratios while being quite CPU resource-intensive, [GZIP](https://en.wikipedia.org/wiki/Gzip) is better than no compression but a little bit worse than LZMA while having minimal CPU footprint while `none` is saving the documents without compression. *(Default value: none)*
+
+| **loa.checksum.type**
+| The type of the hashing algorithm used to create the document's checksum. At the moment only `SHA-256` is available for this purpose. *(Default value: sha-256)*
+|===

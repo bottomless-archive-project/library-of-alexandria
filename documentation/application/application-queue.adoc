@@ -1,0 +1,18 @@
+= Queue Application
+
+This application's goal is to provide an abstraction layer between the applications.
+
+== Workflow
+
+The Queue Application is a simple glue between the Vault Application, Downloader Application, and Generator Application. It exists to make these applications tightly coupled and scalable.
+
+.Parameters
+|===
+| Parameter | Description
+
+| **loa.queue.port**
+| The port where the application should listen. *(Default value: 61616)*
+
+| **loa.queue.data-directory**
+| The location where the queue should save its contents. It should be a folder on the filesystem.
+|===

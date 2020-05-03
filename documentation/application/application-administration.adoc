@@ -1,0 +1,28 @@
+= Administrator Application
+
+This application's goal is to provide basic database administrator tasks (initialize the databases, query statistics, initiate the re-crawling of failed tasks etc).
+
+.Parameters
+|===
+| Parameter | Description
+
+| **loa.database.host**
+| The host location of the MongoDB database server. *(Default value: localhost)*
+
+| **loa.database.port**
+| The port open for the MongoDB database server. *(Default value: 27017)*
+
+| **loa.indexer.database.host**
+| The host of the Elasticsearch database.
+
+| **loa.indexer.database.port**
+| The port of the Elasticsearch database.
+|===
+
+.Tasks
+|===
+| Name | Description
+
+| initialize-indexer
+| This task will initialize the indexes in the Elasticsearch database. Elasticsearch should run while this command is running.
+|===
