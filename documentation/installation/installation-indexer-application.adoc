@@ -1,6 +1,6 @@
 = Running the Indexer Application
 
-You can download the indexer application files at our https://github.com/bottomless-archive-project/library-of-alexandria/releases[release page]. Please take care to choose a non "pre-release" version!
+You can download the <<Indexer Application>> files at our https://github.com/bottomless-archive-project/library-of-alexandria/releases[release page]. Please take care to choose a non "pre-release" version!
 
 After the download is complete run the application via the following command:
 
@@ -8,4 +8,4 @@ After the download is complete run the application via the following command:
 java -jar loa-indexer-application-{release-number}.jar ...
 ....
 
-In the place of the ... you should write the various parameters. For the available parameters check the parameter list under the Indexer Application.
+In the place of the ... you should write the various parameters. For the available parameters check the parameter list under the <<Indexer Application>>.
