@@ -2,7 +2,7 @@
 
 == Workflow
 
-This application is responsible for reading out the document locations from the Queue Application and downloading its contents.
+This application is responsible for reading out the document locations from the <<Queue Application>> and downloading its contents.
 
 .Parameters
 |===

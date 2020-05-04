@@ -4,7 +4,7 @@ This application's goal is to provide an abstraction layer between the applicati
 
 == Workflow
 
-The Queue Application is a simple glue between the Vault Application, Downloader Application, and Generator Application. It exists to make these applications tightly coupled and scalable.
+The Queue Application is a simple glue between the <<Vault Application>>, <<Downloader Application>>, and <<Generator Application>>. It exists to make these applications tightly coupled and scalable.
 
 .Parameters
 |===

@@ -4,7 +4,7 @@ Responsible for storing documents and making them available via web endpoints.
 
 == Workflow
 
-The Vault Application connects to the Queue Application, asks for new documents that should be archived (these were inserted by the Downloader Application to the queue previously).
+The Vault Application connects to the <<Queue Application>>, asks for new documents that should be archived (these were inserted by the Downloader Application to the queue previously).
 
 Once a new document is acquired then it will be moved into a staging area. A checksum will be generated from the staging copy and checked for duplicates using the data available in the MongoDB database.
 

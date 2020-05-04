@@ -1,10 +1,10 @@
 = Indexer Application
 
-...
+This application makes documents searchable by inserting them into an Elasticsearch cluster.
 
 == Workflow
 
-...
+The application looks for documents that has the `DOWNLOADED` status and indexes them by sending them to the Elasticsearch cluster.
 
 .Parameters
 |===
@@ -23,17 +23,14 @@
 | The password to access the database named `loa` on the MongoDB database server.
 
 | **loa.vault.client.host**
-| WIP
+| The IP address of the <<Vault Application>> to grab the documents from.
 
 | **loa.vault.client.port**
-| WIP
+| The port of the <<Vault Application>> to grab the documents from.
 
 | **loa.indexer.database.host**
-| WIP
+| The host of the Elasticsearch database.
 
 | **loa.indexer.database.port**
-| WIP
-
-| **loa.indexer.sleep-time**
-| WIP
+| The port of the Elasticsearch database.
 |===

@@ -1,10 +1,12 @@
 = Generator Application
 
-This application's goal is to fill the Queue Application with downloadable document locations (links).
+This application's goal is to fill the <<Queue Application>> with downloadable document locations (links).
 
 == Workflow
 
-...
+The Vault Application connects to the <<Queue Application>> application and send URLs to be checked and downloaded there.
+
+These URLs could come from various sources like a local file or from http://commoncrawl.org/[Common Crawl] corpus.
 
 .Parameters
 |===

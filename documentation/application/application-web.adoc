@@ -1,10 +1,10 @@
 = Web Application
 
-...
+The Web Application provides access to the users to the indexed documents.
 
 == Workflow
 
-...
+The application run queries on the Elasticsearch cluster and display the results. If the user wants to download a document it will reach out to the <<Vault Application>> to download the requested document.
 
 .Parameters
 |===
@@ -23,14 +23,14 @@
 | The password to access the database named `loa` on the MongoDB database server.
 
 | **loa.vault.client.host**
-| WIP
+| The IP address of the <<Vault Application>> to grab the documents for displaying.
 
 | **loa.vault.client.port**
-| WIP
+| The port of the <<Vault Application>> to grab the documents documents for displaying.
 
 | **loa.indexer.database.host**
-| WIP
+| The host of the Elasticsearch database.
 
 | **loa.indexer.database.port**
-| WIP
+| The port of the Elasticsearch database.
 |===
