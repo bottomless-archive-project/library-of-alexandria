@@ -1,7 +1,5 @@
 = Domain Language
 
-WIP!!!
-
 .Language elements
 |===
 | Name | Description
@@ -12,14 +10,11 @@ WIP!!!
 | **Document**
 | A document collected from the internet.
 
-| **Document content**
-| ...
-
 | **Staging area**
 | A temporary location where the collected documents placed for post processing before going to the archive.
 
 | **Source**
-| ...
+| A source of document locations. Could be a file or the http://commoncrawl.org/[Common Crawl] corpus.
 
 | **Failure rate**
 | How many documents fail to download compared to the successfully downloaded ones.
