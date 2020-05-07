@@ -1,0 +1,36 @@
+= Web Application
+
+The Web Application provides access to the users to the indexed documents.
+
+== Workflow
+
+The application run queries on the Elasticsearch cluster and display the results. If the user wants to download a document it will reach out to the <<Vault Application>> to download the requested document.
+
+.Parameters
+|===
+| Parameter | Description
+
+| **spring.data.mongodb.host**
+| The host location of the MongoDB database server. *(Default value: localhost)*
+
+| **spring.data.mongodb.port**
+| The port open for the MongoDB database server. *(Default value: 27017)*
+
+| **spring.data.mongodb.username**
+| The username to access the database named `loa` on the MongoDB database server.
+
+| **spring.data.mongodb.password**
+| The password to access the database named `loa` on the MongoDB database server.
+
+| **loa.vault.client.host**
+| The IP address of the <<Vault Application>> to grab the documents for displaying.
+
+| **loa.vault.client.port**
+| The port of the <<Vault Application>> to grab the documents documents for displaying.
+
+| **loa.indexer.database.host**
+| The host of the Elasticsearch database.
+
+| **loa.indexer.database.port**
+| The port of the Elasticsearch database.
+|===

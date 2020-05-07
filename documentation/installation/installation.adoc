@@ -1,0 +1,14 @@
+= Installation
+
+Installing the applications and the prerequisite software is quite straightforward. At this time we provide a guide to the Windows-based systems. Installing LoA on Linux systems are supported as well but requires more technical knowledge. An ideal deployment is running the apps in separate VMs or Docker containers but for the sake of simplicity, we are not doing that in this guide. In the future, we will create a more advanced guide.
+
+include::installation-java.adoc[leveloffset=+1]
+include::installation-mongodb.adoc[leveloffset=+1]
+include::installation-queue-application.adoc[leveloffset=+1]
+include::installation-vault-application.adoc[leveloffset=+1]
+include::installation-generator-application.adoc[leveloffset=+1]
+include::installation-downloader-application.adoc[leveloffset=+1]
+include::installation-elasticsearch.adoc[leveloffset=+1]
+include::installation-elasticsearch-initialization.adoc[leveloffset=+1]
+include::installation-indexer-application.adoc[leveloffset=+1]
+include::installation-web-application.adoc[leveloffset=+1]

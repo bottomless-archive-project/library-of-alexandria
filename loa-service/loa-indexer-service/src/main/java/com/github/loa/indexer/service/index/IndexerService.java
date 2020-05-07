@@ -22,18 +22,18 @@ public class IndexerService {
     private final DocumentManipulator documentManipulator;
 
     public void indexDocuments(final DocumentMetadata documentMetadata) {
-        final String documentId = documentMetadata.getId();
+        final UUID documentId = documentMetadata.getId();
 
         indexRequestFactory.newIndexRequest(documentMetadata)
                 .subscribe(indexRequest -> {
                     try {
                         restHighLevelClient.index(indexRequest, RequestOptions.DEFAULT);
 
-                        documentManipulator.markIndexed(UUID.fromString(documentId)).subscribe();
+                        documentManipulator.markIndexed(documentId).subscribe();
                     } catch (IOException | ElasticsearchException e) {
                         log.info("Failed to index document " + documentId + "! Cause: '" + e.getMessage() + "'.");
 
-                        documentManipulator.markIndexFailure(UUID.fromString(documentId)).subscribe();
+                        documentManipulator.markIndexFailure(documentId).subscribe();
                     }
                 });
     }

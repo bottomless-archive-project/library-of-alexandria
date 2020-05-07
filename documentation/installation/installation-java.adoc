@@ -1,0 +1,11 @@
+= Installing Java
+
+First, you need to download the Java 13 Runtime Environment. It's available https://www.oracle.com/technetwork/java/javase/downloads/index.html[here]. After the download is complete you should run the installer and follow the directions it provides until the installation is complete.
+
+Once it's done, if you open a command line (write cmd to the Start menu's search bar) you will be able to use the java command. Try to write `java -version`. You should get something similar:
+
+....
+java version "13" 2019-09-17
+Java(TM) SE Runtime Environment (build 13+33)
+Java HotSpot(TM) 64-Bit Server VM (build 13+33, mixed mode, sharing)
+....

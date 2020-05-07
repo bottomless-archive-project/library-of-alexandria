@@ -1,0 +1,36 @@
+= Indexer Application
+
+This application makes documents searchable by inserting them into an Elasticsearch cluster.
+
+== Workflow
+
+The application looks for documents that has the `DOWNLOADED` status and indexes them by sending them to the Elasticsearch cluster.
+
+.Parameters
+|===
+| Parameter | Description
+
+| **spring.data.mongodb.host**
+| The host location of the MongoDB database server. *(Default value: localhost)*
+
+| **spring.data.mongodb.port**
+| The port open for the MongoDB database server. *(Default value: 27017)*
+
+| **spring.data.mongodb.username**
+| The username to access the database named `loa` on the MongoDB database server.
+
+| **spring.data.mongodb.password**
+| The password to access the database named `loa` on the MongoDB database server.
+
+| **loa.vault.client.host**
+| The IP address of the <<Vault Application>> to grab the documents from.
+
+| **loa.vault.client.port**
+| The port of the <<Vault Application>> to grab the documents from.
+
+| **loa.indexer.database.host**
+| The host of the Elasticsearch database.
+
+| **loa.indexer.database.port**
+| The port of the Elasticsearch database.
+|===

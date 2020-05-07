@@ -1,0 +1,19 @@
+= Initializing the Elasticsearch index
+
+Without proper initialization, Elasticsearch is not able to index documents.
+
+To initialize the document mapping you need to run an initialization command available in the Administrator Application.
+
+....
+java -jar loa-database-application-{release-number}.jar --initialize-indexer ...
+....
+
+You need to provide the Elasticsearch connection parameters as well.
+
+For example:
+
+....
+java -jar loa-database-application-{release-number}.jar --initialize-indexer --loa.indexer.database.host=127.0.0.1 --loa.indexer.database.port=9200
+....
+
+After the script finished running, Elasticsearch is ready for indexing.

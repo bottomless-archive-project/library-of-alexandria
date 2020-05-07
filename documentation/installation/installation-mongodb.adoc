@@ -1,0 +1,3 @@
+= Installing MongoDB
+
+Download MongoDB 4.2 from https://www.mongodb.com/download-center/community[here]. After the download is complete run the installer and follow the directions it provides. If it's possible, install the MongoDB Compass tool as well because you will need it later for administrative tasks.
