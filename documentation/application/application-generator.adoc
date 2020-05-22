@@ -12,6 +12,15 @@ These URLs could come from various sources like a local file or from http://comm
 |===
 | Parameter | Description
 
+| **loa.database.host**
+| The host location of the MongoDB database server. *(Default value: localhost)*
+
+| **loa.database.port**
+| The port open for the MongoDB database server. *(Default value: 27017)*
+
+| **loa.database.no-cursor-timeout**
+| Whenever the cursor objects created by the application should be able to timeout. Ideally you would set up the timeout on your MongoDB server (see: https://docs.mongodb.com/manual/reference/parameters/#param.cursorTimeoutMillis[cursorTimeoutMillis]) but because not everybody is a MongoDB expert, we disable timeouts by default. This could cause a couple of open cursors (so extra resource usage) on the MongoDB server when the application crashes for some reason and the cursors are not closed correctly. If you set the cursor timeout too low, then the application will crash if it is not able to process a batch of items under the provided timeout. *(Default value: true)*
+
 | **loa.queue.host**
 | The host of the queue where the application should connect and the document locations should be sent. *(Default value: localhost)*
 

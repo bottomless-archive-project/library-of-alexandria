@@ -1,6 +1,7 @@
 package com.github.loa.document.repository;
 
 import com.github.loa.document.repository.domain.DocumentDatabaseEntity;
+import com.github.loa.repository.configuration.RepositoryConfigurationProperties;
 import com.mongodb.reactivestreams.client.MongoCollection;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -16,6 +17,7 @@ import static com.mongodb.client.model.Updates.set;
 @RequiredArgsConstructor
 public class DocumentRepository {
 
+    private final RepositoryConfigurationProperties repositoryConfigurationProperties;
     private final MongoCollection<DocumentDatabaseEntity> documentDatabaseEntityMongoCollection;
 
     public Mono<DocumentDatabaseEntity> insertDocument(final DocumentDatabaseEntity documentDatabaseEntity) {
@@ -27,8 +29,33 @@ public class DocumentRepository {
         return Mono.from(documentDatabaseEntityMongoCollection.find(eq("_id", documentId)));
     }
 
+
+    /**
+     * Returns a {@link Flux} that will emit all of the documents that have the provided status in the database.
+     *
+     * @return a flux emitting every elements in the database
+     */
     public Flux<DocumentDatabaseEntity> findByStatus(final String status) {
-        return Flux.from(documentDatabaseEntityMongoCollection.find(eq("status", status)));
+        return Flux.from(
+                documentDatabaseEntityMongoCollection.find(eq("status", status))
+                        // We don't want to have the cursor closed while processing. It would be a better idea to set
+                        // a maximum timeout in milliseconds but that only configurable on the server side.
+                        .noCursorTimeout(repositoryConfigurationProperties.isNoCursorTimeout())
+        );
+    }
+
+    /**
+     * Returns a {@link Flux} that will emit all of the documents that are available in the database.
+     *
+     * @return a flux emitting every elements in the database
+     */
+    public Flux<DocumentDatabaseEntity> findAll() {
+        return Flux.from(
+                documentDatabaseEntityMongoCollection.find()
+                        // We don't want to have the cursor closed while processing. It would be a better idea to set
+                        // a maximum timeout in milliseconds but that only configurable on the server side.
+                        .noCursorTimeout(repositoryConfigurationProperties.isNoCursorTimeout())
+        );
     }
 
     public Mono<Void> updateStatus(final UUID documentId, final String status) {
@@ -41,10 +68,6 @@ public class DocumentRepository {
         return Mono.from(documentDatabaseEntityMongoCollection
                 .updateOne(eq("_id", documentId), set("compression", compression)))
                 .then();
-    }
-
-    public Flux<DocumentDatabaseEntity> findAll() {
-        return Flux.from(documentDatabaseEntityMongoCollection.find());
     }
 
     public Mono<Long> count() {
