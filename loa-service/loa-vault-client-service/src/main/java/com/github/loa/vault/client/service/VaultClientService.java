@@ -32,13 +32,14 @@ public class VaultClientService {
                 .uri("/document/" + documentEntity.getId())
                 .retrieve()
                 //TODO: This could be done better! We need to return the bad responses from the client to the caller.
-                //This could happen when the vault is closed forcefully and the file is not saved.
                 .onStatus(HttpStatus::is5xxServerError, (response) -> {
                     log.info("Missing document with id: {}!", documentEntity.getId());
 
                     return response.bodyToMono(String.class)
                             .map(error -> {
-                                if (error.contains("Unable to get the content of a vault location!")) {
+                                // This could happen when the vault is closed forcefully and the file is not/partially saved.
+                                if (error.contains("Unable to get the content of a vault location!")
+                                        || error.contains("Error while decompressing document!")) {
                                     documentManipulator.markIndexFailure(documentEntity.getId()).subscribe();
                                 }
 
