@@ -1,5 +1,14 @@
 apply plugin: 'org.springframework.boot'
 
+apply plugin: 'com.palantir.docker'
+
+docker {
+    dependsOn bootJar
+    name = 'loa-web-application:version'
+    buildArgs([BUILD_VERSION: 'version'])
+    files bootJar.archivePath
+}
+
 dependencies {
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-webflux'
 
