@@ -2,5 +2,5 @@ dependencies {
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-webflux'
     compile group: 'io.projectreactor.addons', name: 'reactor-extra'
 
-    compile group: 'com.github.davidmoten', name: 'io-extras', version: '0.1'
+    compile group: 'com.github.davidmoten', name: 'io-extras', version: '0.1.3'
 }
