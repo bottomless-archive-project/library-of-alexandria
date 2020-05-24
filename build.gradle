@@ -2,8 +2,6 @@ import org.springframework.boot.gradle.plugin.SpringBootPlugin
 
 buildscript {
     ext {
-        springBootVersion = '2.3.0.RELEASE'
-
         set('artemis.version', '2.12.0')
         set('elasticsearch.version', '7.6.0')
         set('mongodb.version', '4.0.3')
@@ -17,9 +15,10 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
-        classpath "com.adarshr:gradle-test-logger-plugin:2.0.0"
-        classpath "com.github.ben-manes:gradle-versions-plugin:0.28.0"
+        classpath('org.springframework.boot:spring-boot-gradle-plugin:2.3.0.RELEASE')
+        classpath('com.adarshr:gradle-test-logger-plugin:2.0.0')
+        classpath('com.github.ben-manes:gradle-versions-plugin:0.28.0')
+        classpath('com.palantir.gradle.docker:gradle-docker:0.25.0')
     }
 }
 
