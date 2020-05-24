@@ -4,7 +4,7 @@ apply plugin: 'com.palantir.docker'
 
 docker {
     dependsOn bootJar
-    name 'loa-vault-application:' + rootProject.version.toString()
+    name 'loa-web-application:' + rootProject.version.toString()
     files bootJar.archiveFile
 }
 
