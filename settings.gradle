@@ -1,4 +1,4 @@
-rootProject.name = 'loa-downloader'
+rootProject.name = 'library-of-alexandria'
 
 include 'loa-application:loa-downloader-application'
 include 'loa-application:loa-web-application'
