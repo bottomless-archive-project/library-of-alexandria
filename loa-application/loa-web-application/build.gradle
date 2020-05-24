@@ -4,9 +4,8 @@ apply plugin: 'com.palantir.docker'
 
 docker {
     dependsOn bootJar
-    name = 'loa-web-application:version'
-    buildArgs([BUILD_VERSION: 'version'])
-    files bootJar.archivePath
+    name 'loa-vault-application:' + rootProject.version.toString()
+    files bootJar.archiveFile
 }
 
 dependencies {
