@@ -59,7 +59,7 @@ subprojects {
         }
     }
 
-    apply plugin: "com.adarshr.test-logger"
+    apply plugin: 'com.adarshr.test-logger'
 
     dependencies {
         // Spring starters
@@ -72,6 +72,8 @@ subprojects {
         // Lombok
         compileOnly group: 'org.projectlombok', name: 'lombok'
         annotationProcessor group: 'org.projectlombok', name: 'lombok'
+        testCompileOnly group: 'org.projectlombok', name: 'lombok'
+        testAnnotationProcessor group: 'org.projectlombok', name: 'lombok'
 
         // Testing
         testCompile group: 'org.mockito', name: 'mockito-core'

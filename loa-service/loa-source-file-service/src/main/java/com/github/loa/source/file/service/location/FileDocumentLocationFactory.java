@@ -12,7 +12,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 
-import java.io.BufferedReader;
 import java.net.URL;
 
 @Slf4j
@@ -22,6 +21,7 @@ import java.net.URL;
 public class FileDocumentLocationFactory implements DocumentLocationFactory {
 
     private final FileDocumentSourceConfigurationProperties fileDocumentSourceConfigurationProperties;
+    private final BufferedReaderAdapter adapter;
     private final FileSourceFactory fileSourceFactory;
     private final URLConverter urlConverter;
 
@@ -39,9 +39,7 @@ public class FileDocumentLocationFactory implements DocumentLocationFactory {
                     + fileDocumentSourceConfigurationProperties.getSkipLines() + " lines.");
         }
 
-        final BufferedReader reader = fileSourceFactory.newSourceReader();
-
-        return Flux.fromStream(reader.lines())
+        return Flux.using(fileSourceFactory::newSourceReader, adapter.consume(), adapter.close())
                 .skip(fileDocumentSourceConfigurationProperties.getSkipLines())
                 .doOnNext(line -> processedDocumentLocationCount.increment())
                 .flatMap(urlConverter::convert);

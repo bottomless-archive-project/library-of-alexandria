@@ -18,6 +18,8 @@ import java.io.BufferedReader;
 import java.net.URL;
 import java.util.List;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -38,6 +40,9 @@ class FileDocumentLocationFactoryTest {
     @Mock
     private Counter processedDocumentLocationCount;
 
+    @Mock
+    private BufferedReaderAdapter adapter;
+
     @InjectMocks
     private FileDocumentLocationFactory underTest;
 
@@ -54,13 +59,20 @@ class FileDocumentLocationFactoryTest {
         when(fileDocumentSourceConfigurationProperties.getSkipLines())
                 .thenReturn(3);
         final BufferedReader reader = mock(BufferedReader.class);
-        when(reader.lines())
-                .thenReturn(List.of("http://www.example.com/1", "http://www.example.com/2", "http://www.example.com/3",
-                        "http://www.example.com/4", "http://www.example.com/5").stream());
         when(fileSourceFactory.newSourceReader())
                 .thenReturn(reader);
         when(urlConverter.convert(anyString()))
                 .thenAnswer((Answer<Mono<URL>>) invocation -> Mono.just(new URL(invocation.getArgument(0))));
+        when(adapter.consume())
+                .thenReturn((newReader) -> {
+                    assertThat(reader, is(newReader));
+
+                    return Flux.fromIterable(List.of("http://www.example.com/1", "http://www.example.com/2", "http://www.example.com/3",
+                            "http://www.example.com/4", "http://www.example.com/5"));
+                });
+        when(adapter.close())
+                .thenReturn((newReader) -> {
+                });
 
         final Flux<URL> result = underTest.streamLocations();
 
@@ -74,13 +86,20 @@ class FileDocumentLocationFactoryTest {
     @Test
     void testWhenSkipLinesAreNotSet() {
         final BufferedReader reader = mock(BufferedReader.class);
-        when(reader.lines())
-                .thenReturn(List.of("http://www.example.com/1", "http://www.example.com/2", "http://www.example.com/3",
-                        "http://www.example.com/4", "http://www.example.com/5").stream());
         when(fileSourceFactory.newSourceReader())
                 .thenReturn(reader);
         when(urlConverter.convert(anyString()))
                 .thenAnswer((Answer<Mono<URL>>) invocation -> Mono.just(new URL(invocation.getArgument(0))));
+        when(adapter.consume())
+                .thenReturn((newReader) -> {
+                    assertThat(reader, is(newReader));
+
+                    return Flux.fromIterable(List.of("http://www.example.com/1", "http://www.example.com/2", "http://www.example.com/3",
+                            "http://www.example.com/4", "http://www.example.com/5"));
+                });
+        when(adapter.close())
+                .thenReturn((newReader) -> {
+                });
 
         final Flux<URL> result = underTest.streamLocations();
 
