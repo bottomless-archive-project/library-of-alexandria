@@ -9,5 +9,6 @@
 
     <rule ref="category/java/errorprone.xml">
         <exclude name="MissingSerialVersionUID"/>
+        <exclude name="DataflowAnomalyAnalysis"/>
     </rule>
 </ruleset>

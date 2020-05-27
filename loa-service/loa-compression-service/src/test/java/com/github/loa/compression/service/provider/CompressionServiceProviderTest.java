@@ -4,26 +4,26 @@ import com.github.loa.compression.domain.DocumentCompression;
 import com.github.loa.compression.service.CompressionService;
 import com.github.loa.compression.service.GZIPCompressionService;
 import com.github.loa.compression.service.LZMACompressionService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.mock;
 
+@ExtendWith(MockitoExtension.class)
 class CompressionServiceProviderTest {
 
+    @Mock
     private GZIPCompressionService gzipCompressionService;
+
+    @Mock
     private LZMACompressionService lzmaCompressionService;
+
+    @InjectMocks
     private CompressionServiceProvider underTest;
-
-    @BeforeEach
-    private void setup() {
-        gzipCompressionService = mock(GZIPCompressionService.class);
-        lzmaCompressionService = mock(LZMACompressionService.class);
-
-        underTest = new CompressionServiceProvider(gzipCompressionService, lzmaCompressionService);
-    }
 
     @Test
     void testWhenProviderShouldProvideGzipCompressionService() {

@@ -17,6 +17,7 @@ public class Sha256DocumentLocationIdFactory implements DocumentLocationIdFactor
      * @param documentLocation the location of the document to create the id for
      * @return the id for the document
      */
+    @Override
     public String newDocumentLocationId(final URL documentLocation) {
         return DigestUtils.sha256Hex(documentLocation.toString());
     }
