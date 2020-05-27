@@ -28,7 +28,7 @@ public class ClientProducerFactory {
      * @return the freshly created producer
      */
     public ClientProducer createProducer(final Queue queue) {
-        log.info("Creating new producer for queue: " + queue + "!");
+        log.info("Creating new producer for queue: {}!", queue);
 
         try {
             final ClientSession clientSession = clientSessionFactory.createSession();
@@ -37,7 +37,7 @@ public class ClientProducerFactory {
         } catch (final ActiveMQException e) {
             log.error("Error while creating client producer for queue {}!", queue, e);
 
-            throw new QueueException("Unable to create client producer for queue: " + queue + "!");
+            throw new QueueException("Unable to create client producer for queue: " + queue + "!", e);
         }
     }
 }

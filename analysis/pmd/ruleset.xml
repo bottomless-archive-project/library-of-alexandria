@@ -10,5 +10,7 @@
     <rule ref="category/java/errorprone.xml">
         <exclude name="MissingSerialVersionUID"/>
         <exclude name="DataflowAnomalyAnalysis"/>
+        <exclude name="AvoidDuplicateLiterals"/>
+        <exclude name="BeanMembersShouldSerialize"/>
     </rule>
 </ruleset>

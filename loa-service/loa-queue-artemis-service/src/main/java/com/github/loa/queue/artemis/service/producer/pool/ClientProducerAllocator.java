@@ -26,7 +26,7 @@ public class ClientProducerAllocator implements Allocator<PoolableClientProducer
 
     @Override
     public void deallocate(final PoolableClientProducer poolableClientProducer) {
-        log.info("Closing producer for queue: " + supportedQueue + "!");
+        log.info("Closing producer for queue: {}!", supportedQueue);
 
         try {
             poolableClientProducer.getClientProducer().close();

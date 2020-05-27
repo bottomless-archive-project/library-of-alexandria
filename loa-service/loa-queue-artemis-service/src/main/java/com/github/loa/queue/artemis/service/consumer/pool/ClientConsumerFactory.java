@@ -28,7 +28,7 @@ public class ClientConsumerFactory {
      * @return the freshly created consumer
      */
     public ClientConsumer createConsumer(final Queue queue) {
-        log.info("Creating new consumer for queue: " + queue + "!");
+        log.info("Creating new consumer for queue: {}!", queue);
 
         try {
             final ClientSession clientSession = clientSessionFactory.createSession();
@@ -38,7 +38,9 @@ public class ClientConsumerFactory {
 
             return clientConsumer;
         } catch (final ActiveMQException e) {
-            throw new QueueException("Unable to create client consumer for queue: " + queue + "!");
+            log.error("Error while creating client consumer for queue {}!", queue, e);
+
+            throw new QueueException("Unable to create client consumer for queue: " + queue + "!", e);
         }
     }
 }
