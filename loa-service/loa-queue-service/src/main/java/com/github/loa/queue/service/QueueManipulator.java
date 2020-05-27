@@ -3,9 +3,6 @@ package com.github.loa.queue.service;
 import com.github.loa.queue.service.domain.Queue;
 import com.github.loa.queue.service.domain.QueueException;
 
-import java.io.InputStream;
-import java.io.OutputStream;
-
 public interface QueueManipulator {
 
     /**

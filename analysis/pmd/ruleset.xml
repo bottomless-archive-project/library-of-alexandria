@@ -12,5 +12,6 @@
         <exclude name="DataflowAnomalyAnalysis"/>
         <exclude name="AvoidDuplicateLiterals"/>
         <exclude name="BeanMembersShouldSerialize"/>
+        <exclude name="AssignmentInOperand"/>
     </rule>
 </ruleset>

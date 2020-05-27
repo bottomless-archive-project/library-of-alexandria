@@ -31,7 +31,7 @@ public class FileDocumentLocationFactory implements DocumentLocationFactory {
     @Override
     public Flux<URL> streamLocations() {
         if (fileDocumentSourceConfigurationProperties.getSkipLines() > 0) {
-            log.info("Skipping the first " + fileDocumentSourceConfigurationProperties.getSkipLines() + " lines.");
+            log.info("Skipping the first {} lines.", fileDocumentSourceConfigurationProperties.getSkipLines());
         }
 
         if (fileDocumentSourceConfigurationProperties.getSkipLines() < 0) {
