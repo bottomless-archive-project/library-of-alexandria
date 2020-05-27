@@ -60,6 +60,13 @@ subprojects {
     }
 
     apply plugin: 'com.adarshr.test-logger'
+    apply plugin: 'pmd'
+
+    pmd {
+        ignoreFailures = true
+        ruleSets = []
+        ruleSetFiles = files("${project.rootProject.projectDir}/analysis/pmd/ruleset.xml")
+    }
 
     dependencies {
         // Spring starters
