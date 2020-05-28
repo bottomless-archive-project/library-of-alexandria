@@ -1,6 +1,7 @@
 package com.github.loa.vault.service.location.s3.configuration;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
@@ -14,6 +15,7 @@ import java.net.URISyntaxException;
 
 @Configuration
 @RequiredArgsConstructor
+@ConditionalOnProperty(value = "loa.vault.location.type", havingValue = "s3")
 public class S3Configuration {
 
     private final S3ConfigurationProperties s3ConfigurationProperties;
