@@ -30,8 +30,8 @@ public class IndexerService {
                         restHighLevelClient.index(indexRequest, RequestOptions.DEFAULT);
 
                         documentManipulator.markIndexed(documentId).subscribe();
-                    } catch (IOException | ElasticsearchException e) {
-                        log.info("Failed to index document " + documentId + "! Cause: '" + e.getMessage() + "'.");
+                    } catch (final IOException | ElasticsearchException e) {
+                        log.info("Failed to index document {}! Cause: '{}'.", documentId, e.getMessage());
 
                         documentManipulator.markIndexFailure(documentId).subscribe();
                     }

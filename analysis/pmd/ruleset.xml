@@ -10,6 +10,9 @@
         <exclude name="JUnitAssertionsShouldIncludeMessage"/>
         <exclude name="JUnitTestsShouldIncludeAssert"/>
 
+        <!-- This rule is questionable. -->
+        <exclude name="JUnitTestContainsTooManyAsserts"/>
+
         <!-- Too many false positives. -->
         <exclude name="AvoidUsingHardCodedIP"/>
     </rule>
@@ -18,6 +21,9 @@
         <!-- This would ask us to create a serialVersionUid on every Exception. -->
         <exclude name="MissingSerialVersionUID"/>
 
+        <!-- We don't use the setUp and tearDown conventions. -->
+        <exclude name="JUnitSpelling"/>
+
         <!-- This rule doesn't work well with lambdas. -->
         <exclude name="DataflowAnomalyAnalysis"/>
 
@@ -25,5 +31,18 @@
         <exclude name="AvoidDuplicateLiterals"/>
         <exclude name="BeanMembersShouldSerialize"/>
         <exclude name="AssignmentInOperand"/>
+        <exclude name="AvoidLiteralsInIfCondition"/>
+    </rule>
+
+    <!-- These classes were checked on a case by case basis. -->
+    <rule ref="category/java/errorprone.xml/CloseResource">
+        <properties>
+            <property name="violationSuppressXPath"
+                      value="//ClassOrInterfaceDeclaration['com.github.loa.queue.artemis.service.consumer.pool.QueueConsumerFactory']"/>
+            <property name="violationSuppressXPath"
+                      value="//ClassOrInterfaceDeclaration['com.github.loa.queue.artemis.service.producer.pool.QueueProducerFactory']"/>
+            <property name="violationSuppressXPath"
+                      value="//ClassOrInterfaceDeclaration['.*Test']"/>
+        </properties>
     </rule>
 </ruleset>

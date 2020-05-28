@@ -34,8 +34,8 @@ public class DownloaderQueueConsumer implements Consumer<SynchronousSink<Documen
                             .documentLocation(new URL(documentLocationMessage.getDocumentLocation()))
                             .build()
             );
-        } catch (MalformedURLException e) {
-            log.error("Failed to convert document location: " + documentLocationMessage.getDocumentLocation());
+        } catch (final MalformedURLException e) {
+            log.error("Failed to convert document location: {}", documentLocationMessage.getDocumentLocation());
 
             documentSourceItemSynchronousSink.error(e);
         }
