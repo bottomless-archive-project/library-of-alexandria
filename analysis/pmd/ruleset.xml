@@ -5,7 +5,9 @@
 
     <description>PMD ruleset for Library of Alexandria</description>
 
-    <rule ref="category/java/bestpractices.xml"/>
+    <rule ref="category/java/bestpractices.xml">
+        <exclude name="AvoidUsingHardCodedIP"/>
+    </rule>
 
     <rule ref="category/java/errorprone.xml">
         <exclude name="MissingSerialVersionUID"/>
