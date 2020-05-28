@@ -1,7 +1,6 @@
 package com.github.loa.queue.artemis.service.consumer.pool.domain;
 
 import lombok.Getter;
-import org.apache.activemq.artemis.api.core.client.ClientConsumer;
 import stormpot.BasePoolable;
 import stormpot.Poolable;
 import stormpot.Slot;

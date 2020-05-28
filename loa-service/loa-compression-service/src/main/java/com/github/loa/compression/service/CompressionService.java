@@ -1,7 +1,6 @@
 package com.github.loa.compression.service;
 
 import java.io.InputStream;
-import java.io.OutputStream;
 
 /**
  * A service that is responsible for compressing binary data.

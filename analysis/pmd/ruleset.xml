@@ -6,12 +6,22 @@
     <description>PMD ruleset for Library of Alexandria</description>
 
     <rule ref="category/java/bestpractices.xml">
+        <!-- Unfortunately PMD doesn't work well with StepVerifier. -->
+        <exclude name="JUnitAssertionsShouldIncludeMessage"/>
+        <exclude name="JUnitTestsShouldIncludeAssert"/>
+
+        <!-- Too many false positives. -->
         <exclude name="AvoidUsingHardCodedIP"/>
     </rule>
 
     <rule ref="category/java/errorprone.xml">
+        <!-- This would ask us to create a serialVersionUid on every Exception. -->
         <exclude name="MissingSerialVersionUID"/>
+
+        <!-- This rule doesn't work well with lambdas. -->
         <exclude name="DataflowAnomalyAnalysis"/>
+
+        <!-- Too many false positives. -->
         <exclude name="AvoidDuplicateLiterals"/>
         <exclude name="BeanMembersShouldSerialize"/>
         <exclude name="AssignmentInOperand"/>

@@ -26,24 +26,24 @@ public class RecompressorService {
     private final CompressionConfigurationProperties compressionConfigurationProperties;
 
     public void recompress(final DocumentEntity documentEntity, final DocumentCompression documentCompression) {
-        log.info("Migrating archived document " + documentEntity.getId() + " from " + documentEntity.getCompression()
-                + " compression to " + compressionConfigurationProperties.getAlgorithm() + ".");
+        log.info("Migrating archived document {} from {} compression to {}.", documentEntity.getId(),
+                documentEntity.getCompression(), compressionConfigurationProperties.getAlgorithm());
 
         try (final InputStream documentContentInputStream = vaultDocumentManager.readDocument(documentEntity)
                 .getInputStream()) {
             final byte[] documentContent = documentContentInputStream.readAllBytes();
 
             vaultDocumentManager.removeDocument(documentEntity)
-                    .doOnNext(documentEntity1 -> {
+                    .doOnNext(processedEntity -> {
                         final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentEntity);
 
-                        vaultDocumentStorage.persistDocument(documentEntity1, documentContent, vaultLocation);
+                        vaultDocumentStorage.persistDocument(processedEntity, documentContent, vaultLocation);
                     })
                     .subscribe();
 
             documentManipulator.updateCompression(documentEntity.getId(), documentCompression).subscribe();
-        } catch (IOException e) {
-            throw new RuntimeException("Unable to base64 encode document " + documentEntity.getId() + "!", e);
+        } catch (final IOException e) {
+            throw new RuntimeException("Unable to load document " + documentEntity.getId() + "!", e);
         }
     }
 }

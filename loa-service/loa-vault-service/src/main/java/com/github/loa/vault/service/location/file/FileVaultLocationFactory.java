@@ -27,6 +27,7 @@ public class FileVaultLocationFactory implements VaultLocationFactory {
      * @param documentEntity the entity to create the location for
      * @return the location of the document
      */
+    @Override
     public VaultLocation getLocation(final DocumentEntity documentEntity) {
         return getLocation(documentEntity, documentEntity.getCompression());
     }
@@ -39,6 +40,7 @@ public class FileVaultLocationFactory implements VaultLocationFactory {
      * @param compression    the compression used in the location calculation
      * @return the location of the document
      */
+    @Override
     public VaultLocation getLocation(final DocumentEntity documentEntity, final DocumentCompression compression) {
         if (compression == DocumentCompression.NONE) {
             return new FileVaultLocation(fileFactory.newFile(fileConfigurationProperties.getPath(),

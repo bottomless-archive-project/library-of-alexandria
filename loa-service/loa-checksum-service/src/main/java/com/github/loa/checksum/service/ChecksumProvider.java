@@ -2,8 +2,6 @@ package com.github.loa.checksum.service;
 
 import reactor.core.publisher.Mono;
 
-import java.nio.file.Path;
-
 /**
  * This interface is responsible for providing checksum values for documents in the stage location.
  */

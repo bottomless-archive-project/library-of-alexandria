@@ -1,6 +1,5 @@
 package com.github.loa.url.service;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import reactor.core.publisher.Mono;
@@ -13,12 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class UrlEncoderTest {
 
-    private UrlEncoder urlEncoder;
-
-    @BeforeEach
-    private void setup() {
-        urlEncoder = new UrlEncoder();
-    }
+    private final UrlEncoder underTest = new UrlEncoder();
 
     @ParameterizedTest
     @CsvSource(
@@ -29,7 +23,7 @@ class UrlEncoderTest {
             }
     )
     void testEncodeWhenUsingValidUrls(final String urlToEncode, final String expected) throws MalformedURLException {
-        final Mono<URL> result = urlEncoder.encode(new URL(urlToEncode));
+        final Mono<URL> result = underTest.encode(new URL(urlToEncode));
 
         StepVerifier.create(result)
                 .consumeNextWith(resultValue -> assertEquals(expected, resultValue.toString()))
@@ -43,7 +37,7 @@ class UrlEncoderTest {
             }
     )
     void testEncodeWhenUsingInvalidUrls(final String urlToEncode) throws MalformedURLException {
-        final Mono<URL> result = urlEncoder.encode(new URL(urlToEncode));
+        final Mono<URL> result = underTest.encode(new URL(urlToEncode));
 
         StepVerifier.create(result)
                 .verifyComplete();
