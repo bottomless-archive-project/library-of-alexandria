@@ -1,7 +1,7 @@
 package com.github.loa.queue.artemis.service.consumer;
 
 import com.github.loa.queue.artemis.configuration.QueueServerConfiguration;
-import com.github.loa.queue.artemis.service.consumer.pool.domain.PoolableClientConsumer;
+import com.github.loa.queue.artemis.service.consumer.pool.domain.PoolableQueueConsumer;
 import com.github.loa.queue.service.domain.Queue;
 import com.github.loa.queue.service.domain.QueueException;
 import lombok.RequiredArgsConstructor;
@@ -22,13 +22,13 @@ public class ClientConsumerExecutor {
     private final PoolableClientConsumerPoolFactory poolableClientConsumerPoolFactory;
 
     public <T> T invokeConsumer(final Queue queue, final Function<ClientConsumer, T> clientConsumerConsumer) {
-        try (final PoolableClientConsumer poolableClientConsumer = claimClientConsumer(queue)) {
-            return clientConsumerConsumer.apply(poolableClientConsumer.getClientConsumer());
+        try (final PoolableQueueConsumer poolableClientConsumer = claimClientConsumer(queue)) {
+            return clientConsumerConsumer.apply(poolableClientConsumer.getQueueConsumer().getClientConsumer());
         }
     }
 
-    private PoolableClientConsumer claimClientConsumer(final Queue queue) {
-        final Pool<PoolableClientConsumer> clientConsumersForQueue = poolableClientConsumerPoolFactory.getPool(queue);
+    private PoolableQueueConsumer claimClientConsumer(final Queue queue) {
+        final Pool<PoolableQueueConsumer> clientConsumersForQueue = poolableClientConsumerPoolFactory.getPool(queue);
 
         try {
             return clientConsumersForQueue.claim(new Timeout(Integer.MAX_VALUE, TimeUnit.DAYS));

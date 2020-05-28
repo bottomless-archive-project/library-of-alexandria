@@ -1,6 +1,7 @@
 package com.github.loa.queue.artemis.service.producer.pool;
 
 import com.github.loa.queue.artemis.configuration.QueueServerConfiguration;
+import com.github.loa.queue.artemis.service.producer.pool.domain.QueueProducer;
 import com.github.loa.queue.service.domain.Queue;
 import com.github.loa.queue.service.domain.QueueException;
 import lombok.RequiredArgsConstructor;
@@ -16,24 +17,28 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 @ConditionalOnMissingBean(QueueServerConfiguration.class)
-public class ClientProducerFactory {
+public class QueueProducerFactory {
 
     private final ClientSessionFactory clientSessionFactory;
 
     /**
-     * Creates a new {@link ClientProducer} for a given {@link Queue}. A new Artemis socket is being opened in the
+     * Creates a new {@link QueueProducer} for a given {@link Queue}. A new Artemis socket is being opened in the
      * background for this.
      *
      * @param queue the queue to create the producer for
      * @return the freshly created producer
      */
-    public ClientProducer createProducer(final Queue queue) {
+    public QueueProducer createProducer(final Queue queue) {
         log.info("Creating new producer for queue: {}!", queue);
 
         try {
             final ClientSession clientSession = clientSessionFactory.createSession();
+            final ClientProducer clientProducer = clientSession.createProducer(queue.getAddress());
 
-            return clientSession.createProducer(queue.getAddress());
+            return QueueProducer.builder()
+                    .clientSession(clientSession)
+                    .clientProducer(clientProducer)
+                    .build();
         } catch (final ActiveMQException e) {
             log.error("Error while creating client producer for queue {}!", queue, e);
 

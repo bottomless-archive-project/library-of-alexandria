@@ -1,7 +1,7 @@
 package com.github.loa.queue.artemis.service.producer.pool;
 
 import com.github.loa.queue.artemis.configuration.QueueServerConfiguration;
-import com.github.loa.queue.artemis.service.producer.pool.domain.PoolableClientProducer;
+import com.github.loa.queue.artemis.service.producer.pool.domain.PoolableQueueProducer;
 import com.github.loa.queue.service.domain.Queue;
 import com.github.loa.queue.service.domain.QueueException;
 import lombok.RequiredArgsConstructor;
@@ -14,23 +14,23 @@ import stormpot.Slot;
 @Slf4j
 @RequiredArgsConstructor
 @ConditionalOnMissingBean(QueueServerConfiguration.class)
-public class ClientProducerAllocator implements Allocator<PoolableClientProducer> {
+public class QueueProducerAllocator implements Allocator<PoolableQueueProducer> {
 
     private final Queue supportedQueue;
-    private final ClientProducerFactory clientProducerFactory;
+    private final QueueProducerFactory queueProducerFactory;
 
     @Override
-    public PoolableClientProducer allocate(final Slot slot) {
-        return new PoolableClientProducer(slot, clientProducerFactory.createProducer(supportedQueue));
+    public PoolableQueueProducer allocate(final Slot slot) {
+        return new PoolableQueueProducer(slot, queueProducerFactory.createProducer(supportedQueue));
     }
 
     @Override
-    public void deallocate(final PoolableClientProducer poolableClientProducer) {
+    public void deallocate(final PoolableQueueProducer poolableClientProducer) {
         log.info("Closing producer for queue: {}!", supportedQueue);
 
         try {
-            poolableClientProducer.getClientProducer().close();
-        } catch (final ActiveMQException e) {
+            poolableClientProducer.getQueueProducer().close();
+        } catch (final Exception e) {
             throw new QueueException("Unable to close client producer!", e);
         }
     }

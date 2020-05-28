@@ -1,6 +1,7 @@
 package com.github.loa.queue.artemis.service.consumer.pool;
 
 import com.github.loa.queue.artemis.configuration.QueueServerConfiguration;
+import com.github.loa.queue.artemis.service.consumer.pool.domain.QueueConsumer;
 import com.github.loa.queue.service.domain.Queue;
 import com.github.loa.queue.service.domain.QueueException;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +17,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 @ConditionalOnMissingBean(QueueServerConfiguration.class)
-public class ClientConsumerFactory {
+public class QueueConsumerFactory {
 
     private final ClientSessionFactory clientSessionFactory;
 
@@ -27,16 +28,20 @@ public class ClientConsumerFactory {
      * @param queue the queue to create the consumer for
      * @return the freshly created consumer
      */
-    public ClientConsumer createConsumer(final Queue queue) {
+    public QueueConsumer createConsumer(final Queue queue) {
         log.info("Creating new consumer for queue: {}!", queue);
 
         try {
             final ClientSession clientSession = clientSessionFactory.createSession();
             final ClientConsumer clientConsumer = clientSession.createConsumer(queue.getAddress());
 
+            // Pre-start the consumer so we don't need to synchronize later on
             clientSession.start();
 
-            return clientConsumer;
+            return QueueConsumer.builder()
+                    .clientSession(clientSession)
+                    .clientConsumer(clientConsumer)
+                    .build();
         } catch (final ActiveMQException e) {
             log.error("Error while creating client consumer for queue {}!", queue, e);
 

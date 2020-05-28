@@ -1,7 +1,7 @@
 package com.github.loa.queue.artemis.service.producer;
 
 import com.github.loa.queue.artemis.configuration.QueueServerConfiguration;
-import com.github.loa.queue.artemis.service.producer.pool.domain.PoolableClientProducer;
+import com.github.loa.queue.artemis.service.producer.pool.domain.PoolableQueueProducer;
 import com.github.loa.queue.service.domain.Queue;
 import com.github.loa.queue.service.domain.QueueException;
 import lombok.RequiredArgsConstructor;
@@ -24,13 +24,13 @@ public class ClientProducerExecutor {
     private final PoolableClientProducerPoolFactory poolableClientProducerPoolFactory;
 
     public void invokeProducer(final Queue queue, final Consumer<ClientProducer> clientProducerConsumer) {
-        try (final PoolableClientProducer poolableClientProducer = claimClientProducer(queue)) {
-            clientProducerConsumer.accept(poolableClientProducer.getClientProducer());
+        try (final PoolableQueueProducer poolableClientProducer = claimClientProducer(queue)) {
+            clientProducerConsumer.accept(poolableClientProducer.getQueueProducer().getClientProducer());
         }
     }
 
-    private PoolableClientProducer claimClientProducer(final Queue queue) {
-        final Pool<PoolableClientProducer> clientProducersForQueue = poolableClientProducerPoolFactory.getPool(queue);
+    private PoolableQueueProducer claimClientProducer(final Queue queue) {
+        final Pool<PoolableQueueProducer> clientProducersForQueue = poolableClientProducerPoolFactory.getPool(queue);
 
         try {
             return clientProducersForQueue.claim(new Timeout(Integer.MAX_VALUE, TimeUnit.DAYS));
