@@ -6,6 +6,7 @@ import com.github.loa.queue.service.domain.Queue;
 import com.github.loa.queue.service.domain.QueueException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.activemq.artemis.api.core.ActiveMQException;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import stormpot.Allocator;
 import stormpot.Slot;
@@ -29,7 +30,7 @@ public class QueueProducerAllocator implements Allocator<PoolableQueueProducer> 
 
         try {
             poolableClientProducer.getQueueProducer().close();
-        } catch (final Exception e) {
+        } catch (final ActiveMQException e) {
             throw new QueueException("Unable to close client producer!", e);
         }
     }

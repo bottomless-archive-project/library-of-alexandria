@@ -1,5 +1,6 @@
 package com.github.loa.compression.service;
 
+import com.github.loa.compression.domain.CompressionException;
 import org.apache.commons.compress.compressors.lzma.LZMACompressorInputStream;
 import org.apache.commons.compress.compressors.lzma.LZMACompressorOutputStream;
 import org.springframework.stereotype.Service;
@@ -22,7 +23,7 @@ public class LZMACompressionService implements CompressionService {
 
             return byteArrayOutputStream.toByteArray();
         } catch (final IOException e) {
-            throw new RuntimeException("Error while compressing document!", e);
+            throw new CompressionException("Error while compressing document!", e);
         }
     }
 
@@ -31,7 +32,7 @@ public class LZMACompressionService implements CompressionService {
         try {
             return new LZMACompressorInputStream(compressedDocumentContent);
         } catch (final IOException e) {
-            throw new RuntimeException("Error while decompressing document!", e);
+            throw new CompressionException("Error while decompressing document!", e);
         }
     }
 }

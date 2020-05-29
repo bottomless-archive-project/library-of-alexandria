@@ -1,5 +1,6 @@
 package com.github.loa.downloader.service.document;
 
+import com.github.loa.downloader.service.document.domain.exception.ArchivingException;
 import com.github.loa.queue.service.QueueManipulator;
 import com.github.loa.queue.service.domain.Queue;
 import com.github.loa.queue.service.domain.message.DocumentArchivingMessage;
@@ -39,7 +40,7 @@ public class DocumentArchiver {
                             .build()
             );
         } catch (final IOException e) {
-            throw new RuntimeException("Failed to send document for archiving!", e);
+            throw new ArchivingException("Failed to send document for archiving!", e);
         }
 
         return Mono.just(documentArchivingContext);

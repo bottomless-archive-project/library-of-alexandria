@@ -26,8 +26,8 @@ public class ArtemisInputStream extends InputStream {
                 content.readBytes(bytes);
                 data = new ByteArrayInputStream(bytes);
             }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (final IOException e) {
+            throw new ArtemisInputStreamException(e);
         }
 
         // If read everything that was required
@@ -39,8 +39,8 @@ public class ArtemisInputStream extends InputStream {
 
         try {
             return data.read();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (final IOException e) {
+            throw new ArtemisInputStreamException(e);
         }
     }
 }

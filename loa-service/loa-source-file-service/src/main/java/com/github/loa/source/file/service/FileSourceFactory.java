@@ -2,6 +2,7 @@ package com.github.loa.source.file.service;
 
 import com.github.loa.source.file.configuration.FileDocumentSourceConfigurationProperties;
 import com.github.loa.source.file.service.domain.FileEncodingType;
+import com.github.loa.source.file.service.domain.FileHandlingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -30,8 +31,8 @@ public class FileSourceFactory {
             }
 
             return fileStream;
-        } catch (IOException e) {
-            throw new RuntimeException("Unable to create file input stream for file source!", e);
+        } catch (final IOException e) {
+            throw new FileHandlingException("Unable to create file input stream for file source!", e);
         }
     }
 }

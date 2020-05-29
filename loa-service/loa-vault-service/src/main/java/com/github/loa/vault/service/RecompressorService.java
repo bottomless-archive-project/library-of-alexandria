@@ -4,6 +4,7 @@ import com.github.loa.compression.configuration.CompressionConfigurationProperti
 import com.github.loa.compression.domain.DocumentCompression;
 import com.github.loa.document.service.DocumentManipulator;
 import com.github.loa.document.service.domain.DocumentEntity;
+import com.github.loa.vault.domain.exception.VaultAccessException;
 import com.github.loa.vault.service.backend.service.VaultDocumentStorage;
 import com.github.loa.vault.service.location.VaultLocation;
 import com.github.loa.vault.service.location.VaultLocationFactory;
@@ -43,7 +44,7 @@ public class RecompressorService {
 
             documentManipulator.updateCompression(documentEntity.getId(), documentCompression).subscribe();
         } catch (final IOException e) {
-            throw new RuntimeException("Unable to load document " + documentEntity.getId() + "!", e);
+            throw new VaultAccessException("Unable to load document " + documentEntity.getId() + "!", e);
         }
     }
 }

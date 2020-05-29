@@ -1,5 +1,6 @@
 package com.github.loa.source.file.service.location;
 
+import com.github.loa.source.file.service.domain.FileHandlingException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -46,7 +47,7 @@ public class BufferedReaderAdapter {
             try {
                 reader.close();
             } catch (final IOException e) {
-                throw new RuntimeException("Error while closing document location!", e);
+                throw new FileHandlingException("Error while closing document location!", e);
             }
         };
     }

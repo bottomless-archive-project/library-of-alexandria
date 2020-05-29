@@ -39,7 +39,8 @@ public class SilentCompressorCommand implements CommandLineRunner {
     @Override
     public void run(final String... args) {
         if (!silentCompressorConfigurationProperties.hasAlgorithm()) {
-            throw new RuntimeException("The loa.command.silent-compressor.algorithm command-line argument must be set!");
+            throw new IllegalArgumentException("The loa.command.silent-compressor.algorithm command-line "
+                    + "argument must be set!");
         }
 
         documentEntityFactory.getDocumentEntities()

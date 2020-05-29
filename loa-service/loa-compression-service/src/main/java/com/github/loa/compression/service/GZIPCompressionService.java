@@ -1,5 +1,6 @@
 package com.github.loa.compression.service;
 
+import com.github.loa.compression.domain.CompressionException;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream;
 import org.springframework.stereotype.Service;
@@ -22,7 +23,7 @@ public class GZIPCompressionService implements CompressionService {
 
             return byteArrayOutputStream.toByteArray();
         } catch (final IOException e) {
-            throw new RuntimeException("Error while compressing document!", e);
+            throw new CompressionException("Error while compressing document!", e);
         }
     }
 
@@ -31,7 +32,7 @@ public class GZIPCompressionService implements CompressionService {
         try {
             return new GzipCompressorInputStream(compressedDocumentContent);
         } catch (final IOException e) {
-            throw new RuntimeException("Error while decompressing document!", e);
+            throw new CompressionException("Error while decompressing document!", e);
         }
     }
 }

@@ -5,6 +5,38 @@
 
     <description>PMD ruleset for Library of Alexandria</description>
 
+    <rule ref="category/java/design.xml">
+        <!-- Too many false positives. -->
+        <exclude name="LawOfDemeter"/>
+    </rule>
+
+    <rule ref="category/java/design.xml/UseUtilityClass">
+        <properties>
+            <property name="violationSuppressXPath" value="//ClassOrInterfaceDeclaration['.*Application']"/>
+        </properties>
+    </rule>
+
+    <rule ref="category/java/design.xml/AvoidCatchingGenericException">
+        <properties>
+            <property name="violationSuppressXPath"
+                      value="//ClassOrInterfaceDeclaration['com.github.loa.queue.artemis.configuration.QueueClientConfiguration']"/>
+        </properties>
+    </rule>
+
+    <rule ref="category/java/design.xml/CyclomaticComplexity">
+        <properties>
+            <property name="violationSuppressXPath"
+                      value="//ClassOrInterfaceDeclaration['com.github.loa.indexer.service.index.IndexRequestFactory']"/>
+        </properties>
+    </rule>
+
+    <rule ref="category/java/design.xml/FinalFieldCouldBeStatic">
+        <properties>
+            <property name="violationSuppressXPath"
+                      value="//ClassOrInterfaceDeclaration['com.github.loa.indexer.service.search.domain.SearchContext']"/>
+        </properties>
+    </rule>
+
     <rule ref="category/java/codestyle.xml">
         <!-- Too many false positives. -->
         <exclude name="ShortVariable"/>
