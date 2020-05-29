@@ -6,10 +6,12 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
 
 import java.io.*;
+import java.nio.file.Files;
 
 @RequiredArgsConstructor
 public class FileVaultLocation implements VaultLocation {
 
+    //TODO: This should be a path?
     private final File vaultLocation;
 
     /**
@@ -20,7 +22,7 @@ public class FileVaultLocation implements VaultLocation {
      */
     @Override
     public void upload(final byte[] documentContents) {
-        try (OutputStream outputStream = new FileOutputStream(vaultLocation)) {
+        try (OutputStream outputStream = Files.newOutputStream(vaultLocation.toPath())) {
             IOUtils.copy(new ByteArrayInputStream(documentContents), outputStream);
         } catch (final IOException e) {
             throw new VaultAccessException("Unable to create file in vault!", e);
@@ -35,7 +37,7 @@ public class FileVaultLocation implements VaultLocation {
     @Override
     public InputStream download() {
         try {
-            return new FileInputStream(vaultLocation);
+            return Files.newInputStream(vaultLocation.toPath());
         } catch (final IOException e) {
             throw new VaultAccessException("Unable to get the content of a vault location!", e);
         }

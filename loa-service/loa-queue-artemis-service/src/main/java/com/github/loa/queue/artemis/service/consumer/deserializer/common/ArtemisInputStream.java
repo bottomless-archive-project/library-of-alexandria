@@ -14,7 +14,7 @@ public class ArtemisInputStream extends InputStream {
     private final ActiveMQBuffer content;
 
     private InputStream data;
-    private int dataRead = 0;
+    private int dataRead;
 
     @Override
     public int read() {
