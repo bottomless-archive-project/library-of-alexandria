@@ -24,7 +24,7 @@ public class DocumentArchiver {
     private final Counter archivedDocumentCount;
 
     public Mono<DocumentArchivingContext> archiveDocument(final DocumentArchivingContext documentArchivingContext) {
-        try (final InputStream documentContent = Files.newInputStream(documentArchivingContext.getContents())) {
+        try (InputStream documentContent = Files.newInputStream(documentArchivingContext.getContents())) {
             archivedDocumentCount.increment();
 
             final byte[] content = documentContent.readAllBytes();
@@ -38,7 +38,7 @@ public class DocumentArchiver {
                             .content(content)
                             .build()
             );
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new RuntimeException("Failed to send document for archiving!", e);
         }
 

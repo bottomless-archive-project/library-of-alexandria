@@ -24,7 +24,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class ArchivingServiceTest {
 
-    private final byte[] CONTENT = new byte[]{1, 2, 3, 4, 5};
+    private static final byte[] CONTENT = {1, 2, 3, 4, 5};
 
     @Mock
     private DocumentEntityFactory documentEntityFactory;

@@ -25,10 +25,10 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class S3VaultLocationTest {
 
-    private final String BUCKET_NAME = "test-bucket";
-    private final String FILE_NAME = "example.pdf";
-    private final String CONTENT_TYPE = "application/pdf";
-    private final byte[] CONTENT = {1, 2, 3, 4, 5};
+    private static final String BUCKET_NAME = "test-bucket";
+    private static final String FILE_NAME = "example.pdf";
+    private static final String CONTENT_TYPE = "application/pdf";
+    private static final byte[] CONTENT = {1, 2, 3, 4, 5};
 
     @Mock
     private S3Client s3Client;

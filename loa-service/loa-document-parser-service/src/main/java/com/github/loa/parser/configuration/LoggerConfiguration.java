@@ -10,7 +10,7 @@ import java.util.Arrays;
 @Configuration
 public class LoggerConfiguration {
 
-    private static final String[] UNUSABLE_LOGGING = new String[]{
+    private static final String[] UNUSABLE_LOGGING = {
             "org.apache.pdfbox.util.PDFStreamEngine",
             "org.apache.pdfbox.pdmodel.font.PDSimpleFont",
             "org.apache.pdfbox.pdmodel.font.PDFont",

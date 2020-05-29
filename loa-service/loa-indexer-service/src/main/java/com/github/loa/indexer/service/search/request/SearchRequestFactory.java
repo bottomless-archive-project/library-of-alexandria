@@ -15,7 +15,7 @@ public class SearchRequestFactory {
 
     private final QueryBuilderFactory queryBuilderFactory;
 
-    private static final String[] INDICES = new String[]{"vault_documents"};
+    private static final String[] INDICES = {"vault_documents"};
 
     public SearchRequest newKeywordSearchRequest(final SearchContext searchContext) {
         return new SearchRequest(INDICES, newDocumentContentQuery(searchContext));

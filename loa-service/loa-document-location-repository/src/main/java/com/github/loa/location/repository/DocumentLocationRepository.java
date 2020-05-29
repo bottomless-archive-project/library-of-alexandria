@@ -20,7 +20,7 @@ public class DocumentLocationRepository {
 
         return Mono.from(documentLocationCollection.insertOne(documentLocationDatabaseEntity))
                 .map(result -> Boolean.FALSE)
-                .onErrorReturn((throwable -> throwable instanceof MongoWriteException
-                        && throwable.getMessage().startsWith("E11000 duplicate key error")), Boolean.TRUE);
+                .onErrorReturn(throwable -> throwable instanceof MongoWriteException
+                        && throwable.getMessage().startsWith("E11000 duplicate key error"), Boolean.TRUE);
     }
 }

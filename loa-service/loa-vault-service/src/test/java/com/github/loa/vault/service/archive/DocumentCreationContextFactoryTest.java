@@ -40,7 +40,7 @@ class DocumentCreationContextFactoryTest {
     @Test
     void testNewContext() {
         final UUID id = UUID.randomUUID();
-        final byte[] content = new byte[]{0, 1, 2, 3};
+        final byte[] content = {0, 1, 2, 3};
         final DocumentArchivingContext documentArchivingContext = DocumentArchivingContext.builder()
                 .id(id)
                 .content(content)

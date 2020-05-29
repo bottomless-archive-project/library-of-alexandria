@@ -29,7 +29,7 @@ public class RecompressorService {
         log.info("Migrating archived document {} from {} compression to {}.", documentEntity.getId(),
                 documentEntity.getCompression(), compressionConfigurationProperties.getAlgorithm());
 
-        try (final InputStream documentContentInputStream = vaultDocumentManager.readDocument(documentEntity)
+        try (InputStream documentContentInputStream = vaultDocumentManager.readDocument(documentEntity)
                 .getInputStream()) {
             final byte[] documentContent = documentContentInputStream.readAllBytes();
 

@@ -17,8 +17,8 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class VaultDocumentStorageTest {
 
-    private static final byte[] CONTENT = new byte[]{0, 1, 2, 3, 4, -1, -2, -3, -4, -5};
-    private static final byte[] COMPRESSED_CONTENT = new byte[]{111, 112, 113};
+    private static final byte[] CONTENT = {0, 1, 2, 3, 4, -1, -2, -3, -4, -5};
+    private static final byte[] COMPRESSED_CONTENT = {111, 112, 113};
 
     @Mock
     private VaultLocationFactory vaultLocationFactory;

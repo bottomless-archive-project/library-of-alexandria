@@ -4,7 +4,6 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
@@ -30,7 +29,7 @@ class BufferedReaderAdapterTest {
     public void testCloseWhenNoExceptionThrown() {
         bufferedReaderAdapter.close().accept(bufferedReaderMock);
 
-        verify(bufferedReaderMock, Mockito.only()).close();
+        verify(bufferedReaderMock, only()).close();
     }
 
     @Test

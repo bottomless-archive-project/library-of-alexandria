@@ -5,6 +5,36 @@
 
     <description>PMD ruleset for Library of Alexandria</description>
 
+    <rule ref="category/java/codestyle.xml">
+        <!-- Too many false positives. -->
+        <exclude name="ShortVariable"/>
+        <exclude name="LongVariable"/>
+        <exclude name="OnlyOneReturn"/>
+        <exclude name="LinguisticNaming"/>
+        <exclude name="AtLeastOneConstructor"/>
+        <exclude name="CallSuperInConstructor"/>
+        <exclude name="UseUnderscoresInNumericLiterals"/>
+        <exclude name="CommentDefaultAccessModifier"/>
+    </rule>
+
+    <rule ref="category/java/codestyle.xml/DefaultPackage">
+        <properties>
+            <property name="violationSuppressXPath" value="//ClassOrInterfaceDeclaration['.*Test']"/>
+        </properties>
+    </rule>
+
+    <rule ref="category/java/codestyle.xml/UnnecessaryAnnotationValueElement">
+        <properties>
+            <property name="violationSuppressXPath" value="//ClassOrInterfaceDeclaration['.*Test']"/>
+        </properties>
+    </rule>
+
+    <rule ref="category/java/codestyle.xml/TooManyStaticImports">
+        <properties>
+            <property name="violationSuppressXPath" value="//ClassOrInterfaceDeclaration['.*Test']"/>
+        </properties>
+    </rule>
+
     <rule ref="category/java/bestpractices.xml">
         <!-- Unfortunately PMD doesn't work well with StepVerifier. -->
         <exclude name="JUnitAssertionsShouldIncludeMessage"/>
@@ -41,8 +71,7 @@
                       value="//ClassOrInterfaceDeclaration['com.github.loa.queue.artemis.service.consumer.pool.QueueConsumerFactory']"/>
             <property name="violationSuppressXPath"
                       value="//ClassOrInterfaceDeclaration['com.github.loa.queue.artemis.service.producer.pool.QueueProducerFactory']"/>
-            <property name="violationSuppressXPath"
-                      value="//ClassOrInterfaceDeclaration['.*Test']"/>
+            <property name="violationSuppressXPath" value="//ClassOrInterfaceDeclaration['.*Test']"/>
         </properties>
     </rule>
 </ruleset>

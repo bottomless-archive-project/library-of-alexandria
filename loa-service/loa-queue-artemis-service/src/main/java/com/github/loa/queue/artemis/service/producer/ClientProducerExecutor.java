@@ -24,7 +24,7 @@ public class ClientProducerExecutor {
     private final PoolableClientProducerPoolFactory poolableClientProducerPoolFactory;
 
     public void invokeProducer(final Queue queue, final Consumer<ClientProducer> clientProducerConsumer) {
-        try (final PoolableQueueProducer poolableClientProducer = claimClientProducer(queue)) {
+        try (PoolableQueueProducer poolableClientProducer = claimClientProducer(queue)) {
             clientProducerConsumer.accept(poolableClientProducer.getQueueProducer().getClientProducer());
         }
     }

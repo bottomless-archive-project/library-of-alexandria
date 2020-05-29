@@ -20,7 +20,7 @@ public class FileVaultLocation implements VaultLocation {
      */
     @Override
     public void upload(final byte[] documentContents) {
-        try (final OutputStream outputStream = new FileOutputStream(vaultLocation)) {
+        try (OutputStream outputStream = new FileOutputStream(vaultLocation)) {
             IOUtils.copy(new ByteArrayInputStream(documentContents), outputStream);
         } catch (final IOException e) {
             throw new VaultAccessException("Unable to create file in vault!", e);

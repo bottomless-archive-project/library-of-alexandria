@@ -22,7 +22,7 @@ public class ClientConsumerExecutor {
     private final PoolableClientConsumerPoolFactory poolableClientConsumerPoolFactory;
 
     public <T> T invokeConsumer(final Queue queue, final Function<ClientConsumer, T> clientConsumerConsumer) {
-        try (final PoolableQueueConsumer poolableClientConsumer = claimClientConsumer(queue)) {
+        try (PoolableQueueConsumer poolableClientConsumer = claimClientConsumer(queue)) {
             return clientConsumerConsumer.apply(poolableClientConsumer.getQueueConsumer().getClientConsumer());
         }
     }

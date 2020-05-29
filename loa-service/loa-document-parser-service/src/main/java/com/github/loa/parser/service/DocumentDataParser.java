@@ -62,7 +62,7 @@ public class DocumentDataParser {
         final Metadata metadata = buildMetadata(documentType);
         final ParseContext context = buildParseContext();
 
-        try (final InputStream inputStream = TikaInputStream.get(documentContents)) {
+        try (InputStream inputStream = TikaInputStream.get(documentContents)) {
             documentParser.parse(inputStream, contentHandler, metadata, context);
 
             final int pageCount = parsePageCount(metadata);
