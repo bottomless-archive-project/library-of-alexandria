@@ -5,6 +5,12 @@
 
     <description>PMD ruleset for Library of Alexandria</description>
 
+    <rule ref="category/java/multithreading.xml">
+        <!-- Too many false positives. -->
+        <exclude name="UseConcurrentHashMap"/>
+        <exclude name="AvoidSynchronizedAtMethodLevel"/>
+    </rule>
+
     <rule ref="category/java/design.xml">
         <!-- Too many false positives. -->
         <exclude name="LawOfDemeter"/>
