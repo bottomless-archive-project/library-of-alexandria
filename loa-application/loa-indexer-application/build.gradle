@@ -4,7 +4,7 @@ apply plugin: 'com.palantir.docker'
 
 docker {
     dependsOn bootJar
-    name 'loa-indexer-application:' + rootProject.version.toString()
+    name 'bottomlessarchive/loa-indexer-application:' + rootProject.version.toString()
     files bootJar.archiveFile
 }
 
