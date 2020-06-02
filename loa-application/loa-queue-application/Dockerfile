@@ -1,4 +1,4 @@
-FROM azul/zulu-openjdk-alpine:13-jre-headless
+FROM azul/zulu-openjdk-alpine:14-jre-headless
 
 COPY loa-queue-application-*.jar app.jar
 
