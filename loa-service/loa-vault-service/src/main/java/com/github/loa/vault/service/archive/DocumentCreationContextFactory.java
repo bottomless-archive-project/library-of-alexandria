@@ -4,7 +4,6 @@ import com.github.loa.checksum.service.ChecksumProvider;
 import com.github.loa.compression.configuration.CompressionConfigurationProperties;
 import com.github.loa.document.service.domain.DocumentStatus;
 import com.github.loa.document.service.entity.factory.domain.DocumentCreationContext;
-import com.github.loa.vault.configuration.VaultConfigurationProperties;
 import com.github.loa.vault.service.domain.DocumentArchivingContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,7 +14,6 @@ import reactor.core.publisher.Mono;
 public class DocumentCreationContextFactory {
 
     private final ChecksumProvider checksumProvider;
-    private final VaultConfigurationProperties vaultConfigurationProperties;
     private final CompressionConfigurationProperties compressionConfigurationProperties;
 
     public Mono<DocumentCreationContext> newContext(final DocumentArchivingContext documentArchivingContext) {
@@ -26,7 +24,7 @@ public class DocumentCreationContextFactory {
                         .type(documentArchivingContext.getType())
                         .status(DocumentStatus.DOWNLOADED)
                         .source(documentArchivingContext.getSource())
-                        .versionNumber(vaultConfigurationProperties.getVersionNumber())
+                        .versionNumber(documentArchivingContext.getVersionNumber())
                         .compression(compressionConfigurationProperties.getAlgorithm())
                         .checksum(checksum)
                         .fileSize(documentArchivingContext.getContentLength())

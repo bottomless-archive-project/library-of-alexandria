@@ -10,9 +10,10 @@ import java.util.UUID;
 @Builder
 public class DocumentArchivingContext {
 
-    private UUID id;
-    private DocumentType type;
-    private String source;
-    private int contentLength;
-    private byte[] content;
+    private final UUID id;
+    private final DocumentType type;
+    private final String source;
+    private final int contentLength;
+    private final byte[] content;
+    private final int versionNumber;
 }
