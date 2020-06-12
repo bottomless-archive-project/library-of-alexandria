@@ -16,12 +16,16 @@ public class DocumentEntity {
     @ToString.Include
     private final UUID id;
     @ToString.Include
+    private final String vault;
+    @ToString.Include
     private final DocumentType type;
+    @ToString.Include
     private final DocumentStatus status;
     private final Instant downloadDate;
     private final String checksum;
     private final long fileSize;
     private final int downloaderVersion;
+    @ToString.Include
     private final DocumentCompression compression;
 
     /**
@@ -41,5 +45,9 @@ public class DocumentEntity {
      */
     public boolean isCompressed() {
         return compression != DocumentCompression.NONE;
+    }
+
+    public boolean isInVault(final String vault) {
+        return this.vault.equals(vault);
     }
 }

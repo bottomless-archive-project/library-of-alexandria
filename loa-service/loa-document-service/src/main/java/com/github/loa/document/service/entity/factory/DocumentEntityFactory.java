@@ -69,6 +69,7 @@ public class DocumentEntityFactory {
         final DocumentDatabaseEntity documentDatabaseEntity = new DocumentDatabaseEntity();
 
         documentDatabaseEntity.setId(documentCreationContext.getId());
+        documentDatabaseEntity.setVault(documentCreationContext.getVault());
         documentDatabaseEntity.setType(documentCreationContext.getType().toString());
         documentDatabaseEntity.setStatus(documentCreationContext.getStatus().toString());
         documentDatabaseEntity.setChecksum(hexConverter.decode(documentCreationContext.getChecksum()));

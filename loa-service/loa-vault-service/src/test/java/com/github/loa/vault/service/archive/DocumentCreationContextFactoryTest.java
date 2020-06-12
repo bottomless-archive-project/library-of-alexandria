@@ -6,7 +6,6 @@ import com.github.loa.compression.domain.DocumentCompression;
 import com.github.loa.document.service.domain.DocumentStatus;
 import com.github.loa.document.service.domain.DocumentType;
 import com.github.loa.document.service.entity.factory.domain.DocumentCreationContext;
-import com.github.loa.vault.configuration.VaultConfigurationProperties;
 import com.github.loa.vault.service.domain.DocumentArchivingContext;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,9 +28,6 @@ class DocumentCreationContextFactoryTest {
     private ChecksumProvider checksumProvider;
 
     @Mock
-    private VaultConfigurationProperties vaultConfigurationProperties;
-
-    @Mock
     private CompressionConfigurationProperties compressionConfigurationProperties;
 
     @InjectMocks
@@ -47,11 +43,10 @@ class DocumentCreationContextFactoryTest {
                 .contentLength(4)
                 .source("unknown")
                 .type(DocumentType.PDF)
+                .versionNumber(123)
                 .build();
         when(checksumProvider.checksum(content))
                 .thenReturn(Mono.just("textchecksum"));
-        when(vaultConfigurationProperties.getVersionNumber())
-                .thenReturn(123);
         when(compressionConfigurationProperties.getAlgorithm())
                 .thenReturn(DocumentCompression.GZIP);
 

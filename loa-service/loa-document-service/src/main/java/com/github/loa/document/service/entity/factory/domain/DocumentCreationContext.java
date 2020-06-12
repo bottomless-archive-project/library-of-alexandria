@@ -13,6 +13,7 @@ import java.util.UUID;
 public class DocumentCreationContext {
 
     private final UUID id;
+    private final String vault;
     private final DocumentType type;
     private final String source;
     private final String checksum;
