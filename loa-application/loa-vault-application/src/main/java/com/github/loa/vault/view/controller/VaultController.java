@@ -4,6 +4,7 @@ import com.github.loa.document.service.entity.factory.DocumentEntityFactory;
 import com.github.loa.document.view.response.domain.DocumentResponse;
 import com.github.loa.document.view.response.service.DocumentResponseTransformer;
 import com.github.loa.document.view.service.MediaTypeCalculator;
+import com.github.loa.vault.configuration.VaultConfigurationProperties;
 import com.github.loa.vault.service.RecompressorService;
 import com.github.loa.vault.service.VaultDocumentManager;
 import com.github.loa.vault.view.request.domain.RecompressRequest;
@@ -29,6 +30,7 @@ public class VaultController {
     private final RecompressorService recompressorService;
     private final MediaTypeCalculator mediaTypeCalculator;
     private final DocumentResponseTransformer documentResponseTransformer;
+    private final VaultConfigurationProperties vaultConfigurationProperties;
 
     /**
      * Return a document's content from the vault, based on the provided document id.
@@ -40,6 +42,11 @@ public class VaultController {
     public Mono<ResponseEntity<Resource>> queryDocument(@PathVariable final String documentId) {
         return documentEntityFactory.getDocumentEntity(UUID.fromString(documentId))
                 .map(documentEntity -> {
+                    if (!documentEntity.isInVault(vaultConfigurationProperties.getName())) {
+                        throw new ResponseStatusException(HttpStatus.CONFLICT, "Document with id " + documentId
+                                + " is available on a different vault!");
+                    }
+
                     final Resource resource = vaultDocumentManager.readDocument(documentEntity);
 
                     return ResponseEntity.ok()

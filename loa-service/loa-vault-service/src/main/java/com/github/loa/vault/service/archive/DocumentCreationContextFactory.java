@@ -21,6 +21,7 @@ public class DocumentCreationContextFactory {
                 .flatMap(archivingContext -> checksumProvider.checksum(archivingContext.getContent()))
                 .map(checksum -> DocumentCreationContext.builder()
                         .id(documentArchivingContext.getId())
+                        .vault(documentArchivingContext.getVault())
                         .type(documentArchivingContext.getType())
                         .status(DocumentStatus.DOWNLOADED)
                         .source(documentArchivingContext.getSource())

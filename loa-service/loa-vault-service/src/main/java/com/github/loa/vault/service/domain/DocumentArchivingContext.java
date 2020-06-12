@@ -11,6 +11,7 @@ import java.util.UUID;
 public class DocumentArchivingContext {
 
     private final UUID id;
+    private final String vault;
     private final DocumentType type;
     private final String source;
     private final int contentLength;
