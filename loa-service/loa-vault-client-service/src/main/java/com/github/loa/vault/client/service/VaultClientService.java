@@ -4,6 +4,7 @@ import com.github.loa.compression.domain.DocumentCompression;
 import com.github.loa.document.service.DocumentManipulator;
 import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.vault.client.configuration.VaultClientConfigurationProperties;
+import com.github.loa.vault.client.configuration.VaultClientLocationConfigurationProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -36,8 +37,12 @@ public class VaultClientService {
      */
     //TODO: Instead of returning empty, we should return an error when the request is failed!
     public Mono<byte[]> queryDocument(final DocumentEntity documentEntity) {
+        final VaultClientLocationConfigurationProperties vaultClientLocationConfigurationProperties =
+                vaultClientConfigurationProperties.getLocation(documentEntity.getVault());
+
         return vaultWebClient.get()
-                .uri("/document/" + documentEntity.getId())
+                .uri("http://" + vaultClientLocationConfigurationProperties.getHost() + ":"
+                        + vaultClientLocationConfigurationProperties.getPort() + "/document/" + documentEntity.getId())
                 .retrieve()
                 .bodyToMono(byte[].class)
                 .onErrorResume(WebClientResponseException.class, (error) -> {
@@ -56,9 +61,12 @@ public class VaultClientService {
     }
 
     public void recompressDocument(final DocumentEntity documentEntity, final DocumentCompression documentCompression) {
+        final VaultClientLocationConfigurationProperties vaultClientLocationConfigurationProperties =
+                vaultClientConfigurationProperties.getLocation(documentEntity.getVault());
+
         final HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("http://" + vaultClientConfigurationProperties.getHost() + ":"
-                        + vaultClientConfigurationProperties.getPort() + "/document/" + documentEntity.getId()
+                .uri(URI.create("http://" + vaultClientLocationConfigurationProperties.getHost() + ":"
+                        + vaultClientLocationConfigurationProperties.getPort() + "/document/" + documentEntity.getId()
                         + "/recompress"))
                 .header("Content-Type", "application/json")
                 .POST(ofString("{compression: \"" + documentCompression + "\"}"))
