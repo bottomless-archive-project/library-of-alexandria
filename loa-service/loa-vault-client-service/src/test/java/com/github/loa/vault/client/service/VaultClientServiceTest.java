@@ -7,15 +7,20 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.io.buffer.DefaultDataBufferFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.util.UUID;
 
-import static org.mockito.Mockito.when;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Mockito.*;
 
 /*
  In this test we need to use a real WebClient because mocking it (in a reasonable way) is next to impossible.
@@ -31,8 +36,6 @@ class VaultClientServiceTest {
     @Mock
     private DocumentManipulator documentManipulator;
 
-    private VaultClientService underTest;
-
     @Test
     public void testQueryDocumentWhenUnableToGetDocumentContents() {
         final WebClient webClient = WebClient.builder()
@@ -45,7 +48,8 @@ class VaultClientServiceTest {
                         )
                 )
                 .build();
-        underTest = new VaultClientService(vaultClientConfigurationProperties, documentManipulator, webClient);
+        final VaultClientService underTest = new VaultClientService(
+                vaultClientConfigurationProperties, documentManipulator, webClient);
 
         final DocumentEntity documentEntity = DocumentEntity.builder()
                 .id(TEST_DOCUMENT_ID)
@@ -62,5 +66,34 @@ class VaultClientServiceTest {
 
         StepVerifier.create(indexingFailureMono)
                 .verifyComplete();
+    }
+
+    @Test
+    public void testQueryDocumentWhenTheRequestWasSuccessful() {
+        final DefaultDataBufferFactory dataBufferFactory = new DefaultDataBufferFactory();
+        final WebClient webClient = WebClient.builder()
+                .exchangeFunction(clientRequest ->
+                        Mono.just(
+                                ClientResponse.create(HttpStatus.OK)
+                                        .header("Content-Type", "application/json")
+                                        .body(Flux.just(dataBufferFactory.wrap(new byte[]{0, 1, 2})))
+                                        .build()
+                        )
+                )
+                .build();
+        final VaultClientService underTest = new VaultClientService(
+                vaultClientConfigurationProperties, documentManipulator, webClient);
+
+        final DocumentEntity documentEntity = DocumentEntity.builder()
+                .id(TEST_DOCUMENT_ID)
+                .build();
+
+        final Mono<byte[]> result = underTest.queryDocument(documentEntity);
+
+        StepVerifier.create(result)
+                .consumeNextWith(documentContents -> assertThat(documentContents, is(equalTo(new byte[]{0, 1, 2}))))
+                .verifyComplete();
+
+        verify(documentManipulator, never()).markIndexFailure(TEST_DOCUMENT_ID);
     }
 }
