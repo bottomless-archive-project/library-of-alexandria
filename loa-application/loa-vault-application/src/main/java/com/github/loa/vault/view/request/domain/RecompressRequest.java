@@ -1,10 +1,19 @@
 package com.github.loa.vault.view.request.domain;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.github.loa.compression.domain.DocumentCompression;
-import lombok.Data;
+import lombok.Builder;
+import lombok.Value;
 
-@Data
+@Value
+@Builder(builderClassName = "LombokBuilder")
+@JsonDeserialize(builder = RecompressRequest.LombokBuilder.class)
 public class RecompressRequest {
 
-    private DocumentCompression compression;
+    DocumentCompression compression;
+
+    @JsonPOJOBuilder(withPrefix = "")
+    public static class LombokBuilder {
+    }
 }

@@ -20,6 +20,12 @@ public class VaultConfigurationProperties {
     private String name;
 
     /**
+     * If this vault should be able to modify documents (eg. remove) after they are archived. If your vault is available
+     * publicly on the internet then set this to false!
+     */
+    private boolean modificationEnabled;
+
+    /**
      * If this vault should archive new documents.
      */
     private boolean archiving;

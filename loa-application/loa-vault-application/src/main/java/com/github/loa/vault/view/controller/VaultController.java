@@ -1,8 +1,6 @@
 package com.github.loa.vault.view.controller;
 
 import com.github.loa.document.service.entity.factory.DocumentEntityFactory;
-import com.github.loa.document.view.response.domain.DocumentResponse;
-import com.github.loa.document.view.response.service.DocumentResponseTransformer;
 import com.github.loa.document.view.service.MediaTypeCalculator;
 import com.github.loa.vault.configuration.VaultConfigurationProperties;
 import com.github.loa.vault.service.RecompressorService;
@@ -29,7 +27,6 @@ public class VaultController {
     private final VaultDocumentManager vaultDocumentManager;
     private final RecompressorService recompressorService;
     private final MediaTypeCalculator mediaTypeCalculator;
-    private final DocumentResponseTransformer documentResponseTransformer;
     private final VaultConfigurationProperties vaultConfigurationProperties;
 
     /**
@@ -66,13 +63,23 @@ public class VaultController {
      * @return the document entity that the content was recompressed
      */
     @PostMapping("/document/{documentId}/recompress")
-    public Mono<DocumentResponse> recompressDocument(@PathVariable final String documentId,
+    public Mono<Void> recompressDocument(@PathVariable final String documentId,
             @RequestBody final RecompressRequest recompressRequest) {
+        if (!vaultConfigurationProperties.isModificationEnabled()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Modification is disabled on this vault instance!");
+        }
+
         return documentEntityFactory.getDocumentEntity(UUID.fromString(documentId))
-                .doOnNext(documentEntity ->
-                        recompressorService.recompress(documentEntity, recompressRequest.getCompression()))
-                .map(documentResponseTransformer::transform)
+                .doOnNext(documentEntity -> {
+                    if (!documentEntity.isInVault(vaultConfigurationProperties.getName())) {
+                        throw new ResponseStatusException(HttpStatus.CONFLICT, "Document with id " + documentId
+                                + " is available on a different vault!");
+                    }
+
+                    recompressorService.recompress(documentEntity, recompressRequest.getCompression());
+                })
                 .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "Document not found with id " + documentId + "!")));
+                        "Document not found with id " + documentId + "!")))
+                .then();
     }
 }

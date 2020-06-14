@@ -45,6 +45,9 @@ If the application is not a duplicate then the staging file's contents will be m
 | **loa.vault.name**
 | The unique name of the vault. This name will be saved when archiving new documents and will be used to identify the vault that holds a given document. Do not change this after creating the vault because the documents previously archived by this vault are not going to be accessible.
 
+| **loa.vault.modification-enabled**
+| If this vault should be able to modify documents (eg. remove) after they are archived. If your vault is available publicly on the internet then set this to false! *(Default value: true)*
+
 | **loa.vault.archiving**
 | If this vault should archive new documents. *(Default value: true)*
 
