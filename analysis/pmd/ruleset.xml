@@ -20,6 +20,12 @@
         <exclude name="LawOfDemeter"/>
     </rule>
 
+    <rule ref="category/java/design.xml/TooManyMethods">
+        <properties>
+            <property name="maxmethods" value="20"/>
+        </properties>
+    </rule>
+
     <rule ref="category/java/design.xml/UseUtilityClass">
         <properties>
             <property name="violationSuppressXPath" value="//ClassOrInterfaceDeclaration['.*Application']"/>

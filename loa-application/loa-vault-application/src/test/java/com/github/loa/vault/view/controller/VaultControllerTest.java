@@ -228,4 +228,87 @@ class VaultControllerTest {
 
         verify(recompressorService).recompress(documentEntity, DocumentCompression.GZIP);
     }
+
+    @Test
+    public void testRemoveWhenModificationsAreDisabled() {
+        when(vaultConfigurationProperties.isModificationEnabled())
+                .thenReturn(false);
+
+        webTestClient.delete()
+                .uri("/document/{documentId}", TEST_DOCUMENT_ID)
+                .exchange()
+                .expectStatus().isEqualTo(HttpStatus.FORBIDDEN)
+                .returnResult(Void.class)
+                .getResponseBody()
+                .blockFirst();
+    }
+
+    @Test
+    public void testRemoveWhenDocumentNotFound() {
+        when(vaultConfigurationProperties.isModificationEnabled())
+                .thenReturn(true);
+        when(documentEntityFactory.getDocumentEntity(UUID.fromString(TEST_DOCUMENT_ID)))
+                .thenReturn(Mono.empty());
+
+        webTestClient.delete()
+                .uri("/document/{documentId}", TEST_DOCUMENT_ID)
+                .exchange()
+                .expectStatus().isNotFound()
+                .returnResult(Void.class)
+                .getResponseBody()
+                .blockFirst();
+    }
+
+    @Test
+    public void testRemoveWhenDocumentIsInADifferentVault() {
+        when(vaultConfigurationProperties.isModificationEnabled())
+                .thenReturn(true);
+        when(vaultConfigurationProperties.getName())
+                .thenReturn("my-vault");
+        when(documentEntityFactory.getDocumentEntity(UUID.fromString(TEST_DOCUMENT_ID)))
+                .thenReturn(
+                        Mono.just(
+                                DocumentEntity.builder()
+                                        .vault("different-vault")
+                                        .build()
+                        )
+                );
+
+        webTestClient.delete()
+                .uri("/document/{documentId}", TEST_DOCUMENT_ID)
+                .exchange()
+                .expectStatus().isEqualTo(HttpStatus.CONFLICT)
+                .returnResult(Void.class)
+                .getResponseBody()
+                .blockFirst();
+    }
+
+    @Test
+    public void testRemoveWhenRequestIsSuccessful() {
+        when(vaultConfigurationProperties.isModificationEnabled())
+                .thenReturn(true);
+        when(vaultConfigurationProperties.getName())
+                .thenReturn("my-vault");
+        final DocumentEntity documentEntity = DocumentEntity.builder()
+                .id(UUID.fromString(TEST_DOCUMENT_ID))
+                .vault("my-vault")
+                .build();
+        when(documentEntityFactory.getDocumentEntity(UUID.fromString(TEST_DOCUMENT_ID)))
+                .thenReturn(Mono.just(documentEntity));
+        when(documentEntityFactory.removeDocumentEntity(UUID.fromString(TEST_DOCUMENT_ID)))
+                .thenReturn(Mono.empty());
+        when(vaultDocumentManager.removeDocument(documentEntity))
+                .thenReturn(Mono.empty());
+
+        webTestClient.delete()
+                .uri("/document/{documentId}", TEST_DOCUMENT_ID)
+                .exchange()
+                .expectStatus().isEqualTo(HttpStatus.OK)
+                .returnResult(Void.class)
+                .getResponseBody()
+                .blockFirst();
+
+        verify(vaultDocumentManager).removeDocument(documentEntity);
+        verify(documentEntityFactory).removeDocumentEntity(UUID.fromString(TEST_DOCUMENT_ID));
+    }
 }

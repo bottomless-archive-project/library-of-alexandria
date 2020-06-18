@@ -46,6 +46,16 @@ public class DocumentEntityFactory {
     }
 
     /**
+     * Remove a document by it's id.
+     *
+     * @param documentId the id of the document
+     * @return the result of the removal
+     */
+    public Mono<Void> removeDocumentEntity(final UUID documentId) {
+        return documentRepository.removeDocument(documentId);
+    }
+
+    /**
      * Return all documents available in the database.
      *
      * @return all documents available in the database
@@ -55,6 +65,11 @@ public class DocumentEntityFactory {
                 .map(documentEntityTransformer::transform);
     }
 
+    /**
+     * Return the number of documents available in the database.
+     *
+     * @return the count of documents available in the database
+     */
     public Mono<Long> getDocumentCount() {
         return documentRepository.count();
     }
