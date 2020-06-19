@@ -13,7 +13,9 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.Instant;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -72,6 +74,19 @@ public class DocumentEntityFactory {
      */
     public Mono<Long> getDocumentCount() {
         return documentRepository.count();
+    }
+
+    /**
+     * Return the number of documents available in the database grouped by status.
+     *
+     * @return the count of documents grouped by status
+     */
+    public Mono<Map<DocumentStatus, Integer>> getCountByStatus() {
+        return documentRepository.countByStatus()
+                .map(result -> result.entrySet().stream()
+                        .collect(Collectors.toMap((entry) ->
+                                DocumentStatus.valueOf(entry.getKey()), Map.Entry::getValue))
+                );
     }
 
     /**

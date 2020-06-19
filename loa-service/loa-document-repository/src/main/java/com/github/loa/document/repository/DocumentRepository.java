@@ -1,15 +1,22 @@
 package com.github.loa.document.repository;
 
 import com.github.loa.document.repository.domain.DocumentDatabaseEntity;
+import com.github.loa.document.repository.domain.DocumentStatusAggregateEntity;
 import com.github.loa.repository.configuration.RepositoryConfigurationProperties;
 import com.mongodb.reactivestreams.client.MongoCollection;
 import lombok.RequiredArgsConstructor;
+import org.bson.conversions.Bson;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
+import static com.mongodb.client.model.Accumulators.sum;
+import static com.mongodb.client.model.Aggregates.group;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Updates.set;
 
@@ -77,5 +84,12 @@ public class DocumentRepository {
 
     public Mono<Long> count() {
         return Mono.from(documentDatabaseEntityMongoCollection.countDocuments());
+    }
+
+    public Mono<Map<String, Integer>> countByStatus() {
+        final List<Bson> countByStatusAggregate = Collections.singletonList(group("$status", sum("count", 1L)));
+
+        return Flux.from(documentDatabaseEntityMongoCollection.aggregate(countByStatusAggregate, DocumentStatusAggregateEntity.class))
+                .collectMap(DocumentStatusAggregateEntity::getId, DocumentStatusAggregateEntity::getCount);
     }
 }
