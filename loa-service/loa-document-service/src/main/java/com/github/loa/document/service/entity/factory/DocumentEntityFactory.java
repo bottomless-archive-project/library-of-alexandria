@@ -4,6 +4,7 @@ import com.github.loa.document.repository.DocumentRepository;
 import com.github.loa.document.repository.domain.DocumentDatabaseEntity;
 import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.document.service.domain.DocumentStatus;
+import com.github.loa.document.service.domain.DocumentType;
 import com.github.loa.document.service.entity.factory.domain.DocumentCreationContext;
 import com.github.loa.document.service.entity.transformer.DocumentEntityTransformer;
 import com.github.loa.repository.service.HexConverter;
@@ -86,6 +87,19 @@ public class DocumentEntityFactory {
                 .map(result -> result.entrySet().stream()
                         .collect(Collectors.toMap((entry) ->
                                 DocumentStatus.valueOf(entry.getKey()), Map.Entry::getValue))
+                );
+    }
+
+    /**
+     * Return the number of documents available in the database grouped by type.
+     *
+     * @return the count of documents grouped by type
+     */
+    public Mono<Map<DocumentType, Integer>> getCountByType() {
+        return documentRepository.countByType()
+                .map(result -> result.entrySet().stream()
+                        .collect(Collectors.toMap((entry) ->
+                                DocumentType.valueOf(entry.getKey()), Map.Entry::getValue))
                 );
     }
 

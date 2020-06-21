@@ -2,6 +2,7 @@ package com.github.loa.document.repository;
 
 import com.github.loa.document.repository.domain.DocumentDatabaseEntity;
 import com.github.loa.document.repository.domain.DocumentStatusAggregateEntity;
+import com.github.loa.document.repository.domain.DocumentTypeAggregateEntity;
 import com.github.loa.repository.configuration.RepositoryConfigurationProperties;
 import com.mongodb.reactivestreams.client.MongoCollection;
 import lombok.RequiredArgsConstructor;
@@ -91,5 +92,12 @@ public class DocumentRepository {
 
         return Flux.from(documentDatabaseEntityMongoCollection.aggregate(countByStatusAggregate, DocumentStatusAggregateEntity.class))
                 .collectMap(DocumentStatusAggregateEntity::getId, DocumentStatusAggregateEntity::getCount);
+    }
+
+    public Mono<Map<String, Integer>> countByType() {
+        final List<Bson> countByStatusAggregate = Collections.singletonList(group("$type", sum("count", 1L)));
+
+        return Flux.from(documentDatabaseEntityMongoCollection.aggregate(countByStatusAggregate, DocumentTypeAggregateEntity.class))
+                .collectMap(DocumentTypeAggregateEntity::getId, DocumentTypeAggregateEntity::getCount);
     }
 }

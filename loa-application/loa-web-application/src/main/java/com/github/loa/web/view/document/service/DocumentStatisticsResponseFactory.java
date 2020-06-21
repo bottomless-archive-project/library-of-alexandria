@@ -18,10 +18,17 @@ public class DocumentStatisticsResponseFactory {
                         .documentCount(count)
                 )
                 .flatMap(this::fillDocumentCountByType)
+                .flatMap(this::fillDocumentCountByStatus)
                 .map(DashboardDocumentStatisticsResponse.DashboardDocumentStatisticsResponseBuilder::build);
     }
 
     private Mono<DashboardDocumentStatisticsResponse.DashboardDocumentStatisticsResponseBuilder> fillDocumentCountByType(
+            final DashboardDocumentStatisticsResponse.DashboardDocumentStatisticsResponseBuilder builder) {
+        return documentEntityFactory.getCountByType()
+                .map(builder::documentCountByType);
+    }
+
+    private Mono<DashboardDocumentStatisticsResponse.DashboardDocumentStatisticsResponseBuilder> fillDocumentCountByStatus(
             final DashboardDocumentStatisticsResponse.DashboardDocumentStatisticsResponseBuilder builder) {
         return documentEntityFactory.getCountByStatus()
                 .map(builder::documentCountByStatus);
