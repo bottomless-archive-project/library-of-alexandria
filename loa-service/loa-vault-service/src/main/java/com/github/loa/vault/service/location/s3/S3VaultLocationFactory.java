@@ -36,4 +36,14 @@ public class S3VaultLocationFactory implements VaultLocationFactory {
 
         return new S3VaultLocation(s3ConfigurationProperties.getBucketName(), fileName, contentType, s3Client);
     }
+
+    /**
+     * Return the available free space in bytes on the location host.
+     *
+     * @return the free bytes available
+     */
+    @Override
+    public long getAvailableSpace() {
+        return Long.MAX_VALUE;
+    }
 }

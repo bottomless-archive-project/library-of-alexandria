@@ -25,4 +25,11 @@ public interface VaultLocationFactory {
      * @return the vault location belonging to the document
      */
     VaultLocation getLocation(final DocumentEntity documentEntity, final DocumentCompression compression);
+
+    /**
+     * Return the available free space in bytes on the location host.
+     *
+     * @return the free bytes available
+     */
+    long getAvailableSpace();
 }

@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+
 /**
  * A factory that create a local disc backed {@link VaultLocation} instances for documents.
  */
@@ -50,5 +52,15 @@ public class FileVaultLocationFactory implements VaultLocationFactory {
                     documentEntity.getId() + "." + documentEntity.getType().getFileExtension() + "."
                             + compression.getFileExtension()));
         }
+    }
+
+    /**
+     * Return the available free space in bytes on the location host.
+     *
+     * @return the free bytes available
+     */
+    @Override
+    public long getAvailableSpace() {
+        return new File(fileConfigurationProperties.getPath()).getUsableSpace();
     }
 }

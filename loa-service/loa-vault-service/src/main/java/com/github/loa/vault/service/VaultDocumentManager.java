@@ -73,4 +73,13 @@ public class VaultDocumentManager {
                 .doOnNext(VaultLocation::clear)
                 .thenReturn(documentEntity);
     }
+
+    /**
+     * Return the available free space in the vault in bytes.
+     *
+     * @return the free bytes available
+     */
+    public Mono<Long> getAvailableSpace() {
+        return Mono.fromSupplier(vaultLocationFactory::getAvailableSpace);
+    }
 }

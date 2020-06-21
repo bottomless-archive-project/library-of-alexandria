@@ -6,6 +6,7 @@ import com.github.loa.vault.configuration.VaultConfigurationProperties;
 import com.github.loa.vault.service.RecompressorService;
 import com.github.loa.vault.service.VaultDocumentManager;
 import com.github.loa.vault.view.request.domain.RecompressRequest;
+import com.github.loa.vault.view.response.domain.FreeSpaceResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
@@ -113,5 +114,14 @@ public class VaultController {
                 .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Document not found with id " + documentId + "!")))
                 .then();
+    }
+
+    @GetMapping("/free-space")
+    public Mono<FreeSpaceResponse> getFreeSpace() {
+        return vaultDocumentManager.getAvailableSpace()
+                .map(freeSpace -> FreeSpaceResponse.builder()
+                        .freeSpace(freeSpace)
+                        .build()
+                );
     }
 }
