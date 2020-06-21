@@ -9,12 +9,10 @@ import com.github.loa.web.view.document.response.dashboard.DashboardDocumentStat
 import com.github.loa.web.view.document.response.dashboard.DashboardVaultStatisticsResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Arrays;
-import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
