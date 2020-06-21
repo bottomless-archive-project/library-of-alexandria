@@ -1,6 +1,6 @@
 package com.github.loa.web.view.document.controller;
 
-import com.github.loa.web.view.document.response.DashboardDocumentStatisticsResponse;
+import com.github.loa.web.view.document.response.dashboard.DashboardDocumentStatisticsResponse;
 import com.github.loa.web.view.document.service.DocumentStatisticsResponseFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;

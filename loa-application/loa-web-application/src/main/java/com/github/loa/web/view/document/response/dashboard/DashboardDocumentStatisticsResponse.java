@@ -1,4 +1,4 @@
-package com.github.loa.web.view.document.response;
+package com.github.loa.web.view.document.response.dashboard;
 
 import com.github.loa.document.service.domain.DocumentStatus;
 import com.github.loa.document.service.domain.DocumentType;
@@ -13,7 +13,7 @@ import java.util.Set;
 public class DashboardDocumentStatisticsResponse {
 
     private final long documentCount;
-    private final Set<String> vaultInstances;
+    private final Set<DashboardVaultStatisticsResponse> vaultInstances;
     private final Map<DocumentType, Integer> documentCountByType;
     private final Map<DocumentStatus, Integer> documentCountByStatus;
 }

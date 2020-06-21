@@ -5,6 +5,7 @@ import com.github.loa.document.service.DocumentManipulator;
 import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.vault.client.configuration.VaultClientConfigurationProperties;
 import com.github.loa.vault.client.configuration.VaultClientLocationConfigurationProperties;
+import com.github.loa.vault.client.service.response.FreeSpaceResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -41,8 +42,7 @@ public class VaultClientService {
                 vaultClientConfigurationProperties.getLocation(documentEntity.getVault());
 
         return vaultWebClient.get()
-                .uri("http://" + vaultClientLocationConfigurationProperties.getHost() + ":"
-                        + vaultClientLocationConfigurationProperties.getPort() + "/document/" + documentEntity.getId())
+                .uri(vaultClientLocationConfigurationProperties.getLocation() + "/document/" + documentEntity.getId())
                 .retrieve()
                 .bodyToMono(byte[].class)
                 .onErrorResume(WebClientResponseException.class, (error) -> {
@@ -60,13 +60,13 @@ public class VaultClientService {
                 });
     }
 
+    //TODO: Make reactive!
     public void recompressDocument(final DocumentEntity documentEntity, final DocumentCompression documentCompression) {
         final VaultClientLocationConfigurationProperties vaultClientLocationConfigurationProperties =
                 vaultClientConfigurationProperties.getLocation(documentEntity.getVault());
 
         final HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("http://" + vaultClientLocationConfigurationProperties.getHost() + ":"
-                        + vaultClientLocationConfigurationProperties.getPort() + "/document/" + documentEntity.getId()
+                .uri(URI.create(vaultClientLocationConfigurationProperties.getLocation() + "/document/" + documentEntity.getId()
                         + "/recompress"))
                 .header("Content-Type", "application/json")
                 .POST(ofString("{compression: \"" + documentCompression + "\"}"))
@@ -75,5 +75,16 @@ public class VaultClientService {
         HttpClient.newHttpClient().sendAsync(request, HttpResponse.BodyHandlers.ofString())
                 .thenApply(HttpResponse::body)
                 .join();
+    }
+
+    public Mono<Long> getAvailableSpace(final String vaultName) {
+        final VaultClientLocationConfigurationProperties vaultClientLocationConfigurationProperties =
+                vaultClientConfigurationProperties.getLocation(vaultName);
+
+        return vaultWebClient.get()
+                .uri(vaultClientLocationConfigurationProperties.getLocation() + "/free-space")
+                .retrieve()
+                .bodyToMono(FreeSpaceResponse.class)
+                .map(FreeSpaceResponse::getFreeSpace);
     }
 }

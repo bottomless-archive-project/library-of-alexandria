@@ -4,10 +4,13 @@ import com.github.loa.document.service.domain.DocumentStatus;
 import com.github.loa.document.service.domain.DocumentType;
 import com.github.loa.document.service.entity.factory.DocumentEntityFactory;
 import com.github.loa.vault.client.configuration.VaultClientConfigurationProperties;
-import com.github.loa.vault.client.configuration.VaultClientLocationConfigurationProperties;
-import com.github.loa.web.view.document.response.DashboardDocumentStatisticsResponse;
+import com.github.loa.vault.client.service.VaultClientService;
+import com.github.loa.web.view.document.response.dashboard.DashboardDocumentStatisticsResponse;
+import com.github.loa.web.view.document.response.dashboard.DashboardVaultStatisticsResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Arrays;
@@ -19,6 +22,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class DocumentStatisticsResponseFactory {
 
+    private final VaultClientService vaultClientService;
     private final DocumentEntityFactory documentEntityFactory;
     private final VaultClientConfigurationProperties vaultClientConfigurationProperties;
 
@@ -35,8 +39,17 @@ public class DocumentStatisticsResponseFactory {
 
     private Mono<DashboardDocumentStatisticsResponse.DashboardDocumentStatisticsResponseBuilder> fillVaultInstances(
             final DashboardDocumentStatisticsResponse.DashboardDocumentStatisticsResponseBuilder builder) {
-        return Mono.just(vaultClientConfigurationProperties.getLocations())
-                .map(Map::keySet)
+        return Mono.just(vaultClientConfigurationProperties.getLocations().keySet())
+                .flatMap(vaultNames -> Flux.fromIterable(vaultNames)
+                        .flatMap(vaultName -> vaultClientService.getAvailableSpace(vaultName)
+                                .map(availableSpace -> DashboardVaultStatisticsResponse.builder()
+                                        .name(vaultName)
+                                        .availableStorageInBytes(availableSpace)
+                                        .build()
+                                )
+                        )
+                        .collect(Collectors.toSet())
+                )
                 .map(builder::vaultInstances);
     }
 
