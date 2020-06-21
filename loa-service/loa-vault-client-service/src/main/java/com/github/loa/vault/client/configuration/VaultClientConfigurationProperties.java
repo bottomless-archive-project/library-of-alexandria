@@ -1,12 +1,12 @@
 package com.github.loa.vault.client.configuration;
 
-import lombok.Setter;
+import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
-@Setter
+@Data
 @Component
 @ConfigurationProperties("loa.vault.client")
 public class VaultClientConfigurationProperties {

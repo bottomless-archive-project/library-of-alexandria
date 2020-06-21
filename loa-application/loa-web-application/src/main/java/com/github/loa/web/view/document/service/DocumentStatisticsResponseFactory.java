@@ -3,12 +3,15 @@ package com.github.loa.web.view.document.service;
 import com.github.loa.document.service.domain.DocumentStatus;
 import com.github.loa.document.service.domain.DocumentType;
 import com.github.loa.document.service.entity.factory.DocumentEntityFactory;
+import com.github.loa.vault.client.configuration.VaultClientConfigurationProperties;
+import com.github.loa.vault.client.configuration.VaultClientLocationConfigurationProperties;
 import com.github.loa.web.view.document.response.DashboardDocumentStatisticsResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import java.util.Arrays;
+import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
@@ -17,6 +20,7 @@ import java.util.stream.Collectors;
 public class DocumentStatisticsResponseFactory {
 
     private final DocumentEntityFactory documentEntityFactory;
+    private final VaultClientConfigurationProperties vaultClientConfigurationProperties;
 
     public Mono<DashboardDocumentStatisticsResponse> newStatisticsResponse() {
         return documentEntityFactory.getDocumentCount()
@@ -25,7 +29,15 @@ public class DocumentStatisticsResponseFactory {
                 )
                 .flatMap(this::fillDocumentCountByType)
                 .flatMap(this::fillDocumentCountByStatus)
+                .flatMap(this::fillVaultInstances)
                 .map(DashboardDocumentStatisticsResponse.DashboardDocumentStatisticsResponseBuilder::build);
+    }
+
+    private Mono<DashboardDocumentStatisticsResponse.DashboardDocumentStatisticsResponseBuilder> fillVaultInstances(
+            final DashboardDocumentStatisticsResponse.DashboardDocumentStatisticsResponseBuilder builder) {
+        return Mono.just(vaultClientConfigurationProperties.getLocations())
+                .map(Map::keySet)
+                .map(builder::vaultInstances);
     }
 
     private Mono<DashboardDocumentStatisticsResponse.DashboardDocumentStatisticsResponseBuilder> fillDocumentCountByType(

@@ -6,12 +6,14 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.util.Map;
+import java.util.Set;
 
 @Getter
 @Builder
 public class DashboardDocumentStatisticsResponse {
 
     private final long documentCount;
+    private final Set<String> vaultInstances;
     private final Map<DocumentType, Integer> documentCountByType;
     private final Map<DocumentStatus, Integer> documentCountByStatus;
 }
