@@ -14,6 +14,7 @@ public class DashboardDocumentStatisticsResponse {
 
     private final long documentCount;
     private final Set<DashboardVaultStatisticsResponse> vaultInstances;
+    private final Set<DashboardQueueStatisticsResponse> queues;
     private final Map<DocumentType, Integer> documentCountByType;
     private final Map<DocumentStatus, Integer> documentCountByStatus;
 }

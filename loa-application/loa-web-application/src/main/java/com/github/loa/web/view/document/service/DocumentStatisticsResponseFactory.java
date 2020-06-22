@@ -3,9 +3,12 @@ package com.github.loa.web.view.document.service;
 import com.github.loa.document.service.domain.DocumentStatus;
 import com.github.loa.document.service.domain.DocumentType;
 import com.github.loa.document.service.entity.factory.DocumentEntityFactory;
+import com.github.loa.queue.service.QueueManipulator;
+import com.github.loa.queue.service.domain.Queue;
 import com.github.loa.vault.client.configuration.VaultClientConfigurationProperties;
 import com.github.loa.vault.client.service.VaultClientService;
 import com.github.loa.web.view.document.response.dashboard.DashboardDocumentStatisticsResponse;
+import com.github.loa.web.view.document.response.dashboard.DashboardQueueStatisticsResponse;
 import com.github.loa.web.view.document.response.dashboard.DashboardVaultStatisticsResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,6 +16,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Arrays;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
@@ -20,6 +24,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class DocumentStatisticsResponseFactory {
 
+    private final QueueManipulator queueManipulator;
     private final VaultClientService vaultClientService;
     private final DocumentEntityFactory documentEntityFactory;
     private final VaultClientConfigurationProperties vaultClientConfigurationProperties;
@@ -32,7 +37,21 @@ public class DocumentStatisticsResponseFactory {
                 .flatMap(this::fillDocumentCountByType)
                 .flatMap(this::fillDocumentCountByStatus)
                 .flatMap(this::fillVaultInstances)
+                .flatMap(this::fillQueues)
                 .map(DashboardDocumentStatisticsResponse.DashboardDocumentStatisticsResponseBuilder::build);
+    }
+
+    private Mono<DashboardDocumentStatisticsResponse.DashboardDocumentStatisticsResponseBuilder> fillQueues(
+            final DashboardDocumentStatisticsResponse.DashboardDocumentStatisticsResponseBuilder builder) {
+        final Set<DashboardQueueStatisticsResponse> dashboardQueueStatisticsResponses = Arrays.stream(Queue.values())
+                .map(queue -> DashboardQueueStatisticsResponse.builder()
+                        .name(queue.name())
+                        .messageCount(queueManipulator.getMessageCount(queue))
+                        .build()
+                )
+                .collect(Collectors.toSet());
+
+        return Mono.just(builder.queues(dashboardQueueStatisticsResponses));
     }
 
     private Mono<DashboardDocumentStatisticsResponse.DashboardDocumentStatisticsResponseBuilder> fillVaultInstances(
