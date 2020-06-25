@@ -5,6 +5,6 @@ dependencies {
     compile group: 'org.jsoup', name: 'jsoup', version: '1.13.1'
 
     compile project(':loa-service:loa-source-service')
-    compile project(':loa-service:loa-statistics-service')
+    compile project(':loa-service:loa-logging-service')
     compile project(':loa-service:loa-io-service')
 }

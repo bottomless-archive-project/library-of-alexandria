@@ -1,4 +1,4 @@
-package com.github.loa.statistics.service;
+package com.github.loa.logging.service;
 
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Meter;

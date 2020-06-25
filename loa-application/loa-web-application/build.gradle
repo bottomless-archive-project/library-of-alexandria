@@ -13,6 +13,7 @@ dependencies {
 
     compile project(':loa-service:loa-document-view')
     compile project(':loa-service:loa-indexer-service')
+    compile project(':loa-service:loa-statistics-service')
     compile project(':loa-service:loa-vault-client-service')
     compile project(':loa-service:loa-queue-artemis-service')
 }

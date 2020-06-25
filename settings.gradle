@@ -27,5 +27,7 @@ include 'loa-service:loa-document-parser-service'
 include 'loa-service:loa-queue-service'
 include 'loa-service:loa-queue-artemis-service'
 include 'loa-service:loa-statistics-service'
+include 'loa-service:loa-statistics-repository'
+include 'loa-service:loa-logging-service'
 include 'loa-service:loa-repository'
 

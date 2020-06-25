@@ -25,4 +25,8 @@ public class DocumentLocationEntityFactory {
 
         return documentLocationRepository.existsOrInsert(documentLocationDatabaseEntity);
     }
+
+    public Mono<Long> getDocumentLocationCount() {
+        return documentLocationRepository.count();
+    }
 }
