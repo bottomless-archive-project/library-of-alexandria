@@ -20,7 +20,7 @@ public class StatisticsRepository {
 
     public Flux<StatisticsDatabaseEntity> findStatisticsBetween(final Duration duration) {
         return Flux.from(statisticsDatabaseEntityMongoCollection.find(and(gte("createdAt", Instant.now().minus(duration)),
-                lt("createdAScht", Instant.now()))));
+                lt("createdAt", Instant.now()))));
     }
 
     public Mono<Void> insertStatistics(final StatisticsDatabaseEntity statisticsDatabaseEntity) {
