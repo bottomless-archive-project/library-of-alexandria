@@ -18,7 +18,7 @@ public class ScheduledStatisticPersistenceService {
     private final DocumentEntityFactory documentEntityFactory;
     private final DocumentLocationEntityFactory documentLocationEntityFactory;
 
-    @Scheduled(fixedRate = 60000)
+    @Scheduled(fixedRateString = "${loa.statistics.collection-rate}")
     public void persistStatistics() {
         log.info("Persisiting statistics.");
 

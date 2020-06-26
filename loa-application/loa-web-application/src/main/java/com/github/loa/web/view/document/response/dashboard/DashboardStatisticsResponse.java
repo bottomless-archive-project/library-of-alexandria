@@ -1,4 +1,4 @@
-package com.github.loa.statistics.service.entity.domain;
+package com.github.loa.web.view.document.response.dashboard;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -7,7 +7,7 @@ import java.time.Instant;
 
 @Getter
 @Builder
-public class StatisticsEntity {
+public class DashboardStatisticsResponse {
 
     private final Instant createdAt;
     private final long documentCount;

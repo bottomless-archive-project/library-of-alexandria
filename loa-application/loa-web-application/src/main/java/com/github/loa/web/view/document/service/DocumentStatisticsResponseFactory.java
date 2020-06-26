@@ -5,16 +5,19 @@ import com.github.loa.document.service.domain.DocumentType;
 import com.github.loa.document.service.entity.factory.DocumentEntityFactory;
 import com.github.loa.queue.service.QueueManipulator;
 import com.github.loa.queue.service.domain.Queue;
+import com.github.loa.statistics.service.entity.StatisticsEntityFactory;
 import com.github.loa.vault.client.configuration.VaultClientConfigurationProperties;
 import com.github.loa.vault.client.service.VaultClientService;
 import com.github.loa.web.view.document.response.dashboard.DashboardDocumentStatisticsResponse;
 import com.github.loa.web.view.document.response.dashboard.DashboardQueueStatisticsResponse;
+import com.github.loa.web.view.document.response.dashboard.DashboardStatisticsResponse;
 import com.github.loa.web.view.document.response.dashboard.DashboardVaultStatisticsResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.TreeMap;
@@ -27,6 +30,7 @@ public class DocumentStatisticsResponseFactory {
     private final QueueManipulator queueManipulator;
     private final VaultClientService vaultClientService;
     private final DocumentEntityFactory documentEntityFactory;
+    private final StatisticsEntityFactory statisticsEntityFactory;
     private final VaultClientConfigurationProperties vaultClientConfigurationProperties;
 
     public Mono<DashboardDocumentStatisticsResponse> newStatisticsResponse() {
@@ -38,7 +42,21 @@ public class DocumentStatisticsResponseFactory {
                 .flatMap(this::fillDocumentCountByStatus)
                 .flatMap(this::fillVaultInstances)
                 .flatMap(this::fillQueues)
+                .flatMap(this::fillStatistics)
                 .map(DashboardDocumentStatisticsResponse.DashboardDocumentStatisticsResponseBuilder::build);
+    }
+
+    private Mono<DashboardDocumentStatisticsResponse.DashboardDocumentStatisticsResponseBuilder> fillStatistics(
+            final DashboardDocumentStatisticsResponse.DashboardDocumentStatisticsResponseBuilder builder) {
+        return statisticsEntityFactory.getStatisticsBetween(Duration.ofDays(1))
+                .map(statisticsEntity -> DashboardStatisticsResponse.builder()
+                        .createdAt(statisticsEntity.getCreatedAt())
+                        .documentCount(statisticsEntity.getDocumentCount())
+                        .documentLocationCount(statisticsEntity.getDocumentLocationCount())
+                        .build()
+                )
+                .collectList()
+                .map(builder::statistics);
     }
 
     private Mono<DashboardDocumentStatisticsResponse.DashboardDocumentStatisticsResponseBuilder> fillQueues(
