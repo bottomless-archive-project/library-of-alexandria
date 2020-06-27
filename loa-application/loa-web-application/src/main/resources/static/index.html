@@ -35,7 +35,17 @@
                     .state({
                         name: 'home',
                         url: '/',
-                        templateUrl: './home/home.html',
+                        templateUrl: './home/home.html'
+                    })
+                    .state({
+                        name: 'dashboard',
+                        url: '/dashboard',
+                        templateUrl: './dashboard/dashboard.html'
+                    })
+                    .state({
+                        name: 'search',
+                        url: '/search',
+                        templateUrl: './search/search.html',
                         resolve: {
                             documentStatistics: ['$http', function ($http) {
                                 return $http.get('/statistics')
@@ -205,7 +215,9 @@
             <img class="img-fluid left-sphinx" src="./images/sphinx.svg" alt="Sphinx logo">
         </div>
         <div class="col">
-            <h2 class="display-4 mt-4" style="font-size: 4.1rem;">Library of Alexandria</h2>
+            <h2 class="display-4 mt-4" style="font-size: 4.1rem;">
+                <a class="title-text" ui-sref="home">Library of Alexandria</a>
+            </h2>
         </div>
         <div class="col-md-4 mx-auto d-block">
             <img class="img-fluid right-sphinx" src="./images/sphinx.svg" alt="Sphinx logo">
