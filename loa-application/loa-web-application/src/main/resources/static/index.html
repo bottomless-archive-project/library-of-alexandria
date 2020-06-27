@@ -40,7 +40,18 @@
                     .state({
                         name: 'dashboard',
                         url: '/dashboard',
-                        templateUrl: './dashboard/dashboard.html'
+                        templateUrl: './dashboard/dashboard.html',
+                        resolve: {
+                            dashboardStatistics: ['$http', function ($http) {
+                                return $http.get('/dashboard/statistics')
+                                    .then(function (response) {
+                                        return response.data;
+                                    });
+                            }]
+                        },
+                        controller: function ($scope, dashboardStatistics) {
+                            $scope.statistics = dashboardStatistics;
+                        }
                     })
                     .state({
                         name: 'search',

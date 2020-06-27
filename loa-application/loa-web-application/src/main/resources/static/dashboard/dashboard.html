@@ -1,1 +1,54 @@
-dashboard
+<div class="card mb-2">
+    <div class="card-body">
+        <h6 class="card-title">Basic statistics</h6>
+        Document count: {{statistics.documentCount}}
+    </div>
+</div>
+
+<div class="card mb-2">
+    <div class="card-body">
+        <h6 class="card-title">Documents by status</h6>
+        <div class="row">
+            <div class="col" ng-repeat="(key, value) in statistics.documentCountByStatus">
+                <div ng-bind="key"></div>
+                <div ng-bind="value"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-2">
+    <div class="card-body">
+        <h6 class="card-title">Documents by type</h6>
+        <div class="row">
+            <div class="col-3" ng-repeat="(key, value) in statistics.documentCountByType">
+                <div ng-bind="key"></div>
+                <div ng-bind="value"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-2">
+    <div class="card-body">
+        <h6 class="card-title">Queues</h6>
+        <div class="row">
+            <div class="col" ng-repeat="queue in statistics.queues">
+                <div ng-bind="queue.name"></div>
+                <div ng-bind="queue.messageCount"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-2">
+    <div class="card-body">
+        <h6 class="card-title">Vault instances</h6>
+        <div class="row">
+            <div class="col-4" ng-repeat="vault in statistics.vaultInstances">
+                <div ng-bind="vault.name"></div>
+                <div ng-bind="vault.availableStorageInBytes"></div>
+            </div>
+        </div>
+    </div>
+</div>
