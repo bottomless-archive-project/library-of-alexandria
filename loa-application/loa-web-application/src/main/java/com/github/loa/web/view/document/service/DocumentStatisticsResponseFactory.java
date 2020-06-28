@@ -19,6 +19,7 @@ import reactor.core.publisher.Mono;
 
 import java.time.Duration;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
@@ -61,13 +62,13 @@ public class DocumentStatisticsResponseFactory {
 
     private Mono<DashboardDocumentStatisticsResponse.DashboardDocumentStatisticsResponseBuilder> fillQueues(
             final DashboardDocumentStatisticsResponse.DashboardDocumentStatisticsResponseBuilder builder) {
-        final Set<DashboardQueueStatisticsResponse> dashboardQueueStatisticsResponses = Arrays.stream(Queue.values())
+        final List<DashboardQueueStatisticsResponse> dashboardQueueStatisticsResponses = Arrays.stream(Queue.values())
                 .map(queue -> DashboardQueueStatisticsResponse.builder()
                         .name(queue.name())
                         .messageCount(queueManipulator.getMessageCount(queue))
                         .build()
                 )
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
 
         return Mono.just(builder.queues(dashboardQueueStatisticsResponses));
     }
@@ -83,7 +84,7 @@ public class DocumentStatisticsResponseFactory {
                                         .build()
                                 )
                         )
-                        .collect(Collectors.toSet())
+                        .collect(Collectors.toList())
                 )
                 .map(builder::vaultInstances);
     }

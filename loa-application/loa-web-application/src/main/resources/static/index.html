@@ -52,70 +52,92 @@
                                     });
                             }]
                         },
-                        controller: function ($scope, dashboardStatistics) {
+                        controller: function ($scope, $http, $interval, dashboardStatistics) {
                             $scope.statistics = dashboardStatistics;
 
-                            var ctx = document.getElementById('myChart').getContext('2d');
-                            var documentsCollectedData = $scope.statistics.statistics.map(value => {
-                                return {
-                                    x: Date.parse(value.createdAt),
-                                    y: value.documentCount
-                                }
-                            });
-                            var documentsLocationsCheckedData = $scope.statistics.statistics.map(value => {
-                                return {
-                                    x: Date.parse(value.createdAt),
-                                    y: value.documentLocationCount
-                                }
-                            });
-                            var myChart = new Chart(ctx, {
-                                type: 'line',
-                                data: {
-                                    datasets: [
-                                        {
-                                            label: 'Documents collected',
-                                            data: documentsCollectedData,
-                                            backgroundColor: [
-                                                'rgba(176,224,230, 0.6)'
-                                            ],
-                                            borderColor: [
-                                                'rgba(176,224,230, 1)'
-                                            ],
-                                            borderWidth: 1
-                                        },
-                                        {
-                                            label: 'Documents locations checked',
-                                            data: documentsLocationsCheckedData,
-                                            backgroundColor: [
-                                                'rgba(255, 99, 132, 0.2)'
-                                            ],
-                                            borderColor: [
-                                                'rgba(255, 99, 132, 1)'
-                                            ],
-                                            borderWidth: 1
-                                        }
-                                    ]
-                                },
-                                options: {
-                                    responsive: true,
-                                    maintainAspectRatio: false,
-                                    scales: {
-                                        xAxes: [{
-                                            type: 'time',
-                                            time: {
-                                                minUnit: 'minute',
-                                                unit: 'minute',
-                                                unitStepSize: 30,
-                                            }
-                                        }],
-                                        yAxes: [{
-                                            ticks: {
-                                                stepSize: 1
-                                            }
-                                        }]
+                            $scope.renderChart = function () {
+                                var ctx = document.getElementById('myChart').getContext('2d');
+                                var documentsCollectedData = $scope.statistics.statistics.map(value => {
+                                    return {
+                                        x: Date.parse(value.createdAt),
+                                        y: value.documentCount
                                     }
-                                }
-                            });
+                                });
+                                var documentsLocationsCheckedData = $scope.statistics.statistics.map(value => {
+                                    return {
+                                        x: Date.parse(value.createdAt),
+                                        y: value.documentLocationCount
+                                    }
+                                });
+                                var myChart = new Chart(ctx, {
+                                    type: 'line',
+                                    data: {
+                                        datasets: [
+                                            {
+                                                label: 'Documents collected',
+                                                data: documentsCollectedData,
+                                                backgroundColor: [
+                                                    'rgba(176,224,230, 0.6)'
+                                                ],
+                                                borderColor: [
+                                                    'rgba(176,224,230, 1)'
+                                                ],
+                                                borderWidth: 1
+                                            },
+                                            {
+                                                label: 'Documents locations checked',
+                                                data: documentsLocationsCheckedData,
+                                                backgroundColor: [
+                                                    'rgba(255, 99, 132, 0.2)'
+                                                ],
+                                                borderColor: [
+                                                    'rgba(255, 99, 132, 1)'
+                                                ],
+                                                borderWidth: 1
+                                            }
+                                        ]
+                                    },
+                                    options: {
+                                        responsive: true,
+                                        maintainAspectRatio: false,
+                                        animation: {
+                                            duration: 0
+                                        },
+                                        hover: {
+                                            animationDuration: 0
+                                        },
+                                        responsiveAnimationDuration: 0,
+                                        scales: {
+                                            xAxes: [{
+                                                type: 'time',
+                                                time: {
+                                                    minUnit: 'minute',
+                                                    unit: 'minute',
+                                                    unitStepSize: 30,
+                                                }
+                                            }],
+                                            yAxes: [{
+                                                ticks: {
+                                                    stepSize: 1
+                                                }
+                                            }]
+                                        }
+                                    }
+                                });
+                            }
+
+                            $scope.renderChart();
+
+                            $interval(function () {
+                                console.log("Refreshing!");
+
+                                $http.get('/dashboard/statistics')
+                                    .then(function (response) {
+                                        $scope.statistics = response.data;
+
+                                        $scope.renderChart();
+                                    });
+                            }, 10000)
                         }
                     })
                     .state({
