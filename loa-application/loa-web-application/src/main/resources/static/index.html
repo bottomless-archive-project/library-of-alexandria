@@ -54,6 +54,7 @@
                         },
                         controller: function ($scope, dashboardStatistics) {
                             $scope.statistics = dashboardStatistics;
+
                             var ctx = document.getElementById('myChart').getContext('2d');
                             var documentsCollectedData = $scope.statistics.statistics.map(value => {
                                 return {
@@ -70,28 +71,30 @@
                             var myChart = new Chart(ctx, {
                                 type: 'line',
                                 data: {
-                                    datasets: [{
-                                        label: 'Documents collected',
-                                        data: documentsCollectedData,
-                                        backgroundColor: [
-                                            'rgba(176,224,230, 0.6)'
-                                        ],
-                                        borderColor: [
-                                            'rgba(176,224,230, 1)'
-                                        ],
-                                        borderWidth: 1
-                                    },
-                                    {
-                                        label: 'Documents locations checked',
-                                        data: documentsLocationsCheckedData,
-                                        backgroundColor: [
-                                            'rgba(255, 99, 132, 0.2)'
-                                        ],
-                                        borderColor: [
-                                            'rgba(255, 99, 132, 1)'
-                                        ],
-                                        borderWidth: 1
-                                    }]
+                                    datasets: [
+                                        {
+                                            label: 'Documents collected',
+                                            data: documentsCollectedData,
+                                            backgroundColor: [
+                                                'rgba(176,224,230, 0.6)'
+                                            ],
+                                            borderColor: [
+                                                'rgba(176,224,230, 1)'
+                                            ],
+                                            borderWidth: 1
+                                        },
+                                        {
+                                            label: 'Documents locations checked',
+                                            data: documentsLocationsCheckedData,
+                                            backgroundColor: [
+                                                'rgba(255, 99, 132, 0.2)'
+                                            ],
+                                            borderColor: [
+                                                'rgba(255, 99, 132, 1)'
+                                            ],
+                                            borderWidth: 1
+                                        }
+                                    ]
                                 },
                                 options: {
                                     responsive: true,
