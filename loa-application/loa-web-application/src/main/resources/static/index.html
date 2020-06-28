@@ -55,34 +55,40 @@
                         controller: function ($scope, dashboardStatistics) {
                             $scope.statistics = dashboardStatistics;
                             var ctx = document.getElementById('myChart').getContext('2d');
-                            var data = $scope.statistics.statistics.map(value => {
+                            var documentsCollectedData = $scope.statistics.statistics.map(value => {
                                 return {
                                     x: Date.parse(value.createdAt),
                                     y: value.documentCount
                                 }
                             });
-                            console.log(data);
+                            var documentsLocationsCheckedData = $scope.statistics.statistics.map(value => {
+                                return {
+                                    x: Date.parse(value.createdAt),
+                                    y: value.documentLocationCount
+                                }
+                            });
                             var myChart = new Chart(ctx, {
                                 type: 'line',
                                 data: {
                                     datasets: [{
                                         label: 'Documents collected',
-                                        data: data,
+                                        data: documentsCollectedData,
                                         backgroundColor: [
-                                            'rgba(255, 99, 132, 0.2)',
-                                            'rgba(54, 162, 235, 0.2)',
-                                            'rgba(255, 206, 86, 0.2)',
-                                            'rgba(75, 192, 192, 0.2)',
-                                            'rgba(153, 102, 255, 0.2)',
-                                            'rgba(255, 159, 64, 0.2)'
+                                            'rgba(176,224,230, 0.6)'
                                         ],
                                         borderColor: [
-                                            'rgba(255, 99, 132, 1)',
-                                            'rgba(54, 162, 235, 1)',
-                                            'rgba(255, 206, 86, 1)',
-                                            'rgba(75, 192, 192, 1)',
-                                            'rgba(153, 102, 255, 1)',
-                                            'rgba(255, 159, 64, 1)'
+                                            'rgba(176,224,230, 1)'
+                                        ],
+                                        borderWidth: 1
+                                    },
+                                    {
+                                        label: 'Documents locations checked',
+                                        data: documentsLocationsCheckedData,
+                                        backgroundColor: [
+                                            'rgba(255, 99, 132, 0.2)'
+                                        ],
+                                        borderColor: [
+                                            'rgba(255, 99, 132, 1)'
                                         ],
                                         borderWidth: 1
                                     }]
