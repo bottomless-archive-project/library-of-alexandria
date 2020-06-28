@@ -43,7 +43,7 @@
         <h5 class="card-title">Queues</h5>
         <div class="row">
             <div class="col" ng-repeat="queue in statistics.queues">
-                <div ng-bind="queue.name"></div>
+                <div ng-bind="queue.name | capitalize"></div>
                 <div ng-bind="queue.messageCount"></div>
             </div>
         </div>
@@ -55,8 +55,14 @@
         <h5 class="card-title">Vault instances</h5>
         <div class="row">
             <div class="col-4" ng-repeat="vault in statistics.vaultInstances">
-                <div>Name: {{vault.name}}</div>
-                <div>Free space: {{vault.availableStorageInBytes | bytes}}</div>
+                <div class="card">
+                    <div class="card-body">
+                        <h6 class="card-title">{{vault.name}}</h6>
+                        <div class="card-body p-0">
+                            <p class="m-0">Free space: {{vault.availableStorageInBytes | bytes}}</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
