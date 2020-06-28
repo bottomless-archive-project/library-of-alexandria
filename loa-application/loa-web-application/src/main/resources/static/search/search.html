@@ -18,14 +18,15 @@
             <button class="btn btn-info btn-block dropdown-toggle" role="button" ng-if="language === undefined"
                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Language
             </button>
-            <button class="btn btn-info btn-block" ng-if="language !== undefined" ng-click="setLanguage(undefined)"
-                    style="padding-top: 2px; padding-bottom: 2px;">
-                <span ng-if="language[2]"><img ng-src="./images/flags/{{language[0]}}.png"> - </span>{{language[1]}}
+            <button class="btn btn-info btn-lg btn-block" ng-if="language !== undefined" ng-click="setLanguage(undefined)"
+                    style="padding-top: 2px; padding-bottom: 2px; font-size: 1em; line-height: 2em;">
+                {{language.code | uppercase}} - {{language.name}}
             </button>
             <div class="dropdown-menu btn-block mt-0" style="max-height: 300px; overflow: auto;">
                 <button class="dropdown-item dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
-                        aria-expanded="false" ng-repeat="language in languages" ng-click="setLanguage(language)">
-                    <span ng-if="language[2]"><img ng-src="./images/flags/{{language[0]}}.png"> - </span>{{language[1]}}
+                        aria-expanded="false" ng-repeat="(languageCode, languageName) in languages"
+                        ng-click="setLanguage({code: languageCode, name: languageName})">
+                    {{languageCode | uppercase}} - {{languageName}}
                 </button>
             </div>
         </div>
@@ -147,8 +148,6 @@
     <div class="col">
         <div class="card">
             <div class="card-body">
-                <img ng-src="{{'./images/flags/' + hit.language + '.png'}}"
-                     style="float: right; margin-left: 12px;">
                 <h5 class="card-title" ng-bind="hit.title" ng-if="hit.title"></h5>
                 <h6 class="card-subtitle mb-2 text-muted" ng-bind="hit.author" ng-if="hit.title && hit.author"></h6>
                 <p class="card-text" style="text-align: justify; word-break: break-all;"
@@ -170,6 +169,7 @@
                     <button ng-if="!openPdfs[hit.id]" class="btn btn-primary btn-sm w-25"
                             ng-click="openPdf(hit.id)" style="float: right; min-width: 135px;">Open .pdf
                     </button>
+                    <span style="float: left; font-weight: bold;">{{hit.language | uppercase}} - {{languages[hit.language]}}</span>
                     <span style="float: right; font-weight: bold;" class="mr-3">{{hit.pageCount}} pages</span>
                 </div>
 

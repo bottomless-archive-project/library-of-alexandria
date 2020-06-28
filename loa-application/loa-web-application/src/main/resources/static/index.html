@@ -251,7 +251,7 @@
                                 }
 
                                 if ($scope.language !== undefined) {
-                                    urlBase += '&language=' + $scope.language[0];
+                                    urlBase += '&language=' + $scope.language.code;
                                 }
 
                                 if ($scope.documentLength !== undefined) {
@@ -283,36 +283,36 @@
                                 ['NOVEL', 'Novel (150+ pages)']
                             ];
 
-                            $scope.languages = [
-                                ['be', 'Belarusian', true],
-                                ['ca', 'Catalan', true],
-                                ['da', 'Danish', true],
-                                ['de', 'German', true],
-                                ['eo', 'Esperanto', false],
-                                ['et', 'Estonian', true],
-                                ['el', 'Greek', true],
-                                ['en', 'English', true],
-                                ['es', 'Spanish', true],
-                                ['fi', 'Finnish', true],
-                                ['fr', 'French', true],
-                                ['fa', 'Persian', true],
-                                ['gl', 'Galician', true],
-                                ['hu', 'Hungarian', true],
-                                ['is', 'Icelandic', true],
-                                ['it', 'Italian', true],
-                                ['lt', 'Lithuanian', true],
-                                ['nl', 'Dutch', true],
-                                ['no', 'Norwegian', true],
-                                ['pl', 'Polish', true],
-                                ['pt', 'Portuguese', true],
-                                ['ro', 'Romanian', true],
-                                ['ru', 'Russian', true],
-                                ['sk', 'Slovakian', true],
-                                ['sl', 'Slovenian', true],
-                                ['sv', 'Swedish', true],
-                                ['th', 'Thai', true],
-                                ['uk', 'Ukrainian', true],
-                            ];
+                            $scope.languages = {
+                                'be': 'Belarusian',
+                                'ca': 'Catalan',
+                                'da': 'Danish',
+                                'de': 'German',
+                                'eo': 'Esperanto',
+                                'et': 'Estonian',
+                                'el': 'Greek',
+                                'en': 'English',
+                                'es': 'Spanish',
+                                'fi': 'Finnish',
+                                'fr': 'French',
+                                'fa': 'Persian',
+                                'gl': 'Galician',
+                                'hu': 'Hungarian',
+                                'is': 'Icelandic',
+                                'it': 'Italian',
+                                'lt': 'Lithuanian',
+                                'nl': 'Dutch',
+                                'no': 'Norwegian',
+                                'pl': 'Polish',
+                                'pt': 'Portuguese',
+                                'ro': 'Romanian',
+                                'ru': 'Russian',
+                                'sk': 'Slovakian',
+                                'sl': 'Slovenian',
+                                'sv': 'Swedish',
+                                'th': 'Thai',
+                                'uk': 'Ukrainian',
+                            }
                         }
                     });
             }])
