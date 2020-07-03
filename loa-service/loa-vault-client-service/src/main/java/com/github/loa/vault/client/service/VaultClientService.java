@@ -4,11 +4,13 @@ import com.github.loa.compression.domain.DocumentCompression;
 import com.github.loa.document.service.DocumentManipulator;
 import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.vault.client.configuration.VaultClientConfigurationProperties;
+import com.github.loa.vault.client.configuration.VaultClientLocationConfigurationProperties;
+import com.github.loa.vault.client.service.response.FreeSpaceResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
@@ -27,33 +29,44 @@ public class VaultClientService {
     private final DocumentManipulator documentManipulator;
     private final WebClient vaultWebClient;
 
+    /**
+     * Requests and returns the content of a document. If the document is not found or an error happened while doing
+     * the request, an empty {@link Mono} is returned.
+     *
+     * @param documentEntity the document entity to get the content for
+     * @return the content of the document
+     */
+    //TODO: Instead of returning empty, we should return an error when the request is failed!
     public Mono<byte[]> queryDocument(final DocumentEntity documentEntity) {
+        final VaultClientLocationConfigurationProperties vaultClientLocationConfigurationProperties =
+                vaultClientConfigurationProperties.getLocation(documentEntity.getVault());
+
         return vaultWebClient.get()
-                .uri("/document/" + documentEntity.getId())
+                .uri(vaultClientLocationConfigurationProperties.getLocation() + "/document/" + documentEntity.getId())
                 .retrieve()
-                //TODO: This could be done better! We need to return the bad responses from the client to the caller.
-                .onStatus(HttpStatus::is5xxServerError, (response) -> {
+                .bodyToMono(byte[].class)
+                .onErrorResume(WebClientResponseException.class, (error) -> {
                     log.info("Missing document with id: {}!", documentEntity.getId());
 
-                    return response.bodyToMono(String.class)
-                            .map(error -> {
-                                // This could happen when the vault is closed forcefully and the file is not/partially saved.
-                                if (error.contains("Unable to get the content of a vault location!")
-                                        || error.contains("Error while decompressing document!")) {
-                                    documentManipulator.markIndexFailure(documentEntity.getId()).subscribe();
-                                }
+                    // TODO: Maybe its a better idea to do this in the vault itself?
+                    // This could happen when the vault is closed forcefully and the file is not/partially saved.
+                    if (error.getResponseBodyAsString().contains("Unable to get the content of a vault location!")
+                            || error.getResponseBodyAsString().contains("Error while decompressing document!")) {
+                        return documentManipulator.markIndexFailure(documentEntity.getId())
+                                .then(Mono.empty());
+                    }
 
-                                return Mono.empty();
-                            })
-                            .then(Mono.empty());
-                })
-                .bodyToMono(byte[].class);
+                    return Mono.empty();
+                });
     }
 
+    //TODO: Make reactive!
     public void recompressDocument(final DocumentEntity documentEntity, final DocumentCompression documentCompression) {
+        final VaultClientLocationConfigurationProperties vaultClientLocationConfigurationProperties =
+                vaultClientConfigurationProperties.getLocation(documentEntity.getVault());
+
         final HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("http://" + vaultClientConfigurationProperties.getHost() + ":"
-                        + vaultClientConfigurationProperties.getPort() + "/document/" + documentEntity.getId()
+                .uri(URI.create(vaultClientLocationConfigurationProperties.getLocation() + "/document/" + documentEntity.getId()
                         + "/recompress"))
                 .header("Content-Type", "application/json")
                 .POST(ofString("{compression: \"" + documentCompression + "\"}"))
@@ -62,5 +75,16 @@ public class VaultClientService {
         HttpClient.newHttpClient().sendAsync(request, HttpResponse.BodyHandlers.ofString())
                 .thenApply(HttpResponse::body)
                 .join();
+    }
+
+    public Mono<Long> getAvailableSpace(final String vaultName) {
+        final VaultClientLocationConfigurationProperties vaultClientLocationConfigurationProperties =
+                vaultClientConfigurationProperties.getLocation(vaultName);
+
+        return vaultWebClient.get()
+                .uri(vaultClientLocationConfigurationProperties.getLocation() + "/free-space")
+                .retrieve()
+                .bodyToMono(FreeSpaceResponse.class)
+                .map(FreeSpaceResponse::getFreeSpace);
     }
 }

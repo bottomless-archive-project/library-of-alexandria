@@ -1,5 +1,6 @@
 package com.github.loa.stage.service.domain;
 
+import com.github.loa.stage.service.domain.exception.StageAccessException;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -23,23 +24,24 @@ public class StageLocation {
     public long size() {
         try {
             return Files.size(path);
-        } catch (IOException e) {
-            throw new RuntimeException("Unable to get the size of staged document!", e);
+        } catch (final IOException e) {
+            throw new StageAccessException("Unable to get the size of staged document!", e);
         }
     }
 
     public InputStream openStream() {
         try {
             return Files.newInputStream(path);
-        } catch (IOException e) {
-            throw new RuntimeException("Unable to get the input stream for staged document!", e);
+        } catch (final IOException e) {
+            throw new StageAccessException("Unable to get the input stream for staged document!", e);
         }
     }
 
     public void cleanup() {
         try {
             Files.delete(path);
-        } catch (IOException e) {
+        } catch (final IOException e) {
+            //TODO: This should throw an exception as well!
             log.error("Unable to delete staged document!", e);
         }
     }

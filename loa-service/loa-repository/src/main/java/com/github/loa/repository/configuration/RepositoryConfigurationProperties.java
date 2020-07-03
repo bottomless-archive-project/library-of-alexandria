@@ -11,4 +11,5 @@ public class RepositoryConfigurationProperties {
 
     private String host;
     private int port;
+    private boolean noCursorTimeout;
 }

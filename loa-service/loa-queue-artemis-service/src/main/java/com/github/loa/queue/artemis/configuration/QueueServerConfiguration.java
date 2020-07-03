@@ -20,6 +20,8 @@ import java.util.Map;
 @org.springframework.context.annotation.Configuration
 public class QueueServerConfiguration {
 
+    private static final String BIND_ALL_IP_ADDRESS = "0.0.0.0";
+
     private final QueueConfigurationProperties queueConfigurationProperties;
 
     @Bean
@@ -40,7 +42,7 @@ public class QueueServerConfiguration {
                 NettyConnectorFactory.class.getName()));
         configuration.addAcceptorConfiguration(new TransportConfiguration(NettyAcceptorFactory.class.getName(),
                         Map.of(
-                                TransportConstants.HOST_PROP_NAME, "0.0.0.0",
+                                TransportConstants.HOST_PROP_NAME, BIND_ALL_IP_ADDRESS,
                                 TransportConstants.PORT_PROP_NAME, queueConfigurationProperties.getPort()
                         )
                 )

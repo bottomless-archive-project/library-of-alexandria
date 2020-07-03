@@ -13,6 +13,7 @@ public class DocumentDatabaseEntity {
 
     @BsonId
     private UUID id;
+    private String vault;
     private String type;
     private String status;
     private String source;

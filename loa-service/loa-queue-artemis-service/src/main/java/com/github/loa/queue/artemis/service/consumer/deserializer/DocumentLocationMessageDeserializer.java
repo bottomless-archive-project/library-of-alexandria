@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 @ConditionalOnMissingBean(QueueServerConfiguration.class)
 public class DocumentLocationMessageDeserializer implements MessageDeserializer<DocumentLocationMessage> {
 
+    @Override
     public DocumentLocationMessage deserialize(final ClientMessage clientMessage) {
         return DocumentLocationMessage.builder()
                 .sourceName(clientMessage.getBodyBuffer().readString())

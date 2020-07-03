@@ -16,6 +16,7 @@ public class DocumentArchivingMessageDeserializer implements MessageDeserializer
     public DocumentArchivingMessage deserialize(final ClientMessage clientMessage) {
         final ActiveMQBuffer contentBuffer = clientMessage.getBodyBuffer();
 
+        final String id = contentBuffer.readString();
         final String type = contentBuffer.readString();
         final String source = contentBuffer.readString();
 
@@ -24,6 +25,7 @@ public class DocumentArchivingMessageDeserializer implements MessageDeserializer
         clientMessage.getBodyBuffer().readBytes(content);
 
         return DocumentArchivingMessage.builder()
+                .id(id)
                 .type(type)
                 .source(source)
                 .contentLength(contentLength)

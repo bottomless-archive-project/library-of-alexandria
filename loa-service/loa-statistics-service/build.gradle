@@ -1,3 +1,5 @@
 dependencies {
-    compile group: 'io.micrometer', name: 'micrometer-core'
+    compile project(':loa-service:loa-document-service')
+    compile project(':loa-service:loa-document-location-service')
+    compile project(':loa-service:loa-statistics-repository')
 }

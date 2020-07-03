@@ -14,7 +14,7 @@ public class ArtemisInputStream extends InputStream {
     private final ActiveMQBuffer content;
 
     private InputStream data;
-    private int dataRead = 0;
+    private int dataRead;
 
     @Override
     public int read() {
@@ -26,8 +26,8 @@ public class ArtemisInputStream extends InputStream {
                 content.readBytes(bytes);
                 data = new ByteArrayInputStream(bytes);
             }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (final IOException e) {
+            throw new ArtemisInputStreamException(e);
         }
 
         // If read everything that was required
@@ -39,8 +39,8 @@ public class ArtemisInputStream extends InputStream {
 
         try {
             return data.read();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (final IOException e) {
+            throw new ArtemisInputStreamException(e);
         }
     }
 }

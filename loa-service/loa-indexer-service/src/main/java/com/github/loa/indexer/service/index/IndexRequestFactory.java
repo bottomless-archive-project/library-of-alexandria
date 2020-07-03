@@ -15,11 +15,11 @@ import java.util.Map;
 public class IndexRequestFactory {
 
     public Mono<IndexRequest> newIndexRequest(final DocumentMetadata documentMetadata) {
-        final Map<String, Object> sourceContent = new HashMap<>();
-
         if (documentMetadata.getContent() == null) {
             return Mono.empty();
         }
+
+        final Map<String, Object> sourceContent = new HashMap<>();
 
         sourceContent.put("content", documentMetadata.getContent().trim());
 

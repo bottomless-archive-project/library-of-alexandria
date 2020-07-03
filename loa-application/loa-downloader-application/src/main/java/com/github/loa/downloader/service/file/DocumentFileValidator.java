@@ -47,7 +47,7 @@ public class DocumentFileValidator {
 
     private boolean isParsable(final String documentId, final DocumentType documentType,
             final StageLocation stageLocation) {
-        try (final InputStream inputStream = stageLocation.openStream()) {
+        try (InputStream inputStream = stageLocation.openStream()) {
             documentDataParser.parseDocumentMetadata(UUID.fromString(documentId), documentType, inputStream);
 
             return true;

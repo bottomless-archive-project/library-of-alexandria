@@ -35,6 +35,7 @@ public class DocumentArchivingMessageSerializer implements MessageSerializer<Doc
             final ClientMessage clientMessage) {
         final ActiveMQBuffer bodyBuffer = clientMessage.getBodyBuffer();
 
+        bodyBuffer.writeString(documentArchivingMessage.getId());
         bodyBuffer.writeString(documentArchivingMessage.getType());
         bodyBuffer.writeString(documentArchivingMessage.getSource());
         bodyBuffer.writeInt(documentArchivingMessage.getContentLength());

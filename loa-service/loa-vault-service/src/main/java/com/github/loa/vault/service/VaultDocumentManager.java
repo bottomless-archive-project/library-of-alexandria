@@ -1,32 +1,19 @@
 package com.github.loa.vault.service;
 
-import com.github.loa.checksum.service.ChecksumProvider;
-import com.github.loa.compression.configuration.CompressionConfigurationProperties;
 import com.github.loa.compression.service.provider.CompressionServiceProvider;
 import com.github.loa.document.service.domain.DocumentEntity;
-import com.github.loa.document.service.domain.DocumentStatus;
-import com.github.loa.document.service.entity.factory.DocumentEntityFactory;
-import com.github.loa.document.service.entity.factory.domain.DocumentCreationContext;
-import com.github.loa.vault.configuration.VaultConfigurationProperties;
-import com.github.loa.vault.domain.exception.VaultAccessException;
+import com.github.loa.vault.service.archive.ArchivingService;
 import com.github.loa.vault.service.domain.DocumentArchivingContext;
 import com.github.loa.vault.service.location.VaultLocation;
-import com.mongodb.MongoWaitQueueFullException;
-import com.mongodb.MongoWriteException;
+import com.github.loa.vault.service.location.VaultLocationFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.IOUtils;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.UUID;
 
 /**
  * Provide access to the content of the documents in the vault.
@@ -36,91 +23,23 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class VaultDocumentManager {
 
-    private final ResourceLoader resourceLoader;
+    private final ArchivingService archivingService;
     private final VaultLocationFactory vaultLocationFactory;
     private final CompressionServiceProvider compressionServiceProvider;
-    private final CompressionConfigurationProperties compressionConfigurationProperties;
-    private final VaultConfigurationProperties vaultConfigurationProperties;
-    private final DocumentEntityFactory documentEntityFactory;
-    private final ChecksumProvider checksumProvider;
 
     /**
-     * Archive the content of an input stream as the content of the provided document in the vault.
+     * Archive the document provided in the context.
      */
     public Mono<DocumentEntity> archiveDocument(final DocumentArchivingContext documentArchivingContext) {
-        //TODO: We need to have one ID for a document generated at download time. Just to make logging etc more
-        // convenient.
-        final UUID documentId = UUID.randomUUID();
-
-        log.info("Archiving document with id: {}.", documentId);
+        log.info("Archiving document with id: {}.", documentArchivingContext.getId());
 
         return Mono.just(documentArchivingContext)
-                .flatMap(stageLocation -> checksumProvider.checksum(documentArchivingContext.getContent())
-                        .flatMap(checksum -> documentEntityFactory.newDocumentEntity(
-                                DocumentCreationContext.builder()
-                                        .id(documentId)
-                                        .type(documentArchivingContext.getType())
-                                        .status(DocumentStatus.DOWNLOADED)
-                                        .source(documentArchivingContext.getSource())
-                                        .versionNumber(vaultConfigurationProperties.getVersionNumber())
-                                        .compression(compressionConfigurationProperties.getAlgorithm())
-                                        .checksum(checksum)
-                                        .fileSize(documentArchivingContext.getContentLength())
-                                        .build()
-                                )
-                        )
-                        .flatMap(documentEntity -> Mono.fromSupplier(
-                                () -> saveDocument(documentEntity, documentArchivingContext.getContent())))
-                        .doOnError(throwable -> {
-                            // Ignoring MongoWaitQueueFullException. It will be retried.
-                            if ((throwable instanceof MongoWaitQueueFullException)) {
-                                return;
-                            }
-
-                            if (isDuplicateIndexError(throwable)) {
-                                log.info("Document with id {} is a duplicate.", documentId);
-                            } else {
-                                log.error("Failed to save document!", throwable);
-                            }
-                        })
-                        .retry(throwable -> !isDuplicateIndexError(throwable))
-                )
+                .flatMap(archivingService::archiveDocument)
                 .onErrorResume(error -> Mono.empty());
     }
 
-    private boolean isDuplicateIndexError(final Throwable throwable) {
-        return throwable instanceof MongoWriteException
-                && throwable.getMessage().startsWith("E11000 duplicate key error");
-    }
-
-    public DocumentEntity saveDocument(final DocumentEntity documentEntity, final byte[] documentContents) {
-        try (final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentEntity);
-             final InputStream documentInputStream = new ByteArrayInputStream(documentContents)) {
-            saveDocumentContents(documentEntity, documentInputStream, vaultLocation);
-        } catch (IOException e) {
-            throw new VaultAccessException("Unable to move document with id " + documentEntity.getId()
-                    + " to the vault!", e);
-        }
-
-        return documentEntity;
-    }
-
-    public void saveDocumentContents(final DocumentEntity documentEntity, final InputStream documentContents,
-            final VaultLocation vaultLocation) throws IOException {
-        if (!documentEntity.isCompressed()) {
-            try (final OutputStream outputStream = vaultLocation.destination()) {
-                IOUtils.copy(documentContents, outputStream);
-            }
-        } else {
-            try (final OutputStream outputStream = compressionServiceProvider
-                    .getCompressionService(documentEntity.getCompression()).compress(vaultLocation.destination())) {
-                IOUtils.copy(documentContents, outputStream);
-            }
-        }
-    }
-
     /**
-     * Return the content of a document as an {@link InputStream}.
+     * Return the content of a document as a {@link Resource}.
      *
      * @param documentEntity the document to return the content for
      * @return the content of the document
@@ -130,13 +49,15 @@ public class VaultDocumentManager {
 
         // The non-compressed entries will be served via a zero-copy response
         // See: https://developer.ibm.com/articles/j-zerocopy/
+        final InputStream documentContentsInputStream = vaultLocation.download();
+
         if (documentEntity.isCompressed()) {
-            final InputStream decompressedInputStream = compressionServiceProvider
-                    .getCompressionService(documentEntity.getCompression()).decompress(vaultLocation.content());
+            final InputStream decompressedInputStream = compressionServiceProvider.getCompressionService(
+                    documentEntity.getCompression()).decompress(documentContentsInputStream);
 
             return new InputStreamResource(decompressedInputStream);
         } else {
-            return resourceLoader.getResource("file:/" + vaultLocation.file().getPath());
+            return new InputStreamResource(documentContentsInputStream);
         }
     }
 
@@ -151,5 +72,14 @@ public class VaultDocumentManager {
                 .map(vaultLocationFactory::getLocation)
                 .doOnNext(VaultLocation::clear)
                 .thenReturn(documentEntity);
+    }
+
+    /**
+     * Return the available free space in the vault in bytes.
+     *
+     * @return the free bytes available
+     */
+    public Mono<Long> getAvailableSpace() {
+        return Mono.fromSupplier(vaultLocationFactory::getAvailableSpace);
     }
 }

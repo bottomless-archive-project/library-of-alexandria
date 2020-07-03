@@ -22,14 +22,10 @@ public class VaultClientConfiguration {
 
     private static final int VAULT_CLIENT_TIMEOUT = 120000;
 
-    private final VaultClientConfigurationProperties vaultClientConfigurationProperties;
-
     @Bean
     public WebClient vaultWebClient(
             @Qualifier("vaultClientHttpConnector") final ClientHttpConnector vaultClientHttpConnector) {
         return WebClient.builder()
-                .baseUrl("http://" + vaultClientConfigurationProperties.getHost() + ":"
-                        + vaultClientConfigurationProperties.getPort())
                 .exchangeStrategies(
                         ExchangeStrategies.builder()
                                 .codecs(configurer ->

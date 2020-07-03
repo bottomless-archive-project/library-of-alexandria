@@ -18,6 +18,7 @@ public class DocumentEntityTransformer {
     public DocumentEntity transform(final DocumentDatabaseEntity documentDatabaseEntity) {
         return DocumentEntity.builder()
                 .id(documentDatabaseEntity.getId())
+                .vault(documentDatabaseEntity.getVault())
                 .type(DocumentType.valueOf(documentDatabaseEntity.getType()))
                 .status(DocumentStatus.valueOf(documentDatabaseEntity.getStatus()))
                 .checksum(hexConverter.encode(documentDatabaseEntity.getChecksum()))

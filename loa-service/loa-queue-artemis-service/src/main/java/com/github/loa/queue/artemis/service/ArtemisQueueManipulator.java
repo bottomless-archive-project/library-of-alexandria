@@ -45,14 +45,14 @@ public class ArtemisQueueManipulator implements QueueManipulator {
      */
     @Override
     public void silentlyInitializeQueue(final Queue queue) {
-        try (final ClientSession clientSession = clientSessionFactory.createSession()) {
+        try (ClientSession clientSession = clientSessionFactory.createSession()) {
             final ClientSession.QueueQuery queueQuery = clientSession.queueQuery(
                     SimpleString.toSimpleString(queue.getName()));
 
             if (!queueQuery.isExists()) {
                 initializeQueue(queue);
             }
-        } catch (ActiveMQException e) {
+        } catch (final ActiveMQException e) {
             throw new QueueException("Unable to initialize the " + queue.getName() + " queue!", e);
         }
     }
@@ -67,7 +67,7 @@ public class ArtemisQueueManipulator implements QueueManipulator {
     public void initializeQueue(final Queue queue) {
         log.info("Creating the {} queue because it doesn't exists.", queue.getName());
 
-        try (final ClientSession clientSession = clientSessionFactory.createSession()) {
+        try (ClientSession clientSession = clientSessionFactory.createSession()) {
             clientSession.createQueue(queue.getAddress(), RoutingType.ANYCAST, queue.getName(), true);
         } catch (final ActiveMQException e) {
             throw new QueueException("Unable to initialize the " + queue.getName() + " queue!", e);
@@ -83,12 +83,12 @@ public class ArtemisQueueManipulator implements QueueManipulator {
      */
     @Override
     public long getMessageCount(final Queue queue) {
-        try (final ClientSession clientSession = clientSessionFactory.createSession()) {
+        try (ClientSession clientSession = clientSessionFactory.createSession()) {
             final ClientSession.QueueQuery queueQuery = clientSession.queueQuery(
                     SimpleString.toSimpleString(queue.getName()));
 
             return queueQuery.getMessageCount();
-        } catch (ActiveMQException e) {
+        } catch (final ActiveMQException e) {
             throw new QueueException("Unable to query the " + queue.getName() + " queue!", e);
         }
     }
@@ -108,13 +108,13 @@ public class ArtemisQueueManipulator implements QueueManipulator {
 
         final ClientMessage clientMessage = messageSerializer.serialize(message);
 
-        clientProducerExecutor.invokeProducer(queue, (clientProducer -> {
+        clientProducerExecutor.invokeProducer(queue, clientProducer -> {
             try {
                 clientProducer.send(clientMessage);
-            } catch (ActiveMQException e) {
+            } catch (final ActiveMQException e) {
                 throw new QueueException("Unable to send message to the " + queue.getName() + " queue!", e);
             }
-        }));
+        });
     }
 
     /**
@@ -126,7 +126,7 @@ public class ArtemisQueueManipulator implements QueueManipulator {
      */
     @Override
     public Object readMessage(final Queue queue) {
-        return clientConsumerExecutor.invokeConsumer(queue, (clientConsumer -> {
+        return clientConsumerExecutor.invokeConsumer(queue, clientConsumer -> {
             try {
                 final ClientMessage clientMessage = clientConsumer.receive();
 
@@ -140,7 +140,7 @@ public class ArtemisQueueManipulator implements QueueManipulator {
             } catch (final ActiveMQException e) {
                 throw new QueueException("Unable to read message from the " + queue.getName() + " queue!", e);
             }
-        }));
+        });
     }
 
 

@@ -53,7 +53,7 @@ public class DocumentParserConfiguration {
 
     @Bean
     public LanguageDetector languageDetector() {
-        return LanguageDetectorBuilder.fromAllBuiltInLanguages()
+        return LanguageDetectorBuilder.fromAllLanguages()
                 .build();
     }
 }

@@ -2,11 +2,12 @@ package com.github.loa.vault.service.location.file;
 
 import com.github.loa.compression.domain.DocumentCompression;
 import com.github.loa.document.service.domain.DocumentEntity;
-import com.github.loa.vault.configuration.location.file.FileConfigurationProperties;
-import com.github.loa.vault.service.VaultLocationFactory;
+import com.github.loa.vault.service.location.file.configuration.FileConfigurationProperties;
 import com.github.loa.vault.service.location.VaultLocation;
+import com.github.loa.vault.service.location.VaultLocationFactory;
 import com.github.loa.vault.service.location.file.domain.FileVaultLocation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -16,8 +17,10 @@ import java.io.File;
  */
 @Service
 @RequiredArgsConstructor
+@ConditionalOnProperty(value = "loa.vault.location.type", havingValue = "file", matchIfMissing = true)
 public class FileVaultLocationFactory implements VaultLocationFactory {
 
+    private final FileFactory fileFactory;
     private final FileConfigurationProperties fileConfigurationProperties;
 
     /**
@@ -26,7 +29,8 @@ public class FileVaultLocationFactory implements VaultLocationFactory {
      * @param documentEntity the entity to create the location for
      * @return the location of the document
      */
-    public FileVaultLocation getLocation(final DocumentEntity documentEntity) {
+    @Override
+    public VaultLocation getLocation(final DocumentEntity documentEntity) {
         return getLocation(documentEntity, documentEntity.getCompression());
     }
 
@@ -38,19 +42,25 @@ public class FileVaultLocationFactory implements VaultLocationFactory {
      * @param compression    the compression used in the location calculation
      * @return the location of the document
      */
-    public FileVaultLocation getLocation(final DocumentEntity documentEntity, final DocumentCompression compression) {
+    @Override
+    public VaultLocation getLocation(final DocumentEntity documentEntity, final DocumentCompression compression) {
         if (compression == DocumentCompression.NONE) {
-            // There was a bug in version 1 that added a . to the end of the document files
-            if (documentEntity.getDownloaderVersion() == 1) {
-                return new FileVaultLocation(new File(fileConfigurationProperties.getPath(), documentEntity.getId() + "."
-                        + documentEntity.getType().getFileExtension() + "."));
-            } else {
-                return new FileVaultLocation(new File(fileConfigurationProperties.getPath(), documentEntity.getId() + "."
-                        + documentEntity.getType().getFileExtension()));
-            }
+            return new FileVaultLocation(fileFactory.newFile(fileConfigurationProperties.getPath(),
+                    documentEntity.getId() + "." + documentEntity.getType().getFileExtension()));
         } else {
-            return new FileVaultLocation(new File(fileConfigurationProperties.getPath(), documentEntity.getId() + "."
-                    + documentEntity.getType().getFileExtension() + "." + compression.getFileExtension()));
+            return new FileVaultLocation(fileFactory.newFile(fileConfigurationProperties.getPath(),
+                    documentEntity.getId() + "." + documentEntity.getType().getFileExtension() + "."
+                            + compression.getFileExtension()));
         }
+    }
+
+    /**
+     * Return the available free space in bytes on the location host.
+     *
+     * @return the free bytes available
+     */
+    @Override
+    public long getAvailableSpace() {
+        return new File(fileConfigurationProperties.getPath()).getUsableSpace();
     }
 }

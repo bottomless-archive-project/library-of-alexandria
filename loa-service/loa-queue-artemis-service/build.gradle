@@ -3,7 +3,7 @@ dependencies {
 
     compile group: 'javax.json', name: 'javax.json-api', version: '1.1.4'
 
-    compile group: 'com.github.chrisvest', name: 'stormpot', version: '3.0'
+    compile group: 'com.github.chrisvest', name: 'stormpot', version: '3.0.1'
 
     compile group: 'org.apache.activemq', name: 'artemis-core-client'
     compileOnly group: 'org.apache.activemq', name: 'artemis-server'

@@ -46,11 +46,11 @@ public class DocumentLocationProcessor {
 
         log.debug("Starting to download document {}.", documentLocation);
 
-        return Mono.just(UUID.randomUUID().toString())
-                .flatMap(documentId -> stageLocationFactory.getLocation(documentId, documentType)
+        return Mono.just(UUID.randomUUID())
+                .flatMap(documentId -> stageLocationFactory.getLocation(documentId.toString(), documentType)
                         .flatMap(stageFileLocation -> acquireFile(documentLocation, stageFileLocation))
                         .publishOn(Schedulers.parallel())
-                        .flatMap(documentFileLocation -> documentFileValidator.isValidDocument(documentId, documentType)
+                        .flatMap(documentFileLocation -> documentFileValidator.isValidDocument(documentId.toString(), documentType)
                                 .filter(validationResult -> !validationResult)
                                 .doOnNext(validationResult -> documentFileLocation.cleanup())
                                 .thenReturn(documentFileLocation)
@@ -82,7 +82,7 @@ public class DocumentLocationProcessor {
     }
 
     private Mono<Void> cleanup(final DocumentArchivingContext documentArchivingContext) {
-        return stageLocationFactory.getLocation(documentArchivingContext.getId(), documentArchivingContext.getType())
+        return stageLocationFactory.getLocation(documentArchivingContext.getId().toString(), documentArchivingContext.getType())
                 .doOnNext(StageLocation::cleanup)
                 .then();
     }

@@ -33,3 +33,11 @@ body {
 .document-length-dropdown .dropdown-menu .dropdown-toggle:after {
     content: none;
 }
+
+a.title-text {
+    color: black;
+}
+
+a.title-text:hover {
+    text-decoration: none;
+}

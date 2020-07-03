@@ -8,6 +8,7 @@ import com.github.loa.vault.service.VaultDocumentManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -15,6 +16,7 @@ import reactor.core.scheduler.Schedulers;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "loa.vault.archiving", havingValue = "true")
 public class VaultQueueListener implements CommandLineRunner {
 
     private final QueueManipulator queueManipulator;

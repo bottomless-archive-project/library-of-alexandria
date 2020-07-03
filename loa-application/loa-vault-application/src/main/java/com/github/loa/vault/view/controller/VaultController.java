@@ -1,12 +1,12 @@
 package com.github.loa.vault.view.controller;
 
 import com.github.loa.document.service.entity.factory.DocumentEntityFactory;
-import com.github.loa.document.view.response.domain.DocumentResponse;
-import com.github.loa.document.view.response.service.DocumentResponseTransformer;
 import com.github.loa.document.view.service.MediaTypeCalculator;
+import com.github.loa.vault.configuration.VaultConfigurationProperties;
 import com.github.loa.vault.service.RecompressorService;
 import com.github.loa.vault.service.VaultDocumentManager;
 import com.github.loa.vault.view.request.domain.RecompressRequest;
+import com.github.loa.vault.view.response.domain.FreeSpaceResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
@@ -28,7 +28,7 @@ public class VaultController {
     private final VaultDocumentManager vaultDocumentManager;
     private final RecompressorService recompressorService;
     private final MediaTypeCalculator mediaTypeCalculator;
-    private final DocumentResponseTransformer documentResponseTransformer;
+    private final VaultConfigurationProperties vaultConfigurationProperties;
 
     /**
      * Return a document's content from the vault, based on the provided document id.
@@ -39,33 +39,89 @@ public class VaultController {
     @GetMapping("/document/{documentId}")
     public Mono<ResponseEntity<Resource>> queryDocument(@PathVariable final String documentId) {
         return documentEntityFactory.getDocumentEntity(UUID.fromString(documentId))
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Document not found with id " + documentId + " or already removed!")))
                 .map(documentEntity -> {
+                    if (!documentEntity.isInVault(vaultConfigurationProperties.getName())) {
+                        throw new ResponseStatusException(HttpStatus.CONFLICT, "Document with id " + documentId
+                                + " is available on a different vault!");
+                    }
+
                     final Resource resource = vaultDocumentManager.readDocument(documentEntity);
 
                     return ResponseEntity.ok()
                             .contentType(mediaTypeCalculator.calculateMediaType(documentEntity.getType()))
                             .cacheControl(CacheControl.noCache())
                             .body(resource);
-                })
-                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "Document not found with id " + documentId + " or already removed!")));
+                });
     }
 
     /**
-     * Recompress a document in the vault.
+     * Removed a document from the vault and the database as well.This endpoint only accepts requests when modification
+     * is enabled for this vault.
+     *
+     * @param documentId the id of the document to remove
+     * @return an empty response
+     */
+    @DeleteMapping("/document/{documentId}")
+    public Mono<Void> removeDocument(@PathVariable final String documentId) {
+        if (!vaultConfigurationProperties.isModificationEnabled()) {
+            return Mono.error(new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "Modification is disabled on this vault instance!"));
+        }
+
+        return documentEntityFactory.getDocumentEntity(UUID.fromString(documentId))
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Document not found with id " + documentId + " or already removed!")))
+                .flatMap(documentEntity -> {
+                    if (!documentEntity.isInVault(vaultConfigurationProperties.getName())) {
+                        return Mono.error(new ResponseStatusException(HttpStatus.CONFLICT, "Document with id "
+                                + documentId + " is available on a different vault!"));
+                    }
+
+                    return vaultDocumentManager.removeDocument(documentEntity)
+                            .thenReturn(documentEntity);
+                })
+                .flatMap(documentEntity -> documentEntityFactory.removeDocumentEntity(documentEntity.getId()))
+                .then();
+    }
+
+    /**
+     * Recompress a document in the vault. This endpoint only accepts requests when modification is enabled for this
+     * vault.
      *
      * @param documentId        the id of the document to recompress
      * @param recompressRequest the request for recompression
-     * @return the document entity that the content was recompressed
+     * @return an empty response
      */
     @PostMapping("/document/{documentId}/recompress")
-    public Mono<DocumentResponse> recompressDocument(@PathVariable final String documentId,
+    public Mono<Void> recompressDocument(@PathVariable final String documentId,
             @RequestBody final RecompressRequest recompressRequest) {
+        if (!vaultConfigurationProperties.isModificationEnabled()) {
+            return Mono.error(new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "Modification is disabled on this vault instance!"));
+        }
+
         return documentEntityFactory.getDocumentEntity(UUID.fromString(documentId))
-                .doOnNext(documentEntity ->
-                        recompressorService.recompress(documentEntity, recompressRequest.getCompression()))
-                .map(documentResponseTransformer::transform)
+                .doOnNext(documentEntity -> {
+                    if (!documentEntity.isInVault(vaultConfigurationProperties.getName())) {
+                        throw new ResponseStatusException(HttpStatus.CONFLICT, "Document with id " + documentId
+                                + " is available on a different vault!");
+                    }
+
+                    recompressorService.recompress(documentEntity, recompressRequest.getCompression());
+                })
                 .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "Document not found with id " + documentId + "!")));
+                        "Document not found with id " + documentId + "!")))
+                .then();
+    }
+
+    @GetMapping("/free-space")
+    public Mono<FreeSpaceResponse> getFreeSpace() {
+        return vaultDocumentManager.getAvailableSpace()
+                .map(freeSpace -> FreeSpaceResponse.builder()
+                        .freeSpace(freeSpace)
+                        .build()
+                );
     }
 }

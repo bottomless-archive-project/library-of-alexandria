@@ -30,6 +30,6 @@ public class SearchContext {
     }
 
     public List<DocumentType> getDocumentTypes() {
-        return documentTypes != null ? documentTypes : Collections.emptyList();
+        return documentTypes == null ? Collections.emptyList() : documentTypes;
     }
 }

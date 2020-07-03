@@ -1,0 +1,125 @@
+<?xml version="1.0"?>
+<ruleset name="Custom ruleset" xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 http://pmd.sourceforge.net/ruleset_2_0_0.xsd">
+
+    <description>PMD ruleset for Library of Alexandria</description>
+
+    <rule ref="category/java/security.xml"/>
+
+    <rule ref="category/java/performance.xml"/>
+
+    <rule ref="category/java/multithreading.xml">
+        <!-- Too many false positives. -->
+        <exclude name="UseConcurrentHashMap"/>
+        <exclude name="AvoidSynchronizedAtMethodLevel"/>
+    </rule>
+
+    <rule ref="category/java/design.xml">
+        <!-- Too many false positives. -->
+        <exclude name="LawOfDemeter"/>
+    </rule>
+
+    <rule ref="category/java/design.xml/TooManyMethods">
+        <properties>
+            <property name="maxmethods" value="20"/>
+        </properties>
+    </rule>
+
+    <rule ref="category/java/design.xml/UseUtilityClass">
+        <properties>
+            <property name="violationSuppressXPath" value="//ClassOrInterfaceDeclaration['.*Application']"/>
+        </properties>
+    </rule>
+
+    <rule ref="category/java/design.xml/AvoidCatchingGenericException">
+        <properties>
+            <property name="violationSuppressXPath"
+                      value="//ClassOrInterfaceDeclaration['com.github.loa.queue.artemis.configuration.QueueClientConfiguration']"/>
+        </properties>
+    </rule>
+
+    <rule ref="category/java/design.xml/CyclomaticComplexity">
+        <properties>
+            <property name="violationSuppressXPath"
+                      value="//ClassOrInterfaceDeclaration['com.github.loa.indexer.service.index.IndexRequestFactory']"/>
+        </properties>
+    </rule>
+
+    <rule ref="category/java/design.xml/FinalFieldCouldBeStatic">
+        <properties>
+            <property name="violationSuppressXPath"
+                      value="//ClassOrInterfaceDeclaration['com.github.loa.indexer.service.search.domain.SearchContext']"/>
+        </properties>
+    </rule>
+
+    <rule ref="category/java/codestyle.xml">
+        <!-- Too many false positives. -->
+        <exclude name="ShortVariable"/>
+        <exclude name="LongVariable"/>
+        <exclude name="OnlyOneReturn"/>
+        <exclude name="LinguisticNaming"/>
+        <exclude name="AtLeastOneConstructor"/>
+        <exclude name="CallSuperInConstructor"/>
+        <exclude name="UseUnderscoresInNumericLiterals"/>
+        <exclude name="CommentDefaultAccessModifier"/>
+    </rule>
+
+    <rule ref="category/java/codestyle.xml/DefaultPackage">
+        <properties>
+            <property name="violationSuppressXPath" value="//ClassOrInterfaceDeclaration['.*Test']"/>
+        </properties>
+    </rule>
+
+    <rule ref="category/java/codestyle.xml/UnnecessaryAnnotationValueElement">
+        <properties>
+            <property name="violationSuppressXPath" value="//ClassOrInterfaceDeclaration['.*Test']"/>
+        </properties>
+    </rule>
+
+    <rule ref="category/java/codestyle.xml/TooManyStaticImports">
+        <properties>
+            <property name="violationSuppressXPath" value="//ClassOrInterfaceDeclaration['.*Test']"/>
+        </properties>
+    </rule>
+
+    <rule ref="category/java/bestpractices.xml">
+        <!-- Unfortunately PMD doesn't work well with StepVerifier. -->
+        <exclude name="JUnitAssertionsShouldIncludeMessage"/>
+        <exclude name="JUnitTestsShouldIncludeAssert"/>
+
+        <!-- This rule is questionable. -->
+        <exclude name="JUnitTestContainsTooManyAsserts"/>
+
+        <!-- Too many false positives. -->
+        <exclude name="AvoidUsingHardCodedIP"/>
+    </rule>
+
+    <rule ref="category/java/errorprone.xml">
+        <!-- This would ask us to create a serialVersionUid on every Exception. -->
+        <exclude name="MissingSerialVersionUID"/>
+
+        <!-- We don't use the setUp and tearDown conventions. -->
+        <exclude name="JUnitSpelling"/>
+
+        <!-- This rule doesn't work well with lambdas. -->
+        <exclude name="DataflowAnomalyAnalysis"/>
+
+        <!-- Too many false positives. -->
+        <exclude name="AvoidDuplicateLiterals"/>
+        <exclude name="BeanMembersShouldSerialize"/>
+        <exclude name="AssignmentInOperand"/>
+        <exclude name="AvoidLiteralsInIfCondition"/>
+    </rule>
+
+    <!-- These classes were checked on a case by case basis. -->
+    <rule ref="category/java/errorprone.xml/CloseResource">
+        <properties>
+            <property name="violationSuppressXPath"
+                      value="//ClassOrInterfaceDeclaration['com.github.loa.queue.artemis.service.consumer.pool.QueueConsumerFactory']"/>
+            <property name="violationSuppressXPath"
+                      value="//ClassOrInterfaceDeclaration['com.github.loa.queue.artemis.service.producer.pool.QueueProducerFactory']"/>
+            <property name="violationSuppressXPath" value="//ClassOrInterfaceDeclaration['.*Test']"/>
+        </properties>
+    </rule>
+</ruleset>

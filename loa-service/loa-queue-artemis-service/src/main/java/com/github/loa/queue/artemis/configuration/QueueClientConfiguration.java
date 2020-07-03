@@ -3,6 +3,7 @@ package com.github.loa.queue.artemis.configuration;
 import com.github.loa.queue.configuration.QueueConfigurationProperties;
 import lombok.RequiredArgsConstructor;
 import org.apache.activemq.artemis.api.core.ActiveMQException;
+import org.apache.activemq.artemis.api.core.ActiveMQExceptionType;
 import org.apache.activemq.artemis.api.core.TransportConfiguration;
 import org.apache.activemq.artemis.api.core.client.ActiveMQClient;
 import org.apache.activemq.artemis.api.core.client.ClientSession;
@@ -32,8 +33,13 @@ public class QueueClientConfiguration {
     }
 
     @Bean
-    public ClientSessionFactory clientSessionFactory(final ServerLocator serverLocator) throws Exception {
-        return serverLocator.createSessionFactory();
+    public ClientSessionFactory clientSessionFactory(final ServerLocator serverLocator) throws ActiveMQException {
+        try {
+            return serverLocator.createSessionFactory();
+        } catch (final Exception e) {
+            throw new ActiveMQException("Unable to create ClientSessionFactory!", e,
+                    ActiveMQExceptionType.GENERIC_EXCEPTION);
+        }
     }
 
     @Bean

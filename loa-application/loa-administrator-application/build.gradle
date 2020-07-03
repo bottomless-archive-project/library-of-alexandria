@@ -1,5 +1,13 @@
 apply plugin: 'org.springframework.boot'
 
+apply plugin: 'com.palantir.docker'
+
+docker {
+    dependsOn bootJar
+    name 'bottomlessarchive/loa-administrator-application:' + rootProject.version.toString()
+    files bootJar.archiveFile
+}
+
 dependencies {
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-json'
 

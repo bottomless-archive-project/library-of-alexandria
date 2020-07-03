@@ -1,7 +1,6 @@
 package com.github.loa.document.service.location;
 
 import com.github.loa.location.service.DocumentLocationValidator;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
@@ -12,12 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class DocumentLocationValidatorTest {
 
-    private DocumentLocationValidator underTest;
-
-    @BeforeEach
-    private void setup() {
-        underTest = new DocumentLocationValidator();
-    }
+    private final DocumentLocationValidator underTest = new DocumentLocationValidator();
 
     @ParameterizedTest
     @CsvSource(

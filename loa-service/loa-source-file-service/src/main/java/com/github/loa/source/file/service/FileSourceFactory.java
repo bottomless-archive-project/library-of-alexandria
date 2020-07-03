@@ -2,6 +2,7 @@ package com.github.loa.source.file.service;
 
 import com.github.loa.source.file.configuration.FileDocumentSourceConfigurationProperties;
 import com.github.loa.source.file.service.domain.FileEncodingType;
+import com.github.loa.source.file.service.domain.FileHandlingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +17,12 @@ public class FileSourceFactory {
 
     private final FileDocumentSourceConfigurationProperties fileDocumentSourceConfigurationProperties;
 
-    public InputStream newInputStream(final Path fileLocation) {
+    public BufferedReader newSourceReader() {
+        return new BufferedReader(new InputStreamReader(newInputStream(
+                Path.of(fileDocumentSourceConfigurationProperties.getLocation()))));
+    }
+
+    private InputStream newInputStream(final Path fileLocation) {
         try {
             final InputStream fileStream = Files.newInputStream(fileLocation);
 
@@ -25,8 +31,8 @@ public class FileSourceFactory {
             }
 
             return fileStream;
-        } catch (IOException e) {
-            throw new RuntimeException("Unable to create file input stream for file source!", e);
+        } catch (final IOException e) {
+            throw new FileHandlingException("Unable to create file input stream for file source!", e);
         }
     }
 }

@@ -6,7 +6,8 @@ Responsible for storing documents and making them available via web endpoints.
 
 The Vault Application connects to the <<Queue Application>>, asks for new documents that should be archived (these were inserted by the Downloader Application to the queue previously).
 
-Once a new document is acquired then it will be moved into a staging area. A checksum will be generated from the staging copy and checked for duplicates using the data available in the MongoDB database.
+Once a new document is acquired then it will be moved into a staging area.
+A checksum will be generated from the staging copy and checked for duplicates using the data available in the MongoDB database.
 
 If the application is not a duplicate then the staging file's contents will be moved to the archive and a new entry will be created for the document in the database.
 
@@ -26,6 +27,9 @@ If the application is not a duplicate then the staging file's contents will be m
 | **loa.database.port**
 | The port open for the MongoDB database server. *(Default value: 27017)*
 
+| **loa.database.no-cursor-timeout**
+| Whenever the cursor objects created by the application should be able to timeout. Ideally you would set up the timeout on your MongoDB server (see: https://docs.mongodb.com/manual/reference/parameters/#param.cursorTimeoutMillis[cursorTimeoutMillis]) but because not everybody is a MongoDB expert, we disable timeouts by default. This could cause a couple of open cursors (so extra resource usage) on the MongoDB server when the application crashes for some reason and the cursors are not closed correctly. If you set the cursor timeout too low, then the application will crash if it is not able to process a batch of items under the provided timeout. *(Default value: true)*
+
 | **loa.queue.host**
 | The ip address of the Queue Application.
 
@@ -38,8 +42,17 @@ If the application is not a duplicate then the staging file's contents will be m
 | **server.port**
 | The port where the vault should publish it's web endpoints.
 
+| **loa.vault.name**
+| The unique name of the vault. This name will be saved when archiving new documents and will be used to identify the vault that holds a given document. Do not change this after creating the vault because the documents previously archived by this vault are not going to be accessible.
+
+| **loa.vault.modification-enabled**
+| If this vault should be able to modify documents (eg. remove) after they are archived. If your vault is available publicly on the internet then set this to false! *(Default value: true)*
+
+| **loa.vault.archiving**
+| If this vault should archive new documents. *(Default value: true)*
+
 | **loa.vault.version-number**
-| This version number will be saved to the database for every document that has been archived. Later on, if it will be necessary to run cleanup or fixing database tasks that are specific to a given version will be checked by the value of this version number. This way it will be easier to fix bugs or database inconsistencies introduced by a specific application version. Please do not change this otherwise the official migration/fixer utilities are not going to be usable.
+| This version number will be saved to the database for every document that has been archived. It will be used later on if its necessary to run cleanup or fixing tasks that are specific to a given version. This way it will be easier to fix bugs or database inconsistencies introduced by a specific application version. Please do not change this, otherwise the official migration/fixer utilities are not going to be usable.
 
 | **loa.compression.algorithm**
 | This property describes what compression algorithm should be used while saving documents to the vault. The available values are `lzma`, `gzip`, `none`. [LZMA](https://en.wikipedia.org/wiki/Lempel%E2%80%93Ziv%E2%80%93Markov_chain_algorithm) have the best compression ratios while being quite CPU resource-intensive, [GZIP](https://en.wikipedia.org/wiki/Gzip) is better than no compression but a little bit worse than LZMA while having minimal CPU footprint while `none` is saving the documents without compression. *(Default value: none)*

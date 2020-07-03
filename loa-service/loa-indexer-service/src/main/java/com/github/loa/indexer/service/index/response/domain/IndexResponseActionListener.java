@@ -21,7 +21,7 @@ public class IndexResponseActionListener implements ActionListener<IndexResponse
 
     @Override
     public void onFailure(final Exception e) {
-        log.info("Failed to index document " + documentEntity.getId() + "!", e);
+        log.info("Failed to index document {}!", documentEntity.getId(), e);
 
         documentManipulator.markIndexFailure(documentEntity.getId()).subscribe();
     }

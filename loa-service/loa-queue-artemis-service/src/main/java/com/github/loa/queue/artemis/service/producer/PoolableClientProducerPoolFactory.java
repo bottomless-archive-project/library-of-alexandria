@@ -1,9 +1,9 @@
 package com.github.loa.queue.artemis.service.producer;
 
 import com.github.loa.queue.artemis.configuration.QueueServerConfiguration;
-import com.github.loa.queue.artemis.service.producer.pool.ClientProducerAllocator;
-import com.github.loa.queue.artemis.service.producer.pool.ClientProducerFactory;
-import com.github.loa.queue.artemis.service.producer.pool.domain.PoolableClientProducer;
+import com.github.loa.queue.artemis.service.producer.pool.QueueProducerAllocator;
+import com.github.loa.queue.artemis.service.producer.pool.QueueProducerFactory;
+import com.github.loa.queue.artemis.service.producer.pool.domain.PoolableQueueProducer;
 import com.github.loa.queue.service.domain.Queue;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -20,21 +20,21 @@ import java.util.Map;
 @ConditionalOnMissingBean(QueueServerConfiguration.class)
 public class PoolableClientProducerPoolFactory {
 
-    private final ClientProducerFactory clientProducerFactory;
-    private final Map<Queue, Pool<PoolableClientProducer>> clientProducers = new EnumMap<>(Queue.class);
+    private final QueueProducerFactory clientProducerFactory;
+    private final Map<Queue, Pool<PoolableQueueProducer>> clientProducers = new EnumMap<>(Queue.class);
 
-    public synchronized Pool<PoolableClientProducer> getPool(final Queue queue) {
+    public synchronized Pool<PoolableQueueProducer> getPool(final Queue queue) {
         return clientProducers.computeIfAbsent(queue, this::createPool);
     }
 
-    private Pool<PoolableClientProducer> createPool(final Queue queue) {
+    private Pool<PoolableQueueProducer> createPool(final Queue queue) {
         return Pool.from(createAllocatorForQueue(queue))
                 .setSize(10)
                 .setExpiration(Expiration.never())
                 .build();
     }
 
-    private Allocator<PoolableClientProducer> createAllocatorForQueue(final Queue queue) {
-        return new ClientProducerAllocator(queue, clientProducerFactory);
+    private Allocator<PoolableQueueProducer> createAllocatorForQueue(final Queue queue) {
+        return new QueueProducerAllocator(queue, clientProducerFactory);
     }
 }

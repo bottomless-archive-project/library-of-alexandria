@@ -1,5 +1,6 @@
 package com.github.loa.repository.service;
 
+import com.github.loa.repository.service.domain.HexConversionException;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 import org.springframework.stereotype.Service;
@@ -15,7 +16,7 @@ public class HexConverter {
         try {
             return Hex.decodeHex(target);
         } catch (final DecoderException e) {
-            throw new RuntimeException("Unable to decode: " + target + "!", e);
+            throw new HexConversionException("Unable to decode: " + target + "!", e);
         }
     }
 }
