@@ -6,6 +6,7 @@ import com.github.loa.document.repository.domain.DocumentTypeAggregateEntity;
 import com.github.loa.repository.configuration.RepositoryConfigurationProperties;
 import com.mongodb.reactivestreams.client.MongoCollection;
 import lombok.RequiredArgsConstructor;
+import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
@@ -69,6 +70,18 @@ public class DocumentRepository {
                         // a maximum timeout in milliseconds but that only configurable on the server side.
                         .noCursorTimeout(repositoryConfigurationProperties.isNoCursorTimeout())
         );
+    }
+
+    /**
+     * Update the status of the documents available in the repository to the provided value.
+     *
+     * @param status the value to update the status of the documents to
+     * @return the result of the update
+     */
+    public Mono<Void> updateStatus(final String status) {
+        return Mono.from(documentDatabaseEntityMongoCollection
+                .updateMany(new Document(), set("status", status)))
+                .then();
     }
 
     public Mono<Void> updateStatus(final UUID documentId, final String status) {

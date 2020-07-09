@@ -104,6 +104,16 @@ public class DocumentEntityFactory {
     }
 
     /**
+     * Update the status field of all of the documents available in the database.
+     *
+     * @param documentStatus the status to update the documents to
+     * @return the result of the update
+     */
+    public Mono<Void> updateStatus(final DocumentStatus documentStatus) {
+        return documentRepository.updateStatus(documentStatus.name());
+    }
+
+    /**
      * Creates a new document. The document is persisted to the database.
      *
      * @param documentCreationContext the parameters of the document to create
