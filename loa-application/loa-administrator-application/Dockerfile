@@ -1,4 +1,4 @@
-FROM azul/zulu-openjdk-alpine:14-jre-headless
+FROM azul/zulu-openjdk-alpine:14
 
 COPY loa-administrator-application-*.jar app.jar
 
