@@ -56,7 +56,7 @@ public class DocumentLocationProcessor {
                                 .thenReturn(documentFileLocation)
                         )
                         .publishOn(Schedulers.boundedElastic())
-                        .filter(StageLocation::exists)
+                        .filterWhen(StageLocation::exists)
                         .flatMap(stageLocation -> Mono.just(
                                 DocumentArchivingContext.builder()
                                         .id(documentId)

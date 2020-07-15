@@ -45,6 +45,7 @@ class DocumentFileValidatorTest {
 
         when(stageLocationFactory.getLocation(DOCUMENT_ID.toString(), DOCUMENT_TYPE))
                 .thenReturn(Mono.just(stageLocation));
+        when(stageLocation.size()).thenReturn(Mono.just(0L));
 
         final Mono<Boolean> result = underTest.isValidDocument(DOCUMENT_ID.toString(), DOCUMENT_TYPE);
 
@@ -59,7 +60,7 @@ class DocumentFileValidatorTest {
 
         when(stageLocationFactory.getLocation(DOCUMENT_ID.toString(), DOCUMENT_TYPE))
                 .thenReturn(Mono.just(stageLocation));
-        when(stageLocation.size()).thenReturn(MAX_FILE_SIZE_IN_BYTES + 1);
+        when(stageLocation.size()).thenReturn(Mono.just(MAX_FILE_SIZE_IN_BYTES + 1));
         when(downloaderConfigurationProperties.getMaximumArchiveSize()).thenReturn(MAX_FILE_SIZE_IN_BYTES);
 
         final Mono<Boolean> result = underTest.isValidDocument(DOCUMENT_ID.toString(), DOCUMENT_TYPE);
@@ -75,7 +76,7 @@ class DocumentFileValidatorTest {
 
         when(stageLocationFactory.getLocation(DOCUMENT_ID.toString(), DOCUMENT_TYPE))
                 .thenReturn(Mono.just(stageLocation));
-        when(stageLocation.size()).thenReturn(MAX_FILE_SIZE_IN_BYTES - 1);
+        when(stageLocation.size()).thenReturn(Mono.just(MAX_FILE_SIZE_IN_BYTES - 1));
         when(downloaderConfigurationProperties.getMaximumArchiveSize()).thenReturn(MAX_FILE_SIZE_IN_BYTES);
 
         final InputStream documentInputStream = mock(InputStream.class);
@@ -97,7 +98,7 @@ class DocumentFileValidatorTest {
 
         when(stageLocationFactory.getLocation(DOCUMENT_ID.toString(), DOCUMENT_TYPE))
                 .thenReturn(Mono.just(stageLocation));
-        when(stageLocation.size()).thenReturn(MAX_FILE_SIZE_IN_BYTES - 1);
+        when(stageLocation.size()).thenReturn(Mono.just(MAX_FILE_SIZE_IN_BYTES - 1));
         when(downloaderConfigurationProperties.getMaximumArchiveSize()).thenReturn(MAX_FILE_SIZE_IN_BYTES);
 
         final InputStream documentInputStream = mock(InputStream.class);

@@ -4,6 +4,7 @@ import com.github.loa.stage.service.domain.exception.StageAccessException;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,16 +18,18 @@ public class StageLocation {
 
     private final Path path;
 
-    public boolean exists() {
-        return Files.exists(path);
+    public Mono<Boolean> exists() {
+        return Mono.fromSupplier(() -> Files.exists(path));
     }
 
-    public long size() {
-        try {
-            return Files.size(path);
-        } catch (final IOException e) {
-            throw new StageAccessException("Unable to get the size of staged document!", e);
-        }
+    public Mono<Long> size() {
+        return Mono.fromSupplier(() -> {
+            try {
+                return Files.size(path);
+            } catch (final IOException e) {
+                throw new StageAccessException("Unable to get the size of staged document!", e);
+            }
+        });
     }
 
     public InputStream openStream() {

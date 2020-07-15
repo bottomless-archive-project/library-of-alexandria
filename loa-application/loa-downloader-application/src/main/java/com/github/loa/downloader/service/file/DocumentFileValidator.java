@@ -36,8 +36,9 @@ public class DocumentFileValidator {
      */
     public Mono<Boolean> isValidDocument(final String documentId, final DocumentType documentType) {
         return stageLocationFactory.getLocation(documentId, documentType)
-                .map(stageFileLocation -> isValidFileSize(stageFileLocation.size())
-                        && isParsable(documentId, documentType, stageFileLocation));
+                .flatMap(stageFileLocation -> stageFileLocation.size()
+                        .map(size -> isValidFileSize(size) && isParsable(documentId, documentType, stageFileLocation))
+                );
     }
 
     private boolean isValidFileSize(final long stageFileSize) {
