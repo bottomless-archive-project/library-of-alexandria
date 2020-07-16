@@ -40,12 +40,14 @@ public class StageLocation {
         }
     }
 
-    public void cleanup() {
-        try {
-            Files.delete(path);
-        } catch (final IOException e) {
-            //TODO: This should throw an exception as well!
-            log.error("Unable to delete staged document!", e);
-        }
+    public Mono<Void> cleanup() {
+        return Mono.fromRunnable(() -> {
+            try {
+                Files.delete(path);
+            } catch (final IOException e) {
+                //TODO: This should throw an exception as well!
+                log.error("Unable to delete staged document!", e);
+            }
+        });
     }
 }

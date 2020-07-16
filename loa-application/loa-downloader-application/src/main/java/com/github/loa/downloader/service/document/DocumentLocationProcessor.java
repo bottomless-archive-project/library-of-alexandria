@@ -52,7 +52,7 @@ public class DocumentLocationProcessor {
                         .publishOn(Schedulers.parallel())
                         .flatMap(documentFileLocation -> documentFileValidator.isValidDocument(documentId.toString(), documentType)
                                 .filter(validationResult -> !validationResult)
-                                .doOnNext(validationResult -> documentFileLocation.cleanup())
+                                .flatMap(validationResult -> documentFileLocation.cleanup())
                                 .thenReturn(documentFileLocation)
                         )
                         .publishOn(Schedulers.boundedElastic())
@@ -83,7 +83,6 @@ public class DocumentLocationProcessor {
 
     private Mono<Void> cleanup(final DocumentArchivingContext documentArchivingContext) {
         return stageLocationFactory.getLocation(documentArchivingContext.getId().toString(), documentArchivingContext.getType())
-                .doOnNext(StageLocation::cleanup)
-                .then();
+                .flatMap(StageLocation::cleanup);
     }
 }
