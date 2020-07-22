@@ -11,6 +11,9 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+/**
+ * A location that could be written in the staging area.
+ */
 @Slf4j
 @Getter
 @Builder
@@ -18,10 +21,20 @@ public class StageLocation {
 
     private final Path path;
 
+    /**
+     * Return if the stage location already exists.
+     *
+     * @return true if the location exists, false otherwise
+     */
     public Mono<Boolean> exists() {
         return Mono.fromSupplier(() -> Files.exists(path));
     }
 
+    /**
+     * Return the size of the content at the stage location.
+     *
+     * @return the file size at the stage location
+     */
     public Mono<Long> size() {
         return Mono.fromSupplier(() -> {
             try {
@@ -32,6 +45,11 @@ public class StageLocation {
         });
     }
 
+    /**
+     * Return an {@link InputStream} to the contents at the stage location.
+     *
+     * @return input stream to the content
+     */
     public InputStream openStream() {
         try {
             return Files.newInputStream(path);
@@ -40,13 +58,17 @@ public class StageLocation {
         }
     }
 
+    /**
+     * Removes the content of the stage location.
+     *
+     * @return result of the operation
+     */
     public Mono<Void> cleanup() {
         return Mono.fromRunnable(() -> {
             try {
                 Files.delete(path);
             } catch (final IOException e) {
-                //TODO: This should throw an exception as well!
-                log.error("Unable to delete staged document!", e);
+                throw new StageAccessException("Unable to delete staged document!", e);
             }
         });
     }
