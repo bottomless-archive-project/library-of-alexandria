@@ -7,9 +7,9 @@ import lombok.Getter;
 @Builder
 public class DocumentArchivingMessage {
 
-    private String id;
-    private String type;
-    private String source;
-    private int contentLength;
-    private byte[] content;
+    private final String id;
+    private final String type;
+    private final String source;
+    private final int contentLength;
+    private final byte[] content;
 }
