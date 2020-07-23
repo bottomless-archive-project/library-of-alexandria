@@ -4,6 +4,10 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+/**
+ * Contains the configurations that could be set from the property files regarding the common crawl based document location
+ * source processing.
+ */
 @Data
 @Component
 @ConfigurationProperties("loa.source.commoncrawl")
