@@ -1,4 +1,4 @@
-package com.github.loa.source.cc.service;
+package com.github.loa.source.commoncrawl.service;
 
 import com.github.bottomlessarchive.warc.service.WarcRecordStreamFactory;
 import com.github.bottomlessarchive.warc.service.record.domain.WarcRecord;

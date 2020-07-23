@@ -1,8 +1,8 @@
-package com.github.loa.source.cc.configuration;
+package com.github.loa.source.commoncrawl.configuration;
 
 import com.github.bottomlessarchive.commoncrawl.WarcLocationFactory;
-import com.github.loa.source.cc.service.*;
-import com.github.loa.source.cc.service.location.CommonCrawlDocumentLocationFactory;
+import com.github.loa.source.commoncrawl.service.*;
+import com.github.loa.source.commoncrawl.service.location.CommonCrawlDocumentLocationFactory;
 import com.github.loa.source.service.DocumentLocationFactory;
 import com.github.loa.url.service.URLConverter;
 import io.micrometer.core.instrument.Counter;

@@ -1,7 +1,7 @@
-package com.github.loa.source.cc.service.location;
+package com.github.loa.source.commoncrawl.service.location;
 
-import com.github.loa.source.cc.service.WarcFluxFactory;
-import com.github.loa.source.cc.service.WarcRecordParser;
+import com.github.loa.source.commoncrawl.service.WarcFluxFactory;
+import com.github.loa.source.commoncrawl.service.WarcRecordParser;
 import com.github.loa.source.service.DocumentLocationFactory;
 import com.github.loa.url.service.URLConverter;
 import io.micrometer.core.instrument.Counter;

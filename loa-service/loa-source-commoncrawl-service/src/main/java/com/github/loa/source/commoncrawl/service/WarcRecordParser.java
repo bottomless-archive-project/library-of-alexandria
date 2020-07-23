@@ -1,4 +1,4 @@
-package com.github.loa.source.cc.service;
+package com.github.loa.source.commoncrawl.service;
 
 import com.github.bottomlessarchive.warc.service.content.response.domain.ResponseContentBlock;
 import com.github.bottomlessarchive.warc.service.record.domain.WarcRecord;
