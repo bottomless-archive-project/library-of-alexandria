@@ -22,4 +22,14 @@ public class CommonCrawlDocumentSourceConfigurationProperties {
      * The Id of the WARC file in the crawl. Usually between 1 - 64000.
      */
     private int warcId;
+
+    /**
+     * How many schedulers should be available minimally to parse the document locations.
+     */
+    private int minimumWebpageProcessors;
+
+    /**
+     * How many schedulers should be available maximally to parse the document locations.
+     */
+    private int maximumWebpageProcessors;
 }

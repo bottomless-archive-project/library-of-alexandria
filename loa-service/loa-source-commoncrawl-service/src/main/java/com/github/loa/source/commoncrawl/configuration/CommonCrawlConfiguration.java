@@ -3,6 +3,7 @@ package com.github.loa.source.commoncrawl.configuration;
 import com.github.bottomlessarchive.commoncrawl.WarcLocationFactory;
 import com.github.loa.source.commoncrawl.service.*;
 import com.github.loa.source.commoncrawl.service.location.CommonCrawlDocumentLocationFactory;
+import com.github.loa.source.commoncrawl.service.webpage.WebPageFactory;
 import com.github.loa.source.service.DocumentLocationFactory;
 import com.github.loa.url.service.URLConverter;
 import io.micrometer.core.instrument.Counter;
@@ -26,7 +27,7 @@ public class CommonCrawlConfiguration {
 
     @Bean
     public DocumentLocationFactory warcDocumentLocationFactory(final WarcRecordParser warcRecordParser,
-            final WarcFluxFactory warcFluxFactory, final URLConverter urlConverter,
+            final WarcFluxFactory warcFluxFactory, final WebPageFactory webPageFactory, final URLConverter urlConverter,
             final WarcLocationFactory warcLocationFactory,
             final CommonCrawlDocumentSourceConfigurationProperties commonCrawlDocumentSourceConfigurationProperties) {
         final List<URL> paths = warcLocationFactory
@@ -34,8 +35,8 @@ public class CommonCrawlConfiguration {
                 .skip(commonCrawlDocumentSourceConfigurationProperties.getWarcId())
                 .collect(Collectors.toList());
 
-        return new CommonCrawlDocumentLocationFactory(warcRecordParser, warcFluxFactory,
-                urlConverter, paths, processedDocumentLocationCount);
+        return new CommonCrawlDocumentLocationFactory(warcRecordParser, warcFluxFactory, webPageFactory,
+                urlConverter, paths, processedDocumentLocationCount, commonCrawlDocumentSourceConfigurationProperties);
     }
 
     @Bean
