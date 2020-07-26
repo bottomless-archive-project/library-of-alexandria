@@ -39,6 +39,12 @@ These URLs could come from various sources like a local file or from http://comm
 | **loa.source.commoncrawl.warc-id**
 | Used only when `loa.source.type` is set to `commoncrawl`. Every month's Common Crawl crawling sentence is built from multiple https://en.wikipedia.org/wiki/Web_ARChive[WARC] files (mostly around 64000). This is the id of the WARC file that the parsing should start from. When you first start crawling a month's crawl sequence this should be 1. When the downloader opens a new WARC file it will print it's id to the console. If you need to stop the crawler and want to re-start it from where it stopped then write down the last crawled WARC id and set this parameter to it.
 
+| **loa.source.commoncrawl.minimum-record-processors**
+| Describes how many threads should be minimally used to parse the WARC records in the WARC files. *(Default value: 5)*
+
+| **loa.source.commoncrawl.maximum-record-processors**
+| Describes how many threads should be maximally used to parse the WARC records in the WARC files. If you feel that the bottleneck in the document location collecting is the parsing of the WARC files (and not bandwidth) then increase this value. *(Default value: 10)*
+
 | **loa.source.file.location**
 | Used only when `loa.source.type` is set to `file`. The location of the source file on the disk. It's not a problem if it contains non-pdf files.
 

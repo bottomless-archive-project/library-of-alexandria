@@ -26,10 +26,10 @@ public class CommonCrawlDocumentSourceConfigurationProperties {
     /**
      * How many schedulers should be available minimally to parse the document locations.
      */
-    private int minimumWebpageProcessors;
+    private int minimumRecordProcessors;
 
     /**
      * How many schedulers should be available maximally to parse the document locations.
      */
-    private int maximumWebpageProcessors;
+    private int maximumRecordProcessors;
 }
