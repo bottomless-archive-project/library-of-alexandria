@@ -1,3 +1,5 @@
 dependencies {
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-reactor-netty'
+
+    compile project(':loa-service:loa-document-location-service')
 }

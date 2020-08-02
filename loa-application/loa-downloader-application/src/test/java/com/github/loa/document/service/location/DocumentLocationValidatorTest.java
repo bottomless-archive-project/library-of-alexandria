@@ -1,6 +1,7 @@
 package com.github.loa.document.service.location;
 
 import com.github.loa.location.service.DocumentLocationValidator;
+import com.github.loa.location.domain.DocumentLocation;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
@@ -30,7 +31,10 @@ class DocumentLocationValidatorTest {
             }
     )
     void testValidDocumentLocationWithValidDocuments(final String documentLocation) throws MalformedURLException {
-        final boolean result = underTest.validDocumentLocation(new URL(documentLocation));
+        final boolean result = underTest.validDocumentLocation(DocumentLocation.builder()
+                .location(new URL(documentLocation))
+                .build()
+        );
 
         assertTrue(result);
     }
@@ -44,7 +48,11 @@ class DocumentLocationValidatorTest {
             }
     )
     void testValidDocumentLocationWithInvalidDocuments(final String documentLocation) throws MalformedURLException {
-        final boolean result = underTest.validDocumentLocation(new URL(documentLocation));
+        final boolean result = underTest.validDocumentLocation(
+                DocumentLocation.builder()
+                        .location(new URL(documentLocation))
+                        .build()
+        );
 
         assertFalse(result);
     }

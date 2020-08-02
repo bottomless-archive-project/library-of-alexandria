@@ -1,9 +1,9 @@
 package com.github.loa.downloader.service;
 
 import com.github.loa.downloader.configuration.DownloaderConfigurationProperties;
+import com.github.loa.location.domain.DocumentLocation;
 import com.github.loa.location.service.factory.domain.DocumentLocationCreationContext;
 import com.github.loa.location.service.id.factory.DocumentLocationIdFactory;
-import com.github.loa.source.domain.DocumentSourceItem;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,13 +14,13 @@ public class DocumentLocationCreationContextFactory {
     private final DocumentLocationIdFactory documentLocationIdFactory;
     private final DownloaderConfigurationProperties downloaderConfigurationProperties;
 
-    public DocumentLocationCreationContext newCreatingContext(final DocumentSourceItem documentSourceItem) {
+    public DocumentLocationCreationContext newCreatingContext(final DocumentLocation documentSourceItem) {
         final String documentId = documentLocationIdFactory
-                .newDocumentLocationId(documentSourceItem.getDocumentLocation());
+                .newDocumentLocationId(documentSourceItem.getLocation());
 
         return DocumentLocationCreationContext.builder()
                 .id(documentId)
-                .url(documentSourceItem.getDocumentLocation().toString())
+                .url(documentSourceItem.getLocation().toString())
                 .source(documentSourceItem.getSourceName())
                 .downloaderVersion(downloaderConfigurationProperties.getVersionNumber())
                 .build();

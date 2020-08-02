@@ -1,5 +1,6 @@
 package com.github.loa.source.file.service.location;
 
+import com.github.loa.location.domain.DocumentLocation;
 import com.github.loa.source.file.configuration.FileDocumentSourceConfigurationProperties;
 import com.github.loa.source.file.service.FileSourceFactory;
 import com.github.loa.url.service.URLConverter;
@@ -44,7 +45,7 @@ class FileDocumentLocationFactoryTest {
     private BufferedReaderAdapter adapter;
 
     @InjectMocks
-    private FileDocumentLocationFactory underTest;
+    private FileDocumentLocationSource underTest;
 
     @Test
     void testWhenSkipLinesAreNegative() {
@@ -74,7 +75,7 @@ class FileDocumentLocationFactoryTest {
                 .thenReturn((newReader) -> {
                 });
 
-        final Flux<URL> result = underTest.streamLocations();
+        final Flux<DocumentLocation> result = underTest.streamLocations();
 
         StepVerifier.create(result)
                 .expectNextCount(2)
@@ -101,14 +102,14 @@ class FileDocumentLocationFactoryTest {
                 .thenReturn((newReader) -> {
                 });
 
-        final Flux<URL> result = underTest.streamLocations();
+        final Flux<DocumentLocation> result = underTest.streamLocations();
 
         StepVerifier.create(result)
-                .consumeNextWith(url -> assertEquals("http://www.example.com/1", url.toString()))
-                .consumeNextWith(url -> assertEquals("http://www.example.com/2", url.toString()))
-                .consumeNextWith(url -> assertEquals("http://www.example.com/3", url.toString()))
-                .consumeNextWith(url -> assertEquals("http://www.example.com/4", url.toString()))
-                .consumeNextWith(url -> assertEquals("http://www.example.com/5", url.toString()))
+                .consumeNextWith(url -> assertEquals("http://www.example.com/1", url.getLocation().toString()))
+                .consumeNextWith(url -> assertEquals("http://www.example.com/2", url.getLocation().toString()))
+                .consumeNextWith(url -> assertEquals("http://www.example.com/3", url.getLocation().toString()))
+                .consumeNextWith(url -> assertEquals("http://www.example.com/4", url.getLocation().toString()))
+                .consumeNextWith(url -> assertEquals("http://www.example.com/5", url.getLocation().toString()))
                 .verifyComplete();
 
         verify(processedDocumentLocationCount, times(5)).increment();

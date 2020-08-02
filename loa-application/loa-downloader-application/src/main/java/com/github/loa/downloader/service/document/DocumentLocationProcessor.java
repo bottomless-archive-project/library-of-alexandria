@@ -4,7 +4,7 @@ import com.github.loa.document.service.DocumentTypeCalculator;
 import com.github.loa.document.service.domain.DocumentType;
 import com.github.loa.downloader.service.file.DocumentFileValidator;
 import com.github.loa.downloader.service.file.FileCollector;
-import com.github.loa.source.domain.DocumentSourceItem;
+import com.github.loa.location.domain.DocumentLocation;
 import com.github.loa.stage.service.StageLocationFactory;
 import com.github.loa.stage.service.domain.StageLocation;
 import com.github.loa.vault.client.service.domain.DocumentArchivingContext;
@@ -36,10 +36,10 @@ public class DocumentLocationProcessor {
     @Qualifier("processedDocumentCount")
     private final Counter processedDocumentCount;
 
-    public Mono<Void> processDocumentLocation(final DocumentSourceItem documentSourceItem) {
+    public Mono<Void> processDocumentLocation(final DocumentLocation documentSourceItem) {
         processedDocumentCount.increment();
 
-        final URL documentLocation = documentSourceItem.getDocumentLocation();
+        final URL documentLocation = documentSourceItem.getLocation();
         final DocumentType documentType = documentTypeCalculator.calculate(documentLocation)
                 .orElseThrow(() -> new RuntimeException("Unable to find valid document type for document: "
                         + documentLocation));

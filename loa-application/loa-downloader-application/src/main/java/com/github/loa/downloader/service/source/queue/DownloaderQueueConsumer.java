@@ -1,9 +1,9 @@
 package com.github.loa.downloader.service.source.queue;
 
+import com.github.loa.location.domain.DocumentLocation;
 import com.github.loa.queue.service.QueueManipulator;
 import com.github.loa.queue.service.domain.Queue;
 import com.github.loa.queue.service.domain.message.DocumentLocationMessage;
-import com.github.loa.source.domain.DocumentSourceItem;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -18,20 +18,20 @@ import java.util.function.Consumer;
 @Component
 @RequiredArgsConstructor
 @ConditionalOnProperty(value = "loa.downloader.source", havingValue = "queue")
-public class DownloaderQueueConsumer implements Consumer<SynchronousSink<DocumentSourceItem>> {
+public class DownloaderQueueConsumer implements Consumer<SynchronousSink<DocumentLocation>> {
 
     private final QueueManipulator queueManipulator;
 
     @Override
-    public void accept(final SynchronousSink<DocumentSourceItem> documentSourceItemSynchronousSink) {
+    public void accept(final SynchronousSink<DocumentLocation> documentSourceItemSynchronousSink) {
         final DocumentLocationMessage documentLocationMessage =
                 queueManipulator.readMessage(Queue.DOCUMENT_LOCATION_QUEUE, DocumentLocationMessage.class);
 
         try {
             documentSourceItemSynchronousSink.next(
-                    DocumentSourceItem.builder()
+                    DocumentLocation.builder()
                             .sourceName(documentLocationMessage.getSourceName())
-                            .documentLocation(new URL(documentLocationMessage.getDocumentLocation()))
+                            .location(new URL(documentLocationMessage.getDocumentLocation()))
                             .build()
             );
         } catch (final MalformedURLException e) {
