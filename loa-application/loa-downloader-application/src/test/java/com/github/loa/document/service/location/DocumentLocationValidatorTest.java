@@ -31,9 +31,10 @@ class DocumentLocationValidatorTest {
             }
     )
     void testValidDocumentLocationWithValidDocuments(final String documentLocation) throws MalformedURLException {
-        final boolean result = underTest.validDocumentLocation(DocumentLocation.builder()
-                .location(new URL(documentLocation))
-                .build()
+        final boolean result = underTest.validDocumentLocation(
+                DocumentLocation.builder()
+                        .location(new URL(documentLocation))
+                        .build()
         );
 
         assertTrue(result);
