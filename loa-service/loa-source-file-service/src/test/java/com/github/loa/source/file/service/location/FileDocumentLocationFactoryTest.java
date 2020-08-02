@@ -1,6 +1,7 @@
 package com.github.loa.source.file.service.location;
 
 import com.github.loa.location.domain.DocumentLocation;
+import com.github.loa.source.configuration.DocumentSourceConfiguration;
 import com.github.loa.source.file.configuration.FileDocumentSourceConfigurationProperties;
 import com.github.loa.source.file.service.FileSourceFactory;
 import com.github.loa.url.service.URLConverter;
@@ -43,6 +44,9 @@ class FileDocumentLocationFactoryTest {
 
     @Mock
     private BufferedReaderAdapter adapter;
+
+    @Mock
+    private DocumentSourceConfiguration documentSourceConfiguration;
 
     @InjectMocks
     private FileDocumentLocationSource underTest;
@@ -101,15 +105,32 @@ class FileDocumentLocationFactoryTest {
         when(adapter.close())
                 .thenReturn((newReader) -> {
                 });
+        when(documentSourceConfiguration.getName())
+                .thenReturn("test-source");
 
         final Flux<DocumentLocation> result = underTest.streamLocations();
 
         StepVerifier.create(result)
-                .consumeNextWith(url -> assertEquals("http://www.example.com/1", url.getLocation().toString()))
-                .consumeNextWith(url -> assertEquals("http://www.example.com/2", url.getLocation().toString()))
-                .consumeNextWith(url -> assertEquals("http://www.example.com/3", url.getLocation().toString()))
-                .consumeNextWith(url -> assertEquals("http://www.example.com/4", url.getLocation().toString()))
-                .consumeNextWith(url -> assertEquals("http://www.example.com/5", url.getLocation().toString()))
+                .consumeNextWith(documentLocation -> {
+                    assertEquals("http://www.example.com/1", documentLocation.getLocation().toString());
+                    assertEquals("test-source", documentLocation.getSourceName());
+                })
+                .consumeNextWith(documentLocation -> {
+                    assertEquals("http://www.example.com/2", documentLocation.getLocation().toString());
+                    assertEquals("test-source", documentLocation.getSourceName());
+                })
+                .consumeNextWith(documentLocation -> {
+                    assertEquals("http://www.example.com/3", documentLocation.getLocation().toString());
+                    assertEquals("test-source", documentLocation.getSourceName());
+                })
+                .consumeNextWith(documentLocation -> {
+                    assertEquals("http://www.example.com/4", documentLocation.getLocation().toString());
+                    assertEquals("test-source", documentLocation.getSourceName());
+                })
+                .consumeNextWith(documentLocation -> {
+                    assertEquals("http://www.example.com/5", documentLocation.getLocation().toString());
+                    assertEquals("test-source", documentLocation.getSourceName());
+                })
                 .verifyComplete();
 
         verify(processedDocumentLocationCount, times(5)).increment();
