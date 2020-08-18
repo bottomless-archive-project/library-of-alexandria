@@ -2,7 +2,7 @@ dependencies {
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-reactor-netty'
 
     compile group: 'com.github.pemistahl', name: 'lingua', version: '1.0.2'
-    compile group: 'org.apache.tika', name: 'tika-parsers', version: '1.23'
+    compile group: 'org.apache.tika', name: 'tika-parsers', version: '1.24.1'
 
     compile project(':loa-service:loa-document-service')
     compile project(':loa-service:loa-vault-client-service')
