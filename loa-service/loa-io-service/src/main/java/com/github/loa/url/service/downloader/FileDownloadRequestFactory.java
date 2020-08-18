@@ -11,9 +11,7 @@ import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.retry.Backoff;
-import reactor.retry.Jitter;
-import reactor.retry.Retry;
+import reactor.util.retry.Retry;
 
 import java.net.URI;
 import java.time.Duration;
@@ -52,11 +50,15 @@ public class FileDownloadRequestFactory {
         return Mono.just(clientResponse);
     }
 
-    private Retry<Object> buildRetry() {
-        return Retry.anyOf(RetryableException.class)
-                .jitter(Jitter.random())
-                .backoff(Backoff.exponential(Duration.ofSeconds(5), Duration.ofMinutes(2), 2, true))
-                .retryMax(3);
+    private Retry buildRetry() {
+        return Retry.backoff(3, Duration.ofSeconds(5))
+                .maxBackoff(Duration.ofMinutes(2))
+                .filter(exception -> {
+                    log.debug("Got exception when downloading: {}! Attempting to retry if it is a RetryableException!",
+                            exception.getClass().getName());
+
+                    return exception instanceof RetryableException;
+                });
     }
 
     private Flux<DataBuffer> convertResponse(final ClientResponse clientResponse) {
