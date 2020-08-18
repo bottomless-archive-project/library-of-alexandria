@@ -53,12 +53,21 @@ public class FileDownloadRequestFactory {
     private Retry buildRetry() {
         return Retry.backoff(3, Duration.ofSeconds(5))
                 .maxBackoff(Duration.ofMinutes(2))
-                .filter(exception -> {
-                    log.debug("Got exception when downloading: {}! Attempting to retry if it is a RetryableException!",
-                            exception.getClass().getName());
+                .filter(throwable -> {
+                    if (shouldRetry(throwable)) {
+                        log.debug("Got exception when downloading: {}! Attempting to retry!", throwable.getClass().getName());
 
-                    return exception instanceof RetryableException;
+                        return true;
+                    } else {
+                        log.debug("Got exception when downloading: {}!", throwable.getClass().getName());
+
+                        return false;
+                    }
                 });
+    }
+
+    private boolean shouldRetry(final Throwable throwable) {
+        return throwable instanceof RetryableException;
     }
 
     private Flux<DataBuffer> convertResponse(final ClientResponse clientResponse) {
