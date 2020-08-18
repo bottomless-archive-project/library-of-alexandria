@@ -15,9 +15,9 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath('org.springframework.boot:spring-boot-gradle-plugin:2.3.2.RELEASE')
+        classpath('org.springframework.boot:spring-boot-gradle-plugin:2.3.3.RELEASE')
         classpath('com.adarshr:gradle-test-logger-plugin:2.0.0')
-        classpath('com.github.ben-manes:gradle-versions-plugin:0.28.0')
+        classpath('com.github.ben-manes:gradle-versions-plugin:0.29.0')
         classpath('com.palantir.gradle.docker:gradle-docker:0.25.0')
     }
 }
