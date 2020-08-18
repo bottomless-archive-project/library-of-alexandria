@@ -82,9 +82,6 @@ subprojects {
         testAnnotationProcessor group: 'org.projectlombok', name: 'lombok'
 
         // Testing
-        testCompile group: 'org.mockito', name: 'mockito-core'
-        testCompile group: 'org.hamcrest', name: 'hamcrest', version: '2.2'
-
         testCompile(group: 'org.springframework.boot', name: 'spring-boot-starter-test') {
             exclude group: 'junit', module: 'junit'
         }
