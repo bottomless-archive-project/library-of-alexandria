@@ -9,4 +9,4 @@ List of the required software to start archiving:
 
 List of the required software to be able to search the archived documents:
 
-- https://www.elastic.co/downloads/past-releases/elasticsearch-7-5-0[Elasticsearch 7.5.0]
+- https://www.elastic.co/downloads/past-releases/elasticsearch-7-9-0[Elasticsearch 7.9.0]
