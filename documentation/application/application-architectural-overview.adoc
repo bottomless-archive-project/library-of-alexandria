@@ -1,0 +1,3 @@
+= Architectural overview
+
+image::architecture.svg[align="center"]
