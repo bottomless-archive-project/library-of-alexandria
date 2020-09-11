@@ -1,3 +1,5 @@
 = Architectural overview
 
+The collection of documents starts with the <<Generator Application>>. The <<Generator Application>> is responsible to create *document locations* (known URLs where documents could be available). These locations are passed to the <<Queue Application>> where they are stored until a <<Downloader Application>> picks them up and visit the location to get new *documents*. Then the downloaded document is sent to a new queue in the <<Queue Application>>. After a while a <<Vault Application>> will pick up a document and *archive* it. If indexing is being done then every archived document will be indexed by the <<Indexer Application>> and made searchable by the <<Web Application>>.
+
 image::architecture.svg[align="center"]
