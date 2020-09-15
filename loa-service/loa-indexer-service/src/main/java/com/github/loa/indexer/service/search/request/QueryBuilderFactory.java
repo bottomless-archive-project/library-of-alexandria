@@ -14,6 +14,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class QueryBuilderFactory {
 
+    /**
+     * Create a search query based on the provided {@link SearchContext}.
+     *
+     * @param searchContext the context to base the query creation on
+     * @return the query
+     */
     public QueryBuilder newQueryBuilder(final SearchContext searchContext) {
         final BoolQueryBuilder parentQuery = QueryBuilders.boolQuery();
 

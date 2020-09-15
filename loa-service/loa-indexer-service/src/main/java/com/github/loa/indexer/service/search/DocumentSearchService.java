@@ -15,6 +15,9 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 
+/**
+ * Provides an unified way to search for documents in the index.
+ */
 @Service
 @RequiredArgsConstructor
 public class DocumentSearchService {
@@ -23,6 +26,12 @@ public class DocumentSearchService {
     private final IndexerRequestFactory indexerRequestFactory;
     private final DocumentSearchEntityTransformer documentSearchEntityTransformer;
 
+    /**
+     * Search for documents in the index.
+     *
+     * @param searchContext the parameters of the search
+     * @return the end result of the search
+     */
     public DocumentSearchResult searchDocuments(final SearchContext searchContext) {
         final SearchRequest searchRequest = indexerRequestFactory.newKeywordSearchRequest(searchContext);
 
@@ -38,6 +47,11 @@ public class DocumentSearchService {
         }
     }
 
+    /**
+     * Count the indexed documents.
+     *
+     * @return the number of the indexed documents
+     */
     public long countDocuments() {
         final CountRequest countRequest = indexerRequestFactory.newCountDocumentsRequest();
 
