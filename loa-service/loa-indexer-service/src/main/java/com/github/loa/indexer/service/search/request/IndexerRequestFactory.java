@@ -2,6 +2,7 @@ package com.github.loa.indexer.service.search.request;
 
 import com.github.loa.indexer.service.search.domain.SearchContext;
 import com.github.loa.indexer.service.search.domain.SearchField;
+import com.github.loa.indexer.service.search.request.mapping.MappingConfigurationFactory;
 import lombok.RequiredArgsConstructor;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.client.core.CountRequest;
@@ -13,11 +14,7 @@ import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
-
-import java.io.IOException;
-import java.nio.file.Files;
 
 /**
  * Create the requests to the search engine, to query data about the indexed documents.
@@ -26,10 +23,10 @@ import java.nio.file.Files;
 @RequiredArgsConstructor
 public class IndexerRequestFactory {
 
-    private final ResourceLoader resourceLoader;
-    private final QueryBuilderFactory queryBuilderFactory;
-
     private static final String DOCUMENT_INDEX = "vault_documents";
+
+    private final MappingConfigurationFactory mappingConfigurationFactory;
+    private final QueryBuilderFactory queryBuilderFactory;
 
     /**
      * Create a request that will return the number of documents that are indexed successfully.
@@ -47,7 +44,7 @@ public class IndexerRequestFactory {
      * @return the created request
      */
     public CreateIndexRequest newCreateIndexRequest() {
-        final String mappingConfiguration = loadMappingConfiguration();
+        final String mappingConfiguration = mappingConfigurationFactory.newDocumentMappingConfiguration();
 
         return new CreateIndexRequest(DOCUMENT_INDEX)
                 .mapping(mappingConfiguration, XContentType.JSON)
@@ -59,6 +56,11 @@ public class IndexerRequestFactory {
                 );
     }
 
+    /**
+     * Create a request that will check if an index exists in the search engine.
+     *
+     * @return the created request
+     */
     public GetIndexRequest newIndexExistsRequest() {
         return new GetIndexRequest(DOCUMENT_INDEX);
     }
@@ -87,16 +89,5 @@ public class IndexerRequestFactory {
         return new HighlightBuilder()
                 .field(SearchField.CONTENT.getName(), 500, 1)
                 .order("score");
-    }
-
-    //TODO: Move this to its own service!
-    private String loadMappingConfiguration() {
-        try {
-            return new String(Files.readAllBytes(
-                    resourceLoader.getResource("classpath:indexer/mapping.json").getFile().toPath()));
-        } catch (IOException e) {
-            //TODO: Use named exception!
-            throw new RuntimeException(e);
-        }
     }
 }
