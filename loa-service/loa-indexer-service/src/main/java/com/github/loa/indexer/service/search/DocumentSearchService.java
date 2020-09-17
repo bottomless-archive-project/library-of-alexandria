@@ -86,7 +86,7 @@ public class DocumentSearchService {
         final GetIndexRequest getIndexRequest = indexerRequestFactory.newIndexExistsRequest();
 
         try {
-            boolean exists = restHighLevelClient.indices().exists(getIndexRequest, RequestOptions.DEFAULT);
+            final boolean exists = restHighLevelClient.indices().exists(getIndexRequest, RequestOptions.DEFAULT);
 
             if (exists) {
                 return true;
