@@ -11,6 +11,8 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.core.CountRequest;
+import org.elasticsearch.client.indices.CreateIndexRequest;
+import org.elasticsearch.client.indices.GetIndexRequest;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -60,5 +62,39 @@ public class DocumentSearchService {
         } catch (final IOException e) {
             throw new IndexerAccessException("Failed to search in the indexer!", e);
         }
+    }
+
+    /**
+     * Initialize the search engine for document indexing.
+     */
+    public void initializeSearchEngine() {
+        final CreateIndexRequest createIndexRequest = indexerRequestFactory.newCreateIndexRequest();
+
+        try {
+            restHighLevelClient.indices().create(createIndexRequest, RequestOptions.DEFAULT);
+        } catch (final IOException e) {
+            throw new IndexerAccessException("Failed to initialize the search engine!", e);
+        }
+    }
+
+    /**
+     * Check if the search engine was initialized.
+     *
+     * @return true if the search engine is initialized, false otherwise
+     */
+    public boolean isSearchEngineInitialized() {
+        final GetIndexRequest getIndexRequest = indexerRequestFactory.newIndexExistsRequest();
+
+        try {
+            boolean exists = restHighLevelClient.indices().exists(getIndexRequest, RequestOptions.DEFAULT);
+
+            if (exists) {
+                return true;
+            }
+        } catch (final IOException e) {
+            throw new IndexerAccessException("Failed to verify if search engine initialization is needed!", e);
+        }
+
+        return false;
     }
 }

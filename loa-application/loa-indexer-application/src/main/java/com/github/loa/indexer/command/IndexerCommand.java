@@ -6,6 +6,7 @@ import com.github.loa.document.service.domain.DocumentStatus;
 import com.github.loa.document.service.entity.factory.DocumentEntityFactory;
 import com.github.loa.indexer.configuration.IndexerConfigurationProperties;
 import com.github.loa.indexer.service.index.IndexerService;
+import com.github.loa.indexer.service.search.DocumentSearchService;
 import com.github.loa.parser.service.DocumentDataParser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,10 +24,17 @@ public class IndexerCommand implements CommandLineRunner {
     private final IndexerService indexerService;
     private final DocumentDataParser documentDataParser;
     private final DocumentManipulator documentManipulator;
+    private final DocumentSearchService documentSearchService;
 
     @Override
     public void run(final String... args) {
-        log.info("Initializing document indexing.");
+        if (!documentSearchService.isSearchEngineInitialized()) {
+            log.info("Initializing the search engine!");
+
+            documentSearchService.initializeSearchEngine();
+        }
+
+        log.info("Start document indexing.");
 
         documentEntityFactory.getDocumentEntity(DocumentStatus.DOWNLOADED)
                 .flatMap(this::processDocument, indexerConfigurationProperties.getConcurrentIndexerThreads())
