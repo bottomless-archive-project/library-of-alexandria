@@ -1,8 +1,5 @@
-package com.github.loa.vault.domain.exception;
+package com.github.loa.vault.client.service.domain;
 
-/**
- * This exception is thrown when the vault is inaccessible.
- */
 public class VaultAccessException extends RuntimeException {
 
     public VaultAccessException(final String message, final Throwable throwable) {

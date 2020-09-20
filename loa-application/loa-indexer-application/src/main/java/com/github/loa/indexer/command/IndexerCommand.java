@@ -8,11 +8,14 @@ import com.github.loa.indexer.configuration.IndexerConfigurationProperties;
 import com.github.loa.indexer.service.index.IndexerService;
 import com.github.loa.indexer.service.search.DocumentSearchService;
 import com.github.loa.parser.service.DocumentDataParser;
+import com.github.loa.vault.client.service.domain.VaultAccessException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
+
+import java.net.ConnectException;
 
 @Slf4j
 @Component
@@ -44,6 +47,13 @@ public class IndexerCommand implements CommandLineRunner {
     private Mono<Void> processDocument(final DocumentEntity documentEntity) {
         return documentDataParser.parseDocumentData(documentEntity)
                 .onErrorContinue((throwable, document) -> {
+                    //TODO: This should be handled in the VaultClientService but we are unable to do so
+                    // because of this onErrorContinue here (no sufficient operator in the reactive toolset).
+                    if (throwable instanceof ConnectException) {
+                        throw new VaultAccessException("Error while connecting to the vault for document: "
+                                + documentEntity.getId() + "!", throwable);
+                    }
+
                     documentManipulator.markIndexFailure(documentEntity.getId()).subscribe();
 
                     log.info("Failed to parse document with id: {}!", documentEntity.getId());
