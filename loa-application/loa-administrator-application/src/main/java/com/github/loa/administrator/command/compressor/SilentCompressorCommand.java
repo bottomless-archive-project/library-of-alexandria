@@ -11,14 +11,13 @@ import org.springframework.stereotype.Component;
 import reactor.core.scheduler.Schedulers;
 
 /**
- * This command will go through all of the {@link DocumentEntity}s available in the database and ask the
- * Vault Application to recompress them when the compression is not the same as provided.
+ * This command will go through every {@link DocumentEntity} in the database and ask the Vault Application to recompress them when the
+ * compression is not the same as provided.
  *
  * <ul>
- *      <li>The desired compression should be set with the {@code --loa.command.silent-compressor.algorithm}
- *          command-line argument.</li>
- *      <li>The desired parallelism level should be set with the
- *          {@code --loa.command.silent-compressor.parallelism-level} command-line argument.</li>
+ *      <li>The desired compression should be set with the {@code --loa.command.silent-compressor.algorithm} command-line argument.</li>
+ *      <li>The desired parallelism level should be set with the {@code --loa.command.silent-compressor.parallelism-level} command-line
+ *          argument.</li>
  * </ul>
  */
 @Slf4j

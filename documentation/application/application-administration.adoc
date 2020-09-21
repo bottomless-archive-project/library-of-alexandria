@@ -1,6 +1,6 @@
 = Administrator Application
 
-This application's goal is to provide basic database administrator tasks (initialize the databases, query statistics, initiate the re-crawling of failed tasks etc).
+This application's goal is to provide basic database administrator tasks (query statistics, initiate the re-crawling of failed tasks etc).
 
 .Parameters
 |===
@@ -26,6 +26,9 @@ This application's goal is to provide basic database administrator tasks (initia
 |===
 | Name | Description
 
-| initialize-indexer
-| This task will initialize the indexes in the Elasticsearch database. Elasticsearch should run while this command is running.
+| reindex
+| This task will reset every document's status to `DOWNLOADED`.
+
+| silent-compressor
+| This command will go through every document in the database and ask the <<Vault Application>> to recompress them when the compression is not the same as provided.
 |===
