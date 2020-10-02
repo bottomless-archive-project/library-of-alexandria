@@ -7,8 +7,8 @@ import lombok.Getter;
 @Builder
 public class DocumentLocationCreationContext {
 
-    private String id;
-    private String url;
-    private String source;
-    private int downloaderVersion;
+    private final String id;
+    private final String url;
+    private final String source;
+    private final int downloaderVersion;
 }
