@@ -11,8 +11,8 @@ import java.util.UUID;
 @Builder
 public class DocumentArchivingContext {
 
-    private UUID id;
-    private DocumentType type;
-    private String source;
-    private Path contents;
+    private final UUID id;
+    private final DocumentType type;
+    private final String source;
+    private final Path contents;
 }

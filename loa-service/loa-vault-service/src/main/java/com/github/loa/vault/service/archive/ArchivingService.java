@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
+import reactor.util.retry.Retry;
 
 @Slf4j
 @Service
@@ -19,13 +20,22 @@ public class ArchivingService {
     private final DocumentCreationContextFactory documentCreationContextFactory;
     private final VaultDocumentStorage vaultDocumentStorage;
 
+    /**
+     * Archives a document to the vault. The document will be saved to the vault's physical storage and inserted into the database as well.
+     *
+     * @param documentArchivingContext the context of the document to archive
+     * @return the archived document's representation in the database
+     */
     public Mono<DocumentEntity> archiveDocument(final DocumentArchivingContext documentArchivingContext) {
         return documentCreationContextFactory.newContext(documentArchivingContext)
                 .flatMap(documentEntityFactory::newDocumentEntity)
                 .doOnNext(documentEntity -> vaultDocumentStorage.persistDocument(documentEntity,
                         documentArchivingContext.getContent()))
                 .doOnError(throwable -> handleError(throwable, documentArchivingContext))
-                .retry(throwable -> !isDuplicateIndexError(throwable));
+                .retryWhen(
+                        Retry.indefinitely()
+                                .filter(throwable -> !isDuplicateIndexError(throwable))
+                );
     }
 
     private void handleError(final Throwable throwable, final DocumentArchivingContext documentArchivingContext) {

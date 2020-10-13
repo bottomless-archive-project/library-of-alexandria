@@ -12,6 +12,7 @@ import com.github.loa.queue.service.domain.QueueException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.artemis.api.core.ActiveMQException;
+import org.apache.activemq.artemis.api.core.QueueConfiguration;
 import org.apache.activemq.artemis.api.core.RoutingType;
 import org.apache.activemq.artemis.api.core.SimpleString;
 import org.apache.activemq.artemis.api.core.client.ClientMessage;
@@ -68,7 +69,12 @@ public class ArtemisQueueManipulator implements QueueManipulator {
         log.info("Creating the {} queue because it doesn't exists.", queue.getName());
 
         try (ClientSession clientSession = clientSessionFactory.createSession()) {
-            clientSession.createQueue(queue.getAddress(), RoutingType.ANYCAST, queue.getName(), true);
+            clientSession.createQueue(
+                    new QueueConfiguration(queue.getName())
+                            .setAddress(queue.getAddress())
+                            .setRoutingType(RoutingType.ANYCAST)
+                            .setDurable(true)
+            );
         } catch (final ActiveMQException e) {
             throw new QueueException("Unable to initialize the " + queue.getName() + " queue!", e);
         }
