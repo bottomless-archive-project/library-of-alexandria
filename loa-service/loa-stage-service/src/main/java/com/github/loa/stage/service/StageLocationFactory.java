@@ -36,7 +36,7 @@ public class StageLocationFactory {
 
     private String buildFileName(final String documentId, final DocumentType documentType) {
         return new StringBuilder(documentId)
-                .append(".")
+                .append('.')
                 .append(documentType.getFileExtension())
                 .toString();
     }

@@ -9,16 +9,21 @@ import reactor.core.publisher.Mono;
 @Component
 public class IndexPageWebFilter implements WebFilter {
 
+    private static final String INDEX_PATH_WITHOUT_FILENAME = "/";
+
     @Override
     public Mono<Void> filter(final ServerWebExchange exchange, final WebFilterChain chain) {
-        if (exchange.getRequest().getURI().getPath().equals("/")) {
-            return chain.filter(exchange.mutate()
-                    .request(exchange.getRequest()
-                            .mutate()
-                            .path("/index.html")
+        if (INDEX_PATH_WITHOUT_FILENAME.equals(exchange.getRequest().getURI().getPath())) {
+            return chain.filter(
+                    exchange.mutate()
+                            .request(
+                                    exchange.getRequest()
+                                            .mutate()
+                                            .path("/index.html")
+                                            .build()
+                            )
                             .build()
-                    )
-                    .build());
+            );
         }
 
         return chain.filter(exchange);
