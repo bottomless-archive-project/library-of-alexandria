@@ -34,7 +34,7 @@ subprojects {
 
     java {
         toolchain {
-            languageVersion = JavaLanguageVersion.of(14)
+            languageVersion = JavaLanguageVersion.of(15)
         }
     }
 
@@ -77,10 +77,10 @@ subprojects {
         annotationProcessor group: 'org.springframework.boot', name: 'spring-boot-configuration-processor'
 
         // Lombok
-        compileOnly group: 'org.projectlombok', name: 'lombok'
-        annotationProcessor group: 'org.projectlombok', name: 'lombok'
-        testCompileOnly group: 'org.projectlombok', name: 'lombok'
-        testAnnotationProcessor group: 'org.projectlombok', name: 'lombok'
+        compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.14'
+        annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.14'
+        testCompileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.14'
+        testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.14'
 
         // Testing
         testCompile(group: 'org.springframework.boot', name: 'spring-boot-starter-test') {
