@@ -61,12 +61,12 @@ subprojects {
     }
 
     apply plugin: 'com.adarshr.test-logger'
-    /*apply plugin: 'pmd'
+    apply plugin: 'pmd'
 
     pmd {
         ruleSets = []
         ruleSetFiles = files("${project.rootProject.projectDir}/analysis/pmd/ruleset.xml")
-    }*/
+    }
 
     dependencies {
         // Spring starters
