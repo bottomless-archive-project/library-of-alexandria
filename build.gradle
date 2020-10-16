@@ -33,8 +33,9 @@ subprojects {
     apply plugin: 'java'
 
     java {
-        sourceCompatibility = JavaVersion.VERSION_14
-        targetCompatibility = JavaVersion.VERSION_14
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(14)
+        }
     }
 
     compileJava.dependsOn(processResources)
