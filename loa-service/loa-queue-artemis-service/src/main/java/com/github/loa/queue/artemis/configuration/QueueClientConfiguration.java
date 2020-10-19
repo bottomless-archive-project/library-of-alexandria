@@ -1,9 +1,8 @@
 package com.github.loa.queue.artemis.configuration;
 
 import com.github.loa.queue.configuration.QueueConfigurationProperties;
+import com.github.loa.queue.service.domain.QueueException;
 import lombok.RequiredArgsConstructor;
-import org.apache.activemq.artemis.api.core.ActiveMQException;
-import org.apache.activemq.artemis.api.core.ActiveMQExceptionType;
 import org.apache.activemq.artemis.api.core.TransportConfiguration;
 import org.apache.activemq.artemis.api.core.client.ActiveMQClient;
 import org.apache.activemq.artemis.api.core.client.ClientSession;
@@ -28,17 +27,20 @@ public class QueueClientConfiguration {
      * We create a default session that's necessary to create messages in the serializers/deserializers etc.
      */
     @Bean(destroyMethod = "stop")
-    public ClientSession clientSession(final ClientSessionFactory clientSessionFactory) throws ActiveMQException {
-        return clientSessionFactory.createSession();
+    public ClientSession clientSession(final ClientSessionFactory clientSessionFactory) {
+        try {
+            return clientSessionFactory.createSession();
+        } catch (final Exception e) {
+            throw new QueueException("Unable to create ClientSession!", e);
+        }
     }
 
     @Bean
-    public ClientSessionFactory clientSessionFactory(final ServerLocator serverLocator) throws ActiveMQException {
+    public ClientSessionFactory clientSessionFactory(final ServerLocator serverLocator) {
         try {
             return serverLocator.createSessionFactory();
         } catch (final Exception e) {
-            throw new ActiveMQException("Unable to create ClientSessionFactory!", e,
-                    ActiveMQExceptionType.GENERIC_EXCEPTION);
+            throw new QueueException("Unable to create ClientSessionFactory!", e);
         }
     }
 
