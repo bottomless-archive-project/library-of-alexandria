@@ -1,5 +1,14 @@
 apply plugin: 'org.springframework.boot'
 
+bootJar {
+    manifest {
+        attributes(
+                'Implementation-Title': 'Library of Alexandria - Administrator Application',
+                'Implementation-Version': archiveVersion
+        )
+    }
+}
+
 apply plugin: 'com.palantir.docker'
 
 docker {
