@@ -77,6 +77,7 @@ public class DocumentStatisticsResponseFactory {
         return Mono.just(vaultClientConfigurationProperties.getLocations().keySet())
                 .flatMap(vaultNames -> Flux.fromIterable(vaultNames)
                         .flatMap(vaultName -> vaultClientService.getAvailableSpace(vaultName)
+                                .onErrorReturn(-1L)
                                 .map(availableSpace -> DashboardVaultStatisticsResponse.builder()
                                         .name(vaultName)
                                         .availableStorageInBytes(availableSpace)
