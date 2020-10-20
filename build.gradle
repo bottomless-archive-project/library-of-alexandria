@@ -3,9 +3,9 @@ import org.springframework.boot.gradle.plugin.SpringBootPlugin
 buildscript {
     ext {
         set('artemis.version', '2.14.0')
-        set('elasticsearch.version', '7.9.1')
+        set('elasticsearch.version', '7.9.2')
         set('mongodb.version', '4.1.0')
-        set('mongo-driver-reactivestreams.version', '4.1.0')
+        set('mongo-driver-reactivestreams.version', '4.1.1')
     }
     repositories {
         mavenCentral()
@@ -77,10 +77,10 @@ subprojects {
         annotationProcessor group: 'org.springframework.boot', name: 'spring-boot-configuration-processor'
 
         // Lombok
-        compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.14'
-        annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.14'
-        testCompileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.14'
-        testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.14'
+        compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.16'
+        annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.16'
+        testCompileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.16'
+        testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.16'
 
         // Testing
         testCompile(group: 'org.springframework.boot', name: 'spring-boot-starter-test') {
