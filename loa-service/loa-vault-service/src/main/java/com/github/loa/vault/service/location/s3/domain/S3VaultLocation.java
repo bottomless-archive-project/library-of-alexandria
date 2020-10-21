@@ -12,6 +12,10 @@ import software.amazon.awssdk.services.s3.model.StorageClass;
 
 import java.io.InputStream;
 
+/**
+ * A {@link VaultLocation} implementation that stores the document contents in an S3 compatible location on the network. The contents are
+ * uploaded or downloaded depending on the calls.
+ */
 @RequiredArgsConstructor
 public class S3VaultLocation implements VaultLocation {
 
@@ -20,6 +24,9 @@ public class S3VaultLocation implements VaultLocation {
     private final String contentType;
     private final S3Client s3Client;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void upload(final byte[] documentContents) {
         final PutObjectRequest putObjectRequest = PutObjectRequest.builder()
@@ -32,6 +39,9 @@ public class S3VaultLocation implements VaultLocation {
         s3Client.putObject(putObjectRequest, RequestBody.fromBytes(documentContents));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public InputStream download() {
         final GetObjectRequest getObjectRequest = GetObjectRequest.builder()
@@ -42,6 +52,9 @@ public class S3VaultLocation implements VaultLocation {
         return s3Client.getObject(getObjectRequest, ResponseTransformer.toInputStream());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void clear() {
         final DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()

@@ -12,16 +12,16 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+/**
+ * A {@link VaultLocation} implementation that stores the document contents on a local drive.
+ */
 @RequiredArgsConstructor
 public class FileVaultLocation implements VaultLocation {
 
     private final Path vaultLocation;
 
     /**
-     * Return an output stream that points to the space where the document's content are archived. Should be used if
-     * you want to modify the content of the document.
-     *
-     * @throws StorageAccessException when unable to create the destination file
+     * {@inheritDoc}
      */
     @Override
     public void upload(final byte[] documentContents) {
@@ -33,9 +33,7 @@ public class FileVaultLocation implements VaultLocation {
     }
 
     /**
-     * Return the content of the file in the vault.
-     *
-     * @return the content of the file
+     * {@inheritDoc}
      */
     @Override
     public InputStream download() {
@@ -46,6 +44,9 @@ public class FileVaultLocation implements VaultLocation {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void clear() {
         try {
