@@ -2,6 +2,7 @@ package com.github.loa.vault.service.location.s3.domain;
 
 import com.github.loa.vault.service.location.VaultLocation;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.core.sync.ResponseTransformer;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -16,6 +17,7 @@ import java.io.InputStream;
  * A {@link VaultLocation} implementation that stores the document contents in an S3 compatible location on the network. The contents are
  * uploaded or downloaded depending on the calls.
  */
+@ToString(exclude = "s3Client")
 @RequiredArgsConstructor
 public class S3VaultLocation implements VaultLocation {
 

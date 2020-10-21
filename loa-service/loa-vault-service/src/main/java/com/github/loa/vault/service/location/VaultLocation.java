@@ -9,7 +9,6 @@ import java.io.InputStream;
  */
 public interface VaultLocation {
 
-
     /**
      * Return an output stream that points to the space where the document's content are archived. Should be used if
      * you want to modify the content of the document.

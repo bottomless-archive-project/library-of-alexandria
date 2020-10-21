@@ -5,20 +5,17 @@ import com.github.loa.document.service.DocumentManipulator;
 import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.vault.client.configuration.VaultClientConfigurationProperties;
 import com.github.loa.vault.client.configuration.VaultClientLocationConfigurationProperties;
+import com.github.loa.vault.client.service.request.RecompressRequest;
 import com.github.loa.vault.client.service.response.FreeSpaceResponse;
+import lombok.Builder;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
-
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-
-import static java.net.http.HttpRequest.BodyPublishers.ofString;
 
 @Slf4j
 @Service
@@ -60,21 +57,21 @@ public class VaultClientService {
                 });
     }
 
-    //TODO: Make reactive!
-    public void recompressDocument(final DocumentEntity documentEntity, final DocumentCompression documentCompression) {
+    public Mono<Void> recompressDocument(final DocumentEntity documentEntity, final DocumentCompression documentCompression) {
         final VaultClientLocationConfigurationProperties vaultClientLocationConfigurationProperties =
                 vaultClientConfigurationProperties.getLocation(documentEntity.getVault());
 
-        final HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(vaultClientLocationConfigurationProperties.getLocation() + "/document/" + documentEntity.getId()
-                        + "/recompress"))
-                .header("Content-Type", "application/json")
-                .POST(ofString("{compression: \"" + documentCompression + "\"}"))
-                .build();
-
-        HttpClient.newHttpClient().sendAsync(request, HttpResponse.BodyHandlers.ofString())
-                .thenApply(HttpResponse::body)
-                .join();
+        return vaultWebClient.post()
+                .uri(vaultClientLocationConfigurationProperties.getLocation() + "/document/" + documentEntity.getId() + "/recompress")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(
+                        RecompressRequest.builder()
+                                .compression(documentCompression)
+                                .build()
+                )
+                .retrieve()
+                .toBodilessEntity()
+                .then();
     }
 
     public Mono<Long> getAvailableSpace(final String vaultName) {

@@ -1,6 +1,5 @@
 package com.github.loa.vault.service;
 
-import com.github.loa.compression.configuration.CompressionConfigurationProperties;
 import com.github.loa.compression.domain.DocumentCompression;
 import com.github.loa.document.service.DocumentManipulator;
 import com.github.loa.document.service.domain.DocumentEntity;
@@ -24,11 +23,10 @@ public class RecompressorService {
     private final DocumentManipulator documentManipulator;
     private final VaultLocationFactory vaultLocationFactory;
     private final VaultDocumentStorage vaultDocumentStorage;
-    private final CompressionConfigurationProperties compressionConfigurationProperties;
 
     public void recompress(final DocumentEntity documentEntity, final DocumentCompression documentCompression) {
         log.info("Migrating archived document {} from {} compression to {}.", documentEntity.getId(),
-                documentEntity.getCompression(), compressionConfigurationProperties.getAlgorithm());
+                documentEntity.getCompression(), documentCompression);
 
         try (InputStream documentContentInputStream = vaultDocumentManager.readDocument(documentEntity)
                 .getInputStream()) {
@@ -36,7 +34,7 @@ public class RecompressorService {
 
             vaultDocumentManager.removeDocument(documentEntity)
                     .doOnNext(processedEntity -> {
-                        final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentEntity);
+                        final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentEntity, documentCompression);
 
                         vaultDocumentStorage.persistDocument(processedEntity, documentContent, vaultLocation);
                     })

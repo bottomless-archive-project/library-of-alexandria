@@ -3,6 +3,7 @@ package com.github.loa.vault.service.location.file.domain;
 import com.github.loa.vault.domain.exception.StorageAccessException;
 import com.github.loa.vault.service.location.VaultLocation;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 import org.apache.commons.io.IOUtils;
 
 import java.io.ByteArrayInputStream;
@@ -15,6 +16,7 @@ import java.nio.file.Path;
 /**
  * A {@link VaultLocation} implementation that stores the document contents on a local drive.
  */
+@ToString
 @RequiredArgsConstructor
 public class FileVaultLocation implements VaultLocation {
 
