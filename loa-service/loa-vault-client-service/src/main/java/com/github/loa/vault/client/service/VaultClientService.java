@@ -7,8 +7,6 @@ import com.github.loa.vault.client.configuration.VaultClientConfigurationPropert
 import com.github.loa.vault.client.configuration.VaultClientLocationConfigurationProperties;
 import com.github.loa.vault.client.service.request.RecompressRequest;
 import com.github.loa.vault.client.service.response.FreeSpaceResponse;
-import lombok.Builder;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;

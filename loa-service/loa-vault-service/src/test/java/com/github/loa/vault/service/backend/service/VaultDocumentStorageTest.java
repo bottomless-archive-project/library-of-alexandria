@@ -12,6 +12,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Optional;
+
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -53,6 +55,8 @@ class VaultDocumentStorageTest {
         when(compressionService.compress(CONTENT))
                 .thenReturn(COMPRESSED_CONTENT);
         final VaultLocation vaultLocation = mock(VaultLocation.class);
+        when(vaultLocation.getCompression())
+                .thenReturn(Optional.of(DocumentCompression.GZIP));
 
         underTest.persistDocument(documentEntity, CONTENT, vaultLocation);
 
