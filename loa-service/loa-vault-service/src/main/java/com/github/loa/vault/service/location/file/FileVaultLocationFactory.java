@@ -46,11 +46,11 @@ public class FileVaultLocationFactory implements VaultLocationFactory {
     public VaultLocation getLocation(final DocumentEntity documentEntity, final DocumentCompression compression) {
         if (compression == DocumentCompression.NONE) {
             return new FileVaultLocation(fileFactory.newFile(fileConfigurationProperties.getPath(),
-                    documentEntity.getId() + "." + documentEntity.getType().getFileExtension()));
+                    documentEntity.getId() + "." + documentEntity.getType().getFileExtension()), compression);
         } else {
             return new FileVaultLocation(fileFactory.newFile(fileConfigurationProperties.getPath(),
                     documentEntity.getId() + "." + documentEntity.getType().getFileExtension() + "."
-                            + compression.getFileExtension()));
+                            + compression.getFileExtension()), compression);
         }
     }
 

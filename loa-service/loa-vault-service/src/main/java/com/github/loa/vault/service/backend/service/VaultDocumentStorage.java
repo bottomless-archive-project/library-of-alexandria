@@ -39,8 +39,8 @@ public class VaultDocumentStorage {
      */
     public void persistDocument(final DocumentEntity documentEntity, final byte[] documentContents,
             final VaultLocation vaultLocation) {
-        final byte[] contentToSave = documentEntity.isCompressed() ? compressionServiceProvider.getCompressionService(
-                documentEntity.getCompression()).compress(documentContents) : documentContents;
+        final byte[] contentToSave = vaultLocation.getCompression().isPresent() ? compressionServiceProvider.getCompressionService(
+                vaultLocation.getCompression().get()).compress(documentContents) : documentContents;
 
         try {
             vaultLocation.upload(contentToSave);

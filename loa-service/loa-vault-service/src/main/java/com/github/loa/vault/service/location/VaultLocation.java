@@ -1,8 +1,10 @@
 package com.github.loa.vault.service.location;
 
+import com.github.loa.compression.domain.DocumentCompression;
 import com.github.loa.vault.domain.exception.StorageAccessException;
 
 import java.io.InputStream;
+import java.util.Optional;
 
 /**
  * A location on the storage media where a document's contents are stored.
@@ -28,4 +30,11 @@ public interface VaultLocation {
      * Removes any previously stored data from the document.
      */
     void clear();
+
+    /**
+     * Return the compression of the document on the location.
+     *
+     * @return the compression of the document on the location
+     */
+    Optional<DocumentCompression> getCompression();
 }
