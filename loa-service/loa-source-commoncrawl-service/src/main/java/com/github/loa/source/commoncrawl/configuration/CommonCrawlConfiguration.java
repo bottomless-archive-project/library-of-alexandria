@@ -29,11 +29,8 @@ public class CommonCrawlConfiguration {
 
     @Bean
     public Scheduler documentLocationParserScheduler() {
-        return Schedulers.newBoundedElastic(
-                commonCrawlDocumentSourceConfigurationProperties.getMinimumRecordProcessors(),
-                commonCrawlDocumentSourceConfigurationProperties.getMaximumRecordProcessors(),
-                "parsing-scheduler"
-        );
+        return Schedulers.newBoundedElastic(commonCrawlDocumentSourceConfigurationProperties.getMaximumRecordProcessors(),
+                Integer.MAX_VALUE, "parsing-scheduler");
     }
 
     @Bean

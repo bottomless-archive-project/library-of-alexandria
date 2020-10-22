@@ -1,5 +1,6 @@
 package com.github.loa.source.commoncrawl.service.location;
 
+import com.github.loa.source.commoncrawl.configuration.CommonCrawlDocumentSourceConfigurationProperties;
 import com.github.loa.source.source.DocumentLocationSource;
 import com.github.loa.location.domain.DocumentLocation;
 import com.github.loa.source.commoncrawl.service.WarcFluxFactory;
@@ -43,17 +44,21 @@ public class CommonCrawlDocumentLocationSource implements DocumentLocationSource
     @Qualifier("warcLocations")
     private final List<URL> paths;
 
+    private final CommonCrawlDocumentSourceConfigurationProperties commonCrawlDocumentSourceConfigurationProperties;
+
     @Override
     public Flux<DocumentLocation> streamLocations() {
         return Flux.fromIterable(paths)
-                .flatMap(this::processWarcLocation);
+                .flatMap(this::processWarcLocation, commonCrawlDocumentSourceConfigurationProperties.getMaximumRecordProcessors());
     }
 
     private Flux<DocumentLocation> processWarcLocation(final URL warcLocation) {
+        log.info("Started to process location: {}", warcLocation);
+
         return Mono.just(warcLocation)
                 .flatMapMany(warcFluxFactory::buildWarcRecordFlux)
                 .map(webPageFactory::newWebPage)
-                .publishOn(documentLocationParserScheduler)
+                .subscribeOn(documentLocationParserScheduler)
                 .flatMap(warcRecordParser::parseUrlsFromRecord)
                 .doOnNext(line -> processedDocumentLocationCount.increment())
                 .flatMap(this::buildLocation)

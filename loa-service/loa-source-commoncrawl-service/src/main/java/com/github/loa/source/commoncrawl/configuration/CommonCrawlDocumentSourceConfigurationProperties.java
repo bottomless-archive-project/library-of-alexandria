@@ -24,11 +24,6 @@ public class CommonCrawlDocumentSourceConfigurationProperties {
     private int warcId;
 
     /**
-     * How many schedulers should be available minimally to parse the document locations.
-     */
-    private int minimumRecordProcessors;
-
-    /**
      * How many schedulers should be available maximally to parse the document locations.
      */
     private int maximumRecordProcessors;
