@@ -1,6 +1,7 @@
 package com.github.loa.source.commoncrawl.service.location;
 
 import com.github.loa.source.commoncrawl.configuration.CommonCrawlDocumentSourceConfigurationProperties;
+import com.github.loa.source.commoncrawl.domain.CommonCrawlWarcLocation;
 import com.github.loa.source.source.DocumentLocationSource;
 import com.github.loa.location.domain.DocumentLocation;
 import com.github.loa.source.commoncrawl.service.WarcFluxFactory;
@@ -42,7 +43,7 @@ public class CommonCrawlDocumentLocationSource implements DocumentLocationSource
     private final Counter processedDocumentLocationCount;
 
     @Qualifier("warcLocations")
-    private final List<URL> paths;
+    private final List<CommonCrawlWarcLocation> paths;
 
     private final CommonCrawlDocumentSourceConfigurationProperties commonCrawlDocumentSourceConfigurationProperties;
 
@@ -52,17 +53,16 @@ public class CommonCrawlDocumentLocationSource implements DocumentLocationSource
                 .flatMap(this::processWarcLocation, commonCrawlDocumentSourceConfigurationProperties.getMaximumRecordProcessors());
     }
 
-    private Flux<DocumentLocation> processWarcLocation(final URL warcLocation) {
-        log.info("Started to process location: {}", warcLocation);
+    private Flux<DocumentLocation> processWarcLocation(final CommonCrawlWarcLocation warcLocation) {
+        log.info("Started to process location with id: {} and url: {}.", warcLocation.getId(), warcLocation.getLocation());
 
-        return Mono.just(warcLocation)
-                .flatMapMany(warcFluxFactory::buildWarcRecordFlux)
+        return warcFluxFactory.buildWarcRecordFlux(warcLocation.getLocation())
                 .map(webPageFactory::newWebPage)
                 .subscribeOn(documentLocationParserScheduler)
                 .flatMap(warcRecordParser::parseUrlsFromRecord)
                 .doOnNext(line -> processedDocumentLocationCount.increment())
                 .flatMap(this::buildLocation)
-                .doOnError(error -> handleError(warcLocation, error))
+                .doOnError(error -> handleError(warcLocation.getLocation(), error))
                 .retry();
     }
 
