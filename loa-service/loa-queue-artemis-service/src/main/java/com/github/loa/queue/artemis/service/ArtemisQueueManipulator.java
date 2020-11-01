@@ -107,9 +107,9 @@ public class ArtemisQueueManipulator implements QueueManipulator {
      * @throws QueueException when an error happens while trying to send the message
      */
     @Override
+    @SuppressWarnings("unchecked")
     public void sendMessage(final Queue queue, final Object message) {
-        final MessageSerializer<Object> messageSerializer = (MessageSerializer<Object>) messageSerializerProvider
-                .getSerializer(queue)
+        final MessageSerializer<Object> messageSerializer = (MessageSerializer<Object>) messageSerializerProvider.getSerializer(queue)
                 .orElseThrow(() -> new QueueException("No serializer found for queue: " + queue.getName() + "!"));
 
         final ClientMessage clientMessage = messageSerializer.serialize(message);
@@ -136,12 +136,10 @@ public class ArtemisQueueManipulator implements QueueManipulator {
             try {
                 final ClientMessage clientMessage = clientConsumer.receive();
 
-                // The deserialization should be done inside the invocation because the message is only
-                // readable while the consumer is locked (and doesn't read a new message for an other
-                // thread).
+                // The deserialization should be done inside the invocation because the message is only readable while the consumer is
+                // locked (and doesn't read a new message for an other thread).
                 return messageDeserializerProvider.getDeserializer(queue)
-                        .orElseThrow(() -> new QueueException("No deserializer found for queue: "
-                                + queue.getName() + "!"))
+                        .orElseThrow(() -> new QueueException("No deserializer found for queue: " + queue.getName() + "!"))
                         .deserialize(clientMessage);
             } catch (final ActiveMQException e) {
                 throw new QueueException("Unable to read message from the " + queue.getName() + " queue!", e);
@@ -159,6 +157,7 @@ public class ArtemisQueueManipulator implements QueueManipulator {
      * @throws QueueException when an error happens while trying to read the message
      */
     @Override
+    @SuppressWarnings("unchecked")
     public <T> T readMessage(final Queue queue, final Class<T> resultType) {
         return (T) readMessage(queue);
     }
