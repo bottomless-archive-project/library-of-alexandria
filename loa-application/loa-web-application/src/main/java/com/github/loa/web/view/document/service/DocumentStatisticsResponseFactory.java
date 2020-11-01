@@ -93,7 +93,8 @@ public class DocumentStatisticsResponseFactory {
             final DashboardDocumentStatisticsResponse.DashboardDocumentStatisticsResponseBuilder builder) {
         return documentEntityFactory.getCountByType()
                 .map(typeMap -> Arrays.stream(DocumentType.values())
-                        .collect(Collectors.toMap(documentType -> documentType, documentType -> typeMap.getOrDefault(documentType, 0), (a, b) -> b, TreeMap::new)))
+                        .collect(Collectors.toMap(documentType -> documentType,
+                                documentType -> typeMap.getOrDefault(documentType, 0), (a, b) -> b, TreeMap::new)))
                 .map(builder::documentCountByType);
     }
 
@@ -101,7 +102,8 @@ public class DocumentStatisticsResponseFactory {
             final DashboardDocumentStatisticsResponse.DashboardDocumentStatisticsResponseBuilder builder) {
         return documentEntityFactory.getCountByStatus()
                 .map(statusMap -> Arrays.stream(DocumentStatus.values())
-                        .collect(Collectors.toMap(documentStatus -> documentStatus, documentStatus -> statusMap.getOrDefault(documentStatus, 0), (a, b) -> b, TreeMap::new)))
+                        .collect(Collectors.toMap(documentStatus -> documentStatus,
+                                documentStatus -> statusMap.getOrDefault(documentStatus, 0), (a, b) -> b, TreeMap::new)))
                 .map(builder::documentCountByStatus);
     }
 }

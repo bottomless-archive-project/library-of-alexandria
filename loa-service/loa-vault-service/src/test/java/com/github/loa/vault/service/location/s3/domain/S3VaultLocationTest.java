@@ -21,7 +21,9 @@ import java.io.InputStream;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class S3VaultLocationTest {
@@ -67,6 +69,7 @@ class S3VaultLocationTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     void testDownload() {
         final InputStream downloadResult = mock(InputStream.class);
         when(s3Client.getObject(any(GetObjectRequest.class), any(ResponseTransformer.class)))

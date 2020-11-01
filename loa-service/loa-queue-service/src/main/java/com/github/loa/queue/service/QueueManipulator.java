@@ -11,7 +11,7 @@ public interface QueueManipulator {
      * @param queue the queue to initialize
      * @throws QueueException when an error happens while trying to create the queue
      */
-    void silentlyInitializeQueue(final Queue queue);
+    void silentlyInitializeQueue(Queue queue);
 
     /**
      * Initialize a queue in the Queue Application.
@@ -19,7 +19,7 @@ public interface QueueManipulator {
      * @param queue the queue to initialize
      * @throws QueueException when an error happens while trying to create the queue
      */
-    void initializeQueue(final Queue queue);
+    void initializeQueue(Queue queue);
 
     /**
      * Returns the message count that is available in the provided {@link Queue}.
@@ -28,7 +28,7 @@ public interface QueueManipulator {
      * @return the message count in the queue
      * @throws QueueException when an error happens while trying to create the queue
      */
-    long getMessageCount(final Queue queue);
+    long getMessageCount(Queue queue);
 
     /**
      * Sends the provided message to the provided queue.
@@ -37,7 +37,7 @@ public interface QueueManipulator {
      * @param message the message to send
      * @throws QueueException when an error happens while trying to send the message
      */
-    void sendMessage(final Queue queue, final Object message);
+    void sendMessage(Queue queue, Object message);
 
     /**
      * Reads a message from the provided queue.
@@ -46,7 +46,7 @@ public interface QueueManipulator {
      * @return the message that's being read
      * @throws QueueException when an error happens while trying to read the message
      */
-    Object readMessage(final Queue queue);
+    Object readMessage(Queue queue);
 
-    <T> T readMessage(final Queue queue, final Class<T> resultType);
+    <T> T readMessage(Queue queue, Class<T> resultType);
 }

@@ -10,7 +10,8 @@ import org.springframework.context.annotation.Configuration;
 public class DocumentLocationMongoConfiguration {
 
     @Bean
-    public MongoCollection<DocumentLocationDatabaseEntity> documentLocationDatabaseEntityMongoCollection(final MongoDatabase mongoDatabase) {
+    public MongoCollection<DocumentLocationDatabaseEntity> documentLocationDatabaseEntityMongoCollection(
+            final MongoDatabase mongoDatabase) {
         return mongoDatabase.getCollection("documentLocation", DocumentLocationDatabaseEntity.class);
     }
 }

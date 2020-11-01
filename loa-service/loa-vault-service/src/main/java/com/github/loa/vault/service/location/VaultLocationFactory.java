@@ -14,7 +14,7 @@ public interface VaultLocationFactory {
      * @param documentEntity the entity of the document to return the location for
      * @return the vault location belonging to the document
      */
-    VaultLocation getLocation(final DocumentEntity documentEntity);
+    VaultLocation getLocation(DocumentEntity documentEntity);
 
     /**
      * Return a vault location for a document. The filename part of the location is calculated using the provided
@@ -24,7 +24,7 @@ public interface VaultLocationFactory {
      * @param compression    the compression used in the location calculation
      * @return the vault location belonging to the document
      */
-    VaultLocation getLocation(final DocumentEntity documentEntity, final DocumentCompression compression);
+    VaultLocation getLocation(DocumentEntity documentEntity, DocumentCompression compression);
 
     /**
      * Return the available free space in bytes on the location host.

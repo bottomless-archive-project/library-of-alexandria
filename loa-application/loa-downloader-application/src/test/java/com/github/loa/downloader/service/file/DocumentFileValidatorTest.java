@@ -18,14 +18,16 @@ import reactor.test.StepVerifier;
 import java.io.InputStream;
 import java.util.UUID;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class DocumentFileValidatorTest {
 
-    private final static long MAX_FILE_SIZE_IN_BYTES = 2048;
-    private final static UUID DOCUMENT_ID = UUID.fromString("123e4567-e89b-12d3-a456-556642440000");
-    private final static DocumentType DOCUMENT_TYPE = DocumentType.DOC;
+    private static final long MAX_FILE_SIZE_IN_BYTES = 2048;
+    private static final UUID DOCUMENT_ID = UUID.fromString("123e4567-e89b-12d3-a456-556642440000");
+    private static final DocumentType DOCUMENT_TYPE = DocumentType.DOC;
 
     @Mock
     private DownloaderConfigurationProperties downloaderConfigurationProperties;

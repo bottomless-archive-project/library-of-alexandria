@@ -8,7 +8,8 @@ import org.junit.jupiter.params.provider.CsvSource;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class DocumentLocationValidatorTest {
 

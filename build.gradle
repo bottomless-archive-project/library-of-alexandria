@@ -68,6 +68,11 @@ subprojects {
         ruleSetFiles = files("${project.rootProject.projectDir}/analysis/pmd/ruleset.xml")
     }
 
+    apply plugin: 'checkstyle'
+    checkstyle {
+        configFile = file("${project.rootProject.projectDir}/analysis/checkstyle/checkstyle.xml")
+    }
+
     dependencies {
         // Spring starters
         compile('org.springframework.boot:spring-boot-starter')

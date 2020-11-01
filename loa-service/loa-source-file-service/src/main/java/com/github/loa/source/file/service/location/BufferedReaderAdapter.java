@@ -26,9 +26,11 @@ public class BufferedReaderAdapter {
     public Function<BufferedReader, Flux<String>> consume() {
         return (reader) -> Flux.create(sink -> {
             try {
-                String s;
-                while (Objects.nonNull(s = reader.readLine())) {
+                String s = reader.readLine();
+                while (Objects.nonNull(s)) {
                     sink.next(s);
+
+                    s = reader.readLine();
                 }
                 sink.complete();
             } catch (final IOException e) {
