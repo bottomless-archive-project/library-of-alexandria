@@ -1,8 +1,5 @@
 package com.github.loa.vault.client.configuration;
 
-import io.netty.channel.ChannelOption;
-import io.netty.handler.timeout.ReadTimeoutHandler;
-import io.netty.handler.timeout.WriteTimeoutHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -12,15 +9,14 @@ import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.client.HttpClient;
-import reactor.netty.tcp.TcpClient;
 
-import java.util.concurrent.TimeUnit;
+import java.time.Duration;
 
 @Configuration
 @RequiredArgsConstructor
 public class VaultClientConfiguration {
 
-    private static final int VAULT_CLIENT_TIMEOUT = 120000;
+    private static final int VAULT_CLIENT_TIMEOUT = 120;
 
     @Bean
     public WebClient vaultWebClient(
@@ -45,19 +41,9 @@ public class VaultClientConfiguration {
     }
 
     @Bean
-    protected HttpClient vaultHttpClient(
-            @Qualifier("vaultTcpClient") final TcpClient vaultTcpClient) {
-        return HttpClient.from(vaultTcpClient)
+    protected HttpClient vaultHttpClient() {
+        return HttpClient.create()
+                .responseTimeout(Duration.ofSeconds(VAULT_CLIENT_TIMEOUT))
                 .compress(true);
-    }
-
-    @Bean
-    protected TcpClient vaultTcpClient() {
-        return TcpClient.create()
-                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, VAULT_CLIENT_TIMEOUT)
-                .doOnConnected(connection -> connection
-                        .addHandlerLast(new ReadTimeoutHandler(VAULT_CLIENT_TIMEOUT, TimeUnit.MILLISECONDS))
-                        .addHandlerLast(new WriteTimeoutHandler(VAULT_CLIENT_TIMEOUT, TimeUnit.MILLISECONDS))
-                );
     }
 }
