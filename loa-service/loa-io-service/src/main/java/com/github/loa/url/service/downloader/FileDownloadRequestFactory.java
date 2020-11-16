@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 import java.net.URI;
 
@@ -33,23 +32,17 @@ class FileDownloadRequestFactory {
     Flux<DataBuffer> newDownloadRequest(final URI downloadTarget) {
         return downloaderWebClient.get()
                 .uri(downloadTarget)
-                .exchange()
-                .flatMap(clientResponse -> validateResponse(downloadTarget, clientResponse))
-                .retryWhen(fileDownloadRetryFactory.newRetry())
-                .flatMapMany(this::convertResponse);
+                .exchangeToFlux(clientResponse -> handleExchange(downloadTarget, clientResponse))
+                .retryWhen(fileDownloadRetryFactory.newRetry());
     }
 
-    private Mono<ClientResponse> validateResponse(final URI downloadTarget, final ClientResponse clientResponse) {
+    private Flux<DataBuffer> handleExchange(final URI downloadTarget, final ClientResponse clientResponse) {
         if (clientResponse.statusCode() == HttpStatus.TOO_MANY_REQUESTS) {
             log.debug("Too many requests for location: {}. Retrying!", downloadTarget);
 
-            return Mono.error(new RetryableException());
+            return Flux.error(new RetryableException());
         }
 
-        return Mono.just(clientResponse);
-    }
-
-    private Flux<DataBuffer> convertResponse(final ClientResponse clientResponse) {
         return clientResponse.bodyToFlux(DataBuffer.class);
     }
 }
