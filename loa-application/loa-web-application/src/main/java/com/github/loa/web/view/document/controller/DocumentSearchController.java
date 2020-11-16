@@ -42,7 +42,7 @@ public class DocumentSearchController {
                                 .documentTypes(documentTypes)
                                 .build()
                 ))
-                .subscribeOn(Schedulers.elastic())
+                .subscribeOn(Schedulers.boundedElastic())
                 .map(documentSearchResult -> documentSearchResult.getSearchHits().collectList()
                         .map(documentSearchEntities -> DocumentSearchResponse.builder()
                                 .searchHits(documentEntityResponseTransformer.transform(documentSearchEntities))
