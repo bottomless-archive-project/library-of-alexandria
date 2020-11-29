@@ -1,17 +1,19 @@
 package com.github.loa.vault.client.configuration;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
+import org.springframework.boot.context.properties.ConstructorBinding;
 
 import java.util.Map;
 
-@Data
-@Component
+@Getter
+@ConstructorBinding
+@RequiredArgsConstructor
 @ConfigurationProperties("loa.vault.client")
 public class VaultClientConfigurationProperties {
 
-    private Map<String, VaultClientLocationConfigurationProperties> locations;
+    private final Map<String, VaultClientLocationConfigurationProperties> locations;
 
     public VaultClientLocationConfigurationProperties getLocation(final String vaultName) {
         return locations.get(vaultName);

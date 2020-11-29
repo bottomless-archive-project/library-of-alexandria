@@ -1,20 +1,22 @@
 package com.github.loa.checksum.configuration;
 
 import com.github.loa.checksum.domain.ChecksumType;
-import lombok.Data;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
+import org.springframework.boot.context.properties.ConstructorBinding;
 
 /**
  * Contains the configuration properties for the checksum.
  */
-@Data
-@Component
+@Getter
+@ConstructorBinding
+@RequiredArgsConstructor
 @ConfigurationProperties("loa.checksum")
 public class ChecksumConfigurationProperties {
 
     /**
      * The type of the checksum.
      */
-    private ChecksumType type;
+    private final ChecksumType type;
 }

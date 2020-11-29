@@ -1,15 +1,17 @@
 package com.github.loa.queue.configuration;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
+import org.springframework.boot.context.properties.ConstructorBinding;
 
-@Data
-@Component
+@Getter
+@ConstructorBinding
+@RequiredArgsConstructor
 @ConfigurationProperties("loa.queue")
 public class QueueConfigurationProperties {
 
-    private String host;
-    private int port;
-    private String dataDirectory;
+    private final String host;
+    private final int port;
+    private final String dataDirectory;
 }

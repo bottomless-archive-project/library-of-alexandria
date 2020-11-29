@@ -1,14 +1,16 @@
 package com.github.loa.indexer.configuration;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
+import org.springframework.boot.context.properties.ConstructorBinding;
 
-@Data
-@Component
+@Getter
+@ConstructorBinding
+@RequiredArgsConstructor
 @ConfigurationProperties("loa.indexer")
 public class IndexerConfigurationProperties {
 
-    private int maximumFileSize;
-    private int concurrentIndexerThreads;
+    private final int maximumFileSize;
+    private final int concurrentIndexerThreads;
 }

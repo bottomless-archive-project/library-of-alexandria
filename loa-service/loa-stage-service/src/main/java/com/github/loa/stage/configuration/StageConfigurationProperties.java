@@ -1,13 +1,15 @@
 package com.github.loa.stage.configuration;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
+import org.springframework.boot.context.properties.ConstructorBinding;
 
-@Data
-@Component
+@Getter
+@ConstructorBinding
+@RequiredArgsConstructor
 @ConfigurationProperties("loa.stage")
 public class StageConfigurationProperties {
 
-  private String location;
+  private final String location;
 }

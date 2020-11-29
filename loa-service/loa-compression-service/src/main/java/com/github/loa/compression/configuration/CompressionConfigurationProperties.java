@@ -1,17 +1,19 @@
 package com.github.loa.compression.configuration;
 
 import com.github.loa.compression.domain.DocumentCompression;
-import lombok.Data;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
+import org.springframework.boot.context.properties.ConstructorBinding;
 
 /**
  * Contains the configuration properties for the compression.
  */
-@Data
-@Component
+@Getter
+@ConstructorBinding
+@RequiredArgsConstructor
 @ConfigurationProperties("loa.compression")
 public class CompressionConfigurationProperties {
 
-    private DocumentCompression algorithm;
+    private final DocumentCompression algorithm;
 }

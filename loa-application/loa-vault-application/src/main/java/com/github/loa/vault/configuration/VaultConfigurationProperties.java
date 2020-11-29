@@ -1,14 +1,16 @@
 package com.github.loa.vault.configuration;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
+import org.springframework.boot.context.properties.ConstructorBinding;
 
 /**
  * Holds the configuration properties to the vault.
  */
-@Data
-@Component
+@Getter
+@ConstructorBinding
+@RequiredArgsConstructor
 @ConfigurationProperties("loa.vault")
 public class VaultConfigurationProperties {
 
@@ -17,22 +19,22 @@ public class VaultConfigurationProperties {
      * the vault that holds a given document. Do not change this after creating the vault because the documents
      * previously archived by this vault are not going to be accessible.
      */
-    private String name;
+    private final String name;
 
     /**
      * If this vault should be able to modify documents (eg. remove) after they are archived. If your vault is available
      * publicly on the internet then set this to false!
      */
-    private boolean modificationEnabled;
+    private final boolean modificationEnabled;
 
     /**
      * If this vault should archive new documents.
      */
-    private boolean archiving;
+    private final boolean archiving;
 
     /**
      * This version number will be saved to the database for every document that has been archived. It will be used
      * later on if its necessary to run cleanup or fixing tasks that are specific to a given version.
      */
-    private int versionNumber;
+    private final int versionNumber;
 }
