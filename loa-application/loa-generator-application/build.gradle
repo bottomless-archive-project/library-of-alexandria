@@ -9,12 +9,17 @@ bootJar {
     }
 }
 
-apply plugin: 'com.palantir.docker'
-
-docker {
-    dependsOn bootJar
-    name 'bottomlessarchive/loa-generator-application:' + rootProject.version.toString()
-    files bootJar.archiveFile
+bootBuildImage {
+    imageName = "bottomlessarchive/loa-generator-application:${rootProject.version.toString()}"
+    publish = true
+    docker {
+        publishRegistry {
+            username = dockerUser
+            password = dockerPassword
+            email = dockerEmail
+            url = "https://index.docker.io/v2/"
+        }
+    }
 }
 
 dependencies {
