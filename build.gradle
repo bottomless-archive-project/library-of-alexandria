@@ -2,8 +2,8 @@ import org.springframework.boot.gradle.plugin.SpringBootPlugin
 
 buildscript {
     ext {
-        set('artemis.version', '2.14.0')
-        set('elasticsearch.version', '7.9.3')
+        set('artemis.version', '2.16.0')
+        set('elasticsearch.version', '7.10.0')
         set('mongodb.version', '4.1.0')
     }
     repositories {
