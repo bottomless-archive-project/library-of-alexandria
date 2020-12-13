@@ -14,9 +14,9 @@ public class WebPageFactory {
      * @param warcRecord the WARC record to convert
      * @return the result of the conversion
      */
-    public WebPage newWebPage(final WarcRecord warcRecord) {
+    public WebPage newWebPage(final WarcRecord<ResponseContentBlock> warcRecord) {
         final String warcRecordUrl = warcRecord.getHeader("WARC-Target-URI");
-        final String contentString = ((ResponseContentBlock) warcRecord.getWarcContentBlock()).getPayloadAsString();
+        final String contentString = warcRecord.getContentBlock().getPayloadAsString();
 
         return WebPage.builder()
                 .url(warcRecordUrl)
