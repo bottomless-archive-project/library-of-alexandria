@@ -1,11 +1,11 @@
 package com.github.loa.source.file.service.location;
 
+import com.github.loa.location.domain.link.StringLink;
 import com.github.loa.source.source.DocumentLocationSource;
 import com.github.loa.location.domain.DocumentLocation;
 import com.github.loa.source.configuration.DocumentSourceConfiguration;
 import com.github.loa.source.file.configuration.FileDocumentSourceConfigurationProperties;
 import com.github.loa.source.file.service.FileSourceFactory;
-import com.github.loa.url.service.URLConverter;
 import io.micrometer.core.instrument.Counter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +24,6 @@ public class FileDocumentLocationSource implements DocumentLocationSource {
     private final FileDocumentSourceConfigurationProperties fileDocumentSourceConfigurationProperties;
     private final BufferedReaderAdapter adapter;
     private final FileSourceFactory fileSourceFactory;
-    private final URLConverter urlConverter;
 
     @Qualifier("processedDocumentLocationCount")
     private final Counter processedDocumentLocationCount;
@@ -43,9 +42,12 @@ public class FileDocumentLocationSource implements DocumentLocationSource {
         return Flux.using(fileSourceFactory::newSourceReader, adapter.consume(), adapter.close())
                 .skip(fileDocumentSourceConfigurationProperties.getSkipLines())
                 .doOnNext(line -> processedDocumentLocationCount.increment())
-                .flatMap(urlConverter::convert)
-                .map(url -> DocumentLocation.builder()
-                        .location(url)
+                .map(link -> DocumentLocation.builder()
+                        .location(
+                                StringLink.builder()
+                                        .link(link)
+                                        .build()
+                        )
                         .sourceName(documentSourceConfiguration.getName())
                         .build()
                 );

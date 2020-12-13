@@ -65,6 +65,12 @@
         <exclude name="CommentDefaultAccessModifier"/>
     </rule>
 
+    <rule ref="category/java/codestyle.xml/ShortClassName">
+        <properties>
+            <property name="minimum" value="4"/>
+        </properties>
+    </rule>
+
     <rule ref="category/java/codestyle.xml/DefaultPackage">
         <properties>
             <property name="violationSuppressXPath" value="//ClassOrInterfaceDeclaration['.*Test']"/>

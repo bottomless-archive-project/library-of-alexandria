@@ -4,27 +4,23 @@ import com.github.loa.location.domain.DocumentLocation;
 import com.github.loa.source.configuration.DocumentSourceConfiguration;
 import com.github.loa.source.file.configuration.FileDocumentSourceConfigurationProperties;
 import com.github.loa.source.file.service.FileSourceFactory;
-import com.github.loa.url.service.URLConverter;
 import io.micrometer.core.instrument.Counter;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.stubbing.Answer;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.io.BufferedReader;
-import java.net.URL;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -38,9 +34,6 @@ class FileDocumentLocationFactoryTest {
 
     @Mock
     private FileSourceFactory fileSourceFactory;
-
-    @Mock
-    private URLConverter urlConverter;
 
     @Mock
     private Counter processedDocumentLocationCount;
@@ -69,8 +62,6 @@ class FileDocumentLocationFactoryTest {
         final BufferedReader reader = mock(BufferedReader.class);
         when(fileSourceFactory.newSourceReader())
                 .thenReturn(reader);
-        when(urlConverter.convert(anyString()))
-                .thenAnswer((Answer<Mono<URL>>) invocation -> Mono.just(new URL(invocation.getArgument(0))));
         when(adapter.consume())
                 .thenReturn((newReader) -> {
                     assertThat(reader, is(newReader));
@@ -96,8 +87,6 @@ class FileDocumentLocationFactoryTest {
         final BufferedReader reader = mock(BufferedReader.class);
         when(fileSourceFactory.newSourceReader())
                 .thenReturn(reader);
-        when(urlConverter.convert(anyString()))
-                .thenAnswer((Answer<Mono<URL>>) invocation -> Mono.just(new URL(invocation.getArgument(0))));
         when(adapter.consume())
                 .thenReturn((newReader) -> {
                     assertThat(reader, is(newReader));
@@ -115,23 +104,28 @@ class FileDocumentLocationFactoryTest {
 
         StepVerifier.create(result)
                 .consumeNextWith(documentLocation -> {
-                    assertEquals("http://www.example.com/1", documentLocation.getLocation().toString());
+                    assertTrue(documentLocation.getLocation().toUrl().isPresent());
+                    assertEquals("http://www.example.com/1", documentLocation.getLocation().toUrl().get().toString());
                     assertEquals("test-source", documentLocation.getSourceName());
                 })
                 .consumeNextWith(documentLocation -> {
-                    assertEquals("http://www.example.com/2", documentLocation.getLocation().toString());
+                    assertTrue(documentLocation.getLocation().toUrl().isPresent());
+                    assertEquals("http://www.example.com/2", documentLocation.getLocation().toUrl().get().toString());
                     assertEquals("test-source", documentLocation.getSourceName());
                 })
                 .consumeNextWith(documentLocation -> {
-                    assertEquals("http://www.example.com/3", documentLocation.getLocation().toString());
+                    assertTrue(documentLocation.getLocation().toUrl().isPresent());
+                    assertEquals("http://www.example.com/3", documentLocation.getLocation().toUrl().get().toString());
                     assertEquals("test-source", documentLocation.getSourceName());
                 })
                 .consumeNextWith(documentLocation -> {
-                    assertEquals("http://www.example.com/4", documentLocation.getLocation().toString());
+                    assertTrue(documentLocation.getLocation().toUrl().isPresent());
+                    assertEquals("http://www.example.com/4", documentLocation.getLocation().toUrl().get().toString());
                     assertEquals("test-source", documentLocation.getSourceName());
                 })
                 .consumeNextWith(documentLocation -> {
-                    assertEquals("http://www.example.com/5", documentLocation.getLocation().toString());
+                    assertTrue(documentLocation.getLocation().toUrl().isPresent());
+                    assertEquals("http://www.example.com/5", documentLocation.getLocation().toUrl().get().toString());
                     assertEquals("test-source", documentLocation.getSourceName());
                 })
                 .verifyComplete();

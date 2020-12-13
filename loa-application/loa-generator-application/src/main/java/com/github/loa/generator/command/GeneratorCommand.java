@@ -44,7 +44,8 @@ public class GeneratorCommand implements CommandLineRunner {
     }
 
     private Mono<DocumentLocationMessage> transform(final DocumentLocation documentLocation) {
-        return urlEncoder.encode(documentLocation.getLocation())
+        return Mono.justOrEmpty(documentLocation.getLocation().toUrl())
+                .flatMap(urlEncoder::encode)
                 .map(url -> DocumentLocationMessage.builder()
                         .sourceName(documentLocation.getSourceName())
                         .documentLocation(url.toString())

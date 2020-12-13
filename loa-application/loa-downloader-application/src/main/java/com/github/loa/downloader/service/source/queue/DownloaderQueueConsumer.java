@@ -1,6 +1,7 @@
 package com.github.loa.downloader.service.source.queue;
 
 import com.github.loa.location.domain.DocumentLocation;
+import com.github.loa.location.domain.link.UrlLink;
 import com.github.loa.queue.service.QueueManipulator;
 import com.github.loa.queue.service.domain.Queue;
 import com.github.loa.queue.service.domain.message.DocumentLocationMessage;
@@ -31,7 +32,11 @@ public class DownloaderQueueConsumer implements Consumer<SynchronousSink<Documen
             documentSourceItemSynchronousSink.next(
                     DocumentLocation.builder()
                             .sourceName(documentLocationMessage.getSourceName())
-                            .location(new URL(documentLocationMessage.getDocumentLocation()))
+                            .location(
+                                    UrlLink.builder()
+                                            .url(new URL(documentLocationMessage.getDocumentLocation()))
+                                            .build()
+                            )
                             .build()
             );
         } catch (final MalformedURLException e) {

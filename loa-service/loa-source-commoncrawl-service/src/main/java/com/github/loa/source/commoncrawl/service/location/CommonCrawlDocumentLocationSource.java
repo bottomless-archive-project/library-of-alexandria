@@ -1,5 +1,6 @@
 package com.github.loa.source.commoncrawl.service.location;
 
+import com.github.loa.location.domain.link.StringLink;
 import com.github.loa.source.commoncrawl.configuration.CommonCrawlDocumentSourceConfigurationProperties;
 import com.github.loa.source.commoncrawl.domain.CommonCrawlWarcLocation;
 import com.github.loa.source.source.DocumentLocationSource;
@@ -8,14 +9,12 @@ import com.github.loa.source.commoncrawl.service.WarcFluxFactory;
 import com.github.loa.source.commoncrawl.service.WarcRecordParser;
 import com.github.loa.source.commoncrawl.service.webpage.WebPageFactory;
 import com.github.loa.source.configuration.DocumentSourceConfiguration;
-import com.github.loa.url.service.URLConverter;
 import io.micrometer.core.instrument.Counter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
 
 import java.net.URL;
@@ -34,7 +33,6 @@ public class CommonCrawlDocumentLocationSource implements DocumentLocationSource
     private final WarcRecordParser warcRecordParser;
     private final WarcFluxFactory warcFluxFactory;
     private final WebPageFactory webPageFactory;
-    private final URLConverter urlConverter;
 
     @Qualifier("documentLocationParserScheduler")
     private final Scheduler documentLocationParserScheduler;
@@ -59,20 +57,18 @@ public class CommonCrawlDocumentLocationSource implements DocumentLocationSource
         return warcFluxFactory.buildWarcRecordFlux(warcLocation.getLocation())
                 .map(webPageFactory::newWebPage)
                 .subscribeOn(documentLocationParserScheduler)
-                .flatMap(warcRecordParser::parseUrlsFromRecord)
+                .flatMap(warcRecordParser::parseLinksFromRecord)
                 .doOnNext(line -> processedDocumentLocationCount.increment())
-                .flatMap(this::buildLocation)
+                .map(this::buildLocation)
                 .doOnError(error -> handleError(warcLocation.getLocation(), error))
                 .retry();
     }
 
-    private Mono<DocumentLocation> buildLocation(final String location) {
-        return urlConverter.convert(location)
-                .map(url -> DocumentLocation.builder()
-                        .location(url)
-                        .sourceName(documentSourceConfiguration.getName())
-                        .build()
-                );
+    private DocumentLocation buildLocation(final StringLink location) {
+        return DocumentLocation.builder()
+                .location(location)
+                .sourceName(documentSourceConfiguration.getName())
+                .build();
     }
 
     private void handleError(final URL warcLocation, final Throwable error) {

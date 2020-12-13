@@ -39,7 +39,7 @@ public class DocumentLocationProcessor {
     public Mono<Void> processDocumentLocation(final DocumentLocation documentSourceItem) {
         processedDocumentCount.increment();
 
-        final URL documentLocation = documentSourceItem.getLocation();
+        final URL documentLocation = documentSourceItem.getLocation().toUrl().orElseThrow();
         final DocumentType documentType = documentTypeCalculator.calculate(documentLocation)
                 .orElseThrow(() -> new RuntimeException("Unable to find valid document type for document: "
                         + documentLocation));

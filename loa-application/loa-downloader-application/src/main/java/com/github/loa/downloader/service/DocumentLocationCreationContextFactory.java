@@ -15,8 +15,9 @@ public class DocumentLocationCreationContextFactory {
     private final DownloaderConfigurationProperties downloaderConfigurationProperties;
 
     public DocumentLocationCreationContext newCreatingContext(final DocumentLocation documentSourceItem) {
-        final String documentId = documentLocationIdFactory
-                .newDocumentLocationId(documentSourceItem.getLocation());
+        final String documentId = documentLocationIdFactory.newDocumentLocationId(
+                documentSourceItem.getLocation().toUrl().orElseThrow()
+        );
 
         return DocumentLocationCreationContext.builder()
                 .id(documentId)

@@ -1,12 +1,12 @@
 package com.github.loa.document.service.location;
 
+import com.github.loa.location.domain.link.StringLink;
 import com.github.loa.location.service.DocumentLocationValidator;
 import com.github.loa.location.domain.DocumentLocation;
+import org.apache.commons.lang3.StringUtils;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-
-import java.net.MalformedURLException;
-import java.net.URL;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -28,13 +28,16 @@ class DocumentLocationValidatorTest {
                     "http://www.example.com/test.rtf",
                     "http://www.example.com/test.mobi",
                     "http://www.example.com/test.epub",
-                    "http://www.example.com/test.epub?queryparam=value",
+                    "http://www.example.com/test.epub?queryparam=value"
             }
     )
-    void testValidDocumentLocationWithValidDocuments(final String documentLocation) throws MalformedURLException {
+    void testValidDocumentLocationWithValidDocuments(final String documentLocation) {
         final boolean result = underTest.validDocumentLocation(
                 DocumentLocation.builder()
-                        .location(new URL(documentLocation))
+                        .location(StringLink.builder()
+                                .link(documentLocation)
+                                .build()
+                        )
                         .build()
         );
 
@@ -46,13 +49,48 @@ class DocumentLocationValidatorTest {
             value = {
                     "http://www.example.com/test.exe",
                     "http://www.example.com/test.md",
-                    "http://www.example.com/test",
+                    "http://www.example.com/test"
             }
     )
-    void testValidDocumentLocationWithInvalidDocuments(final String documentLocation) throws MalformedURLException {
+    void testValidDocumentLocationWithInvalidDocuments(final String documentLocation) {
         final boolean result = underTest.validDocumentLocation(
                 DocumentLocation.builder()
-                        .location(new URL(documentLocation))
+                        .location(StringLink.builder()
+                                .link(documentLocation)
+                                .build()
+                        )
+                        .build()
+        );
+
+        assertFalse(result);
+    }
+
+
+    @ParameterizedTest
+    @CsvSource(
+            value = {
+                    "helloWorld"
+            }
+    )
+    void testInvalidDocumentLocation(final String documentLocation) {
+        final boolean result = underTest.validDocumentLocation(
+                DocumentLocation.builder()
+                        .location(StringLink.builder().link(documentLocation).build())
+                        .build()
+        );
+
+        assertFalse(result);
+    }
+
+    // Empty string makes JUnit throw an invalid CSV error so we need to test it in its own method
+    @Test
+    void testEmptyDocumentLocation() {
+        final boolean result = underTest.validDocumentLocation(
+                DocumentLocation.builder()
+                        .location(StringLink.builder()
+                                .link(StringUtils.EMPTY)
+                                .build()
+                        )
                         .build()
         );
 

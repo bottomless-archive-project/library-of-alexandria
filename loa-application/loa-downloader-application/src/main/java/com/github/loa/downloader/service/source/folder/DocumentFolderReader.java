@@ -3,6 +3,7 @@ package com.github.loa.downloader.service.source.folder;
 import com.github.loa.downloader.configuration.DownloaderConfigurationProperties;
 import com.github.loa.downloader.service.document.DocumentLocationProcessor;
 import com.github.loa.location.domain.DocumentLocation;
+import com.github.loa.location.domain.link.UrlLink;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.boot.CommandLineRunner;
@@ -37,7 +38,11 @@ public class DocumentFolderReader implements CommandLineRunner {
     @SneakyThrows
     private DocumentLocation buildDocumentSourceItem(final File file) {
         return DocumentLocation.builder()
-                .location(file.toURI().toURL())
+                .location(
+                        UrlLink.builder()
+                                .url(file.toURI().toURL())
+                                .build()
+                )
                 .build();
     }
 }

@@ -19,8 +19,12 @@ public class DocumentLocationValidator {
      * @return true if the location could contain a document, false otherwise
      */
     public boolean validDocumentLocation(final DocumentLocation documentLocation) {
+        if (!documentLocation.getLocation().isValid()) {
+            return false;
+        }
+
         //Using getPath() to be able to crawl urls like: /example/examplefile.pdf?queryparam=value
-        final String documentLocationPath = documentLocation.getLocation().getPath();
+        final String documentLocationPath = documentLocation.getLocation().toUrl().orElseThrow().getPath();
 
         return Arrays.stream(DocumentType.values())
                 .anyMatch(documentType -> documentLocationPath.endsWith("." + documentType.getFileExtension()));
