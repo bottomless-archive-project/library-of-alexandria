@@ -41,8 +41,7 @@ public class DocumentLocationProcessor {
 
         final URL documentLocation = documentSourceItem.getLocation().toUrl().orElseThrow();
         final DocumentType documentType = documentTypeCalculator.calculate(documentLocation)
-                .orElseThrow(() -> new RuntimeException("Unable to find valid document type for document: "
-                        + documentLocation));
+                .orElseThrow(() -> new RuntimeException("Unable to find valid document type for document: " + documentLocation));
 
         log.debug("Starting to download document {}.", documentLocation);
 

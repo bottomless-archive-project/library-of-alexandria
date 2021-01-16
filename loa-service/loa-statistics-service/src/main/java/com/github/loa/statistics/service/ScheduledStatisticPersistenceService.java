@@ -20,7 +20,7 @@ public class ScheduledStatisticPersistenceService {
 
     @Scheduled(fixedRateString = "${loa.statistics.collection-rate}")
     public void persistStatistics() {
-        log.info("Persisiting statistics.");
+        log.info("Persisting statistics.");
 
         Mono.zip(documentEntityFactory.getDocumentCount(), documentLocationEntityFactory.getDocumentLocationCount())
                 .flatMap(count -> statisticsEntityFactory.createStatisticsPoint(count.getT1(), count.getT2()))
