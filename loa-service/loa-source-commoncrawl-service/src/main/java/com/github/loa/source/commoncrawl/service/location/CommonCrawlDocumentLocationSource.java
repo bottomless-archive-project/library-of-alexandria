@@ -13,6 +13,7 @@ import io.micrometer.core.instrument.Counter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Scheduler;
@@ -27,6 +28,7 @@ import java.util.List;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "loa.source.type", havingValue = "common-crawl")
 public class CommonCrawlDocumentLocationSource implements DocumentLocationSource {
 
     private final DocumentSourceConfiguration documentSourceConfiguration;
