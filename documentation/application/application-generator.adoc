@@ -47,4 +47,7 @@ These URLs could come from various sources like a local file or from http://comm
 
 | **loa.source.file.encoding**
 | Used only when `loa.source.type` is set to `file`. It can be set to `none` or gzip. If it's set to `none` then the file will be read as a non-compressed file. If it's set to `gzip` then it will be red as a gzipped file, being unzipped on the fly. *(Default value: none)*
+
+| **loa.source.file.skip-lines**
+| Skip the number of lines before starting to process the document locations in the file. Can be used to quickly get back to the last processed line if the application is restarted for any reason. *(Default value: 0)*
 |===
