@@ -7,6 +7,8 @@ import com.github.loa.location.service.id.factory.DocumentLocationIdFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.net.URL;
+
 @Service
 @RequiredArgsConstructor
 public class DocumentLocationCreationContextFactory {
@@ -15,13 +17,13 @@ public class DocumentLocationCreationContextFactory {
     private final DownloaderConfigurationProperties downloaderConfigurationProperties;
 
     public DocumentLocationCreationContext newCreatingContext(final DocumentLocation documentSourceItem) {
-        final String documentId = documentLocationIdFactory.newDocumentLocationId(
-                documentSourceItem.getLocation().toUrl().orElseThrow()
-        );
+        final URL documentLocation = documentSourceItem.getLocation().toUrl().orElseThrow();
+
+        final String documentId = documentLocationIdFactory.newDocumentLocationId(documentLocation);
 
         return DocumentLocationCreationContext.builder()
                 .id(documentId)
-                .url(documentSourceItem.getLocation().toString())
+                .url(documentLocation.toString())
                 .source(documentSourceItem.getSourceName())
                 .downloaderVersion(downloaderConfigurationProperties.getVersionNumber())
                 .build();
