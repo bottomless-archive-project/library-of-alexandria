@@ -31,5 +31,5 @@ public class FileDocumentSourceConfigurationProperties {
     /**
      * How many lines should be skipped before starting to process locations again.
      */
-    private final int skipLines;
+    private final long skipLines;
 }
