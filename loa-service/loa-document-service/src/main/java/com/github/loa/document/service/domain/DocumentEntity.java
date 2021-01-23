@@ -37,7 +37,6 @@ public class DocumentEntity {
         return status == DocumentStatus.DOWNLOADED || status == DocumentStatus.INDEXED;
     }
 
-
     /**
      * Returns true if the document is compressed with a {@link DocumentCompression}.
      *
