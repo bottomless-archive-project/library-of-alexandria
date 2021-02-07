@@ -31,7 +31,7 @@ If the application is not a duplicate then the staging file's contents will be m
 | Whenever the cursor objects created by the application should be able to timeout. Ideally you would set up the timeout on your MongoDB server (see: https://docs.mongodb.com/manual/reference/parameters/#param.cursorTimeoutMillis[cursorTimeoutMillis]) but because not everybody is a MongoDB expert, we disable timeouts by default. This could cause a couple of open cursors (so extra resource usage) on the MongoDB server when the application crashes for some reason, and the cursors are not closed correctly. If you set the cursor timeout too low, then the application will crash if it is not able to process a batch of items under the provided timeout. *(Default value: true)*
 
 | **loa.queue.host**
-| The ip address of the Queue Application.
+| The ip address of the Queue Application. *(Default value: localhost)*
 
 | **loa.queue.port**
 | The port where the Queue Application is listening for new connections. *(Default value: 61616)*
