@@ -30,4 +30,7 @@ The application looks for documents that has the `DOWNLOADED` status and indexes
 
 | **loa.indexer.database.port**
 | The port of the Elasticsearch database.
+
+| **loa.indexer.concurrent-indexer-threads**
+| On how many concurrent threads should the indexer run. The number of cores available in the host machine is a good rule of thumb for this property. *(Default value: 1)*
 |===
