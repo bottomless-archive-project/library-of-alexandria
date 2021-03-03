@@ -1,10 +1,10 @@
 package com.github.loa.downloader.service.document;
 
+import com.github.loa.downloader.service.document.domain.DocumentArchivingContext;
 import com.github.loa.downloader.service.document.domain.exception.ArchivingException;
 import com.github.loa.queue.service.QueueManipulator;
 import com.github.loa.queue.service.domain.Queue;
 import com.github.loa.queue.service.domain.message.DocumentArchivingMessage;
-import com.github.loa.vault.client.service.domain.DocumentArchivingContext;
 import io.micrometer.core.instrument.Counter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;

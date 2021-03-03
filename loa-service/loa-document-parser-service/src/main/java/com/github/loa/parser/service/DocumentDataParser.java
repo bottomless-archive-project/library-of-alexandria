@@ -1,10 +1,8 @@
 package com.github.loa.parser.service;
 
-import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.document.service.domain.DocumentType;
 import com.github.loa.parser.domain.DocumentMetadata;
 import com.github.loa.parser.domain.ParsingException;
-import com.github.loa.vault.client.service.VaultClientService;
 import com.github.pemistahl.lingua.api.Language;
 import com.github.pemistahl.lingua.api.LanguageDetector;
 import lombok.RequiredArgsConstructor;
@@ -20,8 +18,6 @@ import org.apache.tika.sax.BodyContentHandler;
 import org.springframework.stereotype.Service;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
-import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -36,13 +32,6 @@ public class DocumentDataParser {
 
     private final Parser documentParser;
     private final LanguageDetector languageDetector;
-    private final VaultClientService vaultClientService;
-
-    public Mono<DocumentMetadata> parseDocumentData(final DocumentEntity documentEntity) {
-        return vaultClientService.queryDocument(documentEntity)
-                .publishOn(Schedulers.parallel())
-                .map(documentContent -> parseDocumentMetadata(documentEntity.getId(), documentEntity.getType(), documentContent));
-    }
 
     public DocumentMetadata parseDocumentMetadata(final UUID documentId, final DocumentType documentType,
             final byte[] documentContents) {

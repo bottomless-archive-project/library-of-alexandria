@@ -1,4 +1,4 @@
-package com.github.loa.vault.client.service.domain;
+package com.github.loa.downloader.service.document.domain;
 
 import com.github.loa.document.service.domain.DocumentType;
 import lombok.Builder;
