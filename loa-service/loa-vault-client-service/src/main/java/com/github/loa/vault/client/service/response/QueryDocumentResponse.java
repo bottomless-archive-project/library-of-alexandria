@@ -7,7 +7,7 @@ import lombok.extern.jackson.Jacksonized;
 @Value
 @Builder
 @Jacksonized
-public class FreeSpaceResponse {
+public class QueryDocumentResponse {
 
-    long freeSpace;
+    byte[] payload;
 }

@@ -1,4 +1,4 @@
-package com.github.loa.vault.client.service.response;
+package com.github.loa.vault.client.service.request;
 
 import lombok.Builder;
 import lombok.Value;
@@ -7,7 +7,7 @@ import lombok.extern.jackson.Jacksonized;
 @Value
 @Builder
 @Jacksonized
-public class FreeSpaceResponse {
+public class QueryDocumentRequest {
 
-    long freeSpace;
+    String documentId;
 }

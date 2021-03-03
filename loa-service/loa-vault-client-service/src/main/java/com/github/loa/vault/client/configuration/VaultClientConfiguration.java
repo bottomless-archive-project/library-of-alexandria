@@ -1,49 +1,35 @@
 package com.github.loa.vault.client.configuration;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.client.reactive.ClientHttpConnector;
-import org.springframework.http.client.reactive.ReactorClientHttpConnector;
-import org.springframework.web.reactive.function.client.ExchangeStrategies;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.netty.http.client.HttpClient;
+import org.springframework.messaging.rsocket.RSocketRequester;
+import org.springframework.messaging.rsocket.RSocketStrategies;
 
-import java.time.Duration;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Configuration
 @RequiredArgsConstructor
 public class VaultClientConfiguration {
 
-    private static final int VAULT_CLIENT_TIMEOUT = 120;
+    private final VaultClientConfigurationProperties vaultClientConfigurationProperties;
 
     @Bean
-    public WebClient vaultWebClient(
-            @Qualifier("vaultClientHttpConnector") final ClientHttpConnector vaultClientHttpConnector) {
-        return WebClient.builder()
-                .exchangeStrategies(
-                        ExchangeStrategies.builder()
-                                .codecs(configurer ->
-                                        configurer.defaultCodecs()
-                                                .maxInMemorySize(-1)
-                                )
-                                .build()
-                )
-                .clientConnector(vaultClientHttpConnector)
-                .build();
-    }
+    public Map<String, RSocketRequester> rSocketRequester(final RSocketStrategies rSocketStrategies) {
+        return vaultClientConfigurationProperties.getLocations().keySet().stream()
+                .map(vaultName -> {
+                    final VaultClientLocationConfigurationProperties vaultClientLocationConfigurationProperties =
+                            vaultClientConfigurationProperties.getLocation(vaultName);
 
-    @Bean
-    protected ClientHttpConnector vaultClientHttpConnector(
-            @Qualifier("vaultHttpClient") final HttpClient vaultHttpClient) {
-        return new ReactorClientHttpConnector(vaultHttpClient);
-    }
-
-    @Bean
-    protected HttpClient vaultHttpClient() {
-        return HttpClient.create()
-                .responseTimeout(Duration.ofSeconds(VAULT_CLIENT_TIMEOUT))
-                .compress(true);
+                    return ImmutablePair.of(vaultName,
+                            RSocketRequester.builder()
+                                    .rsocketStrategies(rSocketStrategies)
+                                    .tcp(vaultClientLocationConfigurationProperties.getHost(),
+                                            vaultClientLocationConfigurationProperties.getPort())
+                    );
+                })
+                .collect(Collectors.toMap(ImmutablePair::getLeft, ImmutablePair::getRight));
     }
 }
