@@ -26,5 +26,5 @@ dependencies {
     compile project(':loa-service:loa-queue-artemis-service')
 
     compile group: 'org.apache.activemq', name: 'artemis-server'
-    compile group: 'org.codehaus.janino', name: 'janino', version: '3.1.2'
+    compile group: 'org.codehaus.janino', name: 'janino', version: '3.1.3'
 }
