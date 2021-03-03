@@ -30,6 +30,4 @@ dependencies {
     compile project(':loa-service:loa-io-service')
     compile project(':loa-service:loa-stage-service')
     compile project(':loa-service:loa-logging-service')
-
-    compile group: 'org.hibernate.validator', name: 'hibernate-validator', version: '6.1.5.Final'
 }
