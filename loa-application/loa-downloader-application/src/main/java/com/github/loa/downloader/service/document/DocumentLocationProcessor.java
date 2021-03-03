@@ -2,12 +2,12 @@ package com.github.loa.downloader.service.document;
 
 import com.github.loa.document.service.DocumentTypeCalculator;
 import com.github.loa.document.service.domain.DocumentType;
+import com.github.loa.downloader.service.document.domain.DocumentArchivingContext;
 import com.github.loa.downloader.service.file.DocumentFileValidator;
 import com.github.loa.downloader.service.file.FileCollector;
 import com.github.loa.location.domain.DocumentLocation;
 import com.github.loa.stage.service.StageLocationFactory;
 import com.github.loa.stage.service.domain.StageLocation;
-import com.github.loa.vault.client.service.domain.DocumentArchivingContext;
 import io.micrometer.core.instrument.Counter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

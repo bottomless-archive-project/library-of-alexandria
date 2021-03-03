@@ -5,5 +5,4 @@ dependencies {
     compile group: 'org.apache.tika', name: 'tika-parsers', version: '1.25'
 
     compile project(':loa-service:loa-document-service')
-    compile project(':loa-service:loa-vault-client-service')
 }
