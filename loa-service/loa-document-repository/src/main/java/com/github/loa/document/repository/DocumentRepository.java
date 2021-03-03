@@ -4,9 +4,9 @@ import com.github.loa.document.repository.domain.DocumentDatabaseEntity;
 import com.github.loa.document.repository.domain.DocumentStatusAggregateEntity;
 import com.github.loa.document.repository.domain.DocumentTypeAggregateEntity;
 import com.github.loa.repository.configuration.RepositoryConfigurationProperties;
+import com.mongodb.client.model.Filters;
 import com.mongodb.reactivestreams.client.MongoCollection;
 import lombok.RequiredArgsConstructor;
-import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
@@ -80,7 +80,7 @@ public class DocumentRepository {
      */
     public Mono<Void> updateStatus(final String status) {
         return Mono.from(documentDatabaseEntityMongoCollection
-                .updateMany(new Document(), set("status", status)))
+                .updateMany(Filters.empty(), set("status", status)))
                 .then();
     }
 

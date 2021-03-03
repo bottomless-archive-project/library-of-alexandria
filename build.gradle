@@ -4,7 +4,7 @@ buildscript {
     ext {
         set('artemis.version', '2.16.0')
         set('elasticsearch.version', '7.10.0')
-        set('mongodb.version', '4.1.0')
+        set('mongodb.version', '4.2.2')
     }
     repositories {
         mavenCentral()
