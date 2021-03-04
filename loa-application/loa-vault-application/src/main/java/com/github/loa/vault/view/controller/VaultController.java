@@ -14,7 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 
@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.util.UUID;
 
 @Slf4j
-@RestController
+@Controller
 @RequiredArgsConstructor
 public class VaultController {
 
@@ -42,12 +42,10 @@ public class VaultController {
         final String documentId = queryDocumentRequest.getDocumentId();
 
         return documentEntityFactory.getDocumentEntity(UUID.fromString(documentId))
-                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "Document not found with id " + documentId + " or already removed!")))
+                .switchIfEmpty(Mono.error(new RuntimeException("Document not found with id " + documentId + " or already removed!")))
                 .map(documentEntity -> {
                     if (!documentEntity.isInVault(vaultConfigurationProperties.getName())) {
-                        throw new ResponseStatusException(HttpStatus.CONFLICT, "Document with id " + documentId
-                                + " is available on a different vault!");
+                        throw new RuntimeException("Document with id " + documentId + " is available on a different vault!");
                     }
 
                     final Resource resource = vaultDocumentManager.readDocument(documentEntity);
@@ -57,8 +55,7 @@ public class VaultController {
                                 .payload(resource.getInputStream().readAllBytes())
                                 .build();
                     } catch (IOException e) {
-                        throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to read the file for document with id "
-                                + documentId + "!");
+                        throw new RuntimeException("Unable to read the file for document with id " + documentId + "!");
                     }
                 });
     }
@@ -75,17 +72,14 @@ public class VaultController {
         final String documentId = deleteDocumentRequest.getDocumentId();
 
         if (!vaultConfigurationProperties.isModificationEnabled()) {
-            return Mono.error(new ResponseStatusException(HttpStatus.FORBIDDEN,
-                    "Modification is disabled on this vault instance!"));
+            return Mono.error(new RuntimeException("Modification is disabled on this vault instance!"));
         }
 
         return documentEntityFactory.getDocumentEntity(UUID.fromString(documentId))
-                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "Document not found with id " + documentId + " or already removed!")))
+                .switchIfEmpty(Mono.error(new RuntimeException("Document not found with id " + documentId + " or already removed!")))
                 .flatMap(documentEntity -> {
                     if (!documentEntity.isInVault(vaultConfigurationProperties.getName())) {
-                        return Mono.error(new ResponseStatusException(HttpStatus.CONFLICT, "Document with id "
-                                + documentId + " is available on a different vault!"));
+                        return Mono.error(new RuntimeException("Document with id " + documentId + " is available on a different vault!"));
                     }
 
                     return vaultDocumentManager.removeDocument(documentEntity)
@@ -107,21 +101,18 @@ public class VaultController {
         final String documentId = recompressRequest.getDocumentId();
 
         if (!vaultConfigurationProperties.isModificationEnabled()) {
-            return Mono.error(new ResponseStatusException(HttpStatus.FORBIDDEN,
-                    "Modification is disabled on this vault instance!"));
+            return Mono.error(new RuntimeException("Modification is disabled on this vault instance!"));
         }
 
         return documentEntityFactory.getDocumentEntity(UUID.fromString(documentId))
                 .doOnNext(documentEntity -> {
                     if (!documentEntity.isInVault(vaultConfigurationProperties.getName())) {
-                        throw new ResponseStatusException(HttpStatus.CONFLICT, "Document with id " + documentId
-                                + " is available on a different vault!");
+                        throw new RuntimeException("Document with id " + documentId + " is available on a different vault!");
                     }
 
                     recompressorService.recompress(documentEntity, recompressRequest.getCompression());
                 })
-                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "Document not found with id " + documentId + "!")))
+                .switchIfEmpty(Mono.error(new RuntimeException("Document not found with id " + documentId + "!")))
                 .then();
     }
 
