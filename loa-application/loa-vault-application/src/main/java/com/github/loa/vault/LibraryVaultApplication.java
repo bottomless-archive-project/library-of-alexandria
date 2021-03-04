@@ -5,6 +5,7 @@ import com.github.loa.compression.configuration.CompressionConfigurationProperti
 import com.github.loa.queue.configuration.QueueConfigurationProperties;
 import com.github.loa.repository.configuration.RepositoryConfigurationProperties;
 import com.github.loa.vault.configuration.VaultConfigurationProperties;
+import com.github.loa.vault.service.location.configuration.VaultLocationConfigurationProperties;
 import com.github.loa.vault.service.location.file.configuration.FileConfigurationProperties;
 import com.github.loa.vault.service.location.s3.configuration.S3ConfigurationProperties;
 import org.springframework.boot.SpringApplication;
@@ -18,7 +19,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
  */
 @EnableConfigurationProperties({VaultConfigurationProperties.class, ChecksumConfigurationProperties.class,
         RepositoryConfigurationProperties.class, CompressionConfigurationProperties.class, QueueConfigurationProperties.class,
-        FileConfigurationProperties.class, S3ConfigurationProperties.class})
+        FileConfigurationProperties.class, S3ConfigurationProperties.class, VaultLocationConfigurationProperties.class})
 @SpringBootApplication(scanBasePackages = "com.github.loa")
 public class LibraryVaultApplication {
 
