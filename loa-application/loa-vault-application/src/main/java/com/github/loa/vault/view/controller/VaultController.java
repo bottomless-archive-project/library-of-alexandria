@@ -1,7 +1,6 @@
 package com.github.loa.vault.view.controller;
 
 import com.github.loa.document.service.entity.factory.DocumentEntityFactory;
-import com.github.loa.document.view.service.MediaTypeCalculator;
 import com.github.loa.vault.configuration.VaultConfigurationProperties;
 import com.github.loa.vault.service.RecompressorService;
 import com.github.loa.vault.service.VaultDocumentManager;

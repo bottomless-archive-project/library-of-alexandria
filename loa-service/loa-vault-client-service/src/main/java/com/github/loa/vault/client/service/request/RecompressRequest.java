@@ -2,11 +2,12 @@ package com.github.loa.vault.client.service.request;
 
 import com.github.loa.compression.domain.DocumentCompression;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Value;
 
-@Getter
+@Value
 @Builder
 public class RecompressRequest {
 
-    private final DocumentCompression compression;
+    String documentId;
+    DocumentCompression compression;
 }
