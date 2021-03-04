@@ -18,7 +18,7 @@ public class VaultQueueConsumer implements Consumer<SynchronousSink<DocumentArch
     private final QueueManipulator queueManipulator;
 
     @Override
-    public void accept(SynchronousSink<DocumentArchivingMessage> documentArchivingMessageSynchronousSink) {
+    public void accept(final SynchronousSink<DocumentArchivingMessage> documentArchivingMessageSynchronousSink) {
         final DocumentArchivingMessage documentArchivingMessage = queueManipulator.readMessage(
                 Queue.DOCUMENT_ARCHIVING_QUEUE, DocumentArchivingMessage.class);
 
