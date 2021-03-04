@@ -4,42 +4,25 @@ import com.github.loa.compression.domain.DocumentCompression;
 import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.document.service.domain.DocumentType;
 import com.github.loa.document.service.entity.factory.DocumentEntityFactory;
-import com.github.loa.document.view.service.MediaTypeCalculator;
-import com.github.loa.queue.artemis.service.ArtemisQueueManipulator;
-import com.github.loa.queue.artemis.service.consumer.ClientConsumerExecutor;
-import com.github.loa.queue.artemis.service.consumer.pool.QueueConsumerFactory;
-import com.github.loa.queue.artemis.service.producer.ClientProducerExecutor;
-import com.github.loa.queue.artemis.service.producer.pool.QueueProducerFactory;
 import com.github.loa.vault.configuration.VaultConfigurationProperties;
 import com.github.loa.vault.service.RecompressorService;
 import com.github.loa.vault.service.VaultDocumentManager;
-import com.github.loa.vault.service.listener.VaultQueueConsumer;
-import com.github.loa.vault.service.listener.VaultQueueListener;
+import com.github.loa.vault.view.request.domain.DeleteDocumentRequest;
 import com.github.loa.vault.view.request.domain.QueryDocumentRequest;
-import com.github.loa.vault.view.request.domain.RecompressRequest;
+import com.github.loa.vault.view.request.domain.RecompressDocumentRequest;
 import com.github.loa.vault.view.response.domain.QueryDocumentResponse;
-import io.netty.handler.codec.json.JsonObjectDecoder;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
-import org.springframework.http.CacheControl;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.codec.json.Jackson2JsonDecoder;
 import org.springframework.http.codec.json.Jackson2JsonEncoder;
 import org.springframework.messaging.rsocket.RSocketRequester;
 import org.springframework.messaging.rsocket.RSocketStrategies;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -157,26 +140,22 @@ class VaultControllerTest {
                 .verifyComplete();
     }
 
-    /*
     @Test
     public void testRecompressWhenModificationsAreDisabled() {
         when(vaultConfigurationProperties.isModificationEnabled())
                 .thenReturn(false);
 
-        webTestClient.post()
-                .uri("/document/{documentId}/recompress", TEST_DOCUMENT_ID)
-                .body(
-                        BodyInserters.fromValue(
-                                RecompressRequest.builder()
-                                        .compression(DocumentCompression.GZIP)
-                                        .build()
-                        )
+        final Mono<Void> response = requester.route("recompressDocument")
+                .data(RecompressDocumentRequest.builder()
+                        .documentId(TEST_DOCUMENT_ID)
+                        .compression(DocumentCompression.GZIP)
+                        .build()
                 )
-                .exchange()
-                .expectStatus().isEqualTo(HttpStatus.FORBIDDEN)
-                .returnResult(Void.class)
-                .getResponseBody()
-                .blockFirst();
+                .retrieveMono(Void.class);
+
+        StepVerifier.create(response)
+                .expectErrorMessage("Modification is disabled on this vault instance!")
+                .verify();
     }
 
     @Test
@@ -186,20 +165,17 @@ class VaultControllerTest {
         when(documentEntityFactory.getDocumentEntity(UUID.fromString(TEST_DOCUMENT_ID)))
                 .thenReturn(Mono.empty());
 
-        webTestClient.post()
-                .uri("/document/{documentId}/recompress", TEST_DOCUMENT_ID)
-                .body(
-                        BodyInserters.fromValue(
-                                RecompressRequest.builder()
-                                        .compression(DocumentCompression.GZIP)
-                                        .build()
-                        )
+        final Mono<Void> response = requester.route("recompressDocument")
+                .data(RecompressDocumentRequest.builder()
+                        .documentId(TEST_DOCUMENT_ID)
+                        .compression(DocumentCompression.GZIP)
+                        .build()
                 )
-                .exchange()
-                .expectStatus().isNotFound()
-                .returnResult(Void.class)
-                .getResponseBody()
-                .blockFirst();
+                .retrieveMono(Void.class);
+
+        StepVerifier.create(response)
+                .expectErrorMessage("Document not found with id 123e4567-e89b-12d3-a456-556642440000!")
+                .verify();
     }
 
     @Test
@@ -217,20 +193,17 @@ class VaultControllerTest {
                         )
                 );
 
-        webTestClient.post()
-                .uri("/document/{documentId}/recompress", TEST_DOCUMENT_ID)
-                .body(
-                        BodyInserters.fromValue(
-                                RecompressRequest.builder()
-                                        .compression(DocumentCompression.GZIP)
-                                        .build()
-                        )
+        final Mono<Void> response = requester.route("recompressDocument")
+                .data(RecompressDocumentRequest.builder()
+                        .documentId(TEST_DOCUMENT_ID)
+                        .compression(DocumentCompression.GZIP)
+                        .build()
                 )
-                .exchange()
-                .expectStatus().isEqualTo(HttpStatus.CONFLICT)
-                .returnResult(Void.class)
-                .getResponseBody()
-                .blockFirst();
+                .retrieveMono(Void.class);
+
+        StepVerifier.create(response)
+                .expectErrorMessage("Document with id 123e4567-e89b-12d3-a456-556642440000 is available on a different vault!")
+                .verify();
     }
 
     @Test
@@ -245,20 +218,16 @@ class VaultControllerTest {
         when(documentEntityFactory.getDocumentEntity(UUID.fromString(TEST_DOCUMENT_ID)))
                 .thenReturn(Mono.just(documentEntity));
 
-        webTestClient.post()
-                .uri("/document/{documentId}/recompress", TEST_DOCUMENT_ID)
-                .body(
-                        BodyInserters.fromValue(
-                                RecompressRequest.builder()
-                                        .compression(DocumentCompression.GZIP)
-                                        .build()
-                        )
+        final Mono<Void> response = requester.route("recompressDocument")
+                .data(RecompressDocumentRequest.builder()
+                        .documentId(TEST_DOCUMENT_ID)
+                        .compression(DocumentCompression.GZIP)
+                        .build()
                 )
-                .exchange()
-                .expectStatus().isEqualTo(HttpStatus.OK)
-                .returnResult(Void.class)
-                .getResponseBody()
-                .blockFirst();
+                .retrieveMono(Void.class);
+
+        StepVerifier.create(response)
+                .verifyComplete();
 
         verify(recompressorService).recompress(documentEntity, DocumentCompression.GZIP);
     }
@@ -268,13 +237,16 @@ class VaultControllerTest {
         when(vaultConfigurationProperties.isModificationEnabled())
                 .thenReturn(false);
 
-        webTestClient.delete()
-                .uri("/document/{documentId}", TEST_DOCUMENT_ID)
-                .exchange()
-                .expectStatus().isEqualTo(HttpStatus.FORBIDDEN)
-                .returnResult(Void.class)
-                .getResponseBody()
-                .blockFirst();
+        final Mono<Void> response = requester.route("deleteDocument")
+                .data(DeleteDocumentRequest.builder()
+                        .documentId(TEST_DOCUMENT_ID)
+                        .build()
+                )
+                .retrieveMono(Void.class);
+
+        StepVerifier.create(response)
+                .expectErrorMessage("Modification is disabled on this vault instance!")
+                .verify();
     }
 
     @Test
@@ -284,13 +256,16 @@ class VaultControllerTest {
         when(documentEntityFactory.getDocumentEntity(UUID.fromString(TEST_DOCUMENT_ID)))
                 .thenReturn(Mono.empty());
 
-        webTestClient.delete()
-                .uri("/document/{documentId}", TEST_DOCUMENT_ID)
-                .exchange()
-                .expectStatus().isNotFound()
-                .returnResult(Void.class)
-                .getResponseBody()
-                .blockFirst();
+        final Mono<Void> response = requester.route("deleteDocument")
+                .data(DeleteDocumentRequest.builder()
+                        .documentId(TEST_DOCUMENT_ID)
+                        .build()
+                )
+                .retrieveMono(Void.class);
+
+        StepVerifier.create(response)
+                .expectErrorMessage("Document not found with id 123e4567-e89b-12d3-a456-556642440000 or already removed!")
+                .verify();
     }
 
     @Test
@@ -308,13 +283,16 @@ class VaultControllerTest {
                         )
                 );
 
-        webTestClient.delete()
-                .uri("/document/{documentId}", TEST_DOCUMENT_ID)
-                .exchange()
-                .expectStatus().isEqualTo(HttpStatus.CONFLICT)
-                .returnResult(Void.class)
-                .getResponseBody()
-                .blockFirst();
+        final Mono<Void> response = requester.route("deleteDocument")
+                .data(DeleteDocumentRequest.builder()
+                        .documentId(TEST_DOCUMENT_ID)
+                        .build()
+                )
+                .retrieveMono(Void.class);
+
+        StepVerifier.create(response)
+                .expectErrorMessage("Document with id 123e4567-e89b-12d3-a456-556642440000 is available on a different vault!")
+                .verify();
     }
 
     @Test
@@ -334,16 +312,17 @@ class VaultControllerTest {
         when(vaultDocumentManager.removeDocument(documentEntity))
                 .thenReturn(Mono.empty());
 
-        webTestClient.delete()
-                .uri("/document/{documentId}", TEST_DOCUMENT_ID)
-                .exchange()
-                .expectStatus().isEqualTo(HttpStatus.OK)
-                .returnResult(Void.class)
-                .getResponseBody()
-                .blockFirst();
+        final Mono<Void> response = requester.route("deleteDocument")
+                .data(DeleteDocumentRequest.builder()
+                        .documentId(TEST_DOCUMENT_ID)
+                        .build()
+                )
+                .retrieveMono(Void.class);
+
+        StepVerifier.create(response)
+                .verifyComplete();
 
         verify(vaultDocumentManager).removeDocument(documentEntity);
         verify(documentEntityFactory).removeDocumentEntity(UUID.fromString(TEST_DOCUMENT_ID));
     }
-     */
 }

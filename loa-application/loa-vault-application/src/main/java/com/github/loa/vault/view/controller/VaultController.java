@@ -6,16 +6,14 @@ import com.github.loa.vault.service.RecompressorService;
 import com.github.loa.vault.service.VaultDocumentManager;
 import com.github.loa.vault.view.request.domain.DeleteDocumentRequest;
 import com.github.loa.vault.view.request.domain.QueryDocumentRequest;
-import com.github.loa.vault.view.request.domain.RecompressRequest;
+import com.github.loa.vault.view.request.domain.RecompressDocumentRequest;
 import com.github.loa.vault.view.response.domain.FreeSpaceResponse;
 import com.github.loa.vault.view.response.domain.QueryDocumentResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
-import org.springframework.http.HttpStatus;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
@@ -97,7 +95,7 @@ public class VaultController {
      * @return an empty response
      */
     @MessageMapping("recompressDocument")
-    public Mono<Void> recompressDocument(final RecompressRequest recompressRequest) {
+    public Mono<Void> recompressDocument(final RecompressDocumentRequest recompressRequest) {
         final String documentId = recompressRequest.getDocumentId();
 
         if (!vaultConfigurationProperties.isModificationEnabled()) {
