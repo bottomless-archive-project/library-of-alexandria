@@ -125,6 +125,11 @@ public class VaultController {
                 .then();
     }
 
+    /**
+     * Return the free space available on this vault instance.
+     *
+     * @return the free space available on this instance
+     */
     @MessageMapping("freeSpace")
     public Mono<FreeSpaceResponse> getFreeSpace() {
         return vaultDocumentManager.getAvailableSpace()
