@@ -1,6 +1,7 @@
 package com.github.loa.vault.client.service;
 
 import com.github.loa.compression.domain.DocumentCompression;
+import com.github.loa.document.service.DocumentManipulator;
 import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.vault.client.service.request.QueryDocumentRequest;
 import com.github.loa.vault.client.service.request.RecompressRequest;
@@ -19,6 +20,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class VaultClientService {
 
+    private final DocumentManipulator documentManipulator;
     private final Map<String, RSocketRequester> rSocketRequester;
 
     /**
@@ -37,9 +39,20 @@ public class VaultClientService {
                                 .build()
                 )
                 .retrieveMono(QueryDocumentResponse.class)
-                //TODO: In the old implementation there was an error handling here that stated: "This could happen when the vault is closed
-                // forcefully and the file is not/partially saved."
-                .map(QueryDocumentResponse::getPayload);
+                .map(QueryDocumentResponse::getPayload)
+                .onErrorResume(RuntimeException.class, (error) -> {
+                    log.info("Missing document with id: {}!", documentEntity.getId());
+
+                    // TODO: Maybe its a better idea to do this in the vault itself?
+                    // This could happen when the vault is closed forcefully and the file is not/partially saved.
+                    if (error.getMessage().contains("Unable to get the content of a vault location!")
+                            || error.getMessage().contains("Error while decompressing document!")) {
+                        return documentManipulator.markIndexFailure(documentEntity.getId())
+                                .then(Mono.empty());
+                    }
+
+                    return Mono.empty();
+                });
     }
 
     public Mono<Void> recompressDocument(final DocumentEntity documentEntity, final DocumentCompression documentCompression) {
