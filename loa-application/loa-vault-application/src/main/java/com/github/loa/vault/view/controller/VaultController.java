@@ -4,6 +4,7 @@ import com.github.loa.document.service.entity.factory.DocumentEntityFactory;
 import com.github.loa.vault.configuration.VaultConfigurationProperties;
 import com.github.loa.vault.service.RecompressorService;
 import com.github.loa.vault.service.VaultDocumentManager;
+import com.github.loa.vault.view.domain.InvalidRequestException;
 import com.github.loa.vault.view.request.domain.DeleteDocumentRequest;
 import com.github.loa.vault.view.request.domain.QueryDocumentRequest;
 import com.github.loa.vault.view.request.domain.RecompressDocumentRequest;
@@ -40,10 +41,10 @@ public class VaultController {
         final String documentId = queryDocumentRequest.getDocumentId();
 
         return documentEntityFactory.getDocumentEntity(UUID.fromString(documentId))
-                .switchIfEmpty(Mono.error(new RuntimeException("Document not found with id " + documentId + " or already removed!")))
+                .switchIfEmpty(Mono.error(new InvalidRequestException("Document not found with id " + documentId + " or already removed!")))
                 .map(documentEntity -> {
                     if (!documentEntity.isInVault(vaultConfigurationProperties.getName())) {
-                        throw new RuntimeException("Document with id " + documentId + " is available on a different vault!");
+                        throw new InvalidRequestException("Document with id " + documentId + " is available on a different vault!");
                     }
 
                     final Resource resource = vaultDocumentManager.readDocument(documentEntity);
@@ -53,7 +54,7 @@ public class VaultController {
                                 .payload(resource.getInputStream().readAllBytes())
                                 .build();
                     } catch (IOException e) {
-                        throw new RuntimeException("Unable to read the file for document with id " + documentId + "!");
+                        throw new InvalidRequestException("Unable to read the file for document with id " + documentId + "!", e);
                     }
                 });
     }
@@ -67,17 +68,18 @@ public class VaultController {
      */
     @MessageMapping("deleteDocument")
     public Mono<Void> removeDocument(final DeleteDocumentRequest deleteDocumentRequest) {
-        final String documentId = deleteDocumentRequest.getDocumentId();
-
         if (!vaultConfigurationProperties.isModificationEnabled()) {
-            return Mono.error(new RuntimeException("Modification is disabled on this vault instance!"));
+            return Mono.error(new InvalidRequestException("Modification is disabled on this vault instance!"));
         }
 
+        final String documentId = deleteDocumentRequest.getDocumentId();
+
         return documentEntityFactory.getDocumentEntity(UUID.fromString(documentId))
-                .switchIfEmpty(Mono.error(new RuntimeException("Document not found with id " + documentId + " or already removed!")))
+                .switchIfEmpty(Mono.error(new InvalidRequestException("Document not found with id " + documentId + " or already removed!")))
                 .flatMap(documentEntity -> {
                     if (!documentEntity.isInVault(vaultConfigurationProperties.getName())) {
-                        return Mono.error(new RuntimeException("Document with id " + documentId + " is available on a different vault!"));
+                        return Mono.error(new InvalidRequestException("Document with id " + documentId
+                                + " is available on a different vault!"));
                     }
 
                     return vaultDocumentManager.removeDocument(documentEntity)
@@ -96,21 +98,21 @@ public class VaultController {
      */
     @MessageMapping("recompressDocument")
     public Mono<Void> recompressDocument(final RecompressDocumentRequest recompressRequest) {
-        final String documentId = recompressRequest.getDocumentId();
-
         if (!vaultConfigurationProperties.isModificationEnabled()) {
-            return Mono.error(new RuntimeException("Modification is disabled on this vault instance!"));
+            return Mono.error(new InvalidRequestException("Modification is disabled on this vault instance!"));
         }
+
+        final String documentId = recompressRequest.getDocumentId();
 
         return documentEntityFactory.getDocumentEntity(UUID.fromString(documentId))
                 .doOnNext(documentEntity -> {
                     if (!documentEntity.isInVault(vaultConfigurationProperties.getName())) {
-                        throw new RuntimeException("Document with id " + documentId + " is available on a different vault!");
+                        throw new InvalidRequestException("Document with id " + documentId + " is available on a different vault!");
                     }
 
                     recompressorService.recompress(documentEntity, recompressRequest.getCompression());
                 })
-                .switchIfEmpty(Mono.error(new RuntimeException("Document not found with id " + documentId + "!")))
+                .switchIfEmpty(Mono.error(new InvalidRequestException("Document not found with id " + documentId + "!")))
                 .then();
     }
 

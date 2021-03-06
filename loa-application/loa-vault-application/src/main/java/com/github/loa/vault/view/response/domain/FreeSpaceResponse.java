@@ -1,7 +1,6 @@
 package com.github.loa.vault.view.response.domain;
 
 import lombok.Builder;
-import lombok.Getter;
 import lombok.Value;
 import lombok.extern.jackson.Jacksonized;
 
