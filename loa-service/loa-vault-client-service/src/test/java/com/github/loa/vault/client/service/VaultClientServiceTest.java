@@ -2,79 +2,65 @@ package com.github.loa.vault.client.service;
 
 import com.github.loa.document.service.DocumentManipulator;
 import com.github.loa.document.service.domain.DocumentEntity;
-import com.github.loa.vault.client.configuration.VaultClientConfigurationProperties;
-import com.github.loa.vault.client.configuration.VaultClientLocationConfigurationProperties;
+import com.github.loa.vault.client.service.response.QueryDocumentResponse;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.core.io.buffer.DefaultDataBufferFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.reactive.function.client.ClientResponse;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Flux;
+import org.springframework.messaging.rsocket.RSocketRequester;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+import java.util.Map;
 import java.util.UUID;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-/*
- In this test we need to use a real WebClient because mocking it (in a reasonable way) is next to impossible.
- */
 @ExtendWith(MockitoExtension.class)
 class VaultClientServiceTest {
 
     private static final UUID TEST_DOCUMENT_ID = UUID.fromString("123e4567-e89b-12d3-a456-556642440000");
 
-    @Mock
-    private VaultClientConfigurationProperties vaultClientConfigurationProperties;
+    private VaultClientService vaultClientService;
 
     @Mock
     private DocumentManipulator documentManipulator;
 
+    @Mock
+    private RSocketRequester rSocketRequester;
+
+    @BeforeEach
+    void setup() {
+        vaultClientService = new VaultClientService(documentManipulator, Map.of("default", rSocketRequester));
+    }
+
     @Test
     public void testQueryDocumentWhenUnableToGetDocumentContents() {
-        final WebClient webClient = WebClient.builder()
-                .exchangeFunction(clientRequest -> {
-                            assertThat(clientRequest.url().toString(), is(equalTo("http://myhost:1234/document/"
-                                    + TEST_DOCUMENT_ID.toString())));
-
-                            return Mono.just(
-                                    ClientResponse.create(HttpStatus.INTERNAL_SERVER_ERROR)
-                                            .header("Content-Type", "application/json")
-                                            .body("{\"error\": \"Unable to get the content of a vault location!\"}")
-                                            .build()
-                            );
-                        }
-                )
-                .build();
-        final VaultClientService underTest = new VaultClientService(
-                vaultClientConfigurationProperties, documentManipulator, webClient);
+        final RSocketRequester.RequestSpec requestSpec = mock(RSocketRequester.RequestSpec.class);
+        when(rSocketRequester.route("queryDocument"))
+                .thenReturn(requestSpec);
+        when(requestSpec.data(any()))
+                .thenReturn(requestSpec);
+        when(requestSpec.retrieveMono(QueryDocumentResponse.class))
+                .thenReturn(Mono.error(new RuntimeException("Unable to get the content of a vault location!")));
 
         final DocumentEntity documentEntity = DocumentEntity.builder()
                 .id(TEST_DOCUMENT_ID)
                 .vault("default")
                 .build();
-
-        final VaultClientLocationConfigurationProperties vaultClientLocationConfigurationProperties =
-                new VaultClientLocationConfigurationProperties();
-        vaultClientLocationConfigurationProperties.setHost("myhost");
-        vaultClientLocationConfigurationProperties.setPort(1234);
-        when(vaultClientConfigurationProperties.getLocation("default"))
-                .thenReturn(vaultClientLocationConfigurationProperties);
-
         final Mono<Void> indexingFailureMono = Mono.empty();
         when(documentManipulator.markIndexFailure(TEST_DOCUMENT_ID))
                 .thenReturn(indexingFailureMono);
 
-        final Mono<byte[]> result = underTest.queryDocument(documentEntity);
+        final Mono<byte[]> result = vaultClientService.queryDocument(documentEntity);
 
         StepVerifier.create(result)
                 .verifyComplete();
@@ -85,37 +71,26 @@ class VaultClientServiceTest {
 
     @Test
     public void testQueryDocumentWhenTheRequestWasSuccessful() {
-        final DefaultDataBufferFactory dataBufferFactory = new DefaultDataBufferFactory();
-        final WebClient webClient = WebClient.builder()
-                .exchangeFunction(clientRequest -> {
-                            assertThat(clientRequest.url().toString(), is(equalTo("http://myhost:1234/document/"
-                                    + TEST_DOCUMENT_ID.toString())));
-
-                            return Mono.just(
-                                    ClientResponse.create(HttpStatus.OK)
-                                            .header("Content-Type", "application/octet-stream")
-                                            .body(Flux.just(dataBufferFactory.wrap(new byte[]{0, 1, 2})))
-                                            .build()
-                            );
-                        }
-                )
-                .build();
-        final VaultClientService underTest = new VaultClientService(
-                vaultClientConfigurationProperties, documentManipulator, webClient);
+        final RSocketRequester.RequestSpec requestSpec = mock(RSocketRequester.RequestSpec.class);
+        when(rSocketRequester.route("queryDocument"))
+                .thenReturn(requestSpec);
+        when(requestSpec.data(any()))
+                .thenReturn(requestSpec);
+        when(requestSpec.retrieveMono(QueryDocumentResponse.class))
+                .thenReturn(
+                        Mono.just(
+                                QueryDocumentResponse.builder()
+                                        .payload(new byte[]{0, 1, 2})
+                                        .build()
+                        )
+                );
 
         final DocumentEntity documentEntity = DocumentEntity.builder()
                 .id(TEST_DOCUMENT_ID)
                 .vault("default")
                 .build();
 
-        final VaultClientLocationConfigurationProperties vaultClientLocationConfigurationProperties =
-                new VaultClientLocationConfigurationProperties();
-        vaultClientLocationConfigurationProperties.setHost("myhost");
-        vaultClientLocationConfigurationProperties.setPort(1234);
-        when(vaultClientConfigurationProperties.getLocation("default"))
-                .thenReturn(vaultClientLocationConfigurationProperties);
-
-        final Mono<byte[]> result = underTest.queryDocument(documentEntity);
+        final Mono<byte[]> result = vaultClientService.queryDocument(documentEntity);
 
         StepVerifier.create(result)
                 .consumeNextWith(documentContents -> assertThat(documentContents, is(equalTo(new byte[]{0, 1, 2}))))

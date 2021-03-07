@@ -1,13 +1,13 @@
 package com.github.loa.vault.client.service.request;
 
-import com.github.loa.compression.domain.DocumentCompression;
 import lombok.Builder;
 import lombok.Value;
+import lombok.extern.jackson.Jacksonized;
 
 @Value
 @Builder
-public class RecompressRequest {
+@Jacksonized
+public class QueryDocumentRequest {
 
     String documentId;
-    DocumentCompression compression;
 }

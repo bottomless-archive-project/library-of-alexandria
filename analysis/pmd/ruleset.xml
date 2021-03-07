@@ -53,6 +53,13 @@
         </properties>
     </rule>
 
+    <rule ref="category/java/design.xml/ExcessiveImports">
+        <properties>
+            <property name="violationSuppressXPath"
+                      value="//ClassOrInterfaceDeclaration['com.github.loa.vault.client.service.VaultClientServiceTest']"/>
+        </properties>
+    </rule>
+
     <rule ref="category/java/codestyle.xml">
         <!-- Too many false positives. -->
         <exclude name="ShortVariable"/>
