@@ -67,7 +67,7 @@ public class VaultController {
      * @return an empty response
      */
     @MessageMapping("deleteDocument")
-    public Mono<Void> removeDocument(final DeleteDocumentRequest deleteDocumentRequest) {
+    public Mono<Void> deleteDocument(final DeleteDocumentRequest deleteDocumentRequest) {
         if (!vaultConfigurationProperties.isModificationEnabled()) {
             return Mono.error(new InvalidRequestException("Modification is disabled on this vault instance!"));
         }

@@ -3,6 +3,7 @@ package com.github.loa.vault.client.service;
 import com.github.loa.compression.domain.DocumentCompression;
 import com.github.loa.document.service.DocumentManipulator;
 import com.github.loa.document.service.domain.DocumentEntity;
+import com.github.loa.vault.client.service.request.DeleteDocumentRequest;
 import com.github.loa.vault.client.service.request.QueryDocumentRequest;
 import com.github.loa.vault.client.service.request.RecompressRequest;
 import com.github.loa.vault.client.service.response.FreeSpaceResponse;
@@ -53,6 +54,23 @@ public class VaultClientService {
 
                     return Mono.empty();
                 });
+    }
+
+    /**
+     * Requests the provided document to be deleted from the vault it resides in.
+     *
+     * @param documentEntity the document to be deleted
+     * @return an empty response
+     */
+    public Mono<Void> deleteDocument(final DocumentEntity documentEntity) {
+        return rSocketRequester.get(documentEntity.getVault())
+                .route("deleteDocument")
+                .data(
+                        DeleteDocumentRequest.builder()
+                                .documentId(documentEntity.getId().toString())
+                                .build()
+                )
+                .retrieveMono(Void.class);
     }
 
     public Mono<Void> recompressDocument(final DocumentEntity documentEntity, final DocumentCompression documentCompression) {
