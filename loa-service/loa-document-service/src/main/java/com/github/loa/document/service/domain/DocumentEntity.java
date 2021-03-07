@@ -38,6 +38,16 @@ public class DocumentEntity {
     }
 
     /**
+     * Returns true if the document is not available in the vault, or the data that is available are corrupt in any for or shape. This
+     * means that a corrupt document mostly likely can't be opened, indexed or restored.
+     *
+     * @return true if the document is corrupt in the vault, false otherwise
+     */
+    public boolean isCorrupt() {
+        return status == DocumentStatus.CORRUPT || status == DocumentStatus.INDEXING_FAILURE;
+    }
+
+    /**
      * Returns true if the document is compressed with a {@link DocumentCompression}.
      *
      * @return true if the document is compressed, false otherwise
