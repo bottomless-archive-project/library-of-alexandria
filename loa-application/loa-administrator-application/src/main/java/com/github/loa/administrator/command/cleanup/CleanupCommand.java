@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 @Slf4j
 @Component
@@ -20,12 +21,17 @@ public class CleanupCommand implements CommandLineRunner {
 
     @Override
     public void run(final String... args) {
+        log.info("Started to run the cleanup command!");
+
         documentEntityFactory.getDocumentEntities()
                 .filter(DocumentEntity::isCorrupt)
-                .flatMap(documentEntity ->
-                        vaultClientService.deleteDocument(documentEntity)
-                                .and(documentEntityFactory.removeDocumentEntity(documentEntity.getId()))
-                )
+                .flatMap(this::cleanup)
                 .subscribe();
+    }
+
+    private Mono<Void> cleanup(final DocumentEntity documentEntity) {
+        log.info("Cleaning up document entity: {}.", documentEntity);
+
+        return vaultClientService.deleteDocument(documentEntity);
     }
 }

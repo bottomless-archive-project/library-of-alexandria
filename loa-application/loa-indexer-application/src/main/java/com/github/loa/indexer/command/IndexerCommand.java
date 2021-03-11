@@ -60,7 +60,8 @@ public class IndexerCommand implements CommandLineRunner {
                                 + documentEntity.getId() + "!", throwable);
                     }
 
-                    documentManipulator.markCorrupt(documentEntity.getId()).subscribe();
+                    documentManipulator.markCorrupt(documentEntity.getId())
+                            .subscribe();
 
                     log.info("Failed to parse document with id: {}!", documentEntity.getId());
                 })
