@@ -10,4 +10,4 @@ This project aims to support this noble goal in a scalable way. We want to make 
 
 ## Documentation
 
-We have an extensive documentation for the applications suite! It is available in our [documentation page](https://bottomless-archive-project.github.io/library-of-alexandria.github.io/documentation/1.0.0/)!
+We have an extensive documentation for the applications suite! It is available in our [documentation page](https://bottomless-archive-project.github.io/library-of-alexandria.github.io/documentation/)!
