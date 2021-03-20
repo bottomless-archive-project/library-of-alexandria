@@ -85,7 +85,7 @@ public class VaultController {
                     return vaultDocumentManager.removeDocument(documentEntity)
                             .thenReturn(documentEntity);
                 })
-                .flatMap(documentEntity -> documentEntityFactory.removeDocumentEntity(documentEntity.getId()))
+                .flatMap(documentEntityFactory::removeDocumentEntity)
                 .then();
     }
 
