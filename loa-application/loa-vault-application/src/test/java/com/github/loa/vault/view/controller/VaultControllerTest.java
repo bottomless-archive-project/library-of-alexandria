@@ -307,7 +307,7 @@ class VaultControllerTest {
                 .build();
         when(documentEntityFactory.getDocumentEntity(UUID.fromString(TEST_DOCUMENT_ID)))
                 .thenReturn(Mono.just(documentEntity));
-        when(documentEntityFactory.removeDocumentEntity(UUID.fromString(TEST_DOCUMENT_ID)))
+        when(documentEntityFactory.removeDocumentEntity(documentEntity))
                 .thenReturn(Mono.empty());
         when(vaultDocumentManager.removeDocument(documentEntity))
                 .thenReturn(Mono.empty());
@@ -323,6 +323,6 @@ class VaultControllerTest {
                 .verifyComplete();
 
         verify(vaultDocumentManager).removeDocument(documentEntity);
-        verify(documentEntityFactory).removeDocumentEntity(UUID.fromString(TEST_DOCUMENT_ID));
+        verify(documentEntityFactory).removeDocumentEntity(documentEntity);
     }
 }
