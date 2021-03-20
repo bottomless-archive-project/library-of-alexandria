@@ -37,7 +37,7 @@ public interface QueueManipulator {
      * @param message the message to send
      * @throws QueueException when an error happens while trying to send the message
      */
-    void sendMessage(Queue queue, Object message);
+    <T> void sendMessage(Queue queue, T message);
 
     /**
      * Reads a message from the provided queue.
@@ -46,7 +46,5 @@ public interface QueueManipulator {
      * @return the message that's being read
      * @throws QueueException when an error happens while trying to read the message
      */
-    Object readMessage(Queue queue);
-
     <T> T readMessage(Queue queue, Class<T> resultType);
 }
