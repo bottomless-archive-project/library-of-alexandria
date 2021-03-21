@@ -33,7 +33,7 @@ public class IndexerService {
                     } catch (final IOException | ElasticsearchException e) {
                         log.info("Failed to index document {}! Cause: '{}'.", documentId, e.getMessage());
 
-                        documentManipulator.markIndexFailure(documentId).subscribe();
+                        documentManipulator.markCorrupt(documentId).subscribe();
                     }
                 });
     }

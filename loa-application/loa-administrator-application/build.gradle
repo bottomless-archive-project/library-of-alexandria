@@ -23,10 +23,10 @@ bootBuildImage {
 }
 
 dependencies {
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter-json'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-json'
 
-    compile group: 'org.elasticsearch.client', name: 'elasticsearch-rest-high-level-client'
+    implementation group: 'org.elasticsearch.client', name: 'elasticsearch-rest-high-level-client'
 
-    compile project(':loa-service:loa-document-parser-service')
-    compile project(':loa-service:loa-vault-client-service')
+    implementation project(':loa-service:loa-document-parser-service')
+    implementation project(':loa-service:loa-vault-client-service')
 }

@@ -1,6 +1,6 @@
 dependencies {
-    compile group: 'org.mongodb', name: 'mongodb-driver-reactivestreams'
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter-reactor-netty'
+    api group: 'org.mongodb', name: 'mongodb-driver-reactivestreams'
+    api group: 'org.springframework.boot', name: 'spring-boot-starter-reactor-netty'
 
-    compile group: 'commons-codec', name: 'commons-codec', version: '1.15'
+    implementation group: 'commons-codec', name: 'commons-codec', version: '1.15'
 }

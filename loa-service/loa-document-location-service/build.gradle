@@ -1,6 +1,6 @@
 dependencies {
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter'
+    implementation project(':loa-service:loa-document-service')
+    implementation project(':loa-service:loa-document-location-repository')
 
-    compile project(':loa-service:loa-document-service')
-    compile project(':loa-service:loa-document-location-repository')
+    implementation group: 'commons-codec', name: 'commons-codec', version: '1.15'
 }

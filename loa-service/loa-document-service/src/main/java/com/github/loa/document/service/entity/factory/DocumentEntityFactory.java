@@ -51,11 +51,11 @@ public class DocumentEntityFactory {
     /**
      * Remove a document by it's id.
      *
-     * @param documentId the id of the document
+     * @param documentEntity the document to remove
      * @return the result of the removal
      */
-    public Mono<Void> removeDocumentEntity(final UUID documentId) {
-        return documentRepository.removeDocument(documentId);
+    public Mono<Void> removeDocumentEntity(final DocumentEntity documentEntity) {
+        return documentRepository.removeDocument(documentEntity.getId());
     }
 
     /**

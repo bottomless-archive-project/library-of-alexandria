@@ -1,10 +1,10 @@
 dependencies {
-    compile group: 'com.github.bottomless-archive-project', name: 'java-warc', version: '1.1.0'
-    compile group: 'com.github.bottomless-archive-project', name: 'common-crawl-client', version: '2943318d20'
+    implementation group: 'com.github.bottomless-archive-project', name: 'java-warc', version: '1.1.0'
+    implementation group: 'com.github.bottomless-archive-project', name: 'common-crawl-client', version: '2943318d20'
 
-    compile group: 'org.jsoup', name: 'jsoup', version: '1.13.1'
+    implementation group: 'org.jsoup', name: 'jsoup', version: '1.13.1'
 
-    compile project(':loa-service:loa-source-service')
-    compile project(':loa-service:loa-logging-service')
-    compile project(':loa-service:loa-io-service')
+    api project(':loa-service:loa-source-service')
+    implementation project(':loa-service:loa-logging-service')
+    implementation project(':loa-service:loa-io-service')
 }

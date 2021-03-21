@@ -21,19 +21,19 @@ public class DocumentManipulator {
     /**
      * Set the document's status as {@link DocumentStatus#INDEXED indexed}.
      *
-     * @param documentId the id of the document to mark as indexer
+     * @param documentId the id of the document to mark as indexed
      */
     public Mono<Void> markIndexed(final UUID documentId) {
         return updateStatus(documentId, DocumentStatus.INDEXED);
     }
 
     /**
-     * Set the document's status to {@link DocumentStatus#INDEXING_FAILURE indexing failure}.
+     * Set the document's status to {@link DocumentStatus#CORRUPT corrupt}.
      *
-     * @param documentId the id of the document to mark as indexer
+     * @param documentId the id of the document to mark as corrupt
      */
-    public Mono<Void> markIndexFailure(final UUID documentId) {
-        return updateStatus(documentId, DocumentStatus.INDEXING_FAILURE);
+    public Mono<Void> markCorrupt(final UUID documentId) {
+        return updateStatus(documentId, DocumentStatus.CORRUPT);
     }
 
     /**

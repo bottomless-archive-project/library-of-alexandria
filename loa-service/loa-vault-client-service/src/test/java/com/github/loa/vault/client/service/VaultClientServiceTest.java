@@ -56,16 +56,16 @@ class VaultClientServiceTest {
                 .id(TEST_DOCUMENT_ID)
                 .vault("default")
                 .build();
-        final Mono<Void> indexingFailureMono = Mono.empty();
-        when(documentManipulator.markIndexFailure(TEST_DOCUMENT_ID))
-                .thenReturn(indexingFailureMono);
+        final Mono<Void> corruptDocumentMono = Mono.empty();
+        when(documentManipulator.markCorrupt(TEST_DOCUMENT_ID))
+                .thenReturn(corruptDocumentMono);
 
         final Mono<byte[]> result = vaultClientService.queryDocument(documentEntity);
 
         StepVerifier.create(result)
                 .verifyComplete();
 
-        StepVerifier.create(indexingFailureMono)
+        StepVerifier.create(corruptDocumentMono)
                 .verifyComplete();
     }
 
@@ -96,6 +96,6 @@ class VaultClientServiceTest {
                 .consumeNextWith(documentContents -> assertThat(documentContents, is(equalTo(new byte[]{0, 1, 2}))))
                 .verifyComplete();
 
-        verify(documentManipulator, never()).markIndexFailure(TEST_DOCUMENT_ID);
+        verify(documentManipulator, never()).markCorrupt(TEST_DOCUMENT_ID);
     }
 }
