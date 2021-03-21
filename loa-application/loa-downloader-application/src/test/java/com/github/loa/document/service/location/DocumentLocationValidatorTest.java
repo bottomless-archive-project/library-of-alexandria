@@ -3,7 +3,6 @@ package com.github.loa.document.service.location;
 import com.github.loa.location.domain.link.StringLink;
 import com.github.loa.location.service.DocumentLocationValidator;
 import com.github.loa.location.domain.DocumentLocation;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -12,6 +11,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class DocumentLocationValidatorTest {
+
+    private static final String EMPTY_LINK = "";
 
     private final DocumentLocationValidator underTest = new DocumentLocationValidator();
 
@@ -88,7 +89,7 @@ class DocumentLocationValidatorTest {
         final boolean result = underTest.validDocumentLocation(
                 DocumentLocation.builder()
                         .location(StringLink.builder()
-                                .link(StringUtils.EMPTY)
+                                .link(EMPTY_LINK)
                                 .build()
                         )
                         .build()

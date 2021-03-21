@@ -1,5 +1,5 @@
 dependencies {
-    compile project(':loa-service:loa-document-service')
-    compile project(':loa-service:loa-document-location-service')
-    compile project(':loa-service:loa-statistics-repository')
+    implementation project(':loa-service:loa-document-service')
+    implementation project(':loa-service:loa-document-location-service')
+    implementation project(':loa-service:loa-statistics-repository')
 }

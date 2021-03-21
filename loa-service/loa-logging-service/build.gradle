@@ -1,3 +1,4 @@
 dependencies {
-    compile group: 'io.micrometer', name: 'micrometer-core'
+    //TODO: This should be implementation! We should abstract that we are using micrometer in the background!
+    api group: 'io.micrometer', name: 'micrometer-core'
 }

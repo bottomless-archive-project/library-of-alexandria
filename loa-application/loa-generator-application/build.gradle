@@ -23,7 +23,8 @@ bootBuildImage {
 }
 
 dependencies {
-    compile project(':loa-service:loa-source-commoncrawl-service')
-    compile project(':loa-service:loa-source-file-service')
-    compile project(':loa-service:loa-queue-artemis-service')
+    implementation project(':loa-service:loa-source-commoncrawl-service')
+    implementation project(':loa-service:loa-source-file-service')
+    implementation project(':loa-service:loa-queue-artemis-service')
+    implementation project(':loa-service:loa-io-service')
 }

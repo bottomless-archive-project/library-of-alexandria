@@ -67,7 +67,7 @@ subprojects {
 
     dependencies {
         // Spring starters
-        compile('org.springframework.boot:spring-boot-starter')
+        implementation group: 'org.springframework.boot', name: 'spring-boot-starter'
 
         // Configuration
         compileOnly group: 'org.springframework.boot', name: 'spring-boot-configuration-processor'
@@ -80,10 +80,10 @@ subprojects {
         testAnnotationProcessor group: 'org.projectlombok', name: 'lombok'
 
         // Testing
-        testCompile(group: 'org.springframework.boot', name: 'spring-boot-starter-test') {
+        testImplementation(group: 'org.springframework.boot', name: 'spring-boot-starter-test') {
             exclude group: 'junit', module: 'junit'
         }
-        testCompile group: 'io.projectreactor', name: 'reactor-test'
+        testImplementation group: 'io.projectreactor', name: 'reactor-test'
     }
 
     apply plugin: "com.github.ben-manes.versions"

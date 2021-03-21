@@ -1,6 +1,7 @@
 dependencies {
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter-json'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-json'
+    api group: 'org.springframework.boot', name: 'spring-boot-starter-reactor-netty'
 
-    compile project(':loa-service:loa-document-repository')
-    compile project(':loa-service:loa-compression-service')
+    implementation project(':loa-service:loa-document-repository')
+    api project(':loa-service:loa-compression-service')
 }
