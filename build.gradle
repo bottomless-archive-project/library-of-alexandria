@@ -80,9 +80,7 @@ subprojects {
         testAnnotationProcessor group: 'org.projectlombok', name: 'lombok'
 
         // Testing
-        testImplementation(group: 'org.springframework.boot', name: 'spring-boot-starter-test') {
-            exclude group: 'junit', module: 'junit'
-        }
+        testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
         testImplementation group: 'io.projectreactor', name: 'reactor-test'
     }
 
