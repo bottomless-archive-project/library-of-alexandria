@@ -37,3 +37,21 @@ The application run queries on the Elasticsearch cluster and display the results
 | **loa.indexer.database.port**
 | The port of the Elasticsearch database.
 |===
+
+== API endpoints
+
+The Web Application is a bit special compared to the others, because it exposes web endpoints as well. These endpoints are mostly used by the UI, but can be used as an API as well if necessary.
+
+=== General endpoints
+
+...
+
+=== Debug endpoints
+
+.APIs
+|===
+| API | Description
+
+| **/document/\{documentId\}/debug**
+| Returns all the data that is available about the document in the database. This endpoint is created mainly because it is hard to search documents by id in MongoDB when the id is represented in binary.
+|===
