@@ -49,7 +49,7 @@ class VaultClientServiceTest {
                             return Mono.just(
                                     ClientResponse.create(HttpStatus.INTERNAL_SERVER_ERROR)
                                             .header("Content-Type", "application/json")
-                                            .body("{\"error\": \"Unable to get the content of a vault location!\"}")
+                                            .body("{\"error\": \"Unable to get document content on a vault location!\"}")
                                             .build()
                             );
                         }
