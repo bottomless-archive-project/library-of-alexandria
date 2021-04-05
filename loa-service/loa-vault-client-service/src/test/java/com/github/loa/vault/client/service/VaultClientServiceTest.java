@@ -50,7 +50,7 @@ class VaultClientServiceTest {
         when(requestSpec.data(any()))
                 .thenReturn(requestSpec);
         when(requestSpec.retrieveMono(QueryDocumentResponse.class))
-                .thenReturn(Mono.error(new RuntimeException("Unable to get the content of a vault location!")));
+                .thenReturn(Mono.error(new RuntimeException("Unable to get document content on a vault location!")));
 
         final DocumentEntity documentEntity = DocumentEntity.builder()
                 .id(TEST_DOCUMENT_ID)

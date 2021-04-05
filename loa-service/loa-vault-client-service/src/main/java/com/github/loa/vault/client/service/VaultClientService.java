@@ -46,7 +46,7 @@ public class VaultClientService {
 
                     // TODO: Maybe its a better idea to do this in the vault itself?
                     // This could happen when the vault is closed forcefully and the file is not/partially saved.
-                    if (error.getMessage().contains("Unable to get the content of a vault location!")
+                    if (error.getMessage().contains("Unable to get document content on a vault location!")
                             || error.getMessage().contains("Error while decompressing document!")) {
                         return documentManipulator.markCorrupt(documentEntity.getId())
                                 .then(Mono.empty());

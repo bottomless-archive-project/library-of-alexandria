@@ -9,4 +9,6 @@ dependencies {
 
     implementation project(':loa-service:loa-document-service')
     implementation project(':loa-service:loa-checksum-service')
+
+    testImplementation group: 'com.google.jimfs', name: 'jimfs', version: '1.2'
 }
