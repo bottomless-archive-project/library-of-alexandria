@@ -9,15 +9,17 @@ import com.github.loa.vault.view.request.domain.DeleteDocumentRequest;
 import com.github.loa.vault.view.request.domain.QueryDocumentRequest;
 import com.github.loa.vault.view.request.domain.RecompressDocumentRequest;
 import com.github.loa.vault.view.response.domain.FreeSpaceResponse;
-import com.github.loa.vault.view.response.domain.QueryDocumentResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.core.io.buffer.DataBufferUtils;
+import org.springframework.core.io.buffer.DefaultDataBufferFactory;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.stereotype.Controller;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.io.IOException;
 import java.util.UUID;
 
 @Slf4j
@@ -37,25 +39,22 @@ public class VaultController {
      * @return the returned document's content
      */
     @MessageMapping("queryDocument")
-    public Mono<QueryDocumentResponse> queryDocument(final QueryDocumentRequest queryDocumentRequest) {
+    public Flux<DataBuffer> queryDocument(final QueryDocumentRequest queryDocumentRequest) {
         final String documentId = queryDocumentRequest.getDocumentId();
 
         return documentEntityFactory.getDocumentEntity(UUID.fromString(documentId))
                 .switchIfEmpty(Mono.error(new InvalidRequestException("Document not found with id " + documentId + " or already removed!")))
-                .map(documentEntity -> {
+                .flatMapMany(documentEntity -> {
                     if (!documentEntity.isInVault(vaultConfigurationProperties.getName())) {
-                        throw new InvalidRequestException("Document with id " + documentId + " is available on a different vault!");
+                        return Flux.error(new InvalidRequestException(
+                                "Document with id " + documentId + " is available on a different vault!"));
                     }
 
                     final Resource resource = vaultDocumentManager.readDocument(documentEntity);
 
-                    try {
-                        return QueryDocumentResponse.builder()
-                                .payload(resource.getInputStream().readAllBytes())
-                                .build();
-                    } catch (IOException e) {
-                        throw new InvalidRequestException("Unable to read the file for document with id " + documentId + "!", e);
-                    }
+                    return DataBufferUtils.read(resource, DefaultDataBufferFactory.sharedInstance, 8192)
+                            .onErrorResume(e -> Mono.error(new InvalidRequestException("Unable to read the file for document with id "
+                                    + documentId + "!", e)));
                 });
     }
 

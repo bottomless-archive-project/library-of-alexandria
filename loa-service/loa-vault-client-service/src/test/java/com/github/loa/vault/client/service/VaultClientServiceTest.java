@@ -8,7 +8,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.messaging.rsocket.RSocketRequester;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -60,7 +62,7 @@ class VaultClientServiceTest {
         when(documentManipulator.markCorrupt(TEST_DOCUMENT_ID))
                 .thenReturn(corruptDocumentMono);
 
-        final Mono<byte[]> result = vaultClientService.queryDocument(documentEntity);
+        final Flux<DataBuffer> result = vaultClientService.queryDocument(documentEntity);
 
         StepVerifier.create(result)
                 .verifyComplete();
@@ -90,7 +92,7 @@ class VaultClientServiceTest {
                 .vault("default")
                 .build();
 
-        final Mono<byte[]> result = vaultClientService.queryDocument(documentEntity);
+        final Flux<DataBuffer> result = vaultClientService.queryDocument(documentEntity);
 
         StepVerifier.create(result)
                 .consumeNextWith(documentContents -> assertThat(documentContents, is(equalTo(new byte[]{0, 1, 2}))))

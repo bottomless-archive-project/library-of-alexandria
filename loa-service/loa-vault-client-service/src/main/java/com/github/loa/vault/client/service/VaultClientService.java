@@ -7,11 +7,12 @@ import com.github.loa.vault.client.service.request.DeleteDocumentRequest;
 import com.github.loa.vault.client.service.request.QueryDocumentRequest;
 import com.github.loa.vault.client.service.request.RecompressRequest;
 import com.github.loa.vault.client.service.response.FreeSpaceResponse;
-import com.github.loa.vault.client.service.response.QueryDocumentResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.messaging.rsocket.RSocketRequester;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Map;
@@ -31,7 +32,7 @@ public class VaultClientService {
      * @param documentEntity the document entity to get the content for
      * @return the content of the document
      */
-    public Mono<byte[]> queryDocument(final DocumentEntity documentEntity) {
+    public Flux<DataBuffer> queryDocument(final DocumentEntity documentEntity) {
         return rSocketRequester.get(documentEntity.getVault())
                 .route("queryDocument")
                 .data(
@@ -39,8 +40,7 @@ public class VaultClientService {
                                 .documentId(documentEntity.getId().toString())
                                 .build()
                 )
-                .retrieveMono(QueryDocumentResponse.class)
-                .map(QueryDocumentResponse::getPayload)
+                .retrieveFlux(DataBuffer.class)
                 .onErrorResume(RuntimeException.class, (error) -> {
                     log.info("Missing document with id: {}!", documentEntity.getId());
 
