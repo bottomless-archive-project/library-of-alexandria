@@ -17,6 +17,8 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
+import java.io.InputStream;
+import java.io.SequenceInputStream;
 import java.net.ConnectException;
 
 @Slf4j
@@ -49,6 +51,8 @@ public class IndexerCommand implements CommandLineRunner {
 
     private Mono<Void> processDocument(final DocumentEntity documentEntity) {
         return vaultClientService.queryDocument(documentEntity)
+                .reduce(InputStream.nullInputStream(),
+                        (s, d) -> new SequenceInputStream(s, d.asInputStream()))
                 .publishOn(Schedulers.parallel())
                 .map(documentContent -> documentDataParser.parseDocumentMetadata(documentEntity.getId(), documentEntity.getType(),
                         documentContent))

@@ -11,6 +11,8 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
+import java.io.InputStream;
+import java.io.SequenceInputStream;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
@@ -38,6 +40,8 @@ public class DocumentValidatorCommand implements CommandLineRunner {
                 })
                 .flatMap(documentEntity ->
                         vaultClientService.queryDocument(documentEntity)
+                                .reduce(InputStream.nullInputStream(),
+                                        (s, d) -> new SequenceInputStream(s, d.asInputStream()))
                                 .publishOn(Schedulers.parallel())
                                 .map(documentContent -> documentDataParser.parseDocumentMetadata(documentEntity.getId(),
                                         documentEntity.getType(), documentContent))

@@ -10,7 +10,7 @@ import com.github.loa.vault.service.VaultDocumentManager;
 import com.github.loa.vault.view.request.domain.DeleteDocumentRequest;
 import com.github.loa.vault.view.request.domain.QueryDocumentRequest;
 import com.github.loa.vault.view.request.domain.RecompressDocumentRequest;
-import com.github.loa.vault.view.response.domain.QueryDocumentResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,13 +19,16 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.codec.json.Jackson2JsonDecoder;
 import org.springframework.http.codec.json.Jackson2JsonEncoder;
 import org.springframework.messaging.rsocket.RSocketRequester;
 import org.springframework.messaging.rsocket.RSocketStrategies;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+import java.io.IOException;
 import java.util.UUID;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -34,6 +37,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@Slf4j
 @EnableAutoConfiguration
 @SpringBootTest(classes = VaultController.class)
 class VaultControllerTest {
@@ -59,9 +63,9 @@ class VaultControllerTest {
         requester = RSocketRequester.builder()
                 .rsocketStrategies(
                         RSocketStrategies.builder()
-                        .decoder(new Jackson2JsonDecoder())
-                        .encoder(new Jackson2JsonEncoder())
-                        .build()
+                                .decoder(new Jackson2JsonDecoder())
+                                .encoder(new Jackson2JsonEncoder())
+                                .build()
                 )
                 .tcp("localhost", port);
     }
@@ -71,12 +75,12 @@ class VaultControllerTest {
         when(documentEntityFactory.getDocumentEntity(UUID.fromString(TEST_DOCUMENT_ID)))
                 .thenReturn(Mono.empty());
 
-        final Mono<QueryDocumentResponse> response = requester.route("queryDocument")
+        final Flux<DataBuffer> response = requester.route("queryDocument")
                 .data(QueryDocumentRequest.builder()
                         .documentId(TEST_DOCUMENT_ID)
                         .build()
                 )
-                .retrieveMono(QueryDocumentResponse.class);
+                .retrieveFlux(DataBuffer.class);
 
         StepVerifier.create(response)
                 .expectErrorMessage("Document not found with id 123e4567-e89b-12d3-a456-556642440000 or already removed!")
@@ -96,12 +100,12 @@ class VaultControllerTest {
                         )
                 );
 
-        final Mono<QueryDocumentResponse> response = requester.route("queryDocument")
+        final Flux<DataBuffer> response = requester.route("queryDocument")
                 .data(QueryDocumentRequest.builder()
                         .documentId(TEST_DOCUMENT_ID)
                         .build()
                 )
-                .retrieveMono(QueryDocumentResponse.class);
+                .retrieveFlux(DataBuffer.class);
 
         StepVerifier.create(response)
                 .expectErrorMessage("Document with id 123e4567-e89b-12d3-a456-556642440000 is available on a different vault!")
@@ -122,20 +126,26 @@ class VaultControllerTest {
         when(vaultDocumentManager.readDocument(documentEntity))
                 .thenReturn(documentResource);
 
-        final Mono<QueryDocumentResponse> response = requester.route("queryDocument")
+        final Flux<DataBuffer> response = requester.route("queryDocument")
                 .data(QueryDocumentRequest.builder()
                         .documentId(TEST_DOCUMENT_ID)
                         .build()
                 )
-                .retrieveMono(QueryDocumentResponse.class);
+                .retrieveFlux(DataBuffer.class);
 
         StepVerifier.create(response)
                 .consumeNextWith(result -> {
-                    assertThat(result, is(notNullValue()));
-                    assertThat(result.getPayload().length, is(3));
-                    assertThat(result.getPayload()[0], is((byte) 0));
-                    assertThat(result.getPayload()[1], is((byte) 1));
-                    assertThat(result.getPayload()[2], is((byte) 2));
+                    try {
+                        final byte[] totalResult = result.asInputStream().readAllBytes();
+
+                        assertThat(result, is(notNullValue()));
+                        assertThat(totalResult.length, is(3));
+                        assertThat(totalResult[0], is((byte) 0));
+                        assertThat(totalResult[1], is((byte) 1));
+                        assertThat(totalResult[2], is((byte) 2));
+                    } catch (IOException e) {
+                        log.error("Failed to get totalResult!", e);
+                    }
                 })
                 .verifyComplete();
     }

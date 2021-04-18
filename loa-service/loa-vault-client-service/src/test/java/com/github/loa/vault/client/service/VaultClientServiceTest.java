@@ -2,7 +2,6 @@ package com.github.loa.vault.client.service;
 
 import com.github.loa.document.service.DocumentManipulator;
 import com.github.loa.document.service.domain.DocumentEntity;
-import com.github.loa.vault.client.service.response.QueryDocumentResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,7 +16,6 @@ import reactor.test.StepVerifier;
 import java.util.Map;
 import java.util.UUID;
 
-import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.any;
@@ -51,8 +49,8 @@ class VaultClientServiceTest {
                 .thenReturn(requestSpec);
         when(requestSpec.data(any()))
                 .thenReturn(requestSpec);
-        when(requestSpec.retrieveMono(QueryDocumentResponse.class))
-                .thenReturn(Mono.error(new RuntimeException("Unable to get document content on a vault location!")));
+        when(requestSpec.retrieveFlux(DataBuffer.class))
+                .thenReturn(Flux.error(new RuntimeException("Unable to get document content on a vault location!")));
 
         final DocumentEntity documentEntity = DocumentEntity.builder()
                 .id(TEST_DOCUMENT_ID)
@@ -78,14 +76,9 @@ class VaultClientServiceTest {
                 .thenReturn(requestSpec);
         when(requestSpec.data(any()))
                 .thenReturn(requestSpec);
-        when(requestSpec.retrieveMono(QueryDocumentResponse.class))
-                .thenReturn(
-                        Mono.just(
-                                QueryDocumentResponse.builder()
-                                        .payload(new byte[]{0, 1, 2})
-                                        .build()
-                        )
-                );
+        final DataBuffer dataBuffer = mock(DataBuffer.class);
+        when(requestSpec.retrieveFlux(DataBuffer.class))
+                .thenReturn(Flux.just(dataBuffer));
 
         final DocumentEntity documentEntity = DocumentEntity.builder()
                 .id(TEST_DOCUMENT_ID)
@@ -95,7 +88,7 @@ class VaultClientServiceTest {
         final Flux<DataBuffer> result = vaultClientService.queryDocument(documentEntity);
 
         StepVerifier.create(result)
-                .consumeNextWith(documentContents -> assertThat(documentContents, is(equalTo(new byte[]{0, 1, 2}))))
+                .consumeNextWith(documentContents -> assertThat(documentContents, is(dataBuffer)))
                 .verifyComplete();
 
         verify(documentManipulator, never()).markCorrupt(TEST_DOCUMENT_ID);
