@@ -70,6 +70,7 @@ public class VaultDocumentManager {
     public Mono<DocumentEntity> removeDocument(final DocumentEntity documentEntity) {
         return Mono.just(documentEntity)
                 .map(vaultLocationFactory::getLocation)
+                .filter(VaultLocation::populated)
                 .doOnNext(VaultLocation::clear)
                 .thenReturn(documentEntity);
     }

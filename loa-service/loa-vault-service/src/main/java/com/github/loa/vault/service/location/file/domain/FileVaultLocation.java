@@ -53,6 +53,14 @@ public class FileVaultLocation implements VaultLocation {
      * {@inheritDoc}
      */
     @Override
+    public boolean populated() {
+        return Files.exists(vaultLocation);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void clear() {
         try {
             Files.delete(vaultLocation);

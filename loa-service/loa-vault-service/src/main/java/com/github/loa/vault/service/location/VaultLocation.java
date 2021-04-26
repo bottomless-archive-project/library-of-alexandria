@@ -27,6 +27,14 @@ public interface VaultLocation {
     InputStream download();
 
     /**
+     * Return whenever the vault location contains data. Depending on the vault backend this could mean that a file exists,
+     * an object is available in a cloud storage solution etc.
+     *
+     * @return if the vault location contains any data
+     */
+    boolean populated();
+
+    /**
      * Removes any previously stored data from the document.
      */
     void clear();

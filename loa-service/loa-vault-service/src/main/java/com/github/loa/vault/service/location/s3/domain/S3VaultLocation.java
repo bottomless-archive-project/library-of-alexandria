@@ -7,10 +7,7 @@ import lombok.ToString;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.core.sync.ResponseTransformer;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
-import software.amazon.awssdk.services.s3.model.GetObjectRequest;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import software.amazon.awssdk.services.s3.model.StorageClass;
+import software.amazon.awssdk.services.s3.model.*;
 
 import java.io.InputStream;
 import java.util.Optional;
@@ -55,6 +52,25 @@ public class S3VaultLocation implements VaultLocation {
                 .build();
 
         return s3Client.getObject(getObjectRequest, ResponseTransformer.toInputStream());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean populated() {
+        final HeadObjectRequest headObjectRequest = HeadObjectRequest.builder()
+                .bucket(bucketName)
+                .key(fileName)
+                .build();
+
+        try {
+            s3Client.headObject(headObjectRequest);
+
+            return true;
+        } catch (final NoSuchKeyException e) {
+            return false;
+        }
     }
 
     /**
