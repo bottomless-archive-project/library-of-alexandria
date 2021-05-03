@@ -9,10 +9,6 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-  <!-- Custom -->
-  <link rel="stylesheet" href="./assets/index.css"/>
-  <link rel="stylesheet" href="./assets/spinner.css"/>
-
   <!-- jQuery -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
@@ -27,6 +23,10 @@
 
   <!-- Chart.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.min.js"></script>
+
+  <!-- Custom -->
+  <link rel="stylesheet" href="./assets/index.css"/>
+  <link rel="stylesheet" href="./assets/spinner.css"/>
 </head>
 <body>
 <div class="main-container container pb-1">
@@ -36,7 +36,7 @@
     </div>
     <div class="col">
       <h2 class="display-4 mt-4" style="font-size: 4.1rem;">
-        <a class="title-text"><!-- ui-sref="home"-->Library of Alexandria</a>
+        <a class="title-text" routerLink="/home" routerLinkActive="active">Library of Alexandria</a>
       </h2>
     </div>
     <div class="col-md-4 mx-auto d-block">
