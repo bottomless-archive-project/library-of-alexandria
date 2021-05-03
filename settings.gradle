@@ -9,6 +9,8 @@ dependencyResolutionManagement {
 
 rootProject.name = 'library-of-alexandria'
 
+include 'loa-frontend'
+
 include 'loa-application:loa-downloader-application'
 include 'loa-application:loa-web-application'
 include 'loa-application:loa-administrator-application'

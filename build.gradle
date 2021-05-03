@@ -20,7 +20,7 @@ buildscript {
     }
 }
 
-subprojects {
+configure(subprojects.findAll {it.name != 'loa-frontend'}) {
     apply plugin: 'java'
 
     java {

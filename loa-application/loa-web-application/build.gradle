@@ -25,6 +25,7 @@ bootBuildImage {
 dependencies {
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-webflux'
 
+    implementation project(':loa-frontend')
     implementation project(':loa-service:loa-document-view')
     implementation project(':loa-service:loa-indexer-service')
     implementation project(':loa-service:loa-statistics-service')
