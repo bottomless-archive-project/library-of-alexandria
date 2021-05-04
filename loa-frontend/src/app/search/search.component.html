@@ -17,24 +17,24 @@
              placeholder="Search for something">
     </div>
   </div>
-  <!--<div class="col-3">
+  <div class="col-3">
     <div class="dropdown language-dropdown">
-      <button class="btn btn-info btn-block dropdown-toggle" role="button" ng-if="language === undefined"
+      <button class="btn btn-info btn-block dropdown-toggle" role="button" *ngIf="language === undefined"
               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Language
       </button>
-      <button class="btn btn-info btn-lg btn-block" ng-if="language !== undefined" ng-click="setLanguage(undefined)"
+      <button class="btn btn-info btn-lg btn-block" *ngIf="language !== undefined" (click)="setLanguage(undefined)"
               style="padding-top: 2px; padding-bottom: 2px; font-size: 1em; line-height: 2em;">
-        {{language.code | uppercase}} - {{language.name | capitalize}}
+        {{language.code | uppercase}} - {{language.name | titlecase}}
       </button>
       <div class="dropdown-menu btn-block mt-0" style="max-height: 300px; overflow: auto;">
         <button class="dropdown-item dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
-                aria-expanded="false" ng-repeat="(languageCode, languageName) in languages"
-                ng-click="setLanguage({code: languageCode, name: languageName})">
-          {{languageCode | uppercase}} - {{languageName | capitalize}}
+                aria-expanded="false" *ngFor='let language of languages'
+                (click)="setLanguage({code: language[0], name: language[1]})">
+          {{language[0] | uppercase}} - {{language[1] | titlecase}}
         </button>
       </div>
     </div>
-  </div>-->
+  </div>
 </div>
 
 <!--
