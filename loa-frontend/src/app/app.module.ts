@@ -5,6 +5,8 @@ import {AppComponent} from './app.component';
 import {HomeComponent} from './home/home.component';
 import {SearchComponent} from './search/search.component';
 import {DashboardComponent} from './dashboard/dashboard.component';
+import {HttpClientModule} from '@angular/common/http';
+import {FormsModule} from "@angular/forms";
 
 @NgModule({
   declarations: [
@@ -15,7 +17,9 @@ import {DashboardComponent} from './dashboard/dashboard.component';
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule
+    HttpClientModule,
+    AppRoutingModule,
+    FormsModule
   ],
   providers: [],
   bootstrap: [AppComponent]
