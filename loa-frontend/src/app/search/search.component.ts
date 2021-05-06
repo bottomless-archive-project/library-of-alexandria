@@ -15,6 +15,7 @@ export class SearchComponent implements OnInit {
   modelChanged: Subject<string> = new Subject<string>();
   languages: string[][];
   language: any = undefined;
+  fileTypes: any[] = [];
 
   constructor(private route: ActivatedRoute) {
     this.modelChanged.pipe(debounceTime(300), distinctUntilChanged())
@@ -117,6 +118,6 @@ export class SearchComponent implements OnInit {
   };
 
   refreshHits() {
-    console.log("Should refresh hits here!");
+    console.log("Should refresh hits here!", this.fileTypes);
   }
 }

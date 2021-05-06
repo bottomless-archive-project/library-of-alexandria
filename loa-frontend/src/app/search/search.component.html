@@ -37,58 +37,57 @@
   </div>
 </div>
 
-<!--
 <div class="row">
   <div class="col-9 pr-0 text-center">
     <div class="form-group">
       <div class="form-check form-check-inline">
-        <input class="form-check-input" type="checkbox" id="pdf" ng-model="fileTypes['PDF']"
-               ng-change="refreshHits()">
+        <input class="form-check-input" type="checkbox" id="pdf" [value]="fileTypes['PDF']"
+               (change)="refreshHits()">
         <label class="form-check-label" for="pdf">.pdf</label>
       </div>
       <div class="form-check form-check-inline">
-        <input class="form-check-input" type="checkbox" id="doc" value="DOC" ng-model="fileTypes['DOC']"
-               ng-change="refreshHits()">
+        <input class="form-check-input" type="checkbox" id="doc" value="DOC" [value]="fileTypes['DOC']"
+               (change)="refreshHits()">
         <label class="form-check-label" for="doc">.doc</label>
       </div>
       <div class="form-check form-check-inline">
-        <input class="form-check-input" type="checkbox" id="ppt" value="PPT" ng-model="fileTypes['PPT']"
-               ng-change="refreshHits()">
+        <input class="form-check-input" type="checkbox" id="ppt" value="PPT" [value]="fileTypes['PPT']"
+               (change)="refreshHits()">
         <label class="form-check-label" for="ppt">.ppt</label>
       </div>
       <div class="form-check form-check-inline">
-        <input class="form-check-input" type="checkbox" id="rtf" value="RTF" ng-model="fileTypes['RTF']"
-               ng-change="refreshHits()">
+        <input class="form-check-input" type="checkbox" id="rtf" value="RTF" [value]="fileTypes['RTF']"
+               (change)="refreshHits()">
         <label class="form-check-label" for="rtf">.rtf</label>
       </div>
       <div class="form-check form-check-inline">
-        <input class="form-check-input" type="checkbox" id="xls" value="XLS" ng-model="fileTypes['XLS']"
-               ng-change="refreshHits()">
+        <input class="form-check-input" type="checkbox" id="xls" value="XLS" [value]="fileTypes['XLS']"
+               (change)="refreshHits()">
         <label class="form-check-label" for="xls">.xls</label>
       </div>
       <div class="form-check form-check-inline">
-        <input class="form-check-input" type="checkbox" id="docx" value="DOCX" ng-model="fileTypes['DOCX']"
-               ng-change="refreshHits()">
+        <input class="form-check-input" type="checkbox" id="docx" value="DOCX" [value]="fileTypes['DOCX']"
+               (change)="refreshHits()">
         <label class="form-check-label" for="docx">.docx</label>
       </div>
       <div class="form-check form-check-inline">
-        <input class="form-check-input" type="checkbox" id="xlsx" value="XLSX" ng-model="fileTypes['XLSX']"
-               ng-change="refreshHits()">
+        <input class="form-check-input" type="checkbox" id="xlsx" value="XLSX" [value]="fileTypes['XLSX']"
+               (change)="refreshHits()">
         <label class="form-check-label" for="xlsx">.xlsx</label>
       </div>
       <div class="form-check form-check-inline">
-        <input class="form-check-input" type="checkbox" id="epub" value="EPUB" ng-model="fileTypes['EPUB']"
-               ng-change="refreshHits()">
+        <input class="form-check-input" type="checkbox" id="epub" value="EPUB" [value]="fileTypes['EPUB']"
+               (change)="refreshHits()">
         <label class="form-check-label" for="epub">.epub</label>
       </div>
       <div class="form-check form-check-inline">
-        <input class="form-check-input" type="checkbox" id="mobi" value="MOBI" ng-model="fileTypes['MOBI']"
-               ng-change="refreshHits()">
+        <input class="form-check-input" type="checkbox" id="mobi" value="MOBI" [value]="fileTypes['MOBI']"
+               (change)="refreshHits()">
         <label class="form-check-label" for="mobi">.mobi</label>
       </div>
     </div>
   </div>
-  <div class="col-3">
+  <!--<div class="col-3">
     <div class="dropdown document-length-dropdown">
       <button class="btn btn-info btn-block dropdown-toggle" role="button" ng-if="documentLength === undefined"
               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Document Length
@@ -105,8 +104,10 @@
         </button>
       </div>
     </div>
-  </div>
+  </div>-->
 </div>
+
+<!--
 <div class="row">
   <div class="col">
     <div class="text-center" style="user-select: none;" ng-if="hits.length > 0">
