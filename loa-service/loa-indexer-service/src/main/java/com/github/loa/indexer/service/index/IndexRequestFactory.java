@@ -1,7 +1,9 @@
 package com.github.loa.indexer.service.index;
 
+import com.github.loa.document.service.DocumentManipulator;
 import com.github.loa.parser.domain.DocumentMetadata;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.common.unit.TimeValue;
 import org.springframework.stereotype.Service;
@@ -10,13 +12,19 @@ import reactor.core.publisher.Mono;
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class IndexRequestFactory {
 
+    private final DocumentManipulator documentManipulator;
+
     public Mono<IndexRequest> newIndexRequest(final DocumentMetadata documentMetadata) {
         if (documentMetadata.getContent() == null) {
-            return Mono.empty();
+            log.info("Marking {} as indexed, even if it has no parsable content!", documentMetadata.getId());
+
+            return documentManipulator.markIndexed(documentMetadata.getId())
+                    .then(Mono.empty());
         }
 
         final Map<String, Object> sourceContent = new HashMap<>();
