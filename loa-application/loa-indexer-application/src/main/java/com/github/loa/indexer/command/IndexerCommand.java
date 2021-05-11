@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.SequenceInputStream;
 import java.net.ConnectException;
@@ -54,8 +55,18 @@ public class IndexerCommand implements CommandLineRunner {
                 .reduce(InputStream.nullInputStream(),
                         (s, d) -> new SequenceInputStream(s, d.asInputStream()))
                 .publishOn(Schedulers.parallel())
-                .map(documentContent -> documentDataParser.parseDocumentMetadata(documentEntity.getId(), documentEntity.getType(),
-                        documentContent))
+                .flatMap(documentContent ->
+                        Mono.using(
+                                () -> documentContent,
+                                (cont) -> Mono.just(documentDataParser.parseDocumentMetadata(documentEntity.getId(), documentEntity.getType(), cont)),
+                                (cont) -> {
+                                    try {
+                                        cont.close();
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+                                })
+                )
                 .onErrorContinue((throwable, document) -> {
                     //TODO: This should be handled in the VaultClientService but we are unable to do so
                     // because of this onErrorContinue here (no sufficient operator in the reactive toolset).
