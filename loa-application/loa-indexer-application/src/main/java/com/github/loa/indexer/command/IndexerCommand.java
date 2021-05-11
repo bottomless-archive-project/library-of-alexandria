@@ -58,12 +58,13 @@ public class IndexerCommand implements CommandLineRunner {
                 .flatMap(documentContent ->
                         Mono.using(
                                 () -> documentContent,
-                                (cont) -> Mono.just(documentDataParser.parseDocumentMetadata(documentEntity.getId(), documentEntity.getType(), cont)),
-                                (cont) -> {
+                                (content) -> Mono.just(documentDataParser.parseDocumentMetadata(
+                                        documentEntity.getId(), documentEntity.getType(), content)),
+                                (content) -> {
                                     try {
-                                        cont.close();
+                                        content.close();
                                     } catch (IOException e) {
-                                        e.printStackTrace();
+                                        log.error("Failed to close vault response!", e);
                                     }
                                 })
                 )
