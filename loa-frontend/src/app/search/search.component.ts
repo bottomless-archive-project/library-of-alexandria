@@ -15,7 +15,17 @@ export class SearchComponent implements OnInit {
   modelChanged: Subject<string> = new Subject<string>();
   languages: string[][];
   language: any = undefined;
-  fileTypes: any[] = [];
+  fileTypes: any = {
+    PDF: false,
+    DOC: false,
+    PPT: false,
+    RTF: false,
+    XLS: false,
+    DOCX: false,
+    XLSX: false,
+    EPUB: false,
+    MOBI: false
+  };
 
   constructor(private route: ActivatedRoute) {
     this.modelChanged.pipe(debounceTime(300), distinctUntilChanged())
