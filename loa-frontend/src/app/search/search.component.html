@@ -41,47 +41,47 @@
   <div class="col-9 pr-0 text-center">
     <div class="form-group">
       <div class="form-check form-check-inline">
-        <input class="form-check-input" type="checkbox" id="pdf" [value]="fileTypes.PDF"
+        <input class="form-check-input" type="checkbox" id="pdf" [(ngModel)]="fileTypes.PDF"
                (change)="refreshHits()">
         <label class="form-check-label" for="pdf">.pdf</label>
       </div>
       <div class="form-check form-check-inline">
-        <input class="form-check-input" type="checkbox" id="doc" value="DOC" [value]="fileTypes.DOC"
+        <input class="form-check-input" type="checkbox" id="doc" [(ngModel)]="fileTypes.DOC"
                (change)="refreshHits()">
         <label class="form-check-label" for="doc">.doc</label>
       </div>
       <div class="form-check form-check-inline">
-        <input class="form-check-input" type="checkbox" id="ppt" value="PPT" [value]="fileTypes.PPT"
+        <input class="form-check-input" type="checkbox" id="ppt" [(ngModel)]="fileTypes.PPT"
                (change)="refreshHits()">
         <label class="form-check-label" for="ppt">.ppt</label>
       </div>
       <div class="form-check form-check-inline">
-        <input class="form-check-input" type="checkbox" id="rtf" value="RTF" [value]="fileTypes.RTF"
+        <input class="form-check-input" type="checkbox" id="rtf" [(ngModel)]="fileTypes.RTF"
                (change)="refreshHits()">
         <label class="form-check-label" for="rtf">.rtf</label>
       </div>
       <div class="form-check form-check-inline">
-        <input class="form-check-input" type="checkbox" id="xls" value="XLS" [value]="fileTypes.XLS"
+        <input class="form-check-input" type="checkbox" id="xls" [(ngModel)]="fileTypes.XLS"
                (change)="refreshHits()">
         <label class="form-check-label" for="xls">.xls</label>
       </div>
       <div class="form-check form-check-inline">
-        <input class="form-check-input" type="checkbox" id="docx" value="DOCX" [value]="fileTypes.DOCX"
+        <input class="form-check-input" type="checkbox" id="docx" [(ngModel)]="fileTypes.DOCX"
                (change)="refreshHits()">
         <label class="form-check-label" for="docx">.docx</label>
       </div>
       <div class="form-check form-check-inline">
-        <input class="form-check-input" type="checkbox" id="xlsx" value="XLSX" [value]="fileTypes.XLSX"
+        <input class="form-check-input" type="checkbox" id="xlsx" [(ngModel)]="fileTypes.XLSX"
                (change)="refreshHits()">
         <label class="form-check-label" for="xlsx">.xlsx</label>
       </div>
       <div class="form-check form-check-inline">
-        <input class="form-check-input" type="checkbox" id="epub" value="EPUB" [value]="fileTypes.EPUB"
+        <input class="form-check-input" type="checkbox" id="epub" [(ngModel)]="fileTypes.EPUB"
                (change)="refreshHits()">
         <label class="form-check-label" for="epub">.epub</label>
       </div>
       <div class="form-check form-check-inline">
-        <input class="form-check-input" type="checkbox" id="mobi" value="MOBI" [value]="fileTypes.MOBI"
+        <input class="form-check-input" type="checkbox" id="mobi" [(ngModel)]="fileTypes.MOBI"
                (change)="refreshHits()">
         <label class="form-check-label" for="mobi">.mobi</label>
       </div>
