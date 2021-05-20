@@ -2,6 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {Subject} from "rxjs";
 import {debounceTime, distinctUntilChanged} from "rxjs/operators";
+import {HttpClient} from "@angular/common/http";
 
 @Component({
   selector: 'app-search',
@@ -13,6 +14,8 @@ export class SearchComponent implements OnInit {
   statistics: any;
   searchText: string = '';
   modelChanged: Subject<string> = new Subject<string>();
+  documentLengths: string[][];
+  documentLength: any = undefined;
   languages: string[][];
   language: any = undefined;
   fileTypes: any = {
@@ -26,8 +29,13 @@ export class SearchComponent implements OnInit {
     EPUB: false,
     MOBI: false
   };
+  hits: any[] = [];
+  hitCount = 0;
+  totalPages = 0;
+  page = 0;
+  loading = false;
 
-  constructor(private route: ActivatedRoute) {
+  constructor(private route: ActivatedRoute, private http: HttpClient) {
     this.modelChanged.pipe(debounceTime(300), distinctUntilChanged())
       .subscribe(searchText => {
         console.log(searchText);
@@ -111,6 +119,13 @@ export class SearchComponent implements OnInit {
       ['yo', 'yoruba'],
       ['zu', 'zulu']
     ]
+
+    this.documentLengths = [
+      ['SHORT_STORY', 'Short story (1 - 10 pages)'],
+      ['NOVELETTE', 'Novelette (11 - 50 pages)'],
+      ['NOVELLA', 'Novella (51 - 150 pages)'],
+      ['NOVEL', 'Novel (150+ pages)']
+    ];
   }
 
   ngOnInit(): void {
@@ -127,7 +142,54 @@ export class SearchComponent implements OnInit {
     this.refreshHits();
   };
 
+  setDocumentLength(documentLength: any) {
+    this.documentLength = documentLength;
+
+    this.refreshHits();
+  };
+
   refreshHits() {
     console.log("Should refresh hits here!", this.fileTypes);
+
+    if (this.searchText === "") {
+      this.hits = [];
+      this.hitCount = 0;
+      this.totalPages = 0;
+
+      return;
+    }
+
+    this.loading = true;
+
+    var pageNumber = this.page * 10;
+    var exactMatch = this.searchText.startsWith("\"") && this.searchText.endsWith("\"");
+
+    var urlBase = '/document/find-by/keyword/' + this.searchText + '/?pageNumber=' + pageNumber;
+
+    if (exactMatch) {
+      urlBase += '&exactMatch=' + exactMatch;
+    }
+
+    if (this.language !== undefined) {
+      urlBase += '&language=' + this.language.code;
+    }
+
+    if (this.documentLength !== undefined) {
+      urlBase += '&documentLength=' + this.documentLength[0];
+    }
+
+    var types = Object.keys(this.fileTypes).filter(value => this.fileTypes[value]);
+    if (types.length > 0) {
+      urlBase += '&documentTypes=' + types.join();
+    }
+
+    //TODO: Use a service!
+    this.http.get(urlBase)
+      .subscribe(response => {
+        this.hits = response.searchHits;
+        this.hitCount = response.totalHitCount;
+        this.totalPages = Math.ceil(response.totalHitCount / 10);
+        this.loading = false;
+      });
   }
 }
