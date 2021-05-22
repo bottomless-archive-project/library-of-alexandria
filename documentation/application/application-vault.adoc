@@ -21,14 +21,7 @@ If the application is not a duplicate then the staging file's contents will be m
 | **loa.vault.location.file.path**
 | Used only when `loa.vault.location.type` is set to `file`. Path to the location of the vault on the filesystem.
 
-| **loa.database.host**
-| The host location of the MongoDB database server. *(Default value: localhost)*
-
-| **loa.database.port**
-| The port open for the MongoDB database server. *(Default value: 27017)*
-
-| **loa.database.no-cursor-timeout**
-| Whenever the cursor objects created by the application should be able to timeout. Ideally you would set up the timeout on your MongoDB server (see: https://docs.mongodb.com/manual/reference/parameters/#param.cursorTimeoutMillis[cursorTimeoutMillis]) but because not everybody is a MongoDB expert, we disable timeouts by default. This could cause a couple of open cursors (so extra resource usage) on the MongoDB server when the application crashes for some reason, and the cursors are not closed correctly. If you set the cursor timeout too low, then the application will crash if it is not able to process a batch of items under the provided timeout. *(Default value: true)*
+include::../service/repository/repository-configuration.adoc[]
 
 | **loa.queue.host**
 | The ip address of the Queue Application. *(Default value: localhost)*
