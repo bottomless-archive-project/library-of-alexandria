@@ -3,6 +3,7 @@ import {ActivatedRoute} from '@angular/router';
 import {Subject} from "rxjs";
 import {debounceTime, distinctUntilChanged} from "rxjs/operators";
 import {HttpClient} from "@angular/common/http";
+import {SearchService} from "../search.service";
 
 @Component({
   selector: 'app-search',
@@ -35,12 +36,12 @@ export class SearchComponent implements OnInit {
   page = 0;
   loading = false;
 
-  constructor(private route: ActivatedRoute, private http: HttpClient) {
+  constructor(private route: ActivatedRoute, private http: HttpClient, private searchService: SearchService) {
     this.modelChanged.pipe(debounceTime(300), distinctUntilChanged())
       .subscribe(searchText => {
-        console.log(searchText);
+        this.searchText = searchText
 
-        return this.searchText = searchText;
+        this.refreshHits();
       });
 
     this.languages = [
@@ -161,30 +162,10 @@ export class SearchComponent implements OnInit {
 
     this.loading = true;
 
-    var pageNumber = this.page * 10;
-    var exactMatch = this.searchText.startsWith("\"") && this.searchText.endsWith("\"");
+    const exactMatch = this.searchText.startsWith("\"") && this.searchText.endsWith("\"");
 
-    var urlBase = '/document/find-by/keyword/' + this.searchText + '/?pageNumber=' + pageNumber;
-
-    if (exactMatch) {
-      urlBase += '&exactMatch=' + exactMatch;
-    }
-
-    if (this.language !== undefined) {
-      urlBase += '&language=' + this.language.code;
-    }
-
-    if (this.documentLength !== undefined) {
-      urlBase += '&documentLength=' + this.documentLength[0];
-    }
-
-    var types = Object.keys(this.fileTypes).filter(value => this.fileTypes[value]);
-    if (types.length > 0) {
-      urlBase += '&documentTypes=' + types.join();
-    }
-
-    //TODO: Use a service!
-    this.http.get(urlBase)
+    this.searchService.searchDocuments(this.searchText, this.page, this.language, exactMatch,
+      this.documentLength, this.fileTypes)
       .subscribe(response => {
         this.hits = response.searchHits;
         this.hitCount = response.totalHitCount;
