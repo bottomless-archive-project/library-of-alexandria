@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.SequenceInputStream;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -43,8 +44,19 @@ public class DocumentValidatorCommand implements CommandLineRunner {
                                 .reduce(InputStream.nullInputStream(),
                                         (s, d) -> new SequenceInputStream(s, d.asInputStream()))
                                 .publishOn(Schedulers.parallel())
-                                .map(documentContent -> documentDataParser.parseDocumentMetadata(documentEntity.getId(),
-                                        documentEntity.getType(), documentContent))
+                                .flatMap(documentContent ->
+                                        Mono.using(
+                                                () -> documentContent,
+                                                (content) -> Mono.just(documentDataParser.parseDocumentMetadata(
+                                                        documentEntity.getId(), documentEntity.getType(), content)),
+                                                (content) -> {
+                                                    try {
+                                                        content.close();
+                                                    } catch (IOException e) {
+                                                        log.error("Failed to close vault response!", e);
+                                                    }
+                                                })
+                                )
                                 .doOnError(error -> log.info("New error! Error count: {}.", errorCount.incrementAndGet()))
                                 .onErrorResume(error -> Mono.empty())
                 )
