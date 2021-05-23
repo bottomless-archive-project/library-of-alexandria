@@ -1,1 +1,91 @@
-<p>dashboard works!</p>
+<div class="card mb-2">
+  <div class="card-body">
+    <h5 class="card-title">Basic statistics</h5>
+    Document count: {{statistics.documentCount}}
+  </div>
+</div>
+
+<div class="card mb-2">
+  <div class="card-body">
+    <h5 class="card-title">Documents by status</h5>
+    <div class="row">
+      <div class="col" *ngFor="let status of statistics.documentCountByStatus | keyvalue: keepOrder">
+        <div class="card">
+          <div class="card-body">
+            <h6 class="card-title">{{status.key.replace('_', ' ') | titlecase}}</h6>
+            <div class="card-body p-0">
+              <p class="m-0">Count: {{status.value}}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card mb-2">
+  <div class="card-body">
+    <h5 class="card-title">Documents by type</h5>
+    <div class="row" style="margin-bottom: -1rem;">
+      <div class="col-3 mb-3" *ngFor="let type of statistics.documentCountByType | keyvalue: keepOrder">
+        <div class="card">
+          <div class="card-body">
+            <h6 class="card-title">.{{type.key.replace('_', ' ') | lowercase}}</h6>
+            <div class="card-body p-0">
+              <p class="m-0">Count: {{type.value}}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card mb-2">
+  <div class="card-body">
+    <h5 class="card-title">Document collection chart</h5>
+    <div>
+      <canvas id="myChart" width="200" height="400"></canvas>
+    </div>
+  </div>
+</div>
+
+<div class="card mb-2">
+  <div class="card-body">
+    <h5 class="card-title">Queues</h5>
+    <div class="row">
+      <div class="col" *ngFor="let queue of statistics.queues">
+        <div class="card">
+          <div class="card-body">
+            <h6 class="card-title">{{queue.name.split('_').join(' ') | titlecase}}</h6>
+            <div class="card-body p-0">
+              <p class="m-0">Messages in queue: {{queue.messageCount}}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card mb-2">
+  <div class="card-body">
+    <h5 class="card-title">Vault instances</h5>
+    <div class="row">
+      <div class="col-4" *ngFor="let vault of statistics.vaultInstances">
+        <div class="card" [ngClass]="{'alert-danger': vault.availableStorageInBytes == -1}">
+          <div class="card-body">
+            <h6 class="card-title">{{vault.name}}
+              <small style="font-weight: bold;" *ngIf="vault.availableStorageInBytes == -1">(Unreachable!)</small>
+            </h6>
+            <div class="card-body p-0">
+              <p class="m-0" *ngIf="vault.availableStorageInBytes > -1">Free
+                space: {{vault.availableStorageInBytes | bytes}}</p>
+              <p class="m-0" *ngIf="vault.availableStorageInBytes == -1">Free space: Unavailable!</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

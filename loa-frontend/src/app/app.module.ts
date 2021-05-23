@@ -7,13 +7,15 @@ import {SearchComponent} from './search/search.component';
 import {DashboardComponent} from './dashboard/dashboard.component';
 import {HttpClientModule} from '@angular/common/http';
 import {FormsModule} from "@angular/forms";
+import {BytesPipe} from "./bytes.pipe";
 
 @NgModule({
   declarations: [
     AppComponent,
     HomeComponent,
     SearchComponent,
-    DashboardComponent
+    DashboardComponent,
+    BytesPipe
   ],
   imports: [
     BrowserModule,
