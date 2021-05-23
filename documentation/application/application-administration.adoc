@@ -31,4 +31,7 @@ This application's goal is to provide basic database administrator tasks (query 
 
 | silent-compressor
 | This command will go through every document in the database and ask the <<Vault Application>> to recompress them when the compression is not the same as provided.
+
+| cleanup
+| Removes every document with status `CORRUPT` or `INDEXING_FAILURE`. The documents will be removed from the vault and the database too.
 |===
