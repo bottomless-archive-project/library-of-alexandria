@@ -197,6 +197,16 @@ export class SearchComponent implements OnInit {
     return this.sanitizer.bypassSecurityTrustResourceUrl('./document/' + documentId);
   }
 
+  getLanguageName(languageId: string) {
+    for (let language of this.languages) {
+      if (language[0] === languageId) {
+        return language[1];
+      }
+    }
+
+    return 'unknown';
+  }
+
   refreshHits() {
     console.log("Should refresh hits here!", this.fileTypes);
 

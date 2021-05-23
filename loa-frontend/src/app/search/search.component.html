@@ -167,7 +167,7 @@
           <!-- DOC and the like - downloading -->
           <div *ngIf="hit.type != 'PDF'" style="width: 100%; height: 32px; line-height: 32px;">
             <span style="float: left; font-weight: bold;">{{hit.language | uppercase}}
-              - <!--{{languages[hit.language] | titlecase}}--></span>
+              - {{getLanguageName(hit.language) | titlecase}}</span>
             <a class="btn btn-primary btn-sm w-25" href="./document/{{hit.id}}"
                style="float: right; min-width: 135px;">
               Download .{{hit.type | lowercase}}</a>
@@ -183,7 +183,7 @@
                     (click)="openPdf(hit.id)" style="float: right; min-width: 135px;">Open .pdf
             </button>
             <span style="float: left; font-weight: bold;">{{hit.language | uppercase}}
-              - <!--{{languages[hit.language] | titlecase}}--></span>
+              - {{getLanguageName(hit.language) | titlecase}}</span>
             <span style="float: right; font-weight: bold;" class="mr-3">{{hit.pageCount}} pages</span>
           </div>
 
