@@ -4,6 +4,7 @@ import {Subject} from "rxjs";
 import {debounceTime, distinctUntilChanged} from "rxjs/operators";
 import {HttpClient} from "@angular/common/http";
 import {SearchService} from "../search.service";
+import {DomSanitizer} from "@angular/platform-browser";
 
 @Component({
   selector: 'app-search',
@@ -33,10 +34,12 @@ export class SearchComponent implements OnInit {
   hits: any[] = [];
   hitCount = 0;
   totalPages = 0;
-  page = 0;
+  page: number = 0;
   loading = false;
+  openPdfs: Map<string, boolean> = new Map();
 
-  constructor(private route: ActivatedRoute, private http: HttpClient, private searchService: SearchService) {
+  constructor(private route: ActivatedRoute, private http: HttpClient, private searchService: SearchService,
+              private sanitizer: DomSanitizer) {
     this.modelChanged.pipe(debounceTime(300), distinctUntilChanged())
       .subscribe(searchText => {
         this.searchText = searchText
@@ -148,6 +151,51 @@ export class SearchComponent implements OnInit {
 
     this.refreshHits();
   };
+
+  jumpToPage(page: number) {
+    this.page = page;
+
+    this.refreshHits();
+  };
+
+  openPdf(pdfId: string) {
+    if (!this.openPdfs.has(pdfId)) {
+      this.openPdfs.set(pdfId, false);
+    }
+
+    this.openPdfs.set(pdfId, !this.openPdfs.get(pdfId));
+  };
+
+  getPageCountToDisplayOnLeftSide() {
+    if (this.page - 5 > 0) {
+      return [this.page - 5, this.page - 4, this.page - 3, this.page - 2, this.page - 1];
+    } else {
+      var result = [];
+      for (var i = 0; i < this.page; i++) {
+        result.push(this.page - i - 1);
+      }
+      result.reverse();
+
+      return result;
+    }
+  };
+
+  getPageCountToDisplayOnRightSide() {
+    if (this.totalPages > this.page + 5) {
+      return [this.page + 1, this.page + 2, this.page + 3, this.page + 4, this.page + 5];
+    } else {
+      var result = [];
+      for (var i = 0; i < this.totalPages - this.page - 1; i++) {
+        result.push(this.page + i + 1);
+      }
+
+      return result;
+    }
+  };
+
+  getDocumentUrl(documentId: string) {
+    return this.sanitizer.bypassSecurityTrustResourceUrl('./document/' + documentId);
+  }
 
   refreshHits() {
     console.log("Should refresh hits here!", this.fileTypes);
