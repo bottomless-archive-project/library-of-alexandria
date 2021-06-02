@@ -1,0 +1,198 @@
+<div>
+  <p class="text-center" style="font-weight: bold;">
+    Documents in database:
+    <span class="badge badge-secondary"
+          [textContent]="((statistics.documentCount / 1000000) | number: '1.2-2') + ' M'"></span>
+    |
+    Documents indexed:
+    <span class="badge badge-secondary"
+          [textContent]="((statistics.indexedDocumentCount / 1000000) | number: '1.2-2') + ' M'"></span>
+  </p>
+</div>
+
+<div class="row">
+  <div class="col-9 pr-0">
+    <div class="form-group">
+      <input [(ngModel)]="searchText" (ngModelChange)='changed($event)' class="form-control"
+             placeholder="Search for something">
+    </div>
+  </div>
+  <div class="col-3">
+    <div class="dropdown language-dropdown">
+      <button class="btn btn-info btn-block dropdown-toggle" role="button" *ngIf="language === undefined"
+              data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Language
+      </button>
+      <button class="btn btn-info btn-lg btn-block" *ngIf="language !== undefined" (click)="setLanguage(undefined)"
+              style="padding-top: 2px; padding-bottom: 2px; font-size: 1em; line-height: 2em;">
+        {{language.code | uppercase}} - {{language.name | titlecase}}
+      </button>
+      <div class="dropdown-menu btn-block mt-0" style="max-height: 300px; overflow: auto;">
+        <button class="dropdown-item dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
+                aria-expanded="false" *ngFor='let language of languages'
+                (click)="setLanguage({code: language[0], name: language[1]})">
+          {{language[0] | uppercase}} - {{language[1] | titlecase}}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-9 pr-0 text-center">
+    <div class="form-group">
+      <div class="form-check form-check-inline">
+        <input class="form-check-input" type="checkbox" id="pdf" [(ngModel)]="fileTypes.PDF"
+               (change)="refreshHits()">
+        <label class="form-check-label" for="pdf">.pdf</label>
+      </div>
+      <div class="form-check form-check-inline">
+        <input class="form-check-input" type="checkbox" id="doc" [(ngModel)]="fileTypes.DOC"
+               (change)="refreshHits()">
+        <label class="form-check-label" for="doc">.doc</label>
+      </div>
+      <div class="form-check form-check-inline">
+        <input class="form-check-input" type="checkbox" id="ppt" [(ngModel)]="fileTypes.PPT"
+               (change)="refreshHits()">
+        <label class="form-check-label" for="ppt">.ppt</label>
+      </div>
+      <div class="form-check form-check-inline">
+        <input class="form-check-input" type="checkbox" id="rtf" [(ngModel)]="fileTypes.RTF"
+               (change)="refreshHits()">
+        <label class="form-check-label" for="rtf">.rtf</label>
+      </div>
+      <div class="form-check form-check-inline">
+        <input class="form-check-input" type="checkbox" id="xls" [(ngModel)]="fileTypes.XLS"
+               (change)="refreshHits()">
+        <label class="form-check-label" for="xls">.xls</label>
+      </div>
+      <div class="form-check form-check-inline">
+        <input class="form-check-input" type="checkbox" id="docx" [(ngModel)]="fileTypes.DOCX"
+               (change)="refreshHits()">
+        <label class="form-check-label" for="docx">.docx</label>
+      </div>
+      <div class="form-check form-check-inline">
+        <input class="form-check-input" type="checkbox" id="xlsx" [(ngModel)]="fileTypes.XLSX"
+               (change)="refreshHits()">
+        <label class="form-check-label" for="xlsx">.xlsx</label>
+      </div>
+      <div class="form-check form-check-inline">
+        <input class="form-check-input" type="checkbox" id="epub" [(ngModel)]="fileTypes.EPUB"
+               (change)="refreshHits()">
+        <label class="form-check-label" for="epub">.epub</label>
+      </div>
+      <div class="form-check form-check-inline">
+        <input class="form-check-input" type="checkbox" id="mobi" [(ngModel)]="fileTypes.MOBI"
+               (change)="refreshHits()">
+        <label class="form-check-label" for="mobi">.mobi</label>
+      </div>
+    </div>
+  </div>
+  <div class="col-3">
+    <div class="dropdown document-length-dropdown">
+      <button class="btn btn-info btn-block dropdown-toggle" role="button" *ngIf="documentLength === undefined"
+              data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Document Length
+      </button>
+      <button class="btn btn-info btn-block" *ngIf="documentLength !== undefined"
+              (click)="setDocumentLength(undefined)"
+              style="padding-top: 2px; padding-bottom: 2px; height: 38px;">
+        {{documentLength[1]}}
+      </button>
+      <div class="dropdown-menu btn-block mt-0" style="max-height: 300px; overflow: auto;">
+        <button class="dropdown-item dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
+                aria-expanded="false" *ngFor="let documentLength of documentLengths"
+                (click)="setDocumentLength(documentLength)">{{documentLength[1]}}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="row">
+  <div class="col">
+    <div class="text-center" style="user-select: none;" *ngIf="hits.length > 0">
+      <nav aria-label="Page navigation example">
+        <ul class="pagination justify-content-center" style="flex-wrap: wrap;">
+          <li class="page-item">
+            <a class="page-link" (click)="jumpToPage(page-1)" *ngIf="page != 0">Prev</a>
+            <a class="page-link disabled" *ngIf="page == 0">Prev</a>
+          </li>
+          <li *ngFor="let x of getPageCountToDisplayOnLeftSide()" class="page-item">
+            <a class="page-link" (click)="jumpToPage(x)">{{x + 1}}</a>
+          </li>
+          <li class="page-item active">
+            <a class="page-link disabled">{{page + 1}}</a>
+          </li>
+          <li *ngFor="let x of getPageCountToDisplayOnRightSide()" class="page-item">
+            <a class="page-link" (click)="jumpToPage(x)">{{x + 1}}</a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" (click)="jumpToPage(page+1)" *ngIf="page != totalPages -1">Next</a>
+            <a class="page-link disabled" *ngIf="page == totalPages -1">Next</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+<div class="row mb-3 text-center" *ngIf="hits.length > 0">
+  <div class="col">
+    <p class="mb-0">
+      <small style="font-weight: bold;">Found around {{hitCount}} documents.</small>
+    </p>
+  </div>
+</div>
+
+<div class="row mb-3 text-center" *ngIf="hits.length == 0 && !loading">
+  <div class="col">
+    <p class="mb-0"><b>Nothing to display (yet)!</b></p>
+  </div>
+</div>
+
+<div class="row mb-3 search-hit" *ngFor="let hit of hits">
+  <ng-container *ngIf="hits.length > 0 && !loading">
+    <div class="col">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title" *ngIf="hit.title">
+            {{hit.title}}
+          </h5>
+          <h6 class="card-subtitle mb-2 text-muted" *ngIf="hit.title && hit.author">
+            {{hit.author}}
+          </h6>
+          <p class="card-text" style="text-align: justify; word-break: break-all;"
+             [innerHtml]="hit.description"></p>
+
+          <!-- DOC and the like - downloading -->
+          <div *ngIf="hit.type != 'PDF'" style="width: 100%; height: 32px; line-height: 32px;">
+            <span style="float: left; font-weight: bold;">{{hit.language | uppercase}}
+              - {{getLanguageName(hit.language) | titlecase}}</span>
+            <a class="btn btn-primary btn-sm w-25" href="./document/{{hit.id}}"
+               style="float: right; min-width: 135px;">
+              Download .{{hit.type | lowercase}}</a>
+          </div>
+          <!-- /DOC and the like - downloading -->
+
+          <!-- PDF - rendering -->
+          <div *ngIf="hit.type == 'PDF'" style="width: 100%; height: 32px; line-height: 32px;">
+            <button *ngIf="openPdfs.has(hit.id) && openPdfs.get(hit.id)" class="btn btn-primary btn-sm w-25"
+                    (click)="openPdf(hit.id)" style="float: right; min-width: 135px;">Close .pdf
+            </button>
+            <button *ngIf="!openPdfs.has(hit.id) || !openPdfs.get(hit.id)" class="btn btn-primary btn-sm w-25"
+                    (click)="openPdf(hit.id)" style="float: right; min-width: 135px;">Open .pdf
+            </button>
+            <span style="float: left; font-weight: bold;">{{hit.language | uppercase}}
+              - {{getLanguageName(hit.language) | titlecase}}</span>
+            <span style="float: right; font-weight: bold;" class="mr-3">{{hit.pageCount}} pages</span>
+          </div>
+
+          <iframe *ngIf="openPdfs.has(hit.id) && openPdfs.get(hit.id) && hit.type == 'PDF'"
+                  [src]="getDocumentUrl(hit.id)"
+                  style="width: 100%; height: 600px;" frameborder="0" class="mt-3"></iframe>
+          <!-- /PDF - rendering -->
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</div>

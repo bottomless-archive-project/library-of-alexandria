@@ -1,0 +1,16 @@
+plugins {
+    id 'java'
+    id 'com.github.node-gradle.node' version '3.0.1'
+}
+
+node {
+    version = '10.16.0'
+    npmVersion = '6.5.0'
+    download = true
+}
+
+jar.dependsOn 'npm_run_build'
+
+jar {
+    from 'dist/loa-frontend' into 'static'
+}

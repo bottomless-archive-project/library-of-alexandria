@@ -1,5 +1,6 @@
 package com.github.loa.repository.configuration;
 
+import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.ServerAddress;
 import com.mongodb.reactivestreams.client.MongoClient;
@@ -35,13 +36,24 @@ public class RepositoryConfiguration {
 
     @Bean
     public MongoClientSettings mongoClientSettings(final CodecRegistry codecRegistry) {
-        return MongoClientSettings.builder()
-                .applyToClusterSettings((builder) ->
-                        builder.hosts(List.of(new ServerAddress(repositoryConfigurationProperties.getHost(),
-                                repositoryConfigurationProperties.getPort()))))
+        final MongoClientSettings.Builder builder = MongoClientSettings.builder()
                 .codecRegistry(codecRegistry)
-                .uuidRepresentation(UuidRepresentation.JAVA_LEGACY)
-                .build();
+                .uuidRepresentation(UuidRepresentation.JAVA_LEGACY);
+
+        if (repositoryConfigurationProperties.isUriConfiguration()) {
+            builder.applyConnectionString(new ConnectionString(repositoryConfigurationProperties.getUri()));
+        } else {
+            builder.applyToClusterSettings((clusterBuilder) -> clusterBuilder.hosts(
+                    List.of(
+                            new ServerAddress(
+                                    repositoryConfigurationProperties.getHost(),
+                                    repositoryConfigurationProperties.getPort()
+                            )
+                    )
+            ));
+        }
+
+        return builder.build();
     }
 
     @Bean
