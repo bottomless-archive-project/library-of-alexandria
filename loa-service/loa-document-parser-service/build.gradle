@@ -1,7 +1,7 @@
 dependencies {
     api group: 'org.springframework.boot', name: 'spring-boot-starter-reactor-netty'
 
-    implementation group: 'com.github.pemistahl', name: 'lingua', version: '1.0.3'
+    implementation group: 'com.github.pemistahl', name: 'lingua', version: '1.1.0'
     implementation group: 'org.apache.tika', name: 'tika-parsers', version: '1.25'
 
     api project(':loa-service:loa-document-service')

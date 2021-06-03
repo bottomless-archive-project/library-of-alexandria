@@ -54,6 +54,7 @@ public class DocumentParserConfiguration {
     @Bean
     public LanguageDetector languageDetector() {
         return LanguageDetectorBuilder.fromAllLanguages()
+                .withPreloadedLanguageModels()
                 .build();
     }
 }
