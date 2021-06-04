@@ -3,7 +3,7 @@ import {ActivatedRoute} from '@angular/router';
 import {Subject} from "rxjs";
 import {debounceTime, distinctUntilChanged} from "rxjs/operators";
 import {HttpClient} from "@angular/common/http";
-import {SearchService} from "../shared/search/service/search.service";
+import {SearchService} from "../../shared/search/service/search.service";
 import {DomSanitizer} from "@angular/platform-browser";
 
 @Component({

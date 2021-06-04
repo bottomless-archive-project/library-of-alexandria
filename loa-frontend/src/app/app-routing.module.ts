@@ -1,8 +1,8 @@
 import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
-import {HomeComponent} from "./home/home.component";
-import {SearchComponent} from "./search/search.component";
-import {DashboardComponent} from "./dashboard/dashboard.component";
+import {HomeComponent} from "./view/home/home.component";
+import {SearchComponent} from "./view/search/search.component";
+import {DashboardComponent} from "./view/dashboard/dashboard.component";
 import {SearchResolver} from "./shared/search/resolver/search.resolver";
 import {StatisticsResolver} from "./statistics.resolver";
 
