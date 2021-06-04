@@ -3,7 +3,7 @@ import {RouterModule, Routes} from '@angular/router';
 import {HomeComponent} from "./home/home.component";
 import {SearchComponent} from "./search/search.component";
 import {DashboardComponent} from "./dashboard/dashboard.component";
-import {SearchResolver} from "./search.resolver";
+import {SearchResolver} from "./shared/search/resolver/search.resolver";
 import {StatisticsResolver} from "./statistics.resolver";
 
 const routes: Routes = [
