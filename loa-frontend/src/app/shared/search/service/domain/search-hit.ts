@@ -6,7 +6,8 @@ export class SearchHit {
     public author: string,
     public description: string,
     public type: string,
-    public language: string
+    public language: string,
+    public pageCount: number
   ) {
   }
 }

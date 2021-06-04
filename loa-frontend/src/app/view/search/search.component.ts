@@ -5,6 +5,7 @@ import {debounceTime, distinctUntilChanged} from "rxjs/operators";
 import {HttpClient} from "@angular/common/http";
 import {SearchService} from "../../shared/search/service/search.service";
 import {DomSanitizer} from "@angular/platform-browser";
+import {SearchHit} from "../../shared/search/service/domain/search-hit";
 
 @Component({
   selector: 'app-search',
@@ -31,7 +32,7 @@ export class SearchComponent implements OnInit {
     EPUB: false,
     MOBI: false
   };
-  hits: any[] = [];
+  hits: SearchHit[] = [];
   hitCount = 0;
   totalPages = 0;
   page: number = 0;
