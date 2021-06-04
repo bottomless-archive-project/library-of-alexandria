@@ -167,7 +167,7 @@ export class SearchComponent implements OnInit {
     this.openPdfs.set(pdfId, !this.openPdfs.get(pdfId));
   };
 
-  getPageCountToDisplayOnLeftSide() {
+  getPageCountToDisplayOnLeftSide(): number[] {
     if (this.page - 5 > 0) {
       return [this.page - 5, this.page - 4, this.page - 3, this.page - 2, this.page - 1];
     } else {
@@ -181,7 +181,7 @@ export class SearchComponent implements OnInit {
     }
   };
 
-  getPageCountToDisplayOnRightSide() {
+  getPageCountToDisplayOnRightSide(): number[] {
     if (this.totalPages > this.page + 5) {
       return [this.page + 1, this.page + 2, this.page + 3, this.page + 4, this.page + 5];
     } else {

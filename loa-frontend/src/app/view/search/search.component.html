@@ -107,7 +107,7 @@
   </div>
 </div>
 
-
+<!-- Top pager -->
 <div class="row">
   <div class="col">
     <div class="text-center" style="user-select: none;" *ngIf="hits.length > 0">
@@ -117,14 +117,14 @@
             <a class="page-link" (click)="jumpToPage(page-1)" *ngIf="page != 0">Prev</a>
             <a class="page-link disabled" *ngIf="page == 0">Prev</a>
           </li>
-          <li *ngFor="let x of getPageCountToDisplayOnLeftSide()" class="page-item">
-            <a class="page-link" (click)="jumpToPage(x)">{{x + 1}}</a>
+          <li *ngFor="let pageOffsetLeft of getPageCountToDisplayOnLeftSide()" class="page-item">
+            <a class="page-link" (click)="jumpToPage(pageOffsetLeft)">{{pageOffsetLeft + 1}}</a>
           </li>
           <li class="page-item active">
             <a class="page-link disabled">{{page + 1}}</a>
           </li>
-          <li *ngFor="let x of getPageCountToDisplayOnRightSide()" class="page-item">
-            <a class="page-link" (click)="jumpToPage(x)">{{x + 1}}</a>
+          <li *ngFor="let pageOffsetRight of getPageCountToDisplayOnRightSide()" class="page-item">
+            <a class="page-link" (click)="jumpToPage(pageOffsetRight)">{{pageOffsetRight + 1}}</a>
           </li>
           <li class="page-item">
             <a class="page-link" (click)="jumpToPage(page+1)" *ngIf="page != totalPages -1">Next</a>
@@ -136,6 +136,7 @@
   </div>
 </div>
 
+<!-- Search results -->
 <div class="row mb-3 text-center" *ngIf="hits.length > 0">
   <div class="col">
     <p class="mb-0">
@@ -195,4 +196,33 @@
       </div>
     </div>
   </ng-container>
+</div>
+
+<!-- Bottom pager -->
+<div class="row">
+  <div class="col">
+    <div class="text-center" style="user-select: none;" *ngIf="hits.length > 0">
+      <nav aria-label="Page navigation example">
+        <ul class="pagination justify-content-center" style="flex-wrap: wrap;">
+          <li class="page-item">
+            <a class="page-link" (click)="jumpToPage(page-1)" *ngIf="page != 0">Prev</a>
+            <a class="page-link disabled" *ngIf="page == 0">Prev</a>
+          </li>
+          <li *ngFor="let pageOffsetLeft of getPageCountToDisplayOnLeftSide()" class="page-item">
+            <a class="page-link" (click)="jumpToPage(pageOffsetLeft)">{{pageOffsetLeft + 1}}</a>
+          </li>
+          <li class="page-item active">
+            <a class="page-link disabled">{{page + 1}}</a>
+          </li>
+          <li *ngFor="let pageOffsetRight of getPageCountToDisplayOnRightSide()" class="page-item">
+            <a class="page-link" (click)="jumpToPage(pageOffsetRight)">{{pageOffsetRight + 1}}</a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" (click)="jumpToPage(page+1)" *ngIf="page != totalPages -1">Next</a>
+            <a class="page-link disabled" *ngIf="page == totalPages -1">Next</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
 </div>
