@@ -1,11 +1,11 @@
 <div>
   <p class="text-center" style="font-weight: bold;">
     Documents in database:
-    <span class="badge badge-secondary"
+    <span class="badge bg-secondary"
           [textContent]="((statistics.documentCount / 1000000) | number: '1.2-2') + ' M'"></span>
     |
     Documents indexed:
-    <span class="badge badge-secondary"
+    <span class="badge bg-secondary"
           [textContent]="((statistics.indexedDocumentCount / 1000000) | number: '1.2-2') + ' M'"></span>
   </p>
 </div>
@@ -19,19 +19,23 @@
   </div>
   <div class="col-3">
     <div class="dropdown language-dropdown">
-      <button class="btn btn-info btn-block dropdown-toggle" role="button" *ngIf="language === undefined"
-              data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Language
-      </button>
-      <button class="btn btn-info btn-lg btn-block" *ngIf="language !== undefined" (click)="setLanguage(undefined)"
-              style="padding-top: 2px; padding-bottom: 2px; font-size: 1em; line-height: 2em;">
-        {{language.code | uppercase}} - {{language.name | titlecase}}
-      </button>
-      <div class="dropdown-menu btn-block mt-0" style="max-height: 300px; overflow: auto;">
-        <button class="dropdown-item dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
-                aria-expanded="false" *ngFor='let language of languages'
-                (click)="setLanguage({code: language[0], name: language[1]})">
-          {{language[0] | uppercase}} - {{language[1] | titlecase}}
+      <div class="d-grid gap-2">
+        <button class="btn btn-info dropdown-toggle" role="button" *ngIf="language === undefined"
+                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Language
         </button>
+        <button class="btn btn-info btn-lg" *ngIf="language !== undefined" (click)="setLanguage(undefined)"
+                style="padding-top: 2px; padding-bottom: 2px; font-size: 1em; line-height: 2em;">
+          {{language.code | uppercase}} - {{language.name | titlecase}}
+        </button>
+      </div>
+      <div class="dropdown-menu mt-0" style="max-height: 300px; overflow: auto;">
+        <div class="d-grid gap-2">
+          <button class="dropdown-item dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
+                  aria-expanded="false" *ngFor='let language of languages'
+                  (click)="setLanguage({code: language[0], name: language[1]})">
+            {{language[0] | uppercase}} - {{language[1] | titlecase}}
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -89,19 +93,23 @@
   </div>
   <div class="col-3">
     <div class="dropdown document-length-dropdown">
-      <button class="btn btn-info btn-block dropdown-toggle" role="button" *ngIf="documentLength === undefined"
-              data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Document Length
-      </button>
-      <button class="btn btn-info btn-block" *ngIf="documentLength !== undefined"
-              (click)="setDocumentLength(undefined)"
-              style="padding-top: 2px; padding-bottom: 2px; height: 38px;">
-        {{documentLength[1]}}
-      </button>
-      <div class="dropdown-menu btn-block mt-0" style="max-height: 300px; overflow: auto;">
-        <button class="dropdown-item dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
-                aria-expanded="false" *ngFor="let documentLength of documentLengths"
-                (click)="setDocumentLength(documentLength)">{{documentLength[1]}}
+      <div class="d-grid gap-2">
+        <button class="btn btn-info dropdown-toggle" role="button" *ngIf="documentLength === undefined"
+                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Document Length
         </button>
+        <button class="btn btn-info" *ngIf="documentLength !== undefined"
+                (click)="setDocumentLength(undefined)"
+                style="padding-top: 2px; padding-bottom: 2px; height: 38px;">
+          {{documentLength[1]}}
+        </button>
+      </div>
+      <div class="dropdown-menu mt-0" style="max-height: 300px; overflow: auto;">
+        <div class="d-grid gap-2">
+          <button class="dropdown-item dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
+                  aria-expanded="false" *ngFor="let documentLength of documentLengths"
+                  (click)="setDocumentLength(documentLength)">{{documentLength[1]}}
+          </button>
+        </div>
       </div>
     </div>
   </div>
