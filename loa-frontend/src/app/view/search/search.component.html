@@ -151,6 +151,11 @@
   </div>
 </div>
 
+<div class="spin-wrapper" *ngIf="loading">
+  <div class="spinner">
+  </div>
+</div>
+
 <div class="row mb-3 search-hit" *ngFor="let hit of hits">
   <ng-container *ngIf="hits.length > 0 && !loading">
     <div class="col">

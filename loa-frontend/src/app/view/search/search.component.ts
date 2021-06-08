@@ -220,6 +220,9 @@ export class SearchComponent implements OnInit {
     }
 
     this.loading = true;
+    this.hits = [];
+    this.hitCount = 0;
+    this.totalPages = 0;
 
     const exactMatch = this.searchText.startsWith("\"") && this.searchText.endsWith("\"");
 
