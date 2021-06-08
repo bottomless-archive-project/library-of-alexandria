@@ -10,12 +10,12 @@ body {
 }
 
 .left-sphinx {
-    height: 200px;
+    max-height: 240px;
     transform: scale(-1, 1);
 }
 
 .right-sphinx {
-    height: 200px;
+    max-height: 240px;
 }
 
 .search-hit em {
@@ -39,5 +39,6 @@ a.title-text {
 }
 
 a.title-text:hover {
+    color: black;
     text-decoration: none;
 }
