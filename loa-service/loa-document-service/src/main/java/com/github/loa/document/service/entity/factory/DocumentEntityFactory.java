@@ -78,6 +78,16 @@ public class DocumentEntityFactory {
     }
 
     /**
+     * Return the approximate number of documents available in the database. It is much faster than
+     * {@link #getDocumentCount()} but not accurate.
+     *
+     * @return the approximate count of documents available in the database
+     */
+    public Mono<Long> getEstimatedDocumentCount() {
+        return documentRepository.estimateCount();
+    }
+
+    /**
      * Return the number of documents available in the database grouped by status.
      *
      * @return the count of documents grouped by status

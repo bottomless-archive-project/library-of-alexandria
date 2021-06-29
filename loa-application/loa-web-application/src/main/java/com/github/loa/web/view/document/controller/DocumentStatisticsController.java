@@ -17,7 +17,7 @@ public class DocumentStatisticsController {
 
     @GetMapping("/statistics")
     public Mono<DocumentStatisticsResponse> documentStatistics() {
-        return documentEntityFactory.getDocumentCount()
+        return documentEntityFactory.getEstimatedDocumentCount()
                 .map(count -> DocumentStatisticsResponse.builder()
                         .documentCount(count)
                         .indexedDocumentCount(documentSearchService.countDocuments())

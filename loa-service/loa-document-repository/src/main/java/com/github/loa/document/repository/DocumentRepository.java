@@ -100,6 +100,10 @@ public class DocumentRepository {
         return Mono.from(documentDatabaseEntityMongoCollection.countDocuments());
     }
 
+    public Mono<Long> estimateCount() {
+        return Mono.from(documentDatabaseEntityMongoCollection.estimatedDocumentCount());
+    }
+
     public Mono<Map<String, Integer>> countByStatus() {
         final List<Bson> countByStatusAggregate = Collections.singletonList(group("$status", sum("count", 1L)));
 

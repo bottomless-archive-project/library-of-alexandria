@@ -34,7 +34,7 @@ public class DocumentStatisticsResponseFactory {
     private final VaultClientConfigurationProperties vaultClientConfigurationProperties;
 
     public Mono<DashboardDocumentStatisticsResponse> newStatisticsResponse() {
-        return documentEntityFactory.getDocumentCount()
+        return documentEntityFactory.getEstimatedDocumentCount()
                 .map(count -> DashboardDocumentStatisticsResponse.builder()
                         .documentCount(count)
                 )
