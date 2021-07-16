@@ -23,6 +23,4 @@ public class DownloaderConfigurationProperties {
     private final long maximumArchiveSize = 8589934592L;
 
     private final SourceLocation source;
-
-    private final String folderSourceLocation;
 }

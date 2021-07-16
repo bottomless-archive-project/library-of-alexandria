@@ -17,5 +17,17 @@ This application is responsible for reading out the document locations from the 
 | **loa.stage.location**
 | The location where the document files are first downloaded. After some validation and occasionally modification (compression etc) it is moved to the vault.
 
+| **loa.downloader.version-number**
+| The version number that should be saved as the downloader version to the database when a new document is inserted. Can be used for debugging, cleanups and so on. *(Default value: 2)*
+
+| **loa.downloader.maximum-archive-size**
+| If a document's size in bytes is bigger than the provided value, then the archiving step will be skipped. Too big documents can use up way too much space, compared to how useful they are. This parameter could be used to defend against this problem. *(Default value: 8589934592 bytes aka 8 GB)*
+
+| **loa.downloader.source**
+| Two types of document sources are supported by the downloader application. One of this is the `QUEUE` source, where the application get the possible locations of documents (URLs), and download them from there, then sends them for archiving. The other one is `FOLDER`, where the application load document files from a provided folder on the filesystem, and sends them for archiving. *(Default value: QUEUE)*
+
+| **loa.downloader.source.folder.location
+| The location on the filesystem where the downloader should load the files from in case of the source set to `FOLDER`.
+
 include::../service/repository/repository-configuration.adoc[]
 |===
