@@ -22,12 +22,7 @@ If the application is not a duplicate then the staging file's contents will be m
 | Used only when `loa.vault.location.type` is set to `file`. Path to the location of the vault on the filesystem.
 
 include::../service/repository/repository-configuration.adoc[]
-
-| **loa.queue.host**
-| The ip address of the Queue Application. *(Default value: localhost)*
-
-| **loa.queue.port**
-| The port where the Queue Application is listening for new connections. *(Default value: 61616)*
+include::../service/queue/queue-configuration.adoc[]
 
 | **loa.stage.location**
 | The location where the document files are first moved. After the checksum calculation and duplicate detection, they are moved to the vault.

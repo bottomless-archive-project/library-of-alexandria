@@ -8,12 +8,6 @@ This application is responsible for reading out the document locations from the 
 |===
 | Parameter | Description
 
-| **loa.queue.port**
-| The port of the queue where the application should connect, and the document locations should be sent. *(Default value: 61616)*
-
-| **loa.queue.host**
-| The host of the queue where the application should connect, and the document locations should be sent. *(Default value: localhost)*
-
 | **loa.stage.location**
 | The location where the document files are first downloaded. After some validation and occasionally modification (compression etc) it is moved to the vault.
 
@@ -29,5 +23,6 @@ This application is responsible for reading out the document locations from the 
 | **loa.downloader.source.folder.location
 | The location on the filesystem where the downloader should load the files from in case of the source set to `FOLDER`.
 
+include::../service/queue/queue-configuration.adoc[]
 include::../service/repository/repository-configuration.adoc[]
 |===
