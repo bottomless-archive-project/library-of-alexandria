@@ -12,8 +12,8 @@ import org.apache.tika.parser.ParserDecorator;
 import org.apache.tika.parser.epub.EpubParser;
 import org.apache.tika.parser.microsoft.OfficeParser;
 import org.apache.tika.parser.microsoft.ooxml.OOXMLParser;
+import org.apache.tika.parser.microsoft.rtf.RTFParser;
 import org.apache.tika.parser.pdf.PDFParser;
-import org.apache.tika.parser.rtf.RTFParser;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
