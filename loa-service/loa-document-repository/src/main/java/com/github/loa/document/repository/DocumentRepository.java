@@ -45,7 +45,7 @@ public class DocumentRepository {
 
 
     /**
-     * Returns a {@link Flux} that will emit all of the documents that have the provided status in the database.
+     * Returns a {@link Flux} that will emit all the documents that have the provided status in the database.
      *
      * @return a flux emitting every elements in the database
      */
@@ -59,7 +59,7 @@ public class DocumentRepository {
     }
 
     /**
-     * Returns a {@link Flux} that will emit all of the documents that are available in the database.
+     * Returns a {@link Flux} that will emit all the documents that are available in the database.
      *
      * @return a flux emitting every elements in the database
      */

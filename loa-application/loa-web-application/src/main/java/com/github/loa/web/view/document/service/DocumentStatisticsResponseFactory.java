@@ -16,10 +16,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.time.Duration;
 import java.util.Arrays;
-import java.util.List;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
@@ -34,19 +34,29 @@ public class DocumentStatisticsResponseFactory {
     private final VaultClientConfigurationProperties vaultClientConfigurationProperties;
 
     public Mono<DashboardDocumentStatisticsResponse> newStatisticsResponse() {
-        return documentEntityFactory.getEstimatedDocumentCount()
-                .map(count -> DashboardDocumentStatisticsResponse.builder()
-                        .documentCount(count)
+        final DashboardDocumentStatisticsResponse.DashboardDocumentStatisticsResponseBuilder builder =
+                DashboardDocumentStatisticsResponse.builder();
+
+        return Mono.when(
+                        this.fillDocumentCount(builder),
+                        this.fillStatistics(builder),
+                        this.fillQueues(builder),
+                        this.fillDocumentCountByStatus(builder),
+                        this.fillDocumentCountByType(builder),
+                        this.fillVaultInstances(builder)
                 )
-                .flatMap(this::fillDocumentCountByType)
-                .flatMap(this::fillDocumentCountByStatus)
-                .flatMap(this::fillVaultInstances)
-                .flatMap(this::fillQueues)
-                .flatMap(this::fillStatistics)
-                .map(DashboardDocumentStatisticsResponse.DashboardDocumentStatisticsResponseBuilder::build);
+                .then(Mono.defer(() -> Mono.just(builder.build())));
     }
 
-    private Mono<DashboardDocumentStatisticsResponse.DashboardDocumentStatisticsResponseBuilder> fillStatistics(
+    private Mono<Void> fillDocumentCount(
+            final DashboardDocumentStatisticsResponse.DashboardDocumentStatisticsResponseBuilder builder) {
+        return documentEntityFactory.getEstimatedDocumentCount()
+                .map(builder::documentCount)
+                .subscribeOn(Schedulers.boundedElastic())
+                .then();
+    }
+
+    private Mono<Void> fillStatistics(
             final DashboardDocumentStatisticsResponse.DashboardDocumentStatisticsResponseBuilder builder) {
         return statisticsEntityFactory.getStatisticsBetween(Duration.ofDays(1))
                 .map(statisticsEntity -> DashboardStatisticsResponse.builder()
@@ -56,23 +66,27 @@ public class DocumentStatisticsResponseFactory {
                         .build()
                 )
                 .collectList()
-                .map(builder::statistics);
+                .map(builder::statistics)
+                .subscribeOn(Schedulers.boundedElastic())
+                .then();
     }
 
-    private Mono<DashboardDocumentStatisticsResponse.DashboardDocumentStatisticsResponseBuilder> fillQueues(
+    private Mono<Void> fillQueues(
             final DashboardDocumentStatisticsResponse.DashboardDocumentStatisticsResponseBuilder builder) {
-        final List<DashboardQueueStatisticsResponse> dashboardQueueStatisticsResponses = Arrays.stream(Queue.values())
-                .map(queue -> DashboardQueueStatisticsResponse.builder()
-                        .name(queue.name())
-                        .messageCount(queueManipulator.getMessageCount(queue))
-                        .build()
+        return Mono.fromCallable(() -> Arrays.stream(Queue.values())
+                        .map(queue -> DashboardQueueStatisticsResponse.builder()
+                                .name(queue.name())
+                                .messageCount(queueManipulator.getMessageCount(queue))
+                                .build()
+                        )
+                        .collect(Collectors.toList())
                 )
-                .collect(Collectors.toList());
-
-        return Mono.just(builder.queues(dashboardQueueStatisticsResponses));
+                .map(builder::queues)
+                .subscribeOn(Schedulers.boundedElastic())
+                .then();
     }
 
-    private Mono<DashboardDocumentStatisticsResponse.DashboardDocumentStatisticsResponseBuilder> fillVaultInstances(
+    private Mono<Void> fillVaultInstances(
             final DashboardDocumentStatisticsResponse.DashboardDocumentStatisticsResponseBuilder builder) {
         return Mono.just(vaultClientConfigurationProperties.getLocations().keySet())
                 .flatMap(vaultNames -> Flux.fromIterable(vaultNames)
@@ -86,24 +100,30 @@ public class DocumentStatisticsResponseFactory {
                         )
                         .collect(Collectors.toList())
                 )
-                .map(builder::vaultInstances);
+                .map(builder::vaultInstances)
+                .subscribeOn(Schedulers.boundedElastic())
+                .then();
     }
 
-    private Mono<DashboardDocumentStatisticsResponse.DashboardDocumentStatisticsResponseBuilder> fillDocumentCountByType(
+    private Mono<Void> fillDocumentCountByType(
             final DashboardDocumentStatisticsResponse.DashboardDocumentStatisticsResponseBuilder builder) {
         return documentEntityFactory.getCountByType()
                 .map(typeMap -> Arrays.stream(DocumentType.values())
                         .collect(Collectors.toMap(documentType -> documentType,
                                 documentType -> typeMap.getOrDefault(documentType, 0), (a, b) -> b, TreeMap::new)))
-                .map(builder::documentCountByType);
+                .map(builder::documentCountByType)
+                .subscribeOn(Schedulers.boundedElastic())
+                .then();
     }
 
-    private Mono<DashboardDocumentStatisticsResponse.DashboardDocumentStatisticsResponseBuilder> fillDocumentCountByStatus(
+    private Mono<Void> fillDocumentCountByStatus(
             final DashboardDocumentStatisticsResponse.DashboardDocumentStatisticsResponseBuilder builder) {
         return documentEntityFactory.getCountByStatus()
                 .map(statusMap -> Arrays.stream(DocumentStatus.values())
                         .collect(Collectors.toMap(documentStatus -> documentStatus,
                                 documentStatus -> statusMap.getOrDefault(documentStatus, 0), (a, b) -> b, TreeMap::new)))
-                .map(builder::documentCountByStatus);
+                .map(builder::documentCountByStatus)
+                .subscribeOn(Schedulers.boundedElastic())
+                .then();
     }
 }
