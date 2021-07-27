@@ -5,9 +5,10 @@ import {AppComponent} from './view/app/app.component';
 import {HomeComponent} from './view/home/home.component';
 import {SearchComponent} from './view/search/search.component';
 import {DashboardComponent} from './view/dashboard/dashboard.component';
+import {DebugDocumentComponent} from './view/debug-document/debug-document.component';
 import {HttpClientModule} from '@angular/common/http';
-import {FormsModule} from "@angular/forms";
-import {BytesPipe} from "./bytes.pipe";
+import {FormsModule} from '@angular/forms';
+import {BytesPipe} from './bytes.pipe';
 
 @NgModule({
   declarations: [
@@ -15,6 +16,7 @@ import {BytesPipe} from "./bytes.pipe";
     HomeComponent,
     SearchComponent,
     DashboardComponent,
+    DebugDocumentComponent,
     BytesPipe
   ],
   imports: [

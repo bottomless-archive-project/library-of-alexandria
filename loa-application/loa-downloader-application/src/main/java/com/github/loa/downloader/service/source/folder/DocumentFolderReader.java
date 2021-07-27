@@ -1,7 +1,7 @@
 package com.github.loa.downloader.service.source.folder;
 
-import com.github.loa.downloader.configuration.DownloaderConfigurationProperties;
 import com.github.loa.downloader.service.document.DocumentLocationProcessor;
+import com.github.loa.downloader.service.source.configuration.DownloaderFolderSourceConfiguration;
 import com.github.loa.location.domain.DocumentLocation;
 import com.github.loa.location.domain.link.UrlLink;
 import lombok.RequiredArgsConstructor;
@@ -20,12 +20,12 @@ import java.util.Objects;
 @ConditionalOnProperty(value = "loa.downloader.source", havingValue = "folder")
 public class DocumentFolderReader implements CommandLineRunner {
 
-    private final DownloaderConfigurationProperties downloaderConfigurationProperties;
+    private final DownloaderFolderSourceConfiguration downloaderFolderSourceConfiguration;
     private final DocumentLocationProcessor documentLocationProcessor;
 
     @Override
     public void run(final String... args) {
-        final File sourceFolder = new File(downloaderConfigurationProperties.getFolderSourceLocation());
+        final File sourceFolder = new File(downloaderFolderSourceConfiguration.getLocation());
 
         //TODO: Why not Flux.generate like DownloadQueueListener?
         Flux.fromArray(Objects.requireNonNull(sourceFolder.listFiles()))

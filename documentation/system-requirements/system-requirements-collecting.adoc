@@ -1,26 +1,27 @@
 = Collecting
 
-Collecting is less memory-intensive than indexing the documents but doesn't provide any search capability. The CPU requirements are quite high however because the documents are verified and validated to avoid corrupt documents littering the archive.
+The resources used by collecting will be limited most likely by the bandwidth of your connection.
+The CPU requirements can be quite high because the documents are verified and validated to avoid corrupt documents littering the archive.
 
 == Recommended hardware
 
 === Collecting small amounts (1 - 25 million)
 
 * **CPU**: http://www.cpu-world.com/CPUs/Zen/AMD-Ryzen%205%203600.html[AMD Ryzen 5 3600] or similar
-* **Memory**: 16 GB DDR4
+* **Memory**: 32 GB DDR4
 * **Disc space**: ~1 - 25 TB
 * **Network**: 100 Mbps
 
 === Collecting medium amounts (25 - 100 million)
 
 * **CPU**: http://www.cpu-world.com/CPUs/Zen/AMD-Ryzen%207%203800X.html[AMD Ryzen 7 3800X] or similar
-* **Memory**: 32 GB DDR4
+* **Memory**: 48 GB DDR4
 * **Disc space**: ~25 - 100 TB
 * **Network**: 500 Mbps
 
 === Collecting massive amounts (100 - 500+ million)
 
 * **CPU**: http://www.cpu-world.com/CPUs/Zen/AMD-Ryzen%209%203950X.html[AMD Ryzen 9 3950X] or similar
-* **Memory**: 32 GB DDR4
+* **Memory**: 64 GB DDR4
 * **Disc space**: ~100 - 500 TB
 * **Network**: 500 - 1000 Mbps

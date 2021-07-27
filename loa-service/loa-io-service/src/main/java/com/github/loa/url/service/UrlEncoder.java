@@ -18,7 +18,7 @@ public class UrlEncoder {
     /**
      * Encodes the provided URL to a valid
      * <a href="https://en.wikipedia.org/wiki/Internationalized_Resource_Identifier">resource identifier</a> and return
-     * the new identifier as an URL.
+     * the new identifier as a URL.
      *
      * @param url the url to encode
      * @return the encoded url
@@ -30,7 +30,7 @@ public class UrlEncoder {
 
             return Mono.just(new URL(uri.toASCIIString()));
         } catch (URISyntaxException | MalformedURLException e) {
-            // The constructor of java.net.URL doesn't always validate the passed url correctly so an exception
+            // The constructor of java.net.URL doesn't always validate the passed url correctly, so an exception
             // could happen here.
             return Mono.empty();
         }

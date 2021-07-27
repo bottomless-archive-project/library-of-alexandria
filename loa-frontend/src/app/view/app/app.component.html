@@ -12,5 +12,12 @@
   </div>
 </div>
 <div>
-  <router-outlet></router-outlet>
+  <div class="spin-wrapper" *ngIf="loading">
+    <div class="spinner">
+    </div>
+  </div>
+
+  <div *ngIf="!loading">
+    <router-outlet></router-outlet>
+  </div>
 </div>

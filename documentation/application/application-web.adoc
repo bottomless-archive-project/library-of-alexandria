@@ -11,12 +11,7 @@ The application run queries on the Elasticsearch cluster and display the results
 | Parameter | Description
 
 include::../service/repository/repository-configuration.adoc[]
-
-| **loa.queue.host**
-| The ip address of the Queue Application. *(Default value: localhost)*
-
-| **loa.queue.port**
-| The port where the Queue Application is listening for new connections. *(Default value: 61616)*
+include::../service/queue/queue-configuration.adoc[]
 
 | **loa.vault.client.locations.{vault-name}.host**
 | The IP address of the <<Vault Application>> with the provided name, to grab the documents for displaying. If you use more than one vault, you need to list all of them!
