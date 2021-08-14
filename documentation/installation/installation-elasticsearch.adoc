@@ -2,19 +2,11 @@
 
 Elasticsearch is only necessary for indexing! If you only want to collect the PDF documents then it's unnecessary for you!
 
-You can download Elasticsearch 7.9.0 https://www.elastic.co/downloads/past-releases/elasticsearch-7-9-0[here].
+You can download Elasticsearch 7.13.0 https://www.elastic.co/downloads/past-releases/elasticsearch-7-13-0[here].
 
-After the download complete unzip it. Open a command-line client in the folder where you unzipped it and run the following command:
+After the download complete unzip it. You also need to do some slight adjustments to the default configuration.
 
-....
-.\bin\elasticsearch-plugin install ingest-attachment
-....
-
-This will install the https://www.elastic.co/guide/en/elasticsearch/plugins/current/ingest-attachment.html[Ingest attachment] plugin.
-
-You also need to do some slight adjustments to the default configuration.
-
-Go to the elasticsearch/config folder. Open the jvm.options file in the text editor and edit the following parameters to adjust the memory. We suggest setting at least 12 GB of memory for Elasticsearch. Even if you don't have a lot of files.
+Go to the elasticsearch/config folder. Open the jvm.options file in the text editor and edit the following parameters to adjust the memory. We suggest setting at least 4 GB of memory for Elasticsearch. Even if you don't have a lot of files.
 
 ....
 -Xms1g
@@ -24,8 +16,8 @@ Go to the elasticsearch/config folder. Open the jvm.options file in the text edi
 For example:
 
 ....
--Xms12g
--Xmx12g
+-Xms4g
+-Xmx4g
 ....
 
 If you want to change the data directory then open the config/elasticsearch.yml file, uncomment the path.data and write the expected data path to it.

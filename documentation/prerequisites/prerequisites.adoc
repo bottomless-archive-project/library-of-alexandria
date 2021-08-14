@@ -4,9 +4,9 @@ Special emphasis was placed on to keep the prerequisites of the project to the m
 
 List of the required software to start archiving:
 
-- https://www.oracle.com/technetwork/java/javase/downloads/index.html[Java 15]
+- https://www.oracle.com/technetwork/java/javase/downloads/index.html[Java 17]
 - https://www.mongodb.com/download-center/community[MongoDB 4.4]
 
 List of the required software to be able to search the archived documents:
 
-- https://www.elastic.co/downloads/past-releases/elasticsearch-7-9-0[Elasticsearch 7.9.0]
+- https://www.elastic.co/downloads/past-releases/elasticsearch-7-13-0[Elasticsearch 7.13.0]
