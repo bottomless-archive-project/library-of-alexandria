@@ -2,7 +2,7 @@ dependencies {
     implementation group: 'com.github.bottomless-archive-project', name: 'java-warc', version: '1.1.0'
     implementation group: 'com.github.bottomless-archive-project', name: 'common-crawl-client', version: '2943318d20'
 
-    implementation group: 'org.jsoup', name: 'jsoup', version: '1.14.1'
+    implementation group: 'org.jsoup', name: 'jsoup', version: '1.14.2'
 
     api project(':loa-service:loa-source-service')
     implementation project(':loa-service:loa-logging-service')
