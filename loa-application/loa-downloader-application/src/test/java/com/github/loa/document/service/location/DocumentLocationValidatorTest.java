@@ -83,7 +83,7 @@ class DocumentLocationValidatorTest {
         assertFalse(result);
     }
 
-    // Empty string makes JUnit throw an invalid CSV error so we need to test it in its own method
+    // Empty string makes JUnit throw an invalid CSV error, so we need to test it in its own method
     @Test
     void testEmptyDocumentLocation() {
         final boolean result = underTest.validDocumentLocation(

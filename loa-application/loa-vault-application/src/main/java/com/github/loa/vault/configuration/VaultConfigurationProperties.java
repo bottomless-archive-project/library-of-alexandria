@@ -22,7 +22,7 @@ public class VaultConfigurationProperties {
     private final String name;
 
     /**
-     * If this vault should be able to modify documents (eg. remove) after they are archived. If your vault is available
+     * If this vault should be able to modify documents (e.g. remove) after they are archived. If your vault is available
      * publicly on the internet then set this to false!
      */
     private final boolean modificationEnabled;
@@ -34,7 +34,7 @@ public class VaultConfigurationProperties {
 
     /**
      * This version number will be saved to the database for every document that has been archived. It will be used
-     * later on if its necessary to run cleanup or fixing tasks that are specific to a given version.
+     * later on if it's necessary to run cleanup or fixing tasks that are specific to a given version.
      */
     private final int versionNumber;
 }
