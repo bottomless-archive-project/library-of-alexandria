@@ -44,7 +44,7 @@ public class DocumentEntity {
      * @return true if the document is corrupt in the vault, false otherwise
      */
     public boolean isCorrupt() {
-        return status == DocumentStatus.CORRUPT || status == DocumentStatus.INDEXING_FAILURE;
+        return status == DocumentStatus.CORRUPT;
     }
 
     /**
