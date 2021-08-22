@@ -21,12 +21,23 @@ public class IndexRequestFactory {
 
     public Mono<IndexRequest> newIndexRequest(final DocumentMetadata documentMetadata) {
         if (documentMetadata.getContent() == null) {
-            log.info("Marking {} as indexed, even if it has no parsable content!", documentMetadata.getId());
+            if (log.isInfoEnabled()) {
+                log.info("Marking {} as indexed, even if it has no parsable content!", documentMetadata.getId());
+            }
 
             return documentManipulator.markIndexed(documentMetadata.getId())
                     .then(Mono.empty());
         }
 
+        return Mono.just(
+                new IndexRequest("vault_documents")
+                        .id(documentMetadata.getId().toString())
+                        .source(buildSourceContent(documentMetadata))
+                        .timeout(TimeValue.timeValueMinutes(30))
+        );
+    }
+
+    private Map<String, Object> buildSourceContent(final DocumentMetadata documentMetadata) {
         final Map<String, Object> sourceContent = new HashMap<>();
 
         sourceContent.put("content", documentMetadata.getContent().trim());
@@ -50,11 +61,6 @@ public class IndexRequestFactory {
         sourceContent.put("page_count", documentMetadata.getPageCount());
         sourceContent.put("type", documentMetadata.getType());
 
-        return Mono.just(
-                new IndexRequest("vault_documents")
-                        .id(documentMetadata.getId().toString())
-                        .source(sourceContent)
-                        .timeout(TimeValue.timeValueMinutes(30))
-        );
+        return sourceContent;
     }
 }

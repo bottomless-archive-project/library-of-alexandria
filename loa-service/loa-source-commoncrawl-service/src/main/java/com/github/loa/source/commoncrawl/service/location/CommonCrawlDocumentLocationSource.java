@@ -54,7 +54,10 @@ public class CommonCrawlDocumentLocationSource implements DocumentLocationSource
     }
 
     private Flux<DocumentLocation> processWarcLocation(final CommonCrawlWarcLocation warcLocation) {
-        log.info("Started to process location with id: {} and url: {}.", warcLocation.getId(), warcLocation.getLocation());
+        if (log.isInfoEnabled()) {
+            log.info("Started to process location with id: {} and url: {}.",
+                    warcLocation.getId(), warcLocation.getLocation());
+        }
 
         return warcFluxFactory.buildWarcRecordFlux(warcLocation.getLocation())
                 .map(webPageFactory::newWebPage)

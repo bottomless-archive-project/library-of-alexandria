@@ -9,7 +9,9 @@ import org.springframework.stereotype.Service;
 public class MetricLogger {
 
     public void logCounter(final Counter counter) {
-        log.info("The {} are {} {}!", counter.getId().getTag("printed-name"), (int) counter.count(),
-                counter.getId().getBaseUnit());
+        if (log.isInfoEnabled()) {
+            log.info("The {} are {} {}!", counter.getId().getTag("printed-name"), (int) counter.count(),
+                    counter.getId().getBaseUnit());
+        }
     }
 }

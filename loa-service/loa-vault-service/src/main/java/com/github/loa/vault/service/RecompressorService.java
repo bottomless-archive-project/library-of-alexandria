@@ -25,8 +25,10 @@ public class RecompressorService {
     private final VaultDocumentStorage vaultDocumentStorage;
 
     public void recompress(final DocumentEntity documentEntity, final DocumentCompression documentCompression) {
-        log.info("Migrating archived document {} from {} compression to {}.", documentEntity.getId(),
-                documentEntity.getCompression(), documentCompression);
+        if (log.isInfoEnabled()) {
+            log.info("Migrating archived document {} from {} compression to {}.", documentEntity.getId(),
+                    documentEntity.getCompression(), documentCompression);
+        }
 
         try (InputStream documentContentInputStream = vaultDocumentManager.readDocument(documentEntity)
                 .getInputStream()) {

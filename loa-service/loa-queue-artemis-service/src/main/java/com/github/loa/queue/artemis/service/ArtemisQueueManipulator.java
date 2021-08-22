@@ -66,7 +66,9 @@ public class ArtemisQueueManipulator implements QueueManipulator {
      */
     @Override
     public void initializeQueue(final Queue queue) {
-        log.info("Creating the {} queue because it doesn't exists.", queue.getName());
+        if (log.isInfoEnabled()) {
+            log.info("Creating the {} queue because it doesn't exists.", queue.getName());
+        }
 
         try (ClientSession clientSession = clientSessionFactory.createSession()) {
             clientSession.createQueue(

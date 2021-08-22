@@ -43,7 +43,7 @@ class VaultClientServiceTest {
     }
 
     @Test
-    public void testQueryDocumentWhenUnableToGetDocumentContents() {
+    void testQueryDocumentWhenUnableToGetDocumentContents() {
         final RSocketRequester.RequestSpec requestSpec = mock(RSocketRequester.RequestSpec.class);
         when(rSocketRequester.route("queryDocument"))
                 .thenReturn(requestSpec);
@@ -70,7 +70,7 @@ class VaultClientServiceTest {
     }
 
     @Test
-    public void testQueryDocumentWhenTheRequestWasSuccessful() {
+    void testQueryDocumentWhenTheRequestWasSuccessful() {
         final RSocketRequester.RequestSpec requestSpec = mock(RSocketRequester.RequestSpec.class);
         when(rSocketRequester.route("queryDocument"))
                 .thenReturn(requestSpec);

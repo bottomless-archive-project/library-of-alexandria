@@ -31,7 +31,9 @@ public class IndexerService {
 
                         documentManipulator.markIndexed(documentId).subscribe();
                     } catch (final IOException | ElasticsearchException e) {
-                        log.info("Failed to index document {}! Cause: '{}'.", documentId, e.getMessage());
+                        if (log.isInfoEnabled()) {
+                            log.info("Failed to index document {}! Cause: '{}'.", documentId, e.getMessage());
+                        }
 
                         documentManipulator.markCorrupt(documentId).subscribe();
                     }

@@ -24,11 +24,16 @@ class FileDownloadRetryFactory {
                 .maxBackoff(Duration.ofMinutes(2))
                 .filter(throwable -> {
                     if (shouldRetry(throwable)) {
-                        log.debug("Got exception when downloading: {}! Attempting to retry!", throwable.getClass().getName());
+                        if (log.isDebugEnabled()) {
+                            log.debug("Got exception when downloading: {}! Attempting to retry!",
+                                    throwable.getClass().getName());
+                        }
 
                         return true;
                     } else {
-                        log.debug("Got exception when downloading: {}!", throwable.getClass().getName());
+                        if (log.isDebugEnabled()) {
+                            log.debug("Got exception when downloading: {}!", throwable.getClass().getName());
+                        }
 
                         return false;
                     }

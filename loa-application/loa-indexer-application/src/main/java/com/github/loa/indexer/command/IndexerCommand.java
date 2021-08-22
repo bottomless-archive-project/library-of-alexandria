@@ -22,6 +22,7 @@ import reactor.core.scheduler.Schedulers;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.ConnectException;
+import java.util.UUID;
 
 @Slf4j
 @Component
@@ -54,33 +55,35 @@ public class IndexerCommand implements CommandLineRunner {
     @SneakyThrows
     private Mono<Void> processDocument(final DocumentEntity documentEntity) {
         return vaultClientService.queryDocument(documentEntity)
-                .reduce(new ByteArrayOutputStream(), (boi, value) -> {
+                .reduce(new ByteArrayOutputStream(), (outputStream, value) -> {
                     try {
-                        boi.write(value.asInputStream().readAllBytes());
+                        outputStream.write(value.asInputStream().readAllBytes());
 
                         DataBufferUtils.release(value);
                     } catch (IOException e) {
                         throw new IllegalStateException(e);
                     }
 
-                    return boi;
+                    return outputStream;
                 })
                 .map(ByteArrayOutputStream::toByteArray)
                 .publishOn(Schedulers.parallel())
                 .map(documentContent -> documentDataParser.parseDocumentMetadata(
                         documentEntity.getId(), documentEntity.getType(), documentContent))
                 .onErrorContinue((throwable, document) -> {
+                    final UUID documentId = documentEntity.getId();
+
                     //TODO: This should be handled in the VaultClientService but we are unable to do so
                     // because of this onErrorContinue here (no sufficient operator in the reactive toolset).
                     if (throwable instanceof ConnectException) {
                         throw new VaultAccessException("Error while connecting to the vault for document: "
-                                + documentEntity.getId() + "!", throwable);
+                                + documentId + "!", throwable);
                     }
 
-                    documentManipulator.markCorrupt(documentEntity.getId())
+                    documentManipulator.markCorrupt(documentId)
                             .subscribe();
 
-                    log.info("Failed to parse document with id: {}!", documentEntity.getId());
+                    log.info("Failed to parse document with id: {}!", documentId);
                 })
                 .doOnNext(indexerService::indexDocuments)
                 .then();

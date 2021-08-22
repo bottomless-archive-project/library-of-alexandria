@@ -68,7 +68,9 @@ public class DocumentLocationProcessor {
                         .flatMap(documentArchiver::archiveDocument)
                         .flatMap(this::cleanup)
                         .onErrorResume(error -> {
-                            log.debug("Error downloading a document: {}!", error.getMessage());
+                            if (log.isDebugEnabled()) {
+                                log.debug("Error downloading a document: {}!", error.getMessage());
+                            }
 
                             return Mono.empty();
                         })

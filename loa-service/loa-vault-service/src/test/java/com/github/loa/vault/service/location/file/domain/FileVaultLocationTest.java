@@ -21,7 +21,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
-public class FileVaultLocationTest {
+class FileVaultLocationTest {
 
     private FileSystem fileSystem;
 
@@ -38,7 +38,7 @@ public class FileVaultLocationTest {
 
     @Test
     @SneakyThrows
-    public void testDownload() {
+    void testDownload() {
         final byte[] testFileContent = {12, 34, 56, 78};
         final Path testFilePath = fileSystem.getPath("/test");
 
@@ -52,7 +52,7 @@ public class FileVaultLocationTest {
     }
 
     @Test
-    public void testDownloadWhenExceptionThrown() {
+    void testDownloadWhenExceptionThrown() {
         final FileVaultLocation underTest = new FileVaultLocation(fileSystem.getPath("/test"), DocumentCompression.NONE);
 
         // The message should be the same as used in the VaultClientService class!

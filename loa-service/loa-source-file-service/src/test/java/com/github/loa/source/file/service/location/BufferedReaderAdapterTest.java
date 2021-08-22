@@ -29,7 +29,7 @@ class BufferedReaderAdapterTest {
 
     @Test
     @SneakyThrows
-    public void testCloseWhenNoExceptionThrown() {
+    void testCloseWhenNoExceptionThrown() {
         bufferedReaderAdapter.close().accept(bufferedReaderMock);
 
         verify(bufferedReaderMock, only()).close();
@@ -37,7 +37,7 @@ class BufferedReaderAdapterTest {
 
     @Test
     @SneakyThrows
-    public void testCloseWhenExceptionThrown() {
+    void testCloseWhenExceptionThrown() {
         doThrow(new RuntimeException()).when(bufferedReaderMock).close();
 
         assertThrows(RuntimeException.class,
@@ -46,7 +46,7 @@ class BufferedReaderAdapterTest {
 
     @Test
     @SneakyThrows
-    public void testConsumeReturnsLinesCorrectly() {
+    void testConsumeReturnsLinesCorrectly() {
         when(bufferedReaderMock.readLine()).thenReturn("aaa", "bbb", "ccc", null);
 
         final Flux<String> result = bufferedReaderAdapter.consume().apply(bufferedReaderMock);
@@ -60,7 +60,7 @@ class BufferedReaderAdapterTest {
 
     @Test
     @SneakyThrows
-    public void testConsumeThrowsException() {
+    void testConsumeThrowsException() {
         when(bufferedReaderMock.readLine())
                 .thenReturn("aaa")
                 .thenThrow(new IOException());

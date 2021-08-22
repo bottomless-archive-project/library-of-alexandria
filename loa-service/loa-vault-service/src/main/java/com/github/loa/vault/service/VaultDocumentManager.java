@@ -31,7 +31,9 @@ public class VaultDocumentManager {
      * Archive the document provided in the context.
      */
     public Mono<DocumentEntity> archiveDocument(final DocumentArchivingContext documentArchivingContext) {
-        log.info("Archiving document with id: {}.", documentArchivingContext.getId());
+        if (log.isInfoEnabled()) {
+            log.info("Archiving document with id: {}.", documentArchivingContext.getId());
+        }
 
         return Mono.just(documentArchivingContext)
                 .flatMap(archivingService::archiveDocument)

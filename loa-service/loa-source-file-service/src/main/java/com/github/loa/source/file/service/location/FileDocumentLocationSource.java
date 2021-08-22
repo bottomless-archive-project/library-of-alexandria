@@ -30,7 +30,7 @@ public class FileDocumentLocationSource implements DocumentLocationSource {
 
     @Override
     public Flux<DocumentLocation> streamLocations() {
-        if (fileDocumentSourceConfigurationProperties.getSkipLines() > 0) {
+        if (fileDocumentSourceConfigurationProperties.getSkipLines() > 0 && log.isInfoEnabled()) {
             log.info("Skipping the first {} lines.", fileDocumentSourceConfigurationProperties.getSkipLines());
         }
 

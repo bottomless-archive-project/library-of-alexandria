@@ -40,7 +40,9 @@ public class ArchivingService {
 
     private void handleError(final Throwable throwable, final DocumentArchivingContext documentArchivingContext) {
         if (isDuplicateIndexError(throwable)) {
-            log.info("Document with id {} is a duplicate.", documentArchivingContext.getId());
+            if (log.isInfoEnabled()) {
+                log.info("Document with id {} is a duplicate.", documentArchivingContext.getId());
+            }
         } else {
             log.error("Failed to save document!", throwable);
         }

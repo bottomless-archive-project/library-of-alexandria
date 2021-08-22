@@ -71,7 +71,7 @@ class VaultControllerTest {
     }
 
     @Test
-    public void testQueryDocumentWhenDocumentNotFound() {
+    void testQueryDocumentWhenDocumentNotFound() {
         when(documentEntityFactory.getDocumentEntity(UUID.fromString(TEST_DOCUMENT_ID)))
                 .thenReturn(Mono.empty());
 
@@ -88,7 +88,7 @@ class VaultControllerTest {
     }
 
     @Test
-    public void testQueryDocumentWhenDocumentIsInADifferentVault() {
+    void testQueryDocumentWhenDocumentIsInADifferentVault() {
         when(vaultConfigurationProperties.getName())
                 .thenReturn("my-vault");
         when(documentEntityFactory.getDocumentEntity(UUID.fromString(TEST_DOCUMENT_ID)))
@@ -113,7 +113,7 @@ class VaultControllerTest {
     }
 
     @Test
-    public void testQueryDocumentWhenRequestIsSuccessful() {
+    void testQueryDocumentWhenRequestIsSuccessful() {
         when(vaultConfigurationProperties.getName())
                 .thenReturn("my-vault");
         final DocumentEntity documentEntity = DocumentEntity.builder()
@@ -151,7 +151,7 @@ class VaultControllerTest {
     }
 
     @Test
-    public void testRecompressWhenModificationsAreDisabled() {
+    void testRecompressWhenModificationsAreDisabled() {
         when(vaultConfigurationProperties.isModificationEnabled())
                 .thenReturn(false);
 
@@ -169,7 +169,7 @@ class VaultControllerTest {
     }
 
     @Test
-    public void testRecompressWhenDocumentNotFound() {
+    void testRecompressWhenDocumentNotFound() {
         when(vaultConfigurationProperties.isModificationEnabled())
                 .thenReturn(true);
         when(documentEntityFactory.getDocumentEntity(UUID.fromString(TEST_DOCUMENT_ID)))
@@ -189,7 +189,7 @@ class VaultControllerTest {
     }
 
     @Test
-    public void testRecompressWhenDocumentIsInADifferentVault() {
+    void testRecompressWhenDocumentIsInADifferentVault() {
         when(vaultConfigurationProperties.isModificationEnabled())
                 .thenReturn(true);
         when(vaultConfigurationProperties.getName())
@@ -217,7 +217,7 @@ class VaultControllerTest {
     }
 
     @Test
-    public void testRecompressWhenRequestIsSuccessful() {
+    void testRecompressWhenRequestIsSuccessful() {
         when(vaultConfigurationProperties.isModificationEnabled())
                 .thenReturn(true);
         when(vaultConfigurationProperties.getName())
@@ -243,7 +243,7 @@ class VaultControllerTest {
     }
 
     @Test
-    public void testRemoveWhenModificationsAreDisabled() {
+    void testRemoveWhenModificationsAreDisabled() {
         when(vaultConfigurationProperties.isModificationEnabled())
                 .thenReturn(false);
 
@@ -260,7 +260,7 @@ class VaultControllerTest {
     }
 
     @Test
-    public void testRemoveWhenDocumentNotFound() {
+    void testRemoveWhenDocumentNotFound() {
         when(vaultConfigurationProperties.isModificationEnabled())
                 .thenReturn(true);
         when(documentEntityFactory.getDocumentEntity(UUID.fromString(TEST_DOCUMENT_ID)))
@@ -279,7 +279,7 @@ class VaultControllerTest {
     }
 
     @Test
-    public void testRemoveWhenDocumentIsInADifferentVault() {
+    void testRemoveWhenDocumentIsInADifferentVault() {
         when(vaultConfigurationProperties.isModificationEnabled())
                 .thenReturn(true);
         when(vaultConfigurationProperties.getName())
@@ -306,7 +306,7 @@ class VaultControllerTest {
     }
 
     @Test
-    public void testRemoveWhenRequestIsSuccessful() {
+    void testRemoveWhenRequestIsSuccessful() {
         when(vaultConfigurationProperties.isModificationEnabled())
                 .thenReturn(true);
         when(vaultConfigurationProperties.getName())

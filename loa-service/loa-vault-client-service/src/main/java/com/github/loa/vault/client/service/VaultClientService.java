@@ -41,8 +41,10 @@ public class VaultClientService {
                                 .build()
                 )
                 .retrieveFlux(DataBuffer.class)
-                .onErrorResume(RuntimeException.class, (error) -> {
-                    log.info("Missing document with id: {}!", documentEntity.getId());
+                .onErrorResume(RuntimeException.class, error -> {
+                    if (log.isInfoEnabled()) {
+                        log.info("Missing document with id: {}!", documentEntity.getId());
+                    }
 
                     // TODO: Maybe its a better idea to do this in the vault itself?
                     // This could happen when the vault is closed forcefully and the file is not/partially saved.
