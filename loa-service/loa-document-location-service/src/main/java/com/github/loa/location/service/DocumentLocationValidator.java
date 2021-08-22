@@ -13,7 +13,7 @@ import java.util.Arrays;
 public class DocumentLocationValidator {
 
     /**
-     * Returns true if the location could contain a valid document the the application could archive.
+     * Returns true if the location could contain a valid document the application could archive.
      *
      * @param documentLocation the document location to validate
      * @return true if the location could contain a document, false otherwise

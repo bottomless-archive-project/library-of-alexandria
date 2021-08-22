@@ -12,7 +12,7 @@ import java.net.URL;
 public class Sha256DocumentLocationIdFactory implements DocumentLocationIdFactory {
 
     /**
-     * Create an semi-unique document id based on the SHA-256 hash of the document's location.
+     * Create a semi-unique document id based on the SHA-256 hash of the document's location.
      *
      * @param documentLocation the location of the document to create the id for
      * @return the id for the document

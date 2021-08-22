@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 
 /**
- * Provides an unified way to search for documents in the index.
+ * Provides a unified way to search for documents in the index.
  */
 @Service
 @RequiredArgsConstructor

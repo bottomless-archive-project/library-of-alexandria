@@ -6,7 +6,7 @@ import com.github.loa.queue.service.domain.QueueException;
 public interface QueueManipulator {
 
     /**
-     * Initialize the queue in the Queue Application if it does not exists. If the queue already exist it does nothing.
+     * Initialize the queue in the Queue Application if it does not exist. If the queue already exist it does nothing.
      *
      * @param queue the queue to initialize
      * @throws QueueException when an error happens while trying to create the queue

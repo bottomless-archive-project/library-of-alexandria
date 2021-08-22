@@ -39,7 +39,7 @@ public class ArtemisQueueManipulator implements QueueManipulator {
     private final MessageDeserializerProvider messageDeserializerProvider;
 
     /**
-     * Initialize the queue in the Queue Application if it does not exists. If the queue already exist it does nothing.
+     * Initialize the queue in the Queue Application if it doesn't exist. If the queue already exist it does nothing.
      *
      * @param queue the queue to initialize
      * @throws QueueException when an error happens while trying to create the queue
@@ -141,7 +141,7 @@ public class ArtemisQueueManipulator implements QueueManipulator {
                 final ClientMessage clientMessage = clientConsumer.receive();
 
                 // The deserialization should be done inside the invocation because the message is only readable while the consumer is
-                // locked (and doesn't read a new message for an other thread).
+                // locked (and doesn't read a new message for another thread).
                 return (T) messageDeserializerProvider.getDeserializer(queue)
                         .orElseThrow(() -> new QueueException("No deserializer found for queue: " + queue.getName() + "!"))
                         .deserialize(clientMessage);

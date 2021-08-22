@@ -16,12 +16,12 @@ import org.springframework.boot.context.properties.ConstructorBinding;
 public class CommonCrawlDocumentSourceConfigurationProperties {
 
     /**
-     * The Id of the crawl. For example CC-MAIN-2019-09.
+     * The id of the crawl. For example CC-MAIN-2019-09.
      */
     private final String crawlId;
 
     /**
-     * The Id of the WARC file in the crawl. Usually between 1 - 64000.
+     * The id of the WARC file in the crawl. Usually between 1 - 64000.
      */
     private final int warcId;
 

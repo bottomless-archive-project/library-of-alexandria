@@ -22,7 +22,7 @@ public enum DocumentCompression {
     GZIP("gz", "application/gzip"),
 
     /**
-     * <a href="https://en.wikipedia.org/wiki/Lzma">LZMA</a> is the most efficient compression algorithm but it is
+     * <a href="https://en.wikipedia.org/wiki/Lzma">LZMA</a> is the most efficient compression algorithm, but it is
      * very slow.
      */
     LZMA("lzma", "application/x-lzma");

@@ -27,7 +27,7 @@ public class DocumentEntityFactory {
     private final DocumentEntityTransformer documentEntityTransformer;
 
     /**
-     * Return a document by it's id.
+     * Return a document by its id.
      *
      * @param documentId the id of the document
      * @return the document that belongs to the provided id
@@ -49,7 +49,7 @@ public class DocumentEntityFactory {
     }
 
     /**
-     * Remove a document by it's id.
+     * Remove a document by its id.
      *
      * @param documentEntity the document to remove
      * @return the result of the removal
@@ -114,7 +114,7 @@ public class DocumentEntityFactory {
     }
 
     /**
-     * Update the status field of all of the documents available in the database.
+     * Update the status field of all the documents available in the database.
      *
      * @param documentStatus the status to update the documents to
      * @return the result of the update
