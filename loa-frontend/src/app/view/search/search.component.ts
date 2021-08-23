@@ -44,7 +44,8 @@ export class SearchComponent implements OnInit {
               private sanitizer: DomSanitizer) {
     this.modelChanged.pipe(debounceTime(300), distinctUntilChanged())
       .subscribe(searchText => {
-        this.searchText = searchText
+        this.searchText = searchText;
+        this.page = 0;
 
         this.refreshHits();
       });
@@ -242,6 +243,8 @@ export class SearchComponent implements OnInit {
     this.hits = [];
     this.hitCount = 0;
     this.totalPages = 0;
+    this.openPdfs = new Map<string, boolean>();
+    this.loadedImages = new Map<string, boolean>();
 
     const exactMatch = this.searchText.startsWith("\"") && this.searchText.endsWith("\"");
 
