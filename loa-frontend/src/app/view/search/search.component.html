@@ -169,11 +169,20 @@
           </h6>
 
           <div class="media">
-            <img [src]="'/document/' + hit.id + '/image'" [alt]="hit.title" class="img-thumbnail mr-3"
-                 style="max-width: 200px;"/>
+            <div class="spin-wrapper" style="width: 200px; height: 278px;"
+                 *ngIf="!isImageLoaded(hit.id)">
+              <div class="spinner"></div>
+            </div>
+
+            <img [src]="'/document/' + hit.id + '/image'" [alt]="hit.title"
+                 (load)="setImageLoaded(hit.id, $event)" class="img-thumbnail mr-3"
+                 style="display:none; width: 200px; height: 278px;"/>
+
             <div class="media-body">
-              <p *ngFor="let description of hit.description" [innerHtml]="description"
-                 class="card-text" style="text-align: justify; word-break: break-all;"></p>
+              <div *ngFor="let description of hit.description; let last = last;">
+                <p [innerHtml]="description" class="card-text text-justify"></p>
+                <hr *ngIf="!last">
+              </div>
             </div>
           </div>
 

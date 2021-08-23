@@ -38,6 +38,7 @@ export class SearchComponent implements OnInit {
   page: number = 0;
   loading = false;
   openPdfs: Map<string, boolean> = new Map();
+  loadedImages: Map<string, boolean> = new Map();
 
   constructor(private route: ActivatedRoute, private http: HttpClient, private searchService: SearchService,
               private sanitizer: DomSanitizer) {
@@ -145,19 +146,37 @@ export class SearchComponent implements OnInit {
     this.language = language;
 
     this.refreshHits();
-  };
+  }
 
   setDocumentLength(documentLength: any) {
     this.documentLength = documentLength;
 
     this.refreshHits();
-  };
+  }
 
   jumpToPage(page: number) {
     this.page = page;
 
     this.refreshHits();
-  };
+  }
+
+  isImageLoaded(documentId: string) {
+    console.log('Get the preview loaded for document with id: ' + documentId + '.');
+
+    if(!this.loadedImages.has(documentId)) {
+      return false;
+    }
+
+    return this.loadedImages.get(documentId);
+  }
+
+  setImageLoaded(documentId: string, event: any) {
+    console.log('Set the preview loaded for document with id: ' + documentId + '.');
+
+    event.target.style.display = 'block';
+
+    this.loadedImages.set(documentId, true);
+  }
 
   openPdf(pdfId: string) {
     if (!this.openPdfs.has(pdfId)) {
@@ -165,7 +184,7 @@ export class SearchComponent implements OnInit {
     }
 
     this.openPdfs.set(pdfId, !this.openPdfs.get(pdfId));
-  };
+  }
 
   getPageCountToDisplayOnLeftSide(): number[] {
     if (this.page - 5 > 0) {
@@ -179,7 +198,7 @@ export class SearchComponent implements OnInit {
 
       return result;
     }
-  };
+  }
 
   getPageCountToDisplayOnRightSide(): number[] {
     if (this.totalPages > this.page + 5) {
@@ -192,7 +211,7 @@ export class SearchComponent implements OnInit {
 
       return result;
     }
-  };
+  }
 
   getDocumentUrl(documentId: string) {
     return this.sanitizer.bypassSecurityTrustResourceUrl('./document/' + documentId);
