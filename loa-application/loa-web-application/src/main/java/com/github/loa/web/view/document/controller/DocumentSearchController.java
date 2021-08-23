@@ -31,8 +31,7 @@ public class DocumentSearchController {
             @RequestParam(required = false) final String language,
             @RequestParam(required = false) final DocumentLength documentLength,
             @RequestParam(required = false) final List<DocumentType> documentTypes) {
-        return Mono
-                .fromSupplier(() -> documentSearchService.searchDocuments(
+        return Mono.fromSupplier(() -> documentSearchService.searchDocuments(
                         SearchContext.builder()
                                 .keyword(keyword)
                                 .pageNumber(pageNumber)
@@ -43,7 +42,8 @@ public class DocumentSearchController {
                                 .build()
                 ))
                 .subscribeOn(Schedulers.boundedElastic())
-                .map(documentSearchResult -> documentSearchResult.getSearchHits().collectList()
+                .map(documentSearchResult -> documentSearchResult.getSearchHits()
+                        .collectList()
                         .map(documentSearchEntities -> DocumentSearchResponse.builder()
                                 .searchHits(documentEntityResponseTransformer.transform(documentSearchEntities))
                                 .totalHitCount(documentSearchResult.getTotalHitCount())

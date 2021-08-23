@@ -87,7 +87,7 @@ public class IndexerRequestFactory {
 
     private HighlightBuilder newHighlightBuilder() {
         return new HighlightBuilder()
-                .field(SearchField.CONTENT.getName(), 500, 1)
+                .field(SearchField.CONTENT.getName(), 350, 3)
                 .order("score");
     }
 }

@@ -172,8 +172,8 @@
             <img [src]="'/document/' + hit.id + '/image'" [alt]="hit.title" class="img-thumbnail mr-3"
                  style="max-width: 200px;"/>
             <div class="media-body">
-              <p class="card-text" style="text-align: justify; word-break: break-all;"
-                 [innerHtml]="hit.description"></p>
+              <p *ngFor="let description of hit.description" [innerHtml]="description"
+                 class="card-text" style="text-align: justify; word-break: break-all;"></p>
             </div>
           </div>
 

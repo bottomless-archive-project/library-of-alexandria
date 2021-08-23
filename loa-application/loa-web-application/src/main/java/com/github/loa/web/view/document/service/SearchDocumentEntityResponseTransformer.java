@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -15,7 +14,7 @@ public class SearchDocumentEntityResponseTransformer {
     public List<SearchDocumentEntityResponse> transform(final List<DocumentSearchEntity> documentSearchEntity) {
         return documentSearchEntity.stream()
                 .map(this::transform)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public SearchDocumentEntityResponse transform(final DocumentSearchEntity documentSearchEntity) {
