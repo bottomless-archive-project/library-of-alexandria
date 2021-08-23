@@ -3,6 +3,7 @@ package com.github.loa.web.view.document.controller;
 import com.github.loa.document.service.entity.factory.DocumentEntityFactory;
 import com.github.loa.document.view.service.MediaTypeCalculator;
 import com.github.loa.vault.client.service.VaultClientService;
+import com.github.loa.web.view.document.service.DocumentRenderer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.CacheControl;
@@ -24,6 +25,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class DocumentQueryController {
 
+    private final DocumentRenderer documentRenderer;
     private final DocumentEntityFactory documentEntityFactory;
     private final VaultClientService vaultClientService;
     private final MediaTypeCalculator mediaTypeCalculator;
@@ -37,11 +39,22 @@ public class DocumentQueryController {
     @GetMapping("/document/{documentId}")
     public Mono<ResponseEntity<Flux<DataBuffer>>> queryDocument(@PathVariable final String documentId) {
         return documentEntityFactory.getDocumentEntity(UUID.fromString(documentId))
-                .zipWhen((documentEntity) -> Mono.just(vaultClientService.queryDocument(documentEntity)))
+                .zipWhen(documentEntity -> Mono.just(vaultClientService.queryDocument(documentEntity)))
                 .map(documentEntity -> ResponseEntity.ok()
                         .contentType(mediaTypeCalculator.calculateMediaType(documentEntity.getT1().getType()))
                         .cacheControl(CacheControl.noCache())
                         .body(documentEntity.getT2())
+                )
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Document not found with id " + documentId + "!")));
+    }
+
+    @GetMapping(path = "/document/{documentId}/image", produces = "image/png")
+    public Mono<byte[]> queryDocumentImage(@PathVariable final String documentId) {
+        return documentEntityFactory.getDocumentEntity(UUID.fromString(documentId))
+                .zipWhen(documentEntity -> Mono.just(vaultClientService.queryDocumentAsInputStream(documentEntity)))
+                .flatMap(value -> value.getT2() //TODO: Close the stream
+                        .flatMap(documentContent -> Mono.fromSupplier(() -> documentRenderer.renderFirstPage(documentContent)))
                 )
                 .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Document not found with id " + documentId + "!")));

@@ -31,4 +31,7 @@ dependencies {
     implementation project(':loa-service:loa-statistics-service')
     implementation project(':loa-service:loa-vault-client-service')
     implementation project(':loa-service:loa-queue-artemis-service')
+
+    implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: '2.0.24'
+    implementation group: 'com.mortennobel', name: 'java-image-scaling', version: '0.8.6'
 }

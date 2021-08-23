@@ -147,7 +147,7 @@
 
 <div class="row mb-3 text-center" *ngIf="hits.length == 0 && !loading">
   <div class="col">
-    <p class="mb-0"><b>Nothing to display (yet)!</b></p>
+    <p class="mb-0" style="font-weight: 700;">Nothing to display (yet)!</p>
   </div>
 </div>
 
@@ -167,8 +167,15 @@
           <h6 class="card-subtitle mb-2 text-muted" *ngIf="hit.title && hit.author">
             {{hit.author}}
           </h6>
-          <p class="card-text" style="text-align: justify; word-break: break-all;"
-             [innerHtml]="hit.description"></p>
+
+          <div class="media">
+            <img [src]="'/document/' + hit.id + '/image'" [alt]="hit.title" class="img-thumbnail mr-3"
+                 style="max-width: 200px;"/>
+            <div class="media-body">
+              <p class="card-text" style="text-align: justify; word-break: break-all;"
+                 [innerHtml]="hit.description"></p>
+            </div>
+          </div>
 
           <!-- DOC and the like - downloading -->
           <div *ngIf="hit.type != 'PDF'" style="width: 100%; height: 32px; line-height: 32px;">

@@ -14,7 +14,10 @@ import org.springframework.messaging.rsocket.RSocketRequester;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
+import java.io.InputStream;
+import java.io.SequenceInputStream;
 import java.util.Map;
 
 @Slf4j
@@ -56,6 +59,20 @@ public class VaultClientService {
 
                     return Mono.empty();
                 });
+    }
+
+    /**
+     * Requests and returns the content of a document as an {@link InputStream}. If the document is not found or an error happened while
+     * doing the request, an empty {@link Mono} is returned.
+     *
+     * @param documentEntity the document entity to get the content for
+     * @return the content of the document as an input stream
+     */
+    public Mono<InputStream> queryDocumentAsInputStream(final DocumentEntity documentEntity) {
+        return queryDocument(documentEntity)
+                .reduce(InputStream.nullInputStream(),
+                        (s, d) -> new SequenceInputStream(s, d.asInputStream()))
+                .publishOn(Schedulers.parallel());
     }
 
     /**

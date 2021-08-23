@@ -9,11 +9,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.SequenceInputStream;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
@@ -40,16 +37,13 @@ public class DocumentValidatorCommand implements CommandLineRunner {
                     }
                 })
                 .flatMap(documentEntity ->
-                        vaultClientService.queryDocument(documentEntity)
-                                .reduce(InputStream.nullInputStream(),
-                                        (s, d) -> new SequenceInputStream(s, d.asInputStream()))
-                                .publishOn(Schedulers.parallel())
+                        vaultClientService.queryDocumentAsInputStream(documentEntity)
                                 .flatMap(documentContent ->
                                         Mono.using(
                                                 () -> documentContent,
-                                                (content) -> Mono.just(documentDataParser.parseDocumentMetadata(
+                                                content -> Mono.just(documentDataParser.parseDocumentMetadata(
                                                         documentEntity.getId(), documentEntity.getType(), content)),
-                                                (content) -> {
+                                                content -> {
                                                     try {
                                                         content.close();
                                                     } catch (IOException e) {
