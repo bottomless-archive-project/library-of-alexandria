@@ -17,7 +17,7 @@ import java.io.InputStream;
 public class DocumentRenderer {
 
     public byte[] renderFirstPage(final InputStream documentContent) {
-        try (PDDocument document = PDDocument.load(documentContent)) {
+        try (PDDocument document = PDDocument.load(documentContent); documentContent) {
             final PDFRenderer pdfRenderer = new PDFRenderer(document);
 
             final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
