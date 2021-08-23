@@ -43,7 +43,6 @@ public class DocumentRepository {
         return Mono.from(documentDatabaseEntityMongoCollection.find(eq("_id", documentId)));
     }
 
-
     /**
      * Returns a {@link Flux} that will emit all the documents that have the provided status in the database.
      *

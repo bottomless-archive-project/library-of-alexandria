@@ -16,6 +16,8 @@ import reactor.util.retry.Retry;
 @RequiredArgsConstructor
 public class ArchivingService {
 
+    private static final int DUPLICATE_DOCUMENT_ID_ERROR_CODE = 11000;
+
     private final DocumentEntityFactory documentEntityFactory;
     private final DocumentCreationContextFactory documentCreationContextFactory;
     private final VaultDocumentStorage vaultDocumentStorage;
@@ -49,7 +51,7 @@ public class ArchivingService {
     }
 
     private boolean isDuplicateIndexError(final Throwable throwable) {
-        return throwable instanceof MongoWriteException
-                && throwable.getMessage().startsWith("E11000 duplicate key error");
+        return throwable instanceof MongoWriteException mongoWriteException
+                && mongoWriteException.getError().getCode() == DUPLICATE_DOCUMENT_ID_ERROR_CODE;
     }
 }
