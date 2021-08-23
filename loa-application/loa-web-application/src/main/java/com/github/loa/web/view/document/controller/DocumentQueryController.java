@@ -1,5 +1,6 @@
 package com.github.loa.web.view.document.controller;
 
+import com.github.loa.document.service.domain.DocumentType;
 import com.github.loa.document.service.entity.factory.DocumentEntityFactory;
 import com.github.loa.document.view.service.MediaTypeCalculator;
 import com.github.loa.vault.client.service.VaultClientService;
@@ -53,8 +54,16 @@ public class DocumentQueryController {
     public Mono<byte[]> queryDocumentImage(@PathVariable final String documentId) {
         return documentEntityFactory.getDocumentEntity(UUID.fromString(documentId))
                 .zipWhen(documentEntity -> Mono.just(vaultClientService.queryDocumentAsInputStream(documentEntity)))
-                .flatMap(value -> value.getT2() //TODO: Close the stream
-                        .flatMap(documentContent -> Mono.fromSupplier(() -> documentRenderer.renderFirstPage(documentContent)))
+                .flatMap(value -> {
+                            if (value.getT1().getType() != DocumentType.PDF) {
+                                return Mono.error(new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                                        "Images can only be rendered for documents that are in a PDF format."));
+                            }
+
+                            return value.getT2().flatMap(documentContent ->
+                                    Mono.fromSupplier(() -> documentRenderer.renderFirstPage(documentContent))
+                            );
+                        }
                 )
                 .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Document not found with id " + documentId + "!")));
