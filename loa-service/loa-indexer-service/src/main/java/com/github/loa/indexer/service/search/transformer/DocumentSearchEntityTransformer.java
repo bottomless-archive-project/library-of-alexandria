@@ -6,7 +6,6 @@ import com.github.loa.indexer.domain.IndexerAccessException;
 import com.github.loa.indexer.service.search.domain.SearchDatabaseEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.elasticsearch.common.text.Text;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.springframework.stereotype.Service;
