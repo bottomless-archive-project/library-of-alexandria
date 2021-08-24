@@ -6,6 +6,7 @@ import com.github.loa.document.service.entity.factory.domain.DocumentCreationCon
 import com.github.loa.vault.service.backend.service.VaultDocumentStorage;
 import com.github.loa.vault.service.domain.DocumentArchivingContext;
 import com.mongodb.MongoWriteException;
+import com.mongodb.WriteError;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -82,7 +83,11 @@ class ArchivingServiceTest {
         when(documentEntityFactory.newDocumentEntity(documentCreationContext))
                 .thenReturn(Mono.just(documentEntity));
         final MongoWriteException mongoWriteException = mock(MongoWriteException.class);
-        when(mongoWriteException.getMessage()).thenReturn("E11000 duplicate key error");
+        final WriteError writeError = mock(WriteError.class);
+        when(writeError.getCode())
+                .thenReturn(11000);
+        when(mongoWriteException.getError())
+                .thenReturn(writeError);
         //Do a normal exception, then a retry happens and throw the mongo exception to stop the retries
         doThrow(new RuntimeException("Test exception"), mongoWriteException)
                 .when(vaultDocumentStorage).persistDocument(any(), any());
