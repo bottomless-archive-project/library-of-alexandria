@@ -17,6 +17,7 @@ import org.elasticsearch.client.indices.GetIndexRequest;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.UUID;
 
 /**
  * Provides a unified way to search for documents in the index.
@@ -71,8 +72,8 @@ public class DocumentSearchService {
      * @param documentId the id of the document to check
      * @return true if the document exists, false otherwise
      */
-    public boolean isDocumentInIndex(final String documentId) {
-        final GetRequest hasDocumentsRequest = indexerRequestFactory.newDocumentExistsRequest(documentId);
+    public boolean isDocumentInIndex(final UUID documentId) {
+        final GetRequest hasDocumentsRequest = indexerRequestFactory.newDocumentExistsRequest(documentId.toString());
 
         try {
             return restHighLevelClient.exists(hasDocumentsRequest, RequestOptions.DEFAULT);
