@@ -79,7 +79,7 @@ public class DocumentStatisticsResponseFactory {
                                 .messageCount(queueManipulator.getMessageCount(queue))
                                 .build()
                         )
-                        .collect(Collectors.toList())
+                        .toList()
                 )
                 .map(builder::queues)
                 .subscribeOn(Schedulers.boundedElastic())
