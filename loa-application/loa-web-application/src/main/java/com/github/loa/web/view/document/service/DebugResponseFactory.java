@@ -27,13 +27,15 @@ public class DebugResponseFactory {
                 .then(Mono.defer(() -> Mono.just(builder.build())));
     }
 
-    private Mono<Void> fillIndexData(final DocumentEntity documentEntity, final DebugDocumentResponse.DebugDocumentResponseBuilder builder) {
+    private Mono<Void> fillIndexData(final DocumentEntity documentEntity,
+            final DebugDocumentResponse.DebugDocumentResponseBuilder builder) {
         return Mono.fromCallable(() -> documentSearchService.isDocumentInIndex(documentEntity.getId()))
                 .map(builder::isInIndex)
                 .then();
     }
 
-    private Mono<Void> fillEntityData(final DocumentEntity documentEntity, final DebugDocumentResponse.DebugDocumentResponseBuilder builder) {
+    private Mono<Void> fillEntityData(final DocumentEntity documentEntity,
+            final DebugDocumentResponse.DebugDocumentResponseBuilder builder) {
         return Mono.just(documentEntity)
                 .map(entity -> builder
                         .id(entity.getId())
@@ -49,7 +51,8 @@ public class DebugResponseFactory {
                 .then();
     }
 
-    private Mono<Void> fillExistsInVault(final DocumentEntity documentEntity, final DebugDocumentResponse.DebugDocumentResponseBuilder builder) {
+    private Mono<Void> fillExistsInVault(final DocumentEntity documentEntity,
+            final DebugDocumentResponse.DebugDocumentResponseBuilder builder) {
         return Mono.just(documentEntity)
                 .flatMap(vaultClientService::documentExists)
                 .map(builder::isInVault)
