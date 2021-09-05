@@ -43,14 +43,16 @@ public class RepositoryConfiguration {
         if (repositoryConfigurationProperties.isUriConfiguration()) {
             builder.applyConnectionString(new ConnectionString(repositoryConfigurationProperties.getUri()));
         } else {
-            builder.applyToClusterSettings((clusterBuilder) -> clusterBuilder.hosts(
-                    List.of(
-                            new ServerAddress(
-                                    repositoryConfigurationProperties.getHost(),
-                                    repositoryConfigurationProperties.getPort()
+            builder.applyToClusterSettings(clusterBuilder ->
+                    clusterBuilder.hosts(
+                            List.of(
+                                    new ServerAddress(
+                                            repositoryConfigurationProperties.getHost(),
+                                            repositoryConfigurationProperties.getPort()
+                                    )
                             )
                     )
-            ));
+            );
         }
 
         return builder.build();
