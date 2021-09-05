@@ -40,7 +40,13 @@ public class IndexerRequestFactory {
                 .query(QueryBuilders.matchAllQuery());
     }
 
-    public GetRequest newHasDocumentsRequest(String documentId) {
+    /**
+     * Create a new request that can be used to check if a document exists in the index or not.
+     *
+     * @param documentId the id of the document to check
+     * @return the created request
+     */
+    public GetRequest newDocumentExistsRequest(final String documentId) {
         final GetRequest getRequest = new GetRequest(DOCUMENT_INDEX, documentId);
 
         getRequest.fetchSourceContext(new FetchSourceContext(false));

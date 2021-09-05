@@ -65,8 +65,14 @@ public class DocumentSearchService {
         }
     }
 
-    public boolean isDocumentInIndex(String documentId) {
-        final GetRequest hasDocumentsRequest = indexerRequestFactory.newHasDocumentsRequest(documentId);
+    /**
+     * Check if the document with the provided id exists in the index.
+     *
+     * @param documentId the id of the document to check
+     * @return true if the document exists, false otherwise
+     */
+    public boolean isDocumentInIndex(final String documentId) {
+        final GetRequest hasDocumentsRequest = indexerRequestFactory.newDocumentExistsRequest(documentId);
 
         try {
             return restHighLevelClient.exists(hasDocumentsRequest, RequestOptions.DEFAULT);
