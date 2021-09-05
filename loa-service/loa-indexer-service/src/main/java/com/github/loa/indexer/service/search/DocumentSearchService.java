@@ -6,6 +6,7 @@ import com.github.loa.indexer.service.search.domain.SearchContext;
 import com.github.loa.indexer.service.search.request.IndexerRequestFactory;
 import com.github.loa.indexer.service.search.transformer.DocumentSearchEntityTransformer;
 import lombok.RequiredArgsConstructor;
+import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
@@ -59,6 +60,16 @@ public class DocumentSearchService {
 
         try {
             return restHighLevelClient.count(countRequest, RequestOptions.DEFAULT).getCount();
+        } catch (final IOException e) {
+            throw new IndexerAccessException("Failed to search in the indexer!", e);
+        }
+    }
+
+    public boolean isDocumentInIndex(String documentId) {
+        final GetRequest hasDocumentsRequest = indexerRequestFactory.newHasDocumentsRequest(documentId);
+
+        try {
+            return restHighLevelClient.exists(hasDocumentsRequest, RequestOptions.DEFAULT);
         } catch (final IOException e) {
             throw new IndexerAccessException("Failed to search in the indexer!", e);
         }

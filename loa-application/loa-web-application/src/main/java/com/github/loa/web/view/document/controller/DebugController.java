@@ -1,6 +1,7 @@
 package com.github.loa.web.view.document.controller;
 
 import com.github.loa.document.service.entity.factory.DocumentEntityFactory;
+import com.github.loa.indexer.service.search.DocumentSearchService;
 import com.github.loa.web.view.document.response.DebugDocumentResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,12 +19,30 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class DebugController {
 
+    private final DocumentSearchService documentSearchService;
     private final DocumentEntityFactory documentEntityFactory;
 
     @GetMapping("/document/{documentId}/debug")
     public Mono<DebugDocumentResponse> getDocumentById(@PathVariable final String documentId) {
+        final DebugDocumentResponse.DebugDocumentResponseBuilder builder =
+                DebugDocumentResponse.builder();
+
+        return Mono.when(
+                        this.fillIndexData(documentId, builder),
+                        this.fillEntityData(documentId, builder)
+                )
+                .then(Mono.defer(() -> Mono.just(builder.build())));
+    }
+
+    private Mono<Void> fillIndexData(final String documentId, final DebugDocumentResponse.DebugDocumentResponseBuilder builder) {
+        return Mono.fromCallable(() -> documentSearchService.isDocumentInIndex(documentId))
+                .map(builder::isInIndex)
+                .then();
+    }
+
+    private Mono<Void> fillEntityData(final String documentId, final DebugDocumentResponse.DebugDocumentResponseBuilder builder) {
         return documentEntityFactory.getDocumentEntity(UUID.fromString(documentId))
-                .map(documentEntity -> DebugDocumentResponse.builder()
+                .map(documentEntity -> builder
                         .id(documentEntity.getId())
                         .vault(documentEntity.getVault())
                         .type(documentEntity.getType())
@@ -33,9 +52,9 @@ public class DebugController {
                         .fileSize(documentEntity.getFileSize())
                         .downloadDate(documentEntity.getDownloadDate())
                         .downloaderVersion(documentEntity.getDownloaderVersion())
-                        .build()
                 )
                 .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "Document not found with id " + documentId + "!")));
+                        "Document not found with id " + documentId + "!")))
+                .then();
     }
 }

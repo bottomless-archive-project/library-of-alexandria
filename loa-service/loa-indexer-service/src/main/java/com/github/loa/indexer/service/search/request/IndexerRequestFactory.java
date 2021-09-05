@@ -4,6 +4,7 @@ import com.github.loa.indexer.service.search.domain.SearchContext;
 import com.github.loa.indexer.service.search.domain.SearchField;
 import com.github.loa.indexer.service.search.request.mapping.MappingConfigurationFactory;
 import lombok.RequiredArgsConstructor;
+import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.client.core.CountRequest;
 import org.elasticsearch.client.indices.CreateIndexRequest;
@@ -13,6 +14,7 @@ import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.fetch.subphase.FetchSourceContext;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.springframework.stereotype.Service;
 
@@ -36,6 +38,15 @@ public class IndexerRequestFactory {
     public CountRequest newCountDocumentsRequest() {
         return new CountRequest(DOCUMENT_INDEX)
                 .query(QueryBuilders.matchAllQuery());
+    }
+
+    public GetRequest newHasDocumentsRequest(String documentId) {
+        final GetRequest getRequest = new GetRequest(DOCUMENT_INDEX, documentId);
+
+        getRequest.fetchSourceContext(new FetchSourceContext(false));
+        getRequest.storedFields("_none_");
+
+        return getRequest;
     }
 
     /**

@@ -22,4 +22,6 @@ public class DebugDocumentResponse {
     long fileSize;
     Instant downloadDate;
     int downloaderVersion;
+
+    boolean isInIndex;
 }
