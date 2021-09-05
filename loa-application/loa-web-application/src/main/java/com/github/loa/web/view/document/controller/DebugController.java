@@ -2,6 +2,7 @@ package com.github.loa.web.view.document.controller;
 
 import com.github.loa.document.service.entity.factory.DocumentEntityFactory;
 import com.github.loa.indexer.service.search.DocumentSearchService;
+import com.github.loa.vault.client.service.VaultClientService;
 import com.github.loa.web.view.document.response.DebugDocumentResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,6 +20,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class DebugController {
 
+    private final VaultClientService vaultClientService;
     private final DocumentSearchService documentSearchService;
     private final DocumentEntityFactory documentEntityFactory;
 
@@ -29,7 +31,8 @@ public class DebugController {
 
         return Mono.when(
                         this.fillIndexData(documentId, builder),
-                        this.fillEntityData(documentId, builder)
+                        this.fillEntityData(documentId, builder),
+                        this.fillExistsInVault(documentId, builder)
                 )
                 .then(Mono.defer(() -> Mono.just(builder.build())));
     }
@@ -41,6 +44,7 @@ public class DebugController {
     }
 
     private Mono<Void> fillEntityData(final String documentId, final DebugDocumentResponse.DebugDocumentResponseBuilder builder) {
+        //TODO: How can we do this query only once? It is being done in fillExistsInVault too
         return documentEntityFactory.getDocumentEntity(UUID.fromString(documentId))
                 .map(documentEntity -> builder
                         .id(documentEntity.getId())
@@ -55,6 +59,13 @@ public class DebugController {
                 )
                 .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Document not found with id " + documentId + "!")))
+                .then();
+    }
+
+    private Mono<Void> fillExistsInVault(final String documentId, final DebugDocumentResponse.DebugDocumentResponseBuilder builder) {
+        return documentEntityFactory.getDocumentEntity(UUID.fromString(documentId))
+                .flatMap(vaultClientService::documentExists)
+                .map(builder::isInVault)
                 .then();
     }
 }

@@ -4,8 +4,10 @@ import com.github.loa.compression.domain.DocumentCompression;
 import com.github.loa.document.service.DocumentManipulator;
 import com.github.loa.document.service.domain.DocumentEntity;
 import com.github.loa.vault.client.service.request.DeleteDocumentRequest;
+import com.github.loa.vault.client.service.request.DocumentExistsRequest;
 import com.github.loa.vault.client.service.request.QueryDocumentRequest;
 import com.github.loa.vault.client.service.request.RecompressRequest;
+import com.github.loa.vault.client.service.response.DocumentExistsResponse;
 import com.github.loa.vault.client.service.response.FreeSpaceResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -109,5 +111,17 @@ public class VaultClientService {
                 .route("freeSpace")
                 .retrieveMono(FreeSpaceResponse.class)
                 .map(FreeSpaceResponse::getFreeSpace);
+    }
+
+    public Mono<Boolean> documentExists(final DocumentEntity documentEntity) {
+        return rSocketRequester.get(documentEntity.getVault())
+                .route("documentExists")
+                .data(
+                        DocumentExistsRequest.builder()
+                                .documentId(documentEntity.getId().toString())
+                                .build()
+                )
+                .retrieveMono(DocumentExistsResponse.class)
+                .map(DocumentExistsResponse::isExists);
     }
 }

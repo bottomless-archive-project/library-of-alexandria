@@ -5,9 +5,11 @@ import com.github.loa.vault.configuration.VaultConfigurationProperties;
 import com.github.loa.vault.service.RecompressorService;
 import com.github.loa.vault.service.VaultDocumentManager;
 import com.github.loa.vault.view.domain.InvalidRequestException;
+import com.github.loa.vault.view.request.DocumentExistsRequest;
 import com.github.loa.vault.view.request.domain.DeleteDocumentRequest;
 import com.github.loa.vault.view.request.domain.QueryDocumentRequest;
 import com.github.loa.vault.view.request.domain.RecompressDocumentRequest;
+import com.github.loa.vault.view.response.domain.DocumentExistsResponse;
 import com.github.loa.vault.view.response.domain.FreeSpaceResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -125,6 +127,25 @@ public class VaultController {
         return vaultDocumentManager.getAvailableSpace()
                 .map(freeSpace -> FreeSpaceResponse.builder()
                         .freeSpace(freeSpace)
+                        .build()
+                );
+    }
+
+    @MessageMapping("documentExists")
+    public Mono<DocumentExistsResponse> getDocumentExists(final DocumentExistsRequest documentExistsRequest) {
+        final String documentId = documentExistsRequest.getDocumentId();
+
+        return documentEntityFactory.getDocumentEntity(UUID.fromString(documentId))
+                .flatMap(documentEntity -> {
+                    if (!documentEntity.isInVault(vaultConfigurationProperties.getName())) {
+                        return Mono.error(new InvalidRequestException("Document with id " + documentId
+                                + " is available on a different vault!"));
+                    }
+
+                    return vaultDocumentManager.documentExists(documentEntity);
+                })
+                .map(exists -> DocumentExistsResponse.builder()
+                        .exists(exists)
                         .build()
                 );
     }

@@ -63,6 +63,11 @@ public class VaultDocumentManager {
         }
     }
 
+    public Mono<Boolean> documentExists(final DocumentEntity documentEntity) {
+        return Mono.just(vaultLocationFactory.getLocation(documentEntity))
+                .map(VaultLocation::populated);
+    }
+
     /**
      * Remove the content of a document from the vault.
      *
