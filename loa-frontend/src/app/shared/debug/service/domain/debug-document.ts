@@ -9,7 +9,9 @@ export class DebugDocument {
     public checksum: string,
     public fileSize: number,
     public downloadDate: string,
-    public downloaderVersion: number
+    public downloaderVersion: number,
+    public isInVault: boolean,
+    public isInIndex: boolean;
   ) {
   }
 }
