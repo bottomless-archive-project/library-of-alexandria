@@ -11,7 +11,7 @@ export class DebugDocument {
     public downloadDate: string,
     public downloaderVersion: number,
     public isInVault: boolean,
-    public isInIndex: boolean;
+    public isInIndex: boolean
   ) {
   }
 }
