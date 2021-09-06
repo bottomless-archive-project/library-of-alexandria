@@ -95,7 +95,7 @@ public class DocumentEntityFactory {
     public Mono<Map<DocumentStatus, Integer>> getCountByStatus() {
         return documentRepository.countByStatus()
                 .map(result -> result.entrySet().stream()
-                        .collect(Collectors.toMap((entry) ->
+                        .collect(Collectors.toMap(entry ->
                                 DocumentStatus.valueOf(entry.getKey()), Map.Entry::getValue))
                 );
     }
@@ -108,7 +108,7 @@ public class DocumentEntityFactory {
     public Mono<Map<DocumentType, Integer>> getCountByType() {
         return documentRepository.countByType()
                 .map(result -> result.entrySet().stream()
-                        .collect(Collectors.toMap((entry) ->
+                        .collect(Collectors.toMap(entry ->
                                 DocumentType.valueOf(entry.getKey()), Map.Entry::getValue))
                 );
     }

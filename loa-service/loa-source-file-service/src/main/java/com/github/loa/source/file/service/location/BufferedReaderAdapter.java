@@ -24,7 +24,7 @@ public class BufferedReaderAdapter {
      * @return a reader function
      */
     public Function<BufferedReader, Flux<String>> consume() {
-        return (reader) -> Flux.create(sink -> {
+        return reader -> Flux.create(sink -> {
             try {
                 String s = reader.readLine();
                 while (Objects.nonNull(s)) {
@@ -45,7 +45,7 @@ public class BufferedReaderAdapter {
      * @return a closer function
      */
     public Consumer<BufferedReader> close() {
-        return (reader) -> {
+        return reader -> {
             try {
                 reader.close();
             } catch (final IOException e) {

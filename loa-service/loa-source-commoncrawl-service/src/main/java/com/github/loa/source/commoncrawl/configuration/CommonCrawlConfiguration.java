@@ -11,7 +11,6 @@ import reactor.core.scheduler.Schedulers;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 @Configuration
 @RequiredArgsConstructor
@@ -33,7 +32,7 @@ public class CommonCrawlConfiguration {
                                 .build()
                 )
                 .skip(commonCrawlDocumentSourceConfigurationProperties.getWarcId())
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Bean

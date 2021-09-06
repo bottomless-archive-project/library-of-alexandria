@@ -10,8 +10,10 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
@@ -37,7 +39,13 @@ public class FileDownloadManager {
                     fileDownloadRequestFactory.newDownloadRequest(downloadTarget.toURI());
 
             return DataBufferUtils.write(dataBufferFlux, resultLocation)
-                    .doOnError(error -> resultLocation.toFile().delete())
+                    .doOnError(error -> {
+                        try {
+                            Files.delete(resultLocation);
+                        } catch (final IOException e) {
+                            log.error("Failed to delete file at the staging location!", e);
+                        }
+                    })
                     .thenReturn(resultLocation);
         } catch (final URISyntaxException e) {
             log.debug("Failed to download document from location: {}.", downloadTarget, e);

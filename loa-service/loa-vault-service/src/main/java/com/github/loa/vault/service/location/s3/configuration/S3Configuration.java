@@ -10,9 +10,6 @@ import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-
 @Configuration
 @RequiredArgsConstructor
 @ConditionalOnProperty(value = "loa.vault.location.type", havingValue = "s3")
@@ -21,10 +18,9 @@ public class S3Configuration {
     private final S3ConfigurationProperties s3ConfigurationProperties;
 
     @Bean
-    public S3Client s3Client(final StaticCredentialsProvider staticCredentialsProvider) throws URISyntaxException {
+    public S3Client s3Client(final StaticCredentialsProvider staticCredentialsProvider) {
         return S3Client.builder()
-                .endpointOverride(new URI("http://" + s3ConfigurationProperties.getHost() + ":"
-                        + s3ConfigurationProperties.getPort() + "/"))
+                .endpointOverride(s3ConfigurationProperties.getEndpointLocation())
                 .region(Region.of(s3ConfigurationProperties.getRegion()))
                 .credentialsProvider(staticCredentialsProvider)
                 .build();

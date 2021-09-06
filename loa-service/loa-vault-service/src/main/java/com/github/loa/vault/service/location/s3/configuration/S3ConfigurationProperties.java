@@ -5,6 +5,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.ConstructorBinding;
 
+import java.net.URI;
+
 @Getter
 @ConstructorBinding
 @RequiredArgsConstructor
@@ -17,4 +19,8 @@ public class S3ConfigurationProperties {
     private final String secretKey;
     private final String region;
     private final String bucketName;
+
+    public URI getEndpointLocation() {
+        return URI.create("http://" + host + ":" + port + "/");
+    }
 }

@@ -35,6 +35,8 @@ public class ClientProducerExecutor {
         try {
             return clientProducersForQueue.claim(new Timeout(Integer.MAX_VALUE, TimeUnit.DAYS));
         } catch (final InterruptedException e) {
+            Thread.currentThread().interrupt();
+
             throw new QueueException("Unable to acquire client producer!", e);
         }
     }

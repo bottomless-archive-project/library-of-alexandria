@@ -10,7 +10,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -28,6 +27,6 @@ public class WarcRecordParser {
     private List<String> parseLinksFromDocument(final Document document) {
         return document.select("a").stream()
                 .map(element -> element.absUrl("href").trim())
-                .collect(Collectors.toList());
+                .toList();
     }
 }
