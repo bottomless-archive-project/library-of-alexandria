@@ -1,11 +1,12 @@
 package com.github.loa.source.commoncrawl.service.location;
 
+import com.github.bottomlessarchive.warc.service.WarcRecordFluxFactory;
+import com.github.bottomlessarchive.warc.service.record.domain.WarcRecordType;
 import com.github.loa.location.domain.link.StringLink;
 import com.github.loa.source.commoncrawl.configuration.CommonCrawlDocumentSourceConfigurationProperties;
 import com.github.loa.source.commoncrawl.domain.CommonCrawlWarcLocation;
 import com.github.loa.source.source.DocumentLocationSource;
 import com.github.loa.location.domain.DocumentLocation;
-import com.github.loa.source.commoncrawl.service.WarcFluxFactory;
 import com.github.loa.source.commoncrawl.service.WarcRecordParser;
 import com.github.loa.source.commoncrawl.service.webpage.WebPageFactory;
 import com.github.loa.source.configuration.DocumentSourceConfiguration;
@@ -33,7 +34,6 @@ public class CommonCrawlDocumentLocationSource implements DocumentLocationSource
 
     private final DocumentSourceConfiguration documentSourceConfiguration;
     private final WarcRecordParser warcRecordParser;
-    private final WarcFluxFactory warcFluxFactory;
     private final WebPageFactory webPageFactory;
 
     @Qualifier("documentLocationParserScheduler")
@@ -59,7 +59,7 @@ public class CommonCrawlDocumentLocationSource implements DocumentLocationSource
                     warcLocation.getId(), warcLocation.getLocation());
         }
 
-        return warcFluxFactory.buildWarcRecordFlux(warcLocation.getLocation())
+        return WarcRecordFluxFactory.buildWarcRecordFlux(warcLocation.getLocation(), WarcRecordType.RESPONSE)
                 .map(webPageFactory::newWebPage)
                 .subscribeOn(documentLocationParserScheduler)
                 .flatMap(warcRecordParser::parseLinksFromRecord)

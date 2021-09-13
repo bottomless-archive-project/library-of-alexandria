@@ -1,5 +1,5 @@
 dependencies {
-    implementation group: 'com.github.bottomless-archive-project', name: 'java-warc', version: '1.1.0'
+    implementation group: 'com.github.bottomless-archive-project', name: 'java-warc-reactive', version: '1.2.1'
     implementation group: 'com.github.bottomless-archive-project', name: 'common-crawl-client', version: '2943318d20'
 
     implementation group: 'org.jsoup', name: 'jsoup', version: '1.14.2'
