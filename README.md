@@ -10,7 +10,11 @@ This project aims to support this noble goal in a scalable way. We want to make 
 
 ## Documentation
 
-We have an extensive documentation for the applications suite! It is available in our [documentation page](https://bottomless-archive-project.github.io/library-of-alexandria.github.io/documentation/)!
+We have an extensive documentation for the application suite! It is available in our [documentation page](https://bottomless-archive-project.github.io/library-of-alexandria.github.io/documentation/)!
+
+## Introduction video
+
+We have an introduction video on [YouTube](https://www.youtube.com/watch?v=-9EAxaWTtw0) to show the application in action. The example dataset shown in the video is **33 TB** in size with **30 million documents**.
 
 ## Discord
 
