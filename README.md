@@ -14,7 +14,7 @@ We have an extensive documentation for the application suite! It is available in
 
 ## Introduction video
 
-We have an introduction video on [YouTube](https://www.youtube.com/watch?v=-9EAxaWTtw0) to show the application in action. The example dataset shown in the video is **33 TB** in size with **30 million documents**.
+We have an [introduction video on YouTube](https://www.youtube.com/watch?v=-9EAxaWTtw0) to show the application in action. The example dataset shown in the video is **33 TB** in size with **30 million documents**.
 
 ## Discord
 
