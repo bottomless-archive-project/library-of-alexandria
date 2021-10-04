@@ -11,3 +11,7 @@ This project aims to support this noble goal in a scalable way. We want to make 
 ## Documentation
 
 We have an extensive documentation for the applications suite! It is available in our [documentation page](https://bottomless-archive-project.github.io/library-of-alexandria.github.io/documentation/)!
+
+## Discord
+
+We have an official [Discord server](https://discord.gg/bK84Jc3zrB) to help people setting up the application and discussing possible/upcoming updates. Feel free to join.
