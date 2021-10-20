@@ -1,6 +1,6 @@
 = Installing Java
 
-First, you need to download the Java 15 Runtime Environment. It's available https://www.oracle.com/technetwork/java/javase/downloads/index.html[here]. After the download is complete you should run the installer and follow the directions it provides until the installation is complete.
+First, you need to download the Java 17 Runtime Environment. It's available https://www.oracle.com/technetwork/java/javase/downloads/index.html[here]. After the download is complete you should run the installer and follow the directions it provides until the installation is complete.
 
 Once it's done, if you open a command line (write cmd to the Start menu's search bar) you will be able to use the java command. Try to write `java -version`. You should get something similar:
 
