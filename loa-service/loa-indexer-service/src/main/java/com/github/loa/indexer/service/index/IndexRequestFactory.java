@@ -5,7 +5,7 @@ import com.github.loa.parser.domain.DocumentMetadata;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.common.unit.TimeValue;
+import org.elasticsearch.core.TimeValue;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
