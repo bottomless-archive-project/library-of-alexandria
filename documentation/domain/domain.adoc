@@ -14,7 +14,7 @@
 | A temporary location where the collected documents placed for post processing before going to the archive.
 
 | **Source**
-| A source of document locations. Could be a file or the http://commoncrawl.org/[Common Crawl] corpus.
+| A source of document locations. At the moment, it can only be a file.
 
 | **Failure rate**
 | How many documents fail to download compared to the successfully downloaded ones.

@@ -8,12 +8,5 @@ public enum DocumentSourceType {
     /**
      * The source data are loaded from a file.
      */
-    FILE,
-
-    /**
-     * The source data are parsed from the Common Crawl corpus.
-     *
-     * @see <a href="http://commoncrawl.org/">Common Crawl</a>
-     */
-    COMMON_CRAWL
+    FILE
 }

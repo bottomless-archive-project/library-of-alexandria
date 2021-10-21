@@ -4,9 +4,9 @@ This application's goal is to fill the <<Queue Application>> with downloadable d
 
 == Workflow
 
-The Vault Application connects to the <<Queue Application>> application and send URLs to be checked and downloaded there.
+The Generator Application connects to the <<Queue Application>> and send URLs to be checked and downloaded by the <<Downloader Application>>.
 
-These URLs could come from various sources like a local file or from http://commoncrawl.org/[Common Crawl] corpus.
+These URLs could come from various sources, the most common is a local file.
 
 .Parameters
 |===
@@ -19,16 +19,7 @@ include::../service/queue/queue-configuration.adoc[]
 | The name of the source location. This name will be saved to the database for every crawled document. It could be helpful for statistics collection or in identifying bugs and errors with specific sources. *(Default value: unknown)*
 
 | **loa.source.type**
-| Describes the type of the source. Could be either `file` or `common-crawl`. If the value is file then the location data will be loaded from a local file. If it is `common-crawl` then the parser will start loading and parsing urls from the http://commoncrawl.org/[Common Crawl] corpus. *(Default value: file)*
-
-| **loa.source.commoncrawl.crawl-id**
-| Used only when `loa.source.type` is set to `common-crawl`. The id of the Common Crawl crawling sentence. For example the http://commoncrawl.org/2019/01/january-2019-crawl-archive-now-available/[2019 January]'s id is CC-MAIN-2019-04. You can acquire the crawl id for each month's corpus http://commoncrawl.org/the-data/get-started/[here].
-
-| **loa.source.commoncrawl.warc-id**
-| Used only when `loa.source.type` is set to `common-crawl`. Every month's Common Crawl crawling sentence is built from multiple https://en.wikipedia.org/wiki/Web_ARChive[WARC] files (mostly around 64000). This is the id of the WARC file that the parsing should start from. When you first start crawling a month's crawl sequence this should be 1. When the downloader opens a new WARC file it will print its id to the console. If you need to stop the crawler and want to re-start it from where it stopped then write down the last crawled WARC id and set this parameter to it.
-
-| **loa.source.commoncrawl.maximum-record-processors**
-| Describes how many threads should be maximally used to parse the WARC records in the WARC files. If you feel that the bottleneck in the document location collecting is the parsing of the WARC files (and not bandwidth) then increase this value. *(Default value: 10)*
+| Describes the type of the source. The only one supported at the moment is `file`. If the value is file then the location data will be loaded from a local file. *(Default value: file)*
 
 | **loa.source.file.location**
 | Used only when `loa.source.type` is set to `file`. The location of the source file on the disk. It's not a problem if it contains non-pdf files.

@@ -23,7 +23,6 @@ bootBuildImage {
 }
 
 dependencies {
-    implementation project(':loa-service:loa-source-commoncrawl-service')
     implementation project(':loa-service:loa-source-file-service')
     implementation project(':loa-service:loa-queue-artemis-service')
     implementation project(':loa-service:loa-io-service')
