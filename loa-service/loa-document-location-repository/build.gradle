@@ -1,3 +1,0 @@
-dependencies {
-    api project(':loa-service:loa-repository')
-}

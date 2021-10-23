@@ -25,11 +25,11 @@ bootBuildImage {
 dependencies {
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-webflux'
 
-    implementation project(':loa-service:loa-document-location-service')
-    implementation project(':loa-service:loa-document-parser-service')
-    implementation project(':loa-service:loa-source-service')
-    implementation project(':loa-service:loa-queue-artemis-service')
-    implementation project(':loa-service:loa-io-service')
-    implementation project(':loa-service:loa-stage-service')
-    implementation project(':loa-service:loa-logging-service')
+    implementation project(':loa-library:loa-document-location-service')
+    implementation project(':loa-library:loa-document-parser-service')
+    implementation project(':loa-library:loa-source-service')
+    implementation project(':loa-library:loa-queue-artemis-service')
+    implementation project(':loa-library:loa-io-service')
+    implementation project(':loa-library:loa-stage-service')
+    implementation project(':loa-library:loa-logging-service')
 }

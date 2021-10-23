@@ -1,5 +1,0 @@
-dependencies {
-    api project(':loa-service:loa-source-service')
-    implementation project(':loa-service:loa-io-service')
-    implementation project(':loa-service:loa-logging-service')
-}

@@ -1,0 +1,3 @@
+dependencies {
+    implementation project(':loa-library:loa-repository')
+}

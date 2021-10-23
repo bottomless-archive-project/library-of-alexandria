@@ -26,7 +26,7 @@ dependencies {
     implementation group: 'org.mongodb', name: 'mongodb-driver-core'
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-rsocket'
 
-    implementation project(':loa-service:loa-vault-service')
-    implementation project(':loa-service:loa-document-view')
-    implementation project(':loa-service:loa-queue-artemis-service')
+    implementation project(':loa-library:loa-vault-service')
+    implementation project(':loa-library:loa-document-view')
+    implementation project(':loa-library:loa-queue-artemis-service')
 }

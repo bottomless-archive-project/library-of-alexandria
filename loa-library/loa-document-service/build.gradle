@@ -2,6 +2,6 @@ dependencies {
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-json'
     api group: 'org.springframework.boot', name: 'spring-boot-starter-reactor-netty'
 
-    implementation project(':loa-service:loa-document-repository')
-    api project(':loa-service:loa-compression-service')
+    implementation project(':loa-library:loa-document-repository')
+    api project(':loa-library:loa-compression-service')
 }

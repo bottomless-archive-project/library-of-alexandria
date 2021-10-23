@@ -27,6 +27,6 @@ dependencies {
 
     implementation group: 'org.elasticsearch.client', name: 'elasticsearch-rest-high-level-client'
 
-    implementation project(':loa-service:loa-document-parser-service')
-    implementation project(':loa-service:loa-vault-client-service')
+    implementation project(':loa-library:loa-document-parser-service')
+    implementation project(':loa-library:loa-vault-client-service')
 }

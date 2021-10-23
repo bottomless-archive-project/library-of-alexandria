@@ -23,7 +23,7 @@ bootBuildImage {
 }
 
 dependencies {
-    implementation project(':loa-service:loa-queue-artemis-service')
+    implementation project(':loa-library:loa-queue-artemis-service')
 
     implementation group: 'org.apache.activemq', name: 'artemis-server'
     implementation group: 'org.codehaus.janino', name: 'janino', version: '3.1.6'
