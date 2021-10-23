@@ -13,7 +13,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath('org.springframework.boot:spring-boot-gradle-plugin:2.5.5')
+        classpath('org.springframework.boot:spring-boot-gradle-plugin:2.5.6')
         classpath('com.adarshr:gradle-test-logger-plugin:2.0.0')
         classpath('com.github.ben-manes:gradle-versions-plugin:0.29.0')
         classpath('com.palantir.gradle.docker:gradle-docker:0.25.0')
@@ -73,10 +73,10 @@ configure(subprojects.findAll {it.name != 'loa-frontend'}) {
         annotationProcessor group: 'org.springframework.boot', name: 'spring-boot-configuration-processor'
 
         // Lombok
-        compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.22'
-        annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.22'
-        testCompileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.22'
-        testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.22'
+        compileOnly group: 'org.projectlombok', name: 'lombok'
+        annotationProcessor group: 'org.projectlombok', name: 'lombok'
+        testCompileOnly group: 'org.projectlombok', name: 'lombok'
+        testAnnotationProcessor group: 'org.projectlombok', name: 'lombok'
 
         // Testing
         testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'

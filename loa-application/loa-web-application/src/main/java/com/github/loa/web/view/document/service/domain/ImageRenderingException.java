@@ -1,8 +1,7 @@
 package com.github.loa.web.view.document.service.domain;
 
-public class ImageRenderingException extends RuntimeException {
+import lombok.experimental.StandardException;
 
-    public ImageRenderingException(final String message, final Throwable throwable) {
-        super(message, throwable);
-    }
+@StandardException
+public class ImageRenderingException extends RuntimeException {
 }

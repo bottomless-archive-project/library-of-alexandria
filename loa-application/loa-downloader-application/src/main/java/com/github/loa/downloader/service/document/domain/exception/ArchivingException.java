@@ -1,8 +1,7 @@
 package com.github.loa.downloader.service.document.domain.exception;
 
-public class ArchivingException extends RuntimeException {
+import lombok.experimental.StandardException;
 
-    public ArchivingException(final String message, final Throwable throwable) {
-        super(message, throwable);
-    }
+@StandardException
+public class ArchivingException extends RuntimeException {
 }
