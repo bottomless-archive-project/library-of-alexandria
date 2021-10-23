@@ -35,28 +35,28 @@
     <rule ref="category/java/design.xml/AvoidCatchingGenericException">
         <properties>
             <property name="violationSuppressXPath"
-                      value="//ClassOrInterfaceDeclaration['com.github.loa.queue.artemis.configuration.QueueClientConfiguration']"/>
+                      value="//ClassOrInterfaceDeclaration['com.github.bottomlessarchive.loa.queue.artemis.configuration.QueueClientConfiguration']"/>
         </properties>
     </rule>
 
     <rule ref="category/java/design.xml/CyclomaticComplexity">
         <properties>
             <property name="violationSuppressXPath"
-                      value="//ClassOrInterfaceDeclaration['com.github.loa.indexer.service.index.IndexRequestFactory']"/>
+                      value="//ClassOrInterfaceDeclaration['com.github.bottomlessarchive.loa.indexer.service.index.IndexRequestFactory']"/>
         </properties>
     </rule>
 
     <rule ref="category/java/design.xml/FinalFieldCouldBeStatic">
         <properties>
             <property name="violationSuppressXPath"
-                      value="//ClassOrInterfaceDeclaration['com.github.loa.indexer.service.search.domain.SearchContext']"/>
+                      value="//ClassOrInterfaceDeclaration['com.github.bottomlessarchive.loa.indexer.service.search.domain.SearchContext']"/>
         </properties>
     </rule>
 
     <rule ref="category/java/design.xml/ExcessiveImports">
         <properties>
             <property name="violationSuppressXPath"
-                      value="//ClassOrInterfaceDeclaration['com.github.loa.vault.client.service.VaultClientServiceTest']"/>
+                      value="//ClassOrInterfaceDeclaration['com.github.bottomlessarchive.loa.vault.client.service.VaultClientServiceTest']"/>
         </properties>
     </rule>
 
@@ -129,9 +129,9 @@
     <rule ref="category/java/errorprone.xml/CloseResource">
         <properties>
             <property name="violationSuppressXPath"
-                      value="//ClassOrInterfaceDeclaration['com.github.loa.queue.artemis.service.consumer.pool.QueueConsumerFactory']"/>
+                      value="//ClassOrInterfaceDeclaration['com.github.bottomlessarchive.loa.queue.artemis.service.consumer.pool.QueueConsumerFactory']"/>
             <property name="violationSuppressXPath"
-                      value="//ClassOrInterfaceDeclaration['com.github.loa.queue.artemis.service.producer.pool.QueueProducerFactory']"/>
+                      value="//ClassOrInterfaceDeclaration['com.github.bottomlessarchive.loa.queue.artemis.service.producer.pool.QueueProducerFactory']"/>
             <property name="violationSuppressXPath" value="//ClassOrInterfaceDeclaration['.*Test']"/>
         </properties>
     </rule>

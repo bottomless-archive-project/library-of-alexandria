@@ -1,0 +1,93 @@
+package com.github.bottomlessarchive.loa.vault.service;
+
+import com.github.bottomlessarchive.loa.compression.service.provider.CompressionServiceProvider;
+import com.github.bottomlessarchive.loa.document.service.domain.DocumentEntity;
+import com.github.bottomlessarchive.loa.vault.service.archive.ArchivingService;
+import com.github.bottomlessarchive.loa.vault.service.domain.DocumentArchivingContext;
+import com.github.bottomlessarchive.loa.vault.service.location.VaultLocation;
+import com.github.bottomlessarchive.loa.vault.service.location.VaultLocationFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
+import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
+
+import java.io.InputStream;
+
+/**
+ * Provide access to the content of the documents in the vault.
+ */
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class VaultDocumentManager {
+
+    private final ArchivingService archivingService;
+    private final VaultLocationFactory vaultLocationFactory;
+    private final CompressionServiceProvider compressionServiceProvider;
+
+    /**
+     * Archive the document provided in the context.
+     */
+    public Mono<DocumentEntity> archiveDocument(final DocumentArchivingContext documentArchivingContext) {
+        if (log.isInfoEnabled()) {
+            log.info("Archiving document with id: {}.", documentArchivingContext.getId());
+        }
+
+        return Mono.just(documentArchivingContext)
+                .flatMap(archivingService::archiveDocument)
+                .onErrorResume(error -> Mono.empty());
+    }
+
+    /**
+     * Return the content of a document as a {@link Resource}.
+     *
+     * @param documentEntity the document to return the content for
+     * @return the content of the document
+     */
+    public Resource readDocument(final DocumentEntity documentEntity) {
+        final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentEntity);
+
+        // The non-compressed entries will be served via a zero-copy response
+        // See: https://developer.ibm.com/articles/j-zerocopy/
+        final InputStream documentContentsInputStream = vaultLocation.download();
+
+        if (documentEntity.isCompressed()) {
+            final InputStream decompressedInputStream = compressionServiceProvider.getCompressionService(
+                    documentEntity.getCompression()).decompress(documentContentsInputStream);
+
+            return new InputStreamResource(decompressedInputStream);
+        } else {
+            return new InputStreamResource(documentContentsInputStream);
+        }
+    }
+
+    public Mono<Boolean> documentExists(final DocumentEntity documentEntity) {
+        return Mono.just(vaultLocationFactory.getLocation(documentEntity))
+                .map(VaultLocation::populated);
+    }
+
+    /**
+     * Remove the content of a document from the vault.
+     *
+     * @param documentEntity the document to remove
+     * @return the document that was removed
+     */
+    public Mono<DocumentEntity> removeDocument(final DocumentEntity documentEntity) {
+        return Mono.just(documentEntity)
+                .map(vaultLocationFactory::getLocation)
+                .filter(VaultLocation::populated)
+                .doOnNext(VaultLocation::clear)
+                .thenReturn(documentEntity);
+    }
+
+    /**
+     * Return the available free space in the vault in bytes.
+     *
+     * @return the free bytes available
+     */
+    public Mono<Long> getAvailableSpace() {
+        return Mono.fromSupplier(vaultLocationFactory::getAvailableSpace);
+    }
+}
