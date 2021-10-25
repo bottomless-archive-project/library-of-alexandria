@@ -7,8 +7,8 @@ import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 /**
  * An application that is an intermediate between the Generator and the Downloader Application.
  */
-@SpringBootApplication(scanBasePackages = "com.github.loa")
-@ConfigurationPropertiesScan(basePackages = "com.github.loa")
+@SpringBootApplication(scanBasePackages = "com.github.bottomlessarchive.loa")
+@ConfigurationPropertiesScan(basePackages = "com.github.bottomlessarchive.loa")
 public class LibraryQueueApplication {
 
     public static void main(final String[] args) {

@@ -10,8 +10,8 @@ import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
  * <p>
  * The main logic of the archiving is found in the {@link VaultQueueListener}.
  */
-@SpringBootApplication(scanBasePackages = "com.github.loa")
-@ConfigurationPropertiesScan(basePackages = "com.github.loa")
+@SpringBootApplication(scanBasePackages = "com.github.bottomlessarchive.loa")
+@ConfigurationPropertiesScan(basePackages = "com.github.bottomlessarchive.loa")
 public class LibraryVaultApplication {
 
     public static void main(final String[] args) {

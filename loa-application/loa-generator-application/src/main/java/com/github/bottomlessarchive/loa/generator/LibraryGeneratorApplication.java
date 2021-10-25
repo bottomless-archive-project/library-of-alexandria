@@ -9,8 +9,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  * The runner class of the generator application.
  */
 @EnableScheduling
-@SpringBootApplication(scanBasePackages = "com.github.loa")
-@ConfigurationPropertiesScan(basePackages = "com.github.loa")
+@SpringBootApplication(scanBasePackages = "com.github.bottomlessarchive.loa")
+@ConfigurationPropertiesScan(basePackages = "com.github.bottomlessarchive.loa")
 public class LibraryGeneratorApplication {
 
     public static void main(final String[] args) {

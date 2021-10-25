@@ -1,5 +1,5 @@
 dependencies {
-    // TODO: This shouldn't be here! It's only here because of com.github.loa.vault.service.archive.ArchivingService.isDuplicateIndexError.
+    // TODO: This shouldn't be here! It's only here because of com.github.bottomlessarchive.loa.vault.service.archive.ArchivingService.isDuplicateIndexError.
     // However, instead of checking that there, we should catch it in a lower layer. and throw our own exception there!
     implementation group: 'org.mongodb', name: 'mongodb-driver-reactivestreams'
 
