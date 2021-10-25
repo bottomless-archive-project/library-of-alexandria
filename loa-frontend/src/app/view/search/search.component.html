@@ -1,17 +1,17 @@
 <div>
   <p class="text-center" style="font-weight: bold;">
     Documents in database:
-    <span class="badge badge-secondary"
+    <span class="badge bg-secondary"
           [textContent]="((statistics.documentCount / 1000000) | number: '1.2-2') + ' M'"></span>
     |
     Documents indexed:
-    <span class="badge badge-secondary"
+    <span class="badge bg-secondary"
           [textContent]="((statistics.indexedDocumentCount / 1000000) | number: '1.2-2') + ' M'"></span>
   </p>
 </div>
 
-<div class="row">
-  <div class="col-9 pr-0">
+<div class="row mb-2">
+  <div class="col-9 pe-0">
     <div class="form-group">
       <input [(ngModel)]="searchText" (ngModelChange)='changed($event)' class="form-control"
              placeholder="Search for something...">
@@ -19,26 +19,25 @@
   </div>
   <div class="col-3">
     <div class="dropdown language-dropdown">
-      <button class="btn btn-info btn-block dropdown-toggle" role="button" *ngIf="language === undefined"
-              data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Language
+      <button class="btn btn-loa col-12 dropdown-toggle" role="button" *ngIf="language === undefined"
+              data-bs-toggle="dropdown">Language
       </button>
-      <button class="btn btn-info btn-lg btn-block" *ngIf="language !== undefined" (click)="setLanguage(undefined)"
+      <button class="btn btn-loa col-12 btn-lg" *ngIf="language !== undefined" (click)="setLanguage(undefined)"
               style="padding-top: 2px; padding-bottom: 2px; font-size: 1em; line-height: 2em;">
         {{language.code | uppercase}} - {{language.name | titlecase}}
       </button>
-      <div class="dropdown-menu btn-block mt-0" style="max-height: 300px; overflow: auto;">
-        <button class="dropdown-item dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
-                aria-expanded="false" *ngFor='let language of languages'
-                (click)="setLanguage({code: language[0], name: language[1]})">
+      <ul class="dropdown-menu col-12" style="max-height: 200px; overflow: auto;" id="language-dropdown">
+        <li class="dropdown-item" *ngFor='let language of languages'
+            (click)="setLanguage({code: language[0], name: language[1]})">
           {{language[0] | uppercase}} - {{language[1] | titlecase}}
-        </button>
-      </div>
+        </li>
+      </ul>
     </div>
   </div>
 </div>
 
-<div class="row">
-  <div class="col-9 pr-0 text-center">
+<div class="row mb-2">
+  <div class="col-9 pe-0 text-center">
     <div class="form-group">
       <div class="form-check form-check-inline">
         <input class="form-check-input" type="checkbox" id="pdf" [(ngModel)]="fileTypes.PDF"
@@ -89,20 +88,20 @@
   </div>
   <div class="col-3">
     <div class="dropdown document-length-dropdown">
-      <button class="btn btn-info btn-block dropdown-toggle" role="button" *ngIf="documentLength === undefined"
-              data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Document Length
+      <button class="btn btn-loa col-12 dropdown-toggle" role="button" *ngIf="documentLength === undefined"
+              data-bs-toggle="dropdown">Document Length
       </button>
-      <button class="btn btn-info btn-block" *ngIf="documentLength !== undefined"
+      <button class="btn btn-loa col-12" *ngIf="documentLength !== undefined"
               (click)="setDocumentLength(undefined)"
               style="padding-top: 2px; padding-bottom: 2px; height: 38px;">
         {{documentLength[1]}}
       </button>
-      <div class="dropdown-menu btn-block mt-0" style="max-height: 300px; overflow: auto;">
-        <button class="dropdown-item dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
-                aria-expanded="false" *ngFor="let documentLength of documentLengths"
-                (click)="setDocumentLength(documentLength)">{{documentLength[1]}}
-        </button>
-      </div>
+      <ul class="dropdown-menu col-12" style="max-height: 200px; overflow: auto;" id="length-dropdown">
+        <li class="dropdown-item" *ngFor="let documentLength of documentLengths"
+                (click)="setDocumentLength(documentLength)">
+          {{documentLength[1]}}
+        </li>
+      </ul>
     </div>
   </div>
 </div>
@@ -184,7 +183,7 @@
           </div>
 
           <div *ngIf="hit.type != 'PDF'" style="width: 100%; height: 32px; line-height: 32px;" class="mt-3">
-            <a class="btn btn-primary btn-sm w-25" href="./document/{{hit.id}}"
+            <a class="btn btn-loa btn-sm w-25" href="./document/{{hit.id}}"
                style="float: right; min-width: 135px;">
               Download .{{hit.type | lowercase}}</a>
           </div>
@@ -192,14 +191,14 @@
 
           <!-- Pdf documents should have an openable panel to show the pdf document on the webpage. -->
           <div class="media" *ngIf="hit.type == 'PDF'">
-            <div class="spin-wrapper" style="width: 200px; height: 278px;"
+            <div class="spin-wrapper" style="width: 200px; height: 278px; float: left;"
                  *ngIf="!isImageLoaded(hit.id)">
               <div class="spinner"></div>
             </div>
 
             <img [src]="'/document/' + hit.id + '/image'" [alt]="hit.title"
-                 (load)="setImageLoaded(hit.id, $event)" class="img-thumbnail mr-3"
-                 style="display:none; width: 200px; height: 278px;"/>
+                 (load)="setImageLoaded(hit.id, $event)" class="img-thumbnail me-3"
+                 style="display:none; width: 200px; height: 278px; float: left;"/>
 
             <div class="media-body">
               <div *ngFor="let description of hit.description; let last = last;">
@@ -210,13 +209,13 @@
           </div>
 
           <div *ngIf="hit.type == 'PDF'" style="width: 100%; height: 32px; line-height: 32px;" class="mt-3">
-            <button *ngIf="openPdfs.has(hit.id) && openPdfs.get(hit.id)" class="btn btn-primary btn-sm w-25"
+            <button *ngIf="openPdfs.has(hit.id) && openPdfs.get(hit.id)" class="btn btn-loa btn-sm w-25"
                     (click)="openPdf(hit.id)" style="float: right; min-width: 135px;">Close .pdf
             </button>
-            <button *ngIf="!openPdfs.has(hit.id) || !openPdfs.get(hit.id)" class="btn btn-primary btn-sm w-25"
+            <button *ngIf="!openPdfs.has(hit.id) || !openPdfs.get(hit.id)" class="btn btn-loa btn-sm w-25"
                     (click)="openPdf(hit.id)" style="float: right; min-width: 135px;">Open .pdf
             </button>
-            <span style="float: right; font-weight: bold;" class="mr-3">{{hit.pageCount}} pages</span>
+            <span style="float: right; font-weight: bold;" class="me-3">{{hit.pageCount}} pages</span>
           </div>
 
           <iframe *ngIf="openPdfs.has(hit.id) && openPdfs.get(hit.id) && hit.type == 'PDF'"
