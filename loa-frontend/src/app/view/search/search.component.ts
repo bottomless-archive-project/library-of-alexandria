@@ -144,12 +144,18 @@ export class SearchComponent implements OnInit {
   }
 
   setLanguage(language: any) {
+    document.getElementById('language-dropdown')
+      ?.classList.remove('show');
+
     this.language = language;
 
     this.refreshHits();
   }
 
   setDocumentLength(documentLength: any) {
+    document.getElementById('length-dropdown')
+      ?.classList.remove('show');
+
     this.documentLength = documentLength;
 
     this.refreshHits();

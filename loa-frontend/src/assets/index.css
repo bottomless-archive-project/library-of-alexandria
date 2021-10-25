@@ -22,14 +22,6 @@ body {
     font-weight: 700;
 }
 
-.language-dropdown .dropdown-menu .dropdown-toggle:after {
-    content: none;
-}
-
-.document-length-dropdown .dropdown-menu .dropdown-toggle:after {
-    content: none;
-}
-
 a.title-text {
   color: black;
   text-decoration: none;
@@ -62,4 +54,8 @@ a.title-text:hover {
 .form-check-input:checked {
   background-color: #138496 !important;
   border-color: #117a8b !important;
+}
+
+.dropdown-item:hover {
+  cursor: pointer;
 }
