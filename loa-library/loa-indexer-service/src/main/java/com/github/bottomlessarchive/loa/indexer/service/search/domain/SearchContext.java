@@ -14,6 +14,7 @@ public class SearchContext {
 
     private final String keyword;
     private final String language;
+    private final int resultSize;
     private final boolean exactMatch;
     private final DocumentLength documentLength;
     private final List<DocumentType> documentTypes;

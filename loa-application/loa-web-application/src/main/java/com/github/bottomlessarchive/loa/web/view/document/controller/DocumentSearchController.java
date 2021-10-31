@@ -27,16 +27,30 @@ public class DocumentSearchController {
     @GetMapping("/document/find-by/keyword/{keyword}")
     public Mono<DocumentSearchResponse> queryDocuments(@PathVariable final String keyword,
             @RequestParam(defaultValue = "0") final int pageNumber,
+            @RequestParam(defaultValue = "10") final int resultSize,
             @RequestParam(defaultValue = "false") final boolean exactMatch,
             @RequestParam(required = false) final String language,
             @RequestParam(required = false) final DocumentLength documentLength,
             @RequestParam(required = false) final List<DocumentType> documentTypes) {
+        if (pageNumber < 0) {
+            throw new IllegalArgumentException("The page number can only be zero or a positive integer!");
+        }
+
+        if (resultSize > 100) {
+            throw new IllegalArgumentException("The result size can't be higher than 100!");
+        }
+
+        if (resultSize < 10) {
+            throw new IllegalArgumentException("The result size can't be lower than 10!");
+        }
+
         return Mono.fromSupplier(() -> documentSearchService.searchDocuments(
                         SearchContext.builder()
                                 .keyword(keyword)
                                 .pageNumber(pageNumber)
                                 .exactMatch(exactMatch)
                                 .language(language)
+                                .resultSize(resultSize)
                                 .documentLength(documentLength)
                                 .documentTypes(documentTypes)
                                 .build()

@@ -98,6 +98,7 @@ public class IndexerRequestFactory {
         return new SearchSourceBuilder()
                 .from(searchContext.getPageNumber())
                 .query(queryBuilder)
+                .size(searchContext.getResultSize())
                 .highlighter(newHighlightBuilder());
     }
 
