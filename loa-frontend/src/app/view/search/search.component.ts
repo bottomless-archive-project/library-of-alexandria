@@ -15,12 +15,13 @@ import {SearchHit} from "../../shared/search/service/domain/search-hit";
 export class SearchComponent implements OnInit {
 
   statistics: any;
-  searchText: string = '';
+  searchText = '';
   modelChanged: Subject<string> = new Subject<string>();
   documentLengths: string[][];
   documentLength: any = undefined;
   languages: string[][];
   language: any = undefined;
+  resultSize = 10;
   fileTypes: any = {
     PDF: false,
     DOC: false,
@@ -35,7 +36,7 @@ export class SearchComponent implements OnInit {
   hits: SearchHit[] = [];
   hitCount = 0;
   totalPages = 0;
-  page: number = 0;
+  page = 0;
   loading = false;
   openPdfs: Map<string, boolean> = new Map();
   loadedImages: Map<string, boolean> = new Map();
@@ -152,6 +153,13 @@ export class SearchComponent implements OnInit {
     this.refreshHits();
   }
 
+  setResultSize(resultSize: number) {
+    this.resultSize = resultSize;
+    this.page = 0;
+
+    this.refreshHits();
+  }
+
   setDocumentLength(documentLength: any) {
     document.getElementById('length-dropdown')
       ?.classList.remove('show');
@@ -235,9 +243,9 @@ export class SearchComponent implements OnInit {
   }
 
   refreshHits() {
-    console.log("Should refresh hits here!", this.fileTypes);
+    console.log('Should refresh hits here!', this.fileTypes);
 
-    if (this.searchText === "") {
+    if (this.searchText === '') {
       this.hits = [];
       this.hitCount = 0;
       this.totalPages = 0;
@@ -252,14 +260,14 @@ export class SearchComponent implements OnInit {
     this.openPdfs = new Map<string, boolean>();
     this.loadedImages = new Map<string, boolean>();
 
-    const exactMatch = this.searchText.startsWith("\"") && this.searchText.endsWith("\"");
+    const exactMatch = this.searchText.startsWith('"') && this.searchText.endsWith('"');
 
     this.searchService.searchDocuments(this.searchText, this.page, this.language, exactMatch,
-      this.documentLength, this.fileTypes)
+      this.documentLength, this.resultSize, this.fileTypes)
       .subscribe(response => {
         this.hits = response.searchHits;
         this.hitCount = response.totalHitCount;
-        this.totalPages = Math.ceil(response.totalHitCount / 10);
+        this.totalPages = Math.ceil(response.totalHitCount / this.resultSize);
         this.loading = false;
       });
   }

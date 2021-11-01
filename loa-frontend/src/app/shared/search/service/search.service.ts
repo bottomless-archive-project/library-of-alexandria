@@ -16,9 +16,11 @@ export class SearchService {
   }
 
   searchDocuments(searchText: string, page: number, language: any, exactMatch: boolean, documentLength: any,
-                  fileTypes: any): Observable<SearchResult> {
+                  resultSize: number, fileTypes: any): Observable<SearchResult> {
     const pageNumber: number = page * 10;
-    let urlBase: string = '/document/find-by/keyword/' + searchText + '/?pageNumber=' + pageNumber;
+    let urlBase: string = '/document/find-by/keyword/' + searchText
+      + '/?pageNumber=' + pageNumber
+      + '&resultSize=' + resultSize;
 
     if (exactMatch) {
       urlBase += '&exactMatch=' + exactMatch;
