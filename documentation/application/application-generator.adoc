@@ -8,6 +8,8 @@ The Generator Application connects to the <<Queue Application>> and send URLs to
 
 These URLs could come from various sources, the most common is a local file.
 
+NOTE: If you do not have a lot of URLs ready at hand, take a look into the https://github.com/bottomless-archive-project/url-collector[url-collector] project or into the https://github.com/bottomless-archive-project/document-location-database[document-location-database]. These projects are also curated by the _Bottomless Archive Project_ and are created for the specific purpose to give easy access for LoA users to a lot of possible document locations.
+
 .Parameters
 |===
 | Parameter | Description
