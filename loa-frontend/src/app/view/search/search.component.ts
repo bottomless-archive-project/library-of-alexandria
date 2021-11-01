@@ -1,11 +1,11 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
-import {Subject} from "rxjs";
-import {debounceTime, distinctUntilChanged} from "rxjs/operators";
-import {HttpClient} from "@angular/common/http";
-import {SearchService} from "../../shared/search/service/search.service";
-import {DomSanitizer} from "@angular/platform-browser";
-import {SearchHit} from "../../shared/search/service/domain/search-hit";
+import {Subject} from 'rxjs';
+import {debounceTime, distinctUntilChanged} from 'rxjs/operators';
+import {HttpClient} from '@angular/common/http';
+import {SearchService} from '../../shared/search/service/search.service';
+import {DomSanitizer, SafeResourceUrl} from '@angular/platform-browser';
+import {SearchHit} from '../../shared/search/service/domain/search-hit';
 
 @Component({
   selector: 'app-search',
@@ -126,7 +126,7 @@ export class SearchComponent implements OnInit {
       ['xh', 'xhosa'],
       ['yo', 'yoruba'],
       ['zu', 'zulu']
-    ]
+    ];
 
     this.documentLengths = [
       ['SHORT_STORY', 'Short story (1 - 10 pages)'],
@@ -140,11 +140,11 @@ export class SearchComponent implements OnInit {
     this.statistics = this.route.snapshot.data.statistics;
   }
 
-  changed(text: string) {
+  changed(text: string): void {
     this.modelChanged.next(text);
   }
 
-  setLanguage(language: any) {
+  setLanguage(language: any): void {
     document.getElementById('language-dropdown')
       ?.classList.remove('show');
 
@@ -153,14 +153,14 @@ export class SearchComponent implements OnInit {
     this.refreshHits();
   }
 
-  setResultSize(resultSize: number) {
+  setResultSize(resultSize: number): void {
     this.resultSize = resultSize;
     this.page = 0;
 
     this.refreshHits();
   }
 
-  setDocumentLength(documentLength: any) {
+  setDocumentLength(documentLength: any): void {
     document.getElementById('length-dropdown')
       ?.classList.remove('show');
 
@@ -169,23 +169,23 @@ export class SearchComponent implements OnInit {
     this.refreshHits();
   }
 
-  jumpToPage(page: number) {
+  jumpToPage(page: number): void {
     this.page = page;
 
     this.refreshHits();
   }
 
-  isImageLoaded(documentId: string) {
+  isImageLoaded(documentId: string): boolean | undefined {
     console.log('Get the preview loaded for document with id: ' + documentId + '.');
 
-    if(!this.loadedImages.has(documentId)) {
+    if (!this.loadedImages.has(documentId)) {
       return false;
     }
 
     return this.loadedImages.get(documentId);
   }
 
-  setImageLoaded(documentId: string, event: any) {
+  setImageLoaded(documentId: string, event: any): void {
     console.log('Set the preview loaded for document with id: ' + documentId + '.');
 
     event.target.style.display = 'block';
@@ -193,7 +193,7 @@ export class SearchComponent implements OnInit {
     this.loadedImages.set(documentId, true);
   }
 
-  openPdf(pdfId: string) {
+  openPdf(pdfId: string): void {
     if (!this.openPdfs.has(pdfId)) {
       this.openPdfs.set(pdfId, false);
     }
@@ -205,8 +205,8 @@ export class SearchComponent implements OnInit {
     if (this.page - 5 > 0) {
       return [this.page - 5, this.page - 4, this.page - 3, this.page - 2, this.page - 1];
     } else {
-      var result = [];
-      for (var i = 0; i < this.page; i++) {
+      const result = [];
+      for (let i = 0; i < this.page; i++) {
         result.push(this.page - i - 1);
       }
       result.reverse();
@@ -219,8 +219,8 @@ export class SearchComponent implements OnInit {
     if (this.totalPages > this.page + 5) {
       return [this.page + 1, this.page + 2, this.page + 3, this.page + 4, this.page + 5];
     } else {
-      var result = [];
-      for (var i = 0; i < this.totalPages - this.page - 1; i++) {
+      const result = [];
+      for (let i = 0; i < this.totalPages - this.page - 1; i++) {
         result.push(this.page + i + 1);
       }
 
@@ -228,12 +228,12 @@ export class SearchComponent implements OnInit {
     }
   }
 
-  getDocumentUrl(documentId: string) {
+  getDocumentUrl(documentId: string): SafeResourceUrl {
     return this.sanitizer.bypassSecurityTrustResourceUrl('./document/' + documentId);
   }
 
-  getLanguageName(languageId: string) {
-    for (let language of this.languages) {
+  getLanguageName(languageId: string): string {
+    for (const language of this.languages) {
       if (language[0] === languageId) {
         return language[1];
       }
@@ -242,7 +242,7 @@ export class SearchComponent implements OnInit {
     return 'unknown';
   }
 
-  refreshHits() {
+  refreshHits(): void {
     console.log('Should refresh hits here!', this.fileTypes);
 
     if (this.searchText === '') {
