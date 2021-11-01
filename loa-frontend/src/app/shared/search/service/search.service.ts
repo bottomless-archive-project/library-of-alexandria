@@ -16,7 +16,7 @@ export class SearchService {
   }
 
   searchDocuments(searchText: string, page: number, language: any, exactMatch: boolean, documentLength: any,
-                  resultSize: number, fileTypes: any): Observable<SearchResult> {
+                  resultSize: number, fileTypes: Map<string, boolean>): Observable<SearchResult> {
     const pageNumber: number = page * 10;
     let urlBase: string = '/document/find-by/keyword/' + searchText
       + '/?pageNumber=' + pageNumber
@@ -34,9 +34,16 @@ export class SearchService {
       urlBase += '&documentLength=' + documentLength[0];
     }
 
-    const types = Object.keys(fileTypes).filter(value => fileTypes[value]);
-    if (types.length > 0) {
-      urlBase += '&documentTypes=' + types.join();
+
+    const values: string[] = [];
+    for (const [type, value] of fileTypes) {
+      if (value) {
+        values.push(type);
+      }
+    }
+
+    if (values.length > 0) {
+      urlBase += '&documentTypes=' + values.join();
     }
 
     return this.http.get<SearchResult>(urlBase);

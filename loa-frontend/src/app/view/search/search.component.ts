@@ -22,17 +22,18 @@ export class SearchComponent implements OnInit {
   languages: string[][];
   language: any = undefined;
   resultSize = 10;
-  fileTypes: any = {
-    PDF: false,
-    DOC: false,
-    PPT: false,
-    RTF: false,
-    XLS: false,
-    DOCX: false,
-    XLSX: false,
-    EPUB: false,
-    MOBI: false
-  };
+  fileTypes: any = new Map<string, boolean>([
+    ['PDF', false],
+    ['DOC', false],
+    ['DOCX', false],
+    ['PPT', false],
+    ['PPTX', false],
+    ['XLS', false],
+    ['XLSX', false],
+    ['RTF', false],
+    ['EPUB', false],
+    ['MOBI', false]
+  ]);
   hits: SearchHit[] = [];
   hitCount = 0;
   totalPages = 0;
@@ -144,6 +145,13 @@ export class SearchComponent implements OnInit {
     this.modelChanged.next(text);
   }
 
+  setType(type: string): void {
+    this.fileTypes.set(type, !this.fileTypes.get(type));
+    this.page = 0;
+
+    this.refreshHits();
+  }
+
   setLanguage(language: any): void {
     document.getElementById('language-dropdown')
       ?.classList.remove('show');
@@ -176,8 +184,6 @@ export class SearchComponent implements OnInit {
   }
 
   isImageLoaded(documentId: string): boolean | undefined {
-    console.log('Get the preview loaded for document with id: ' + documentId + '.');
-
     if (!this.loadedImages.has(documentId)) {
       return false;
     }
