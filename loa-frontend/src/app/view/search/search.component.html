@@ -59,14 +59,19 @@
         <label class="form-check-label" for="doc">.doc</label>
       </div>
       <div class="form-check form-check-inline">
+        <input class="form-check-input" type="checkbox" id="docx" [(ngModel)]="fileTypes.DOCX"
+               (change)="setType('DOCX')">
+        <label class="form-check-label" for="docx">.docx</label>
+      </div>
+      <div class="form-check form-check-inline">
         <input class="form-check-input" type="checkbox" id="ppt" [(ngModel)]="fileTypes.PPT"
                (change)="setType('PPT')">
         <label class="form-check-label" for="ppt">.ppt</label>
       </div>
       <div class="form-check form-check-inline">
-        <input class="form-check-input" type="checkbox" id="rtf" [(ngModel)]="fileTypes.RTF"
-               (change)="setType('RTF')">
-        <label class="form-check-label" for="rtf">.rtf</label>
+        <input class="form-check-input" type="checkbox" id="pptx" [(ngModel)]="fileTypes.PPTX"
+               (change)="setType('PPTX')">
+        <label class="form-check-label" for="pptx">.pptx</label>
       </div>
       <div class="form-check form-check-inline">
         <input class="form-check-input" type="checkbox" id="xls" [(ngModel)]="fileTypes.XLS"
@@ -74,14 +79,14 @@
         <label class="form-check-label" for="xls">.xls</label>
       </div>
       <div class="form-check form-check-inline">
-        <input class="form-check-input" type="checkbox" id="docx" [(ngModel)]="fileTypes.DOCX"
-               (change)="setType('DOCX')">
-        <label class="form-check-label" for="docx">.docx</label>
-      </div>
-      <div class="form-check form-check-inline">
         <input class="form-check-input" type="checkbox" id="xlsx" [(ngModel)]="fileTypes.XLSX"
                (change)="setType('XLSX')">
         <label class="form-check-label" for="xlsx">.xlsx</label>
+      </div>
+      <div class="form-check form-check-inline">
+        <input class="form-check-input" type="checkbox" id="rtf" [(ngModel)]="fileTypes.RTF"
+               (change)="setType('RTF')">
+        <label class="form-check-label" for="rtf">.rtf</label>
       </div>
       <div class="form-check form-check-inline">
         <input class="form-check-input" type="checkbox" id="epub" [(ngModel)]="fileTypes.EPUB"
