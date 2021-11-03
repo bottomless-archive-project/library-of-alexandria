@@ -10,8 +10,8 @@ export class DebugDocument {
     public fileSize: number,
     public downloadDate: string,
     public downloaderVersion: number,
-    public isInVault: boolean,
-    public isInIndex: boolean
+    public inVault: boolean,
+    public inIndex: boolean
   ) {
   }
 }
