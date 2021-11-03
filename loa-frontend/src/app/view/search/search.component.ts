@@ -251,7 +251,9 @@ export class SearchComponent implements OnInit {
   refreshHits(): void {
     console.log('Should refresh hits here!', this.fileTypes);
 
-    if (this.searchText === '') {
+    if (this.searchText === '' || this.searchText.length < 3) {
+      console.log('The length of the search text is not long enough to justify a refresh.');
+
       this.hits = [];
       this.hitCount = 0;
       this.totalPages = 0;
