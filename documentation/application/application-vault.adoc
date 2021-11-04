@@ -43,7 +43,7 @@ include::../service/queue/queue-configuration.adoc[]
 | This version number will be saved to the database for every document that has been archived. It will be used later on if its necessary to run cleanup or fixing tasks that are specific to a given version. This way it will be easier to fix bugs or database inconsistencies introduced by a specific application version. Please do not change this, otherwise the official migration/fixer utilities are not going to be usable.
 
 | **loa.compression.algorithm**
-| This property describes what compression algorithm should be used while saving documents to the vault. The available values are `lzma`, `gzip`, `none`. [LZMA](https://en.wikipedia.org/wiki/Lempel%E2%80%93Ziv%E2%80%93Markov_chain_algorithm) has the best compression ratios while being quite CPU resource-intensive, [GZIP](https://en.wikipedia.org/wiki/Gzip) is better than no compression, but a little worse than LZMA while having minimal CPU footprint while `none` is saving the documents without compression. *(Default value: none)*
+| This property describes what compression algorithm should be used while saving documents to the vault. The available values are `lzma`, `gzip`, `none`. https://en.wikipedia.org/wiki/Lempel%E2%80%93Ziv%E2%80%93Markov_chain_algorithm[LZMA] has the best compression ratios while being quite CPU resource-intensive, https://en.wikipedia.org/wiki/Gzip[GZIP] is better than no compression, but a little worse than LZMA while having minimal CPU footprint while `none` is saving the documents without compression. *(Default value: none)*
 
 | **loa.checksum.type**
 | The type of the hashing algorithm used to create the document's checksum. At the moment only `SHA-256` is available for this purpose. *(Default value: sha-256)*
