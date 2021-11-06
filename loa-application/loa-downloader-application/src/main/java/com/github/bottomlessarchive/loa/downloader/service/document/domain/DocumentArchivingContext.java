@@ -14,5 +14,6 @@ public class DocumentArchivingContext {
     private final UUID id;
     private final DocumentType type;
     private final String source;
+    private final String sourceLocationId;
     private final Path contents;
 }

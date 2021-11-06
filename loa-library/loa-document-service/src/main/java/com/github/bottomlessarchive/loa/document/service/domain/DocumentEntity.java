@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.ToString;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -27,6 +28,9 @@ public class DocumentEntity {
     private final int downloaderVersion;
     @ToString.Include
     private final DocumentCompression compression;
+    private final String source;
+    @ToString.Include
+    private final List<String> sourceLocations;
 
     /**
      * Returns true if the document is saved to the vault.

@@ -47,6 +47,7 @@ public class DebugResponseFactory {
                         .fileSize(entity.getFileSize())
                         .downloadDate(entity.getDownloadDate())
                         .downloaderVersion(entity.getDownloaderVersion())
+                        .sourceLocations(entity.getSourceLocations())
                 )
                 .then();
     }

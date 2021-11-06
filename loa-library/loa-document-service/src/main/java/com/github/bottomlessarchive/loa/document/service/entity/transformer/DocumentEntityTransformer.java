@@ -9,6 +9,8 @@ import com.github.bottomlessarchive.loa.document.service.domain.DocumentType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class DocumentEntityTransformer {
@@ -26,6 +28,11 @@ public class DocumentEntityTransformer {
                 .downloadDate(documentDatabaseEntity.getDownloadDate())
                 .downloaderVersion(documentDatabaseEntity.getDownloaderVersion())
                 .compression(DocumentCompression.valueOf(documentDatabaseEntity.getCompression()))
+                .source(documentDatabaseEntity.getSource())
+                .sourceLocations(documentDatabaseEntity.getSourceLocations().stream()
+                        .map(hexConverter::encode)
+                        .collect(Collectors.toList())
+                )
                 .build();
     }
 }

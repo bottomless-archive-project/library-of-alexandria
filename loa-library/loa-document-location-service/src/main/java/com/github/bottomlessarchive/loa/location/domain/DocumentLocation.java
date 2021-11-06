@@ -8,6 +8,7 @@ import lombok.Getter;
 @Builder
 public class DocumentLocation {
 
+    private final String id;
     private final Link location;
     private final String sourceName;
 }

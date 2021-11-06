@@ -35,6 +35,7 @@ public class DocumentArchiver {
                             .id(documentArchivingContext.getId().toString())
                             .type(documentArchivingContext.getType().toString())
                             .source(documentArchivingContext.getSource())
+                            .sourceLocationId(documentArchivingContext.getSourceLocationId())
                             .contentLength(content.length)
                             .content(content)
                             .build()

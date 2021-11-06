@@ -36,18 +36,18 @@ public class DocumentLocationProcessor {
     @Qualifier("processedDocumentCount")
     private final Counter processedDocumentCount;
 
-    public Mono<Void> processDocumentLocation(final DocumentLocation documentSourceItem) {
+    public Mono<Void> processDocumentLocation(final DocumentLocation documentLocation) {
         processedDocumentCount.increment();
 
-        final URL documentLocation = documentSourceItem.getLocation().toUrl().orElseThrow();
-        final DocumentType documentType = documentTypeCalculator.calculate(documentLocation)
-                .orElseThrow(() -> new RuntimeException("Unable to find valid document type for document: " + documentLocation));
+        final URL documentLocationURL = documentLocation.getLocation().toUrl().orElseThrow();
+        final DocumentType documentType = documentTypeCalculator.calculate(documentLocationURL)
+                .orElseThrow(() -> new RuntimeException("Unable to find valid document type for document: " + documentLocationURL));
 
-        log.debug("Starting to download document {}.", documentLocation);
+        log.debug("Starting to download document {}.", documentLocationURL);
 
         return Mono.just(UUID.randomUUID())
                 .flatMap(documentId -> stageLocationFactory.getLocation(documentId.toString(), documentType)
-                        .flatMap(stageFileLocation -> acquireFile(documentLocation, stageFileLocation))
+                        .flatMap(stageFileLocation -> acquireFile(documentLocationURL, stageFileLocation))
                         .publishOn(Schedulers.parallel())
                         .flatMap(documentFileLocation -> documentFileValidator.isValidDocument(documentId.toString(), documentType)
                                 .filter(validationResult -> !validationResult)
@@ -59,8 +59,9 @@ public class DocumentLocationProcessor {
                         .flatMap(stageLocation -> Mono.just(
                                 DocumentArchivingContext.builder()
                                         .id(documentId)
-                                        .source(documentSourceItem.getSourceName())
                                         .type(documentType)
+                                        .source(documentLocation.getSourceName())
+                                        .sourceLocationId(documentLocation.getId())
                                         .contents(stageLocation.getPath())
                                         .build()
                                 )

@@ -14,6 +14,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -142,6 +143,9 @@ public class DocumentEntityFactory {
         documentDatabaseEntity.setCompression(documentCreationContext.getCompression().name());
         documentDatabaseEntity.setDownloadDate(Instant.now());
         documentDatabaseEntity.setSource(documentCreationContext.getSource());
+        documentDatabaseEntity.setSourceLocations(
+                List.of(hexConverter.decode(documentCreationContext.getSourceLocationId()))
+        );
 
         return documentRepository.insertDocument(documentDatabaseEntity)
                 .map(documentEntityTransformer::transform);
