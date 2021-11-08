@@ -5,6 +5,7 @@ import com.github.bottomlessarchive.loa.document.repository.domain.DocumentStatu
 import com.github.bottomlessarchive.loa.document.repository.domain.DocumentTypeAggregateEntity;
 import com.github.bottomlessarchive.loa.repository.configuration.RepositoryConfigurationProperties;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Updates;
 import com.mongodb.reactivestreams.client.MongoCollection;
 import lombok.RequiredArgsConstructor;
 import org.bson.conversions.Bson;
@@ -85,13 +86,19 @@ public class DocumentRepository {
 
     public Mono<Void> updateStatus(final UUID documentId, final String status) {
         return Mono.from(documentDatabaseEntityMongoCollection
-                .updateOne(eq("_id", documentId), set("status", status)))
+                        .updateOne(eq("_id", documentId), set("status", status)))
                 .then();
     }
 
     public Mono<Void> updateCompression(final UUID documentId, final String compression) {
         return Mono.from(documentDatabaseEntityMongoCollection
-                .updateOne(eq("_id", documentId), set("compression", compression)))
+                        .updateOne(eq("_id", documentId), set("compression", compression)))
+                .then();
+    }
+
+    public Mono<Void> addSourceLocation(final UUID documentId, final UUID documentLocationId) {
+        return Mono.from(documentDatabaseEntityMongoCollection
+                        .updateOne(eq("_id", documentId), Updates.addToSet("sourceLocations", documentLocationId)))
                 .then();
     }
 

@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
 
+import java.util.UUID;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -33,20 +35,26 @@ public class ArchivingService {
                 .flatMap(documentEntityFactory::newDocumentEntity)
                 .doOnNext(documentEntity -> vaultDocumentStorage.persistDocument(documentEntity,
                         documentArchivingContext.getContent()))
-                .doOnError(throwable -> handleError(throwable, documentArchivingContext))
+                .onErrorResume(throwable -> handleError(throwable, documentArchivingContext))
                 .retryWhen(
                         Retry.indefinitely()
                                 .filter(throwable -> !isDuplicateIndexError(throwable))
                 );
     }
 
-    private void handleError(final Throwable throwable, final DocumentArchivingContext documentArchivingContext) {
+    private Mono<DocumentEntity> handleError(final Throwable throwable, final DocumentArchivingContext documentArchivingContext) {
         if (isDuplicateIndexError(throwable)) {
             if (log.isInfoEnabled()) {
                 log.info("Document with id {} is a duplicate.", documentArchivingContext.getId());
             }
+
+            return documentEntityFactory.addSourceLocation(documentArchivingContext.getId(),
+                            UUID.fromString(documentArchivingContext.getSourceLocationId()))
+                    .then(Mono.empty());
         } else {
             log.error("Failed to save document!", throwable);
+
+            return Mono.empty();
         }
     }
 

@@ -14,8 +14,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.Instant;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -124,6 +124,10 @@ public class DocumentEntityFactory {
         return documentRepository.updateStatus(documentStatus.name());
     }
 
+    public Mono<Void> addSourceLocation(final UUID documentId, final UUID documentLocationId) {
+        return documentRepository.addSourceLocation(documentId, documentLocationId);
+    }
+
     /**
      * Creates a new document. The document is persisted to the database.
      *
@@ -144,7 +148,7 @@ public class DocumentEntityFactory {
         documentDatabaseEntity.setDownloadDate(Instant.now());
         documentDatabaseEntity.setSource(documentCreationContext.getSource());
         documentDatabaseEntity.setSourceLocations(
-                List.of(hexConverter.decode(documentCreationContext.getSourceLocationId()))
+                Set.of(UUID.fromString(documentCreationContext.getSourceLocationId()))
         );
 
         return documentRepository.insertDocument(documentDatabaseEntity)

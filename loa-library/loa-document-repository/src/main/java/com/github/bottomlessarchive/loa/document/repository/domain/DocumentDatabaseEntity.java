@@ -5,7 +5,7 @@ import lombok.Setter;
 import org.bson.codecs.pojo.annotations.BsonId;
 
 import java.time.Instant;
-import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Getter
@@ -18,7 +18,7 @@ public class DocumentDatabaseEntity {
     private String type;
     private String status;
     private String source;
-    private List<byte[]> sourceLocations;
+    private Set<UUID> sourceLocations;
     private String compression;
     private byte[] checksum;
     private long fileSize;
