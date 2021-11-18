@@ -1,7 +1,7 @@
 package com.github.bottomlessarchive.loa.parser.service;
 
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentType;
-import com.github.bottomlessarchive.loa.parser.domain.DocumentMetadata;
+import com.github.bottomlessarchive.loa.parser.domain.ParsingResult;
 import com.github.bottomlessarchive.loa.parser.domain.ParsingException;
 import com.github.pemistahl.lingua.api.Language;
 import com.github.pemistahl.lingua.api.LanguageDetector;
@@ -33,15 +33,15 @@ public class DocumentDataParser {
     private final Parser documentParser;
     private final LanguageDetector languageDetector;
 
-    public DocumentMetadata parseDocumentMetadata(final UUID documentId, final DocumentType documentType,
+    public ParsingResult parseDocumentMetadata(final UUID documentId, final DocumentType documentType,
             final byte[] documentContents) {
         return parseDocumentMetadata(documentId, documentType, new ByteArrayInputStream(documentContents));
     }
 
-    public DocumentMetadata parseDocumentMetadata(final UUID documentId, final DocumentType documentType,
+    public ParsingResult parseDocumentMetadata(final UUID documentId, final DocumentType documentType,
             final InputStream documentContents) {
         if (!isParsableType(documentType)) {
-            return DocumentMetadata.builder()
+            return ParsingResult.builder()
                     .id(documentId)
                     .type(documentType)
                     .build();
@@ -57,7 +57,7 @@ public class DocumentDataParser {
             final int pageCount = parsePageCount(metadata);
             final String language = detectLanguage(contentHandler);
 
-            return DocumentMetadata.builder()
+            return ParsingResult.builder()
                     .id(documentId)
                     .title(metadata.get(TikaCoreProperties.TITLE))
                     .author(metadata.get(TikaCoreProperties.CREATOR))

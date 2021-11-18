@@ -8,7 +8,7 @@ import java.util.UUID;
 
 @Getter
 @Builder
-public class DocumentMetadata {
+public class ParsingResult {
 
     private final UUID id;
     private final String content;
