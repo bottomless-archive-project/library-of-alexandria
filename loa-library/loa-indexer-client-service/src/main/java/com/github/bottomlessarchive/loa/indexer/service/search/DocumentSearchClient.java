@@ -24,7 +24,7 @@ import java.util.UUID;
  */
 @Service
 @RequiredArgsConstructor
-public class DocumentSearchService {
+public class DocumentSearchClient {
 
     private final RestHighLevelClient restHighLevelClient;
     private final IndexerRequestFactory indexerRequestFactory;

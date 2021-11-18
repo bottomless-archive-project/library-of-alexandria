@@ -1,7 +1,7 @@
-package com.github.bottomlessarchive.loa.indexer.service.index;
+package com.github.bottomlessarchive.loa.indexer.service.indexer;
 
 import com.github.bottomlessarchive.loa.document.service.DocumentManipulator;
-import com.github.bottomlessarchive.loa.indexer.service.index.domain.IndexingContext;
+import com.github.bottomlessarchive.loa.indexer.service.indexer.domain.IndexingContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.index.IndexRequest;
