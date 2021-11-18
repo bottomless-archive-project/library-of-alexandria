@@ -12,4 +12,5 @@ import org.springframework.boot.context.properties.ConstructorBinding;
 public class DownloaderFolderSourceConfiguration {
 
     private final String location;
+    private final boolean shouldRemove;
 }
