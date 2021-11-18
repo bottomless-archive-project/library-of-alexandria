@@ -36,7 +36,7 @@ public class DocumentFolderReader implements CommandLineRunner {
         Flux.fromStream(Files.list(sourceFolder))
                 .publishOn(Schedulers.boundedElastic())
                 .flatMap(path -> documentLocationProcessor.processDocumentLocation(buildDocumentSourceItem(path))
-                        .doOnNext(result -> {
+                        .thenEmpty(result -> {
                             if (downloaderFolderSourceConfiguration.isShouldRemove()) {
                                 try {
                                     Files.delete(path);
