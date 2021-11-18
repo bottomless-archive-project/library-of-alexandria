@@ -2,6 +2,7 @@ package com.github.bottomlessarchive.loa.indexer.command;
 
 import com.github.bottomlessarchive.loa.document.service.DocumentManipulator;
 import com.github.bottomlessarchive.loa.indexer.configuration.IndexerConfigurationProperties;
+import com.github.bottomlessarchive.loa.indexer.service.index.domain.IndexingContext;
 import com.github.bottomlessarchive.loa.parser.service.DocumentDataParser;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentEntity;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentStatus;
@@ -85,7 +86,18 @@ public class IndexerCommand implements CommandLineRunner {
 
                     log.info("Failed to parse document with id: {}!", documentId);
                 })
-                .doOnNext(indexerService::indexDocuments)
+                .map(documentMetadata -> IndexingContext.builder()
+                        .id(documentMetadata.getId())
+                        .author(documentMetadata.getAuthor())
+                        .content(documentMetadata.getContent())
+                        .date(documentMetadata.getDate())
+                        .language(documentMetadata.getLanguage())
+                        .pageCount(documentMetadata.getPageCount())
+                        .title(documentMetadata.getTitle())
+                        .type(documentMetadata.getType())
+                        .build()
+                )
+                .doOnNext(indexerService::indexDocument)
                 .then();
     }
 }

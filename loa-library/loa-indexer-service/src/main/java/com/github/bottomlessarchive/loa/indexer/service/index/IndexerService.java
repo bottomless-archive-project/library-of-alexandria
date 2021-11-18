@@ -1,7 +1,7 @@
 package com.github.bottomlessarchive.loa.indexer.service.index;
 
 import com.github.bottomlessarchive.loa.document.service.DocumentManipulator;
-import com.github.bottomlessarchive.loa.parser.domain.DocumentMetadata;
+import com.github.bottomlessarchive.loa.indexer.service.index.domain.IndexingContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.ElasticsearchException;
@@ -21,7 +21,7 @@ public class IndexerService {
     private final RestHighLevelClient restHighLevelClient;
     private final DocumentManipulator documentManipulator;
 
-    public void indexDocuments(final DocumentMetadata documentMetadata) {
+    public void indexDocument(final IndexingContext documentMetadata) {
         final UUID documentId = documentMetadata.getId();
 
         indexRequestFactory.newIndexRequest(documentMetadata)
