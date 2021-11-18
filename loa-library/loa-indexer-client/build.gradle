@@ -1,0 +1,7 @@
+dependencies {
+    implementation project(':loa-library:loa-document-service')
+
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-json'
+
+    implementation group: 'org.elasticsearch.client', name: 'elasticsearch-rest-high-level-client'
+}

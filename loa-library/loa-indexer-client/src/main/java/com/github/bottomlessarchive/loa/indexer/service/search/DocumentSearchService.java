@@ -1,7 +1,7 @@
 package com.github.bottomlessarchive.loa.indexer.service.search;
 
-import com.github.bottomlessarchive.loa.indexer.domain.DocumentSearchResult;
-import com.github.bottomlessarchive.loa.indexer.domain.IndexerAccessException;
+import com.github.bottomlessarchive.loa.indexer.service.search.domain.DocumentSearchResult;
+import com.github.bottomlessarchive.loa.indexer.service.search.domain.IndexerAccessException;
 import com.github.bottomlessarchive.loa.indexer.service.search.domain.SearchContext;
 import com.github.bottomlessarchive.loa.indexer.service.search.request.IndexerRequestFactory;
 import com.github.bottomlessarchive.loa.indexer.service.search.transformer.DocumentSearchEntityTransformer;
