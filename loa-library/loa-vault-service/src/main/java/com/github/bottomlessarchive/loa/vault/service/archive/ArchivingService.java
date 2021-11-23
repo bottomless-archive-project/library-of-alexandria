@@ -49,7 +49,7 @@ public class ArchivingService {
             }
 
             return documentEntityFactory.addSourceLocation(documentArchivingContext.getId(),
-                            UUID.fromString(documentArchivingContext.getSourceLocationId()))
+                            documentArchivingContext.getSourceLocationId())
                     .then(Mono.error(throwable));
         } else {
             log.error("Failed to save document!", throwable);
