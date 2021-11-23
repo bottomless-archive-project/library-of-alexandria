@@ -148,7 +148,7 @@ public class DocumentEntityFactory {
         documentDatabaseEntity.setDownloadDate(Instant.now());
         documentDatabaseEntity.setSource(documentCreationContext.getSource());
         documentDatabaseEntity.setSourceLocations(
-                Set.of(UUID.fromString(documentCreationContext.getSourceLocationId()))
+                Set.of(documentCreationContext.getSourceLocationId())
         );
 
         return documentRepository.insertDocument(documentDatabaseEntity)
