@@ -1,4 +1,4 @@
-package com.github.bottomlessarchive.loa.url.service;
+package com.github.bottomlessarchive.loa.url.service.encoder;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
