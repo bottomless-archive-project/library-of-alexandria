@@ -25,10 +25,19 @@ public class UrlEncoder {
      */
     public Mono<URL> encode(final URL url) {
         try {
-            final URI uri = new URI(url.getProtocol(), url.getUserInfo(), url.getHost(), url.getPort(), url.getPath(),
-                    url.getQuery(), url.getRef());
+            URI resultUri;
 
-            return Mono.just(new URL(uri.toASCIIString()));
+            try {
+                final URI originalUri = url.toURI();
+
+                resultUri = new URI(originalUri.getScheme(), originalUri.getUserInfo(), originalUri.getHost(), originalUri.getPort(),
+                        originalUri.getPath(), originalUri.getQuery(), originalUri.getFragment());
+            } catch (URISyntaxException e) {
+                resultUri = new URI(url.getProtocol(), url.getUserInfo(), url.getHost(), url.getPort(), url.getPath(),
+                        url.getQuery(), url.getRef());
+            }
+
+            return Mono.just(new URL(resultUri.toASCIIString()));
         } catch (URISyntaxException | MalformedURLException e) {
             // The constructor of java.net.URL doesn't always validate the passed url correctly, so an exception
             // could happen here.
