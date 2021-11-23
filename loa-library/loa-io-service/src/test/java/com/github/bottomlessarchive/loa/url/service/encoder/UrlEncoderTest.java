@@ -20,7 +20,8 @@ class UrlEncoderTest {
                     "http://www.example.com/?test=Hello world,http://www.example.com/?test=Hello%20world",
                     "http://www.example.com/?test=ŐÚőúŰÜűü,http://www.example.com/?test=%C5%90%C3%9A%C5%91%C3%BA%C5%B0%C3%9C%C5%B1%C3%BC",
                     "http://www.example.com/?test=random word £500 bank $,http://www.example.com/?test=random%20word%20%C2%A3500%20bank%20$",
-                    "http://www.aquincum.hu/wp-content/uploads/2015/06/Aquincumi-F%C3%BCzetek_14_2008.pdf,http://www.aquincum.hu/wp-content/uploads/2015/06/Aquincumi-F%C3%BCzetek_14_2008.pdf"
+                    "http://www.aquincum.hu/wp-content/uploads/2015/06/Aquincumi-F%C3%BCzetek_14_2008.pdf,http://www.aquincum.hu/wp-content/uploads/2015/06/Aquincumi-F%C3%BCzetek_14_2008.pdf",
+                    "http://www.aquincum.hu/wp-content/uploads/2015/06/Aquincumi-F%C3%BCzetek_14 _2008.pdf,http://www.aquincum.hu/wp-content/uploads/2015/06/Aquincumi-F%C3%BCzetek_14%20_2008.pdf"
             }
     )
     void testEncodeWhenUsingValidUrls(final String urlToEncode, final String expected) throws MalformedURLException {
