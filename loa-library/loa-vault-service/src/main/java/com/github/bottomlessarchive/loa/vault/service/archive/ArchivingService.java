@@ -35,11 +35,11 @@ public class ArchivingService {
                 .flatMap(documentEntityFactory::newDocumentEntity)
                 .doOnNext(documentEntity -> vaultDocumentStorage.persistDocument(documentEntity,
                         documentArchivingContext.getContent()))
-                .onErrorResume(throwable -> handleError(throwable, documentArchivingContext))
                 .retryWhen(
                         Retry.indefinitely()
                                 .filter(throwable -> !isDuplicateIndexError(throwable))
-                );
+                )
+                .onErrorResume(throwable -> handleError(throwable, documentArchivingContext));
     }
 
     private Mono<DocumentEntity> handleError(final Throwable throwable, final DocumentArchivingContext documentArchivingContext) {
@@ -50,11 +50,11 @@ public class ArchivingService {
 
             return documentEntityFactory.addSourceLocation(documentArchivingContext.getId(),
                             UUID.fromString(documentArchivingContext.getSourceLocationId()))
-                    .then(Mono.empty());
+                    .then(Mono.error(throwable));
         } else {
             log.error("Failed to save document!", throwable);
 
-            return Mono.empty();
+            return Mono.error(throwable);
         }
     }
 
