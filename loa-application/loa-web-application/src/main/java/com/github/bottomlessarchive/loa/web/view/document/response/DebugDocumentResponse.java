@@ -25,5 +25,5 @@ public class DebugDocumentResponse {
     int downloaderVersion;
     boolean isInIndex;
     boolean isInVault;
-    Set<UUID> sourceLocations;
+    Set<String> sourceLocations;
 }

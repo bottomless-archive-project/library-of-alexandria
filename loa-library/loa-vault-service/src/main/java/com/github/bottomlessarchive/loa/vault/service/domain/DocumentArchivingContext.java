@@ -14,7 +14,7 @@ public class DocumentArchivingContext {
     private final String vault;
     private final DocumentType type;
     private final String source;
-    private final UUID sourceLocationId;
+    private final String sourceLocationId;
     private final int contentLength;
     private final byte[] content;
     private final int versionNumber;

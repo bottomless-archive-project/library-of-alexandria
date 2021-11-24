@@ -124,7 +124,7 @@ public class DocumentEntityFactory {
         return documentRepository.updateStatus(documentStatus.name());
     }
 
-    public Mono<Void> addSourceLocation(final UUID documentId, final UUID documentLocationId) {
+    public Mono<Void> addSourceLocation(final UUID documentId, final String documentLocationId) {
         return documentRepository.addSourceLocation(documentId, documentLocationId);
     }
 
@@ -148,7 +148,7 @@ public class DocumentEntityFactory {
         documentDatabaseEntity.setDownloadDate(Instant.now());
         documentDatabaseEntity.setSource(documentCreationContext.getSource());
         documentDatabaseEntity.setSourceLocations(
-                Set.of(documentCreationContext.getSourceLocationId())
+                Set.of(hexConverter.decode(documentCreationContext.getSourceLocationId()))
         );
 
         return documentRepository.insertDocument(documentDatabaseEntity)

@@ -34,7 +34,7 @@ class ArchivingServiceTest {
 
     private static final byte[] CONTENT = {1, 2, 3, 4, 5};
     private static final UUID DOCUMENT_ID = UUID.fromString("321e4567-e89b-12d3-a456-556642440000");
-    private static final UUID SOURCE_LOCATION_ID = UUID.fromString("123e4567-e89b-12d3-a456-556642440000");
+    private static final String SOURCE_LOCATION_ID = "123e4567-e89b-12d3-a456-556642440000";
 
     @Mock
     private DocumentEntityFactory documentEntityFactory;

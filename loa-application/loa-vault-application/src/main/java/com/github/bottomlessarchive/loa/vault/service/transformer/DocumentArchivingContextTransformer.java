@@ -21,7 +21,7 @@ public class DocumentArchivingContextTransformer {
                 .vault(vaultConfigurationProperties.getName())
                 .type(DocumentType.valueOf(documentArchivingMessage.getType()))
                 .source(documentArchivingMessage.getSource())
-                .sourceLocationId(UUID.fromString(documentArchivingMessage.getSourceLocationId()))
+                .sourceLocationId(documentArchivingMessage.getSourceLocationId())
                 .contentLength(documentArchivingMessage.getContentLength())
                 .content(documentArchivingMessage.getContent())
                 .versionNumber(vaultConfigurationProperties.getVersionNumber())

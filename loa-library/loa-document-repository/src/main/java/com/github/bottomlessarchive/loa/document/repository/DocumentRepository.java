@@ -4,6 +4,7 @@ import com.github.bottomlessarchive.loa.document.repository.domain.DocumentDatab
 import com.github.bottomlessarchive.loa.document.repository.domain.DocumentStatusAggregateEntity;
 import com.github.bottomlessarchive.loa.document.repository.domain.DocumentTypeAggregateEntity;
 import com.github.bottomlessarchive.loa.repository.configuration.RepositoryConfigurationProperties;
+import com.github.bottomlessarchive.loa.repository.service.HexConverter;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 import com.mongodb.reactivestreams.client.MongoCollection;
@@ -27,6 +28,7 @@ import static com.mongodb.client.model.Updates.set;
 @RequiredArgsConstructor
 public class DocumentRepository {
 
+    private final HexConverter hexConverter;
     private final RepositoryConfigurationProperties repositoryConfigurationProperties;
     private final MongoCollection<DocumentDatabaseEntity> documentDatabaseEntityMongoCollection;
 
@@ -96,9 +98,9 @@ public class DocumentRepository {
                 .then();
     }
 
-    public Mono<Void> addSourceLocation(final UUID documentId, final UUID documentLocationId) {
+    public Mono<Void> addSourceLocation(final UUID documentId, final String documentLocationId) {
         return Mono.from(documentDatabaseEntityMongoCollection
-                        .updateOne(eq("_id", documentId), Updates.addToSet("sourceLocations", documentLocationId)))
+                        .updateOne(eq("_id", documentId), Updates.addToSet("sourceLocations", hexConverter.decode(documentLocationId))))
                 .then();
     }
 

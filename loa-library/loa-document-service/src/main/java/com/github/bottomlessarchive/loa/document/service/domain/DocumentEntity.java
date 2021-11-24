@@ -30,7 +30,7 @@ public class DocumentEntity {
     private final DocumentCompression compression;
     private final String source;
     @ToString.Include
-    private final Set<UUID> sourceLocations;
+    private final Set<String> sourceLocations;
 
     /**
      * Returns true if the document is saved to the vault.
