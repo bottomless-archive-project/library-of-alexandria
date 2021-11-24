@@ -1,6 +1,6 @@
 package com.github.bottomlessarchive.loa.web.view.document.service;
 
-import com.github.bottomlessarchive.loa.indexer.domain.DocumentSearchEntity;
+import com.github.bottomlessarchive.loa.indexer.service.search.domain.DocumentSearchEntity;
 import com.github.bottomlessarchive.loa.web.view.document.response.SearchDocumentEntityResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

@@ -13,4 +13,5 @@ public class IndexDatabaseConfigurationProperties {
 
     private final String host;
     private final int port;
+    private final boolean enabled;
 }

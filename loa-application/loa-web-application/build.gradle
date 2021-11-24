@@ -27,10 +27,10 @@ dependencies {
 
     implementation project(':loa-frontend')
     implementation project(':loa-library:loa-document-view')
-    implementation project(':loa-library:loa-indexer-service')
     implementation project(':loa-library:loa-statistics-service')
     implementation project(':loa-library:loa-vault-client-service')
     implementation project(':loa-library:loa-queue-artemis-service')
+    implementation project(':loa-library:loa-indexer-client-service')
 
     implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: '2.0.24'
     implementation group: 'net.coobird', name: 'thumbnailator', version: '0.4.14'

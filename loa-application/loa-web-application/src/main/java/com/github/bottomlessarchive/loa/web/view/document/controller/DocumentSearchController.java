@@ -2,7 +2,7 @@ package com.github.bottomlessarchive.loa.web.view.document.controller;
 
 import com.github.bottomlessarchive.loa.web.view.document.service.SearchDocumentEntityResponseTransformer;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentType;
-import com.github.bottomlessarchive.loa.indexer.service.search.DocumentSearchService;
+import com.github.bottomlessarchive.loa.indexer.service.search.DocumentSearchClient;
 import com.github.bottomlessarchive.loa.indexer.service.search.domain.DocumentLength;
 import com.github.bottomlessarchive.loa.indexer.service.search.domain.SearchContext;
 import com.github.bottomlessarchive.loa.web.view.document.response.DocumentSearchResponse;
@@ -21,7 +21,7 @@ import java.util.function.Function;
 @RequiredArgsConstructor
 public class DocumentSearchController {
 
-    private final DocumentSearchService documentSearchService;
+    private final DocumentSearchClient documentSearchClient;
     private final SearchDocumentEntityResponseTransformer documentEntityResponseTransformer;
 
     @GetMapping("/document/find-by/keyword/{keyword}")
@@ -44,7 +44,7 @@ public class DocumentSearchController {
             throw new IllegalArgumentException("The result size can't be lower than 10!");
         }
 
-        return Mono.fromSupplier(() -> documentSearchService.searchDocuments(
+        return Mono.fromSupplier(() -> documentSearchClient.searchDocuments(
                         SearchContext.builder()
                                 .keyword(keyword)
                                 .pageNumber(pageNumber)

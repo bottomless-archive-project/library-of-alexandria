@@ -27,6 +27,6 @@ dependencies {
 
     implementation project(':loa-library:loa-document-service')
     implementation project(':loa-library:loa-document-parser-service')
-    implementation project(':loa-library:loa-indexer-service')
+    implementation project(':loa-library:loa-indexer-client-service')
     implementation project(':loa-library:loa-vault-client-service')
 }

@@ -42,7 +42,7 @@
     <rule ref="category/java/design.xml/CyclomaticComplexity">
         <properties>
             <property name="violationSuppressXPath"
-                      value="//ClassOrInterfaceDeclaration['com.github.bottomlessarchive.loa.indexer.service.index.IndexRequestFactory']"/>
+                      value="//ClassOrInterfaceDeclaration['com.github.bottomlessarchive.loa.indexer.service.indexer.IndexRequestFactory']"/>
         </properties>
     </rule>
 

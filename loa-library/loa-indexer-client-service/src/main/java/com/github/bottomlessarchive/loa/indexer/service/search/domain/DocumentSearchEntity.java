@@ -1,4 +1,4 @@
-package com.github.bottomlessarchive.loa.indexer.domain;
+package com.github.bottomlessarchive.loa.indexer.service.search.domain;
 
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentType;
 import lombok.Builder;

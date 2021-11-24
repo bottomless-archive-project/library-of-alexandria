@@ -1,7 +1,7 @@
 package com.github.bottomlessarchive.loa.downloader.service.file;
 
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentType;
-import com.github.bottomlessarchive.loa.parser.domain.DocumentMetadata;
+import com.github.bottomlessarchive.loa.parser.domain.ParsingResult;
 import com.github.bottomlessarchive.loa.parser.service.DocumentDataParser;
 import com.github.bottomlessarchive.loa.stage.service.StageLocationFactory;
 import com.github.bottomlessarchive.loa.stage.service.domain.StageLocation;
@@ -107,7 +107,7 @@ class DocumentFileValidatorTest {
         when(stageLocation.openStream()).thenReturn(documentInputStream);
         when(documentDataParser.parseDocumentMetadata(DOCUMENT_ID, DOCUMENT_TYPE, documentInputStream))
                 .thenReturn(
-                        DocumentMetadata.builder()
+                        ParsingResult.builder()
                                 .build()
                 );
 
