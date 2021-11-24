@@ -22,6 +22,8 @@ public class VaultQueueConsumer implements Consumer<SynchronousSink<DocumentArch
         final DocumentArchivingMessage documentArchivingMessage = queueManipulator.readMessage(
                 Queue.DOCUMENT_ARCHIVING_QUEUE, DocumentArchivingMessage.class);
 
+        log.debug("Got new archiving message: {}!", documentArchivingMessage);
+
         documentArchivingMessageSynchronousSink.next(documentArchivingMessage);
     }
 }

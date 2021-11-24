@@ -6,7 +6,7 @@ import com.github.bottomlessarchive.loa.queue.service.QueueManipulator;
 import com.github.bottomlessarchive.loa.queue.service.domain.Queue;
 import com.github.bottomlessarchive.loa.queue.service.domain.message.DocumentLocationMessage;
 import com.github.bottomlessarchive.loa.source.source.DocumentLocationSource;
-import com.github.bottomlessarchive.loa.url.service.UrlEncoder;
+import com.github.bottomlessarchive.loa.url.service.encoder.UrlEncoder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;

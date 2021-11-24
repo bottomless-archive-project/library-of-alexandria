@@ -1,4 +1,4 @@
-package com.github.bottomlessarchive.loa.parser.domain;
+package com.github.bottomlessarchive.loa.indexer.service.indexer.domain;
 
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentType;
 import lombok.Builder;
@@ -8,7 +8,7 @@ import java.util.UUID;
 
 @Getter
 @Builder
-public class DocumentMetadata {
+public class IndexingContext {
 
     private final UUID id;
     private final String content;

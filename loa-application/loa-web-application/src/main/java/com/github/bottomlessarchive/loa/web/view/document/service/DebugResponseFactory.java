@@ -1,7 +1,7 @@
 package com.github.bottomlessarchive.loa.web.view.document.service;
 
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentEntity;
-import com.github.bottomlessarchive.loa.indexer.service.search.DocumentSearchService;
+import com.github.bottomlessarchive.loa.indexer.service.search.DocumentSearchClient;
 import com.github.bottomlessarchive.loa.vault.client.service.VaultClientService;
 import com.github.bottomlessarchive.loa.web.view.document.response.DebugDocumentResponse;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +13,7 @@ import reactor.core.publisher.Mono;
 public class DebugResponseFactory {
 
     private final VaultClientService vaultClientService;
-    private final DocumentSearchService documentSearchService;
+    private final DocumentSearchClient documentSearchClient;
 
     public Mono<DebugDocumentResponse> newDebugDocumentResponse(final DocumentEntity documentEntity) {
         final DebugDocumentResponse.DebugDocumentResponseBuilder builder =
@@ -29,7 +29,7 @@ public class DebugResponseFactory {
 
     private Mono<Void> fillIndexData(final DocumentEntity documentEntity,
             final DebugDocumentResponse.DebugDocumentResponseBuilder builder) {
-        return Mono.fromCallable(() -> documentSearchService.isDocumentInIndex(documentEntity.getId()))
+        return Mono.fromCallable(() -> documentSearchClient.isDocumentInIndex(documentEntity.getId()))
                 .map(builder::isInIndex)
                 .then();
     }

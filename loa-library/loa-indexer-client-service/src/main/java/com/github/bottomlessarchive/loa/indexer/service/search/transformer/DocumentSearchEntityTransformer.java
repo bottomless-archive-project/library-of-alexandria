@@ -1,8 +1,8 @@
 package com.github.bottomlessarchive.loa.indexer.service.search.transformer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.bottomlessarchive.loa.indexer.domain.DocumentSearchEntity;
-import com.github.bottomlessarchive.loa.indexer.domain.IndexerAccessException;
+import com.github.bottomlessarchive.loa.indexer.service.search.domain.DocumentSearchEntity;
+import com.github.bottomlessarchive.loa.indexer.service.search.domain.IndexerAccessException;
 import com.github.bottomlessarchive.loa.indexer.service.search.domain.SearchDatabaseEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -2,12 +2,13 @@ package com.github.bottomlessarchive.loa.indexer.command;
 
 import com.github.bottomlessarchive.loa.document.service.DocumentManipulator;
 import com.github.bottomlessarchive.loa.indexer.configuration.IndexerConfigurationProperties;
+import com.github.bottomlessarchive.loa.indexer.service.indexer.domain.IndexingContext;
 import com.github.bottomlessarchive.loa.parser.service.DocumentDataParser;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentEntity;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentStatus;
 import com.github.bottomlessarchive.loa.document.service.entity.factory.DocumentEntityFactory;
-import com.github.bottomlessarchive.loa.indexer.service.index.IndexerService;
-import com.github.bottomlessarchive.loa.indexer.service.search.DocumentSearchService;
+import com.github.bottomlessarchive.loa.indexer.service.indexer.IndexerClient;
+import com.github.bottomlessarchive.loa.indexer.service.search.DocumentSearchClient;
 import com.github.bottomlessarchive.loa.vault.client.service.VaultClientService;
 import com.github.bottomlessarchive.loa.vault.client.service.domain.VaultAccessException;
 import lombok.RequiredArgsConstructor;
@@ -31,18 +32,18 @@ public class IndexerCommand implements CommandLineRunner {
 
     private final DocumentEntityFactory documentEntityFactory;
     private final IndexerConfigurationProperties indexerConfigurationProperties;
-    private final IndexerService indexerService;
+    private final IndexerClient indexerClient;
     private final VaultClientService vaultClientService;
     private final DocumentDataParser documentDataParser;
     private final DocumentManipulator documentManipulator;
-    private final DocumentSearchService documentSearchService;
+    private final DocumentSearchClient documentSearchClient;
 
     @Override
     public void run(final String... args) {
-        if (!documentSearchService.isSearchEngineInitialized()) {
+        if (!documentSearchClient.isSearchEngineInitialized()) {
             log.info("Initializing the search engine!");
 
-            documentSearchService.initializeSearchEngine();
+            documentSearchClient.initializeSearchEngine();
         }
 
         log.info("Start document indexing.");
@@ -85,7 +86,18 @@ public class IndexerCommand implements CommandLineRunner {
 
                     log.info("Failed to parse document with id: {}!", documentId);
                 })
-                .doOnNext(indexerService::indexDocuments)
+                .map(documentMetadata -> IndexingContext.builder()
+                        .id(documentMetadata.getId())
+                        .author(documentMetadata.getAuthor())
+                        .content(documentMetadata.getContent())
+                        .date(documentMetadata.getDate())
+                        .language(documentMetadata.getLanguage())
+                        .pageCount(documentMetadata.getPageCount())
+                        .title(documentMetadata.getTitle())
+                        .type(documentMetadata.getType())
+                        .build()
+                )
+                .doOnNext(indexerClient::indexDocument)
                 .then();
     }
 }
