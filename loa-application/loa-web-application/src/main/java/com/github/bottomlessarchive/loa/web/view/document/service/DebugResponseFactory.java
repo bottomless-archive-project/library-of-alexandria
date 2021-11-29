@@ -20,7 +20,7 @@ public class DebugResponseFactory {
                 DebugDocumentResponse.builder();
 
         return Mono.when(
-                        this.fillIndexData(documentEntity, builder),
+                        //this.fillIndexData(documentEntity, builder),
                         this.fillEntityData(documentEntity, builder),
                         this.fillExistsInVault(documentEntity, builder)
                 )

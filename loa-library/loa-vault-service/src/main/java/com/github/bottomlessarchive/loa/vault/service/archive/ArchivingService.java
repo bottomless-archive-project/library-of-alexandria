@@ -1,5 +1,6 @@
 package com.github.bottomlessarchive.loa.vault.service.archive;
 
+import com.github.bottomlessarchive.loa.checksum.service.ChecksumProvider;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentEntity;
 import com.github.bottomlessarchive.loa.document.service.entity.factory.DocumentEntityFactory;
 import com.github.bottomlessarchive.loa.vault.service.backend.service.VaultDocumentStorage;
@@ -18,6 +19,7 @@ public class ArchivingService {
 
     private static final int DUPLICATE_DOCUMENT_ID_ERROR_CODE = 11000;
 
+    private final ChecksumProvider checksumProvider;
     private final DocumentEntityFactory documentEntityFactory;
     private final DocumentCreationContextFactory documentCreationContextFactory;
     private final VaultDocumentStorage vaultDocumentStorage;
@@ -46,8 +48,11 @@ public class ArchivingService {
                 log.info("Document with id {} is a duplicate.", documentArchivingContext.getId());
             }
 
-            return documentEntityFactory.addSourceLocation(documentArchivingContext.getId(),
-                            documentArchivingContext.getSourceLocationId())
+            return checksumProvider.checksum(documentArchivingContext.getContent())
+                    .flatMap(checksum -> documentEntityFactory.getDocumentEntity(checksum, documentArchivingContext.getContentLength(),
+                            documentArchivingContext.getType().toString()))
+                    .flatMap(duplicateOf -> documentEntityFactory.addSourceLocation(
+                            duplicateOf.getId(), documentArchivingContext.getSourceLocationId()))
                     .then(Mono.error(throwable));
         } else {
             log.error("Failed to save document!", throwable);

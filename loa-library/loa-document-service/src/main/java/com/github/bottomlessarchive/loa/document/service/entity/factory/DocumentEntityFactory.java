@@ -38,6 +38,13 @@ public class DocumentEntityFactory {
                 .map(documentEntityTransformer::transform);
     }
 
+    public Mono<DocumentEntity> getDocumentEntity(final String checksum, final long fileSize, final String type) {
+        final byte[] checksumAsHex = hexConverter.decode(checksum);
+
+        return documentRepository.findByChecksumAndFileSizeAndType(checksumAsHex, fileSize, type)
+                .map(documentEntityTransformer::transform);
+    }
+
     /**
      * Return the document entities belonging to the provided status.
      *

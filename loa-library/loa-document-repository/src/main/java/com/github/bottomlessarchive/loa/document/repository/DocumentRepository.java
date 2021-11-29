@@ -21,6 +21,7 @@ import java.util.UUID;
 
 import static com.mongodb.client.model.Accumulators.sum;
 import static com.mongodb.client.model.Aggregates.group;
+import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Updates.set;
 
@@ -44,6 +45,11 @@ public class DocumentRepository {
 
     public Mono<DocumentDatabaseEntity> findById(final UUID documentId) {
         return Mono.from(documentDatabaseEntityMongoCollection.find(eq("_id", documentId)));
+    }
+
+    public Mono<DocumentDatabaseEntity> findByChecksumAndFileSizeAndType(final byte[] checksum, final long fileSize, final String type) {
+        return Mono.from(documentDatabaseEntityMongoCollection.find(and(eq("checksum", checksum),
+                eq("fileSize", fileSize), eq("type", type))));
     }
 
     /**
@@ -82,7 +88,7 @@ public class DocumentRepository {
      */
     public Mono<Void> updateStatus(final String status) {
         return Mono.from(documentDatabaseEntityMongoCollection
-                .updateMany(Filters.empty(), set("status", status)))
+                        .updateMany(Filters.empty(), set("status", status)))
                 .then();
     }
 
