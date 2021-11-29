@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.UUID;
@@ -29,11 +28,5 @@ public class DebugController {
                 .flatMap(debugResponseFactory::newDebugDocumentResponse)
                 .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Document not found with id " + documentId + "!")));
-    }
-
-    @GetMapping("/documents")
-    public Flux<DebugDocumentResponse> getDocuments() {
-        return documentEntityFactory.getDocumentEntities()
-                .flatMap(debugResponseFactory::newDebugDocumentResponse);
     }
 }
