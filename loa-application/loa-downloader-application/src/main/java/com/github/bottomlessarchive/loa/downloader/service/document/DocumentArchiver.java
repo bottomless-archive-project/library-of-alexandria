@@ -47,7 +47,7 @@ public class DocumentArchiver {
 
     public DocumentArchivingMessage newDocumentArchivingMessage(final DocumentArchivingContext documentArchivingContext,
             final byte[] content) {
-        return  DocumentArchivingMessage.builder()
+        return DocumentArchivingMessage.builder()
                 .id(documentArchivingContext.getId().toString())
                 .type(documentArchivingContext.getType().toString())
                 .source(documentArchivingContext.getSource())
