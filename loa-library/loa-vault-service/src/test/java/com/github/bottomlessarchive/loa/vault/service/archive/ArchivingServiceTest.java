@@ -1,6 +1,8 @@
 package com.github.bottomlessarchive.loa.vault.service.archive;
 
+import com.github.bottomlessarchive.loa.checksum.service.ChecksumProvider;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentEntity;
+import com.github.bottomlessarchive.loa.document.service.domain.DocumentType;
 import com.github.bottomlessarchive.loa.document.service.entity.factory.DocumentEntityFactory;
 import com.github.bottomlessarchive.loa.document.service.entity.factory.domain.DocumentCreationContext;
 import com.github.bottomlessarchive.loa.vault.service.backend.service.VaultDocumentStorage;
@@ -32,6 +34,8 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class ArchivingServiceTest {
 
+    private static final int DUPLICATE_DOCUMENT_ID_ERROR_CODE = 11000;
+
     private static final byte[] CONTENT = {1, 2, 3, 4, 5};
     private static final UUID DOCUMENT_ID = UUID.fromString("321e4567-e89b-12d3-a456-556642440000");
     private static final String SOURCE_LOCATION_ID = "123e4567-e89b-12d3-a456-556642440000";
@@ -44,6 +48,9 @@ class ArchivingServiceTest {
 
     @Mock
     private VaultDocumentStorage vaultDocumentStorage;
+
+    @Mock
+    private ChecksumProvider checksumProvider;
 
     @Captor
     private ArgumentCaptor<byte[]> documentContent;
@@ -89,13 +96,21 @@ class ArchivingServiceTest {
         final MongoWriteException mongoWriteException = mock(MongoWriteException.class);
         final WriteError writeError = mock(WriteError.class);
         when(writeError.getCode())
-                .thenReturn(11000);
+                .thenReturn(DUPLICATE_DOCUMENT_ID_ERROR_CODE);
         when(mongoWriteException.getError())
                 .thenReturn(writeError);
         //Do a normal exception, then a retry happens and throw the mongo exception to stop the retries
         doThrow(new RuntimeException("Test exception"), mongoWriteException)
                 .when(vaultDocumentStorage).persistDocument(any(), any());
-        when(documentEntityFactory.addSourceLocation(DOCUMENT_ID, SOURCE_LOCATION_ID))
+        final UUID duplicateOfId = UUID.fromString("a10bb054-2d2c-41e8-8d0d-752cc7f0c778");
+        final DocumentEntity duplicateOf = DocumentEntity.builder()
+                .id(duplicateOfId)
+                .build();
+        when(checksumProvider.checksum(documentArchivingContext.getContent()))
+                .thenReturn(Mono.just("test-checksum"));
+        when(documentEntityFactory.getDocumentEntity("test-checksum", CONTENT.length, "PDF"))
+                .thenReturn(Mono.just(duplicateOf));
+        when(documentEntityFactory.addSourceLocation(duplicateOfId, SOURCE_LOCATION_ID))
                 .thenReturn(Mono.empty());
 
         final Mono<DocumentEntity> result = underTest.archiveDocument(documentArchivingContext);
@@ -104,13 +119,16 @@ class ArchivingServiceTest {
                 .verifyError(MongoWriteException.class);
 
         verify(vaultDocumentStorage, times(2)).persistDocument(any(), any());
+        verify(documentEntityFactory).addSourceLocation(duplicateOfId, SOURCE_LOCATION_ID);
     }
 
     private DocumentArchivingContext createDocumentArchivingContext() {
         return DocumentArchivingContext.builder()
                 .id(DOCUMENT_ID)
                 .content(CONTENT)
+                .contentLength(CONTENT.length)
                 .sourceLocationId(SOURCE_LOCATION_ID)
+                .type(DocumentType.PDF)
                 .build();
     }
 }

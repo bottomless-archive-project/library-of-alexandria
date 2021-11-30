@@ -26,6 +26,8 @@ public class ArchivingService {
 
     /**
      * Archives a document to the vault. The document will be saved to the vault's physical storage and inserted into the database as well.
+     * If the document is a duplicate (evaluated by its checksum) then the original document's (the one that the newly inserted document is
+     * the duplicate of) source locations will be updated with the source location of the document that is being inserted.
      *
      * @param documentArchivingContext the context of the document to archive
      * @return the archived document's representation in the database
@@ -49,16 +51,33 @@ public class ArchivingService {
             }
 
             return checksumProvider.checksum(documentArchivingContext.getContent())
-                    .flatMap(checksum -> documentEntityFactory.getDocumentEntity(checksum, documentArchivingContext.getContentLength(),
-                            documentArchivingContext.getType().toString()))
-                    .flatMap(duplicateOf -> documentEntityFactory.addSourceLocation(
-                            duplicateOf.getId(), documentArchivingContext.getSourceLocationId()))
+                    .flatMap(checksum -> getOriginalDocumentEntity(checksum, documentArchivingContext))
+                    .doOnNext(originalDocumentEntity -> logAddingSourceLocation(originalDocumentEntity, documentArchivingContext))
+                    .flatMap(originalDocumentEntity -> addSourceLocation(originalDocumentEntity, documentArchivingContext))
                     .then(Mono.error(throwable));
         } else {
             log.error("Failed to save document!", throwable);
 
             return Mono.error(throwable);
         }
+    }
+
+    private Mono<DocumentEntity> getOriginalDocumentEntity(final String checksum, final DocumentArchivingContext documentArchivingContext) {
+        return documentEntityFactory.getDocumentEntity(checksum, documentArchivingContext.getContentLength(),
+                documentArchivingContext.getType().toString());
+    }
+
+    private void logAddingSourceLocation(final DocumentEntity originalDocumentEntity,
+            final DocumentArchivingContext documentArchivingContext) {
+        if (log.isInfoEnabled()) {
+            log.info("Adding new source location: {} to document: {}.", documentArchivingContext.getSourceLocationId(),
+                    originalDocumentEntity.getId());
+        }
+    }
+
+    private Mono<Void> addSourceLocation(final DocumentEntity originalDocumentEntity,
+            final DocumentArchivingContext documentArchivingContext) {
+        return documentEntityFactory.addSourceLocation(originalDocumentEntity.getId(), documentArchivingContext.getSourceLocationId());
     }
 
     private boolean isDuplicateIndexError(final Throwable throwable) {
