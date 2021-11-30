@@ -17,7 +17,7 @@ public class DocumentLocationRepository {
 
     private final MongoCollection<DocumentLocationDatabaseEntity> documentLocationDatabaseEntityMongoCollection;
 
-    public Mono<DocumentLocationDatabaseEntity> getById(byte[] id) {
+    public Mono<DocumentLocationDatabaseEntity> getById(final byte[] id) {
         return Mono.from(documentLocationDatabaseEntityMongoCollection.find(eq("_id", id)));
     }
 

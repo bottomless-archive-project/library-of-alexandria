@@ -11,7 +11,8 @@ export class DebugDocument {
     public downloadDate: string,
     public downloaderVersion: number,
     public inVault: boolean,
-    public inIndex: boolean
+    public inIndex: boolean,
+    public sourceLocations: string[]
   ) {
   }
 }
