@@ -4,7 +4,9 @@ import com.github.bottomlessarchive.loa.document.repository.domain.DocumentDatab
 import com.github.bottomlessarchive.loa.document.repository.domain.DocumentStatusAggregateEntity;
 import com.github.bottomlessarchive.loa.document.repository.domain.DocumentTypeAggregateEntity;
 import com.github.bottomlessarchive.loa.repository.configuration.RepositoryConfigurationProperties;
+import com.github.bottomlessarchive.loa.repository.service.HexConverter;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Updates;
 import com.mongodb.reactivestreams.client.MongoCollection;
 import lombok.RequiredArgsConstructor;
 import org.bson.conversions.Bson;
@@ -19,6 +21,7 @@ import java.util.UUID;
 
 import static com.mongodb.client.model.Accumulators.sum;
 import static com.mongodb.client.model.Aggregates.group;
+import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Updates.set;
 
@@ -26,6 +29,7 @@ import static com.mongodb.client.model.Updates.set;
 @RequiredArgsConstructor
 public class DocumentRepository {
 
+    private final HexConverter hexConverter;
     private final RepositoryConfigurationProperties repositoryConfigurationProperties;
     private final MongoCollection<DocumentDatabaseEntity> documentDatabaseEntityMongoCollection;
 
@@ -41,6 +45,11 @@ public class DocumentRepository {
 
     public Mono<DocumentDatabaseEntity> findById(final UUID documentId) {
         return Mono.from(documentDatabaseEntityMongoCollection.find(eq("_id", documentId)));
+    }
+
+    public Mono<DocumentDatabaseEntity> findByChecksumAndFileSizeAndType(final byte[] checksum, final long fileSize, final String type) {
+        return Mono.from(documentDatabaseEntityMongoCollection.find(and(eq("checksum", checksum),
+                eq("fileSize", fileSize), eq("type", type))));
     }
 
     /**
@@ -79,19 +88,25 @@ public class DocumentRepository {
      */
     public Mono<Void> updateStatus(final String status) {
         return Mono.from(documentDatabaseEntityMongoCollection
-                .updateMany(Filters.empty(), set("status", status)))
+                        .updateMany(Filters.empty(), set("status", status)))
                 .then();
     }
 
     public Mono<Void> updateStatus(final UUID documentId, final String status) {
         return Mono.from(documentDatabaseEntityMongoCollection
-                .updateOne(eq("_id", documentId), set("status", status)))
+                        .updateOne(eq("_id", documentId), set("status", status)))
                 .then();
     }
 
     public Mono<Void> updateCompression(final UUID documentId, final String compression) {
         return Mono.from(documentDatabaseEntityMongoCollection
-                .updateOne(eq("_id", documentId), set("compression", compression)))
+                        .updateOne(eq("_id", documentId), set("compression", compression)))
+                .then();
+    }
+
+    public Mono<Void> addSourceLocation(final UUID documentId, final String documentLocationId) {
+        return Mono.from(documentDatabaseEntityMongoCollection
+                        .updateOne(eq("_id", documentId), Updates.addToSet("sourceLocations", hexConverter.decode(documentLocationId))))
                 .then();
     }
 

@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
+import static com.mongodb.client.model.Filters.eq;
+
 @Component
 @RequiredArgsConstructor
 public class DocumentLocationRepository {
@@ -14,6 +16,10 @@ public class DocumentLocationRepository {
     private static final int DUPLICATE_DOCUMENT_ID_ERROR_CODE = 11000;
 
     private final MongoCollection<DocumentLocationDatabaseEntity> documentLocationDatabaseEntityMongoCollection;
+
+    public Mono<DocumentLocationDatabaseEntity> getById(final byte[] id) {
+        return Mono.from(documentLocationDatabaseEntityMongoCollection.find(eq("_id", id)));
+    }
 
     public Mono<Boolean> existsOrInsert(final DocumentLocationDatabaseEntity documentLocationDatabaseEntity) {
         return Mono.from(documentLocationDatabaseEntityMongoCollection.insertOne(documentLocationDatabaseEntity))

@@ -1,6 +1,7 @@
 package com.github.bottomlessarchive.loa.downloader.service.source.queue;
 
 import com.github.bottomlessarchive.loa.location.domain.link.UrlLink;
+import com.github.bottomlessarchive.loa.location.service.id.factory.DocumentLocationIdFactory;
 import com.github.bottomlessarchive.loa.queue.service.QueueManipulator;
 import com.github.bottomlessarchive.loa.queue.service.domain.message.DocumentLocationMessage;
 import com.github.bottomlessarchive.loa.location.domain.DocumentLocation;
@@ -22,6 +23,7 @@ import java.util.function.Consumer;
 public class DownloaderQueueConsumer implements Consumer<SynchronousSink<DocumentLocation>> {
 
     private final QueueManipulator queueManipulator;
+    private final DocumentLocationIdFactory documentLocationIdFactory;
 
     @Override
     public void accept(final SynchronousSink<DocumentLocation> documentSourceItemSynchronousSink) {
@@ -29,14 +31,17 @@ public class DownloaderQueueConsumer implements Consumer<SynchronousSink<Documen
                 queueManipulator.readMessage(Queue.DOCUMENT_LOCATION_QUEUE, DocumentLocationMessage.class);
 
         try {
+            final URL documentLocationURL = new URL(documentLocationMessage.getDocumentLocation());
+
             documentSourceItemSynchronousSink.next(
                     DocumentLocation.builder()
-                            .sourceName(documentLocationMessage.getSourceName())
+                            .id(documentLocationIdFactory.newDocumentLocationId(documentLocationURL))
                             .location(
                                     UrlLink.builder()
-                                            .url(new URL(documentLocationMessage.getDocumentLocation()))
+                                            .url(documentLocationURL)
                                             .build()
                             )
+                            .sourceName(documentLocationMessage.getSourceName())
                             .build()
             );
         } catch (final MalformedURLException e) {
