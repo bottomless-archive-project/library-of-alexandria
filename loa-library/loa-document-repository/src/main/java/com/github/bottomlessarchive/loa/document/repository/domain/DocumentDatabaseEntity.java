@@ -28,6 +28,6 @@ public class DocumentDatabaseEntity {
 
     public Set<byte[]> getSourceLocations() {
         // Older documents doesn't have sourceLocations populated
-        return sourceLocations != null ? sourceLocations : Collections.emptySet();
+        return sourceLocations == null ? Collections.emptySet() : sourceLocations;
     }
 }

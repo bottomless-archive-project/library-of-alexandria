@@ -45,7 +45,7 @@ public class DocumentArchiver {
         return Mono.just(documentArchivingContext);
     }
 
-    public DocumentArchivingMessage newDocumentArchivingMessage(final DocumentArchivingContext documentArchivingContext,
+    private DocumentArchivingMessage newDocumentArchivingMessage(final DocumentArchivingContext documentArchivingContext,
             final byte[] content) {
         return DocumentArchivingMessage.builder()
                 .id(documentArchivingContext.getId().toString())
