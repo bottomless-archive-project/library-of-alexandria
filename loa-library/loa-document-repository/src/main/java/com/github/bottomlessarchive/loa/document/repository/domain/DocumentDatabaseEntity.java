@@ -27,6 +27,7 @@ public class DocumentDatabaseEntity {
     private int downloaderVersion;
 
     public Set<byte[]> getSourceLocations() {
+        // Older documents doesn't have sourceLocations populated
         return sourceLocations != null ? sourceLocations : Collections.emptySet();
     }
 }
