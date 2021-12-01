@@ -5,6 +5,7 @@ import lombok.Setter;
 import org.bson.codecs.pojo.annotations.BsonId;
 
 import java.time.Instant;
+import java.util.Collections;
 import java.util.Set;
 import java.util.UUID;
 
@@ -24,4 +25,8 @@ public class DocumentDatabaseEntity {
     private long fileSize;
     private Instant downloadDate;
     private int downloaderVersion;
+
+    public Set<byte[]> getSourceLocations() {
+        return sourceLocations != null ? sourceLocations : Collections.emptySet();
+    }
 }
