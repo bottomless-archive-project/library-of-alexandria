@@ -1,10 +1,10 @@
-package com.github.bottomlessarchive.loa.downloader.service.file;
+package com.github.bottomlessarchive.loa.validator.service;
 
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentType;
-import com.github.bottomlessarchive.loa.downloader.configuration.DownloaderConfigurationProperties;
 import com.github.bottomlessarchive.loa.parser.service.DocumentDataParser;
 import com.github.bottomlessarchive.loa.stage.service.StageLocationFactory;
 import com.github.bottomlessarchive.loa.stage.service.domain.StageLocation;
+import com.github.bottomlessarchive.loa.validator.configuration.FileValidationConfigurationProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,7 +26,7 @@ public class DocumentFileValidator {
 
     private final DocumentDataParser documentDataParser;
     private final StageLocationFactory stageLocationFactory;
-    private final DownloaderConfigurationProperties downloaderConfigurationProperties;
+    private final FileValidationConfigurationProperties fileValidationConfigurationProperties;
 
     /**
      * Evaluates a document's validity based on the document's properties in the staging area.
@@ -43,7 +43,7 @@ public class DocumentFileValidator {
 
     private boolean isValidFileSize(final long stageFileSize) {
         return stageFileSize > MINIMUM_FILE_LENGTH
-                && stageFileSize < downloaderConfigurationProperties.getMaximumArchiveSize();
+                && stageFileSize < fileValidationConfigurationProperties.getMaximumArchiveSize();
     }
 
     private boolean isParsable(final String documentId, final DocumentType documentType,

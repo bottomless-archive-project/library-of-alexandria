@@ -39,5 +39,6 @@ include 'loa-library:loa-queue-artemis-service'
 include 'loa-library:loa-statistics-service'
 include 'loa-library:loa-statistics-repository'
 include 'loa-library:loa-logging-service'
+include 'loa-library:loa-validator-service'
 include 'loa-library:loa-repository'
 

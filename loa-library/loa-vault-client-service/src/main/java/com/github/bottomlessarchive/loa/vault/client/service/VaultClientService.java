@@ -124,4 +124,9 @@ public class VaultClientService {
                 .retrieveMono(DocumentExistsResponse.class)
                 .map(DocumentExistsResponse::isExists);
     }
+
+    public Mono<Void> replaceCorruptDocument(final DocumentEntity documentEntity, final byte[] content) {
+        //TODO!
+        return Mono.empty();
+    }
 }

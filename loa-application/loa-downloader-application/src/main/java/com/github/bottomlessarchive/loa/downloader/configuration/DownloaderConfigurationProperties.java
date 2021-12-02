@@ -17,10 +17,5 @@ public class DownloaderConfigurationProperties {
      */
     private final int versionNumber;
 
-    /**
-     * Maximum file size to archive in bytes. Documents bigger than this in size are not archived.
-     */
-    private final long maximumArchiveSize = 8589934592L;
-
     private final SourceLocation source;
 }
