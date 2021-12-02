@@ -19,6 +19,7 @@ import reactor.test.StepVerifier;
 import java.io.ByteArrayInputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Path;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -54,12 +55,19 @@ class SourceLocationRecrawlerServiceTest {
         when(stageLocationFactory.getLocation(any(), eq(DocumentType.PDF)))
                 .thenReturn(Mono.just(stageLocation));
 
+        final Path mockPath = mock(Path.class);
+        when(stageLocation.getPath())
+                .thenReturn(mockPath);
+        when(fileDownloadManager.downloadFile(sourceLocation, mockPath))
+                .thenReturn(Mono.just(mockPath));
+
         when(documentFileValidator.isValidDocument(any(), eq(DocumentType.PDF)))
                 .thenReturn(Mono.just(true));
 
+        final byte[] content = new byte[]{1, 2, 3};
         when(stageLocation.openStream())
-                .thenReturn(new ByteArrayInputStream(new byte[]{1, 2, 3}));
-        when(vaultClientService.replaceCorruptDocument(documentEntity, new byte[]{1, 2, 3}))
+                .thenReturn(new ByteArrayInputStream(content));
+        when(vaultClientService.replaceCorruptDocument(documentEntity, content))
                 .thenReturn(Mono.empty());
 
         Mono<DocumentEntity> result = underTest.recrawlSourceLocation(sourceLocation, documentEntity);
@@ -69,5 +77,6 @@ class SourceLocationRecrawlerServiceTest {
                 .verifyComplete();
 
         verify(stageLocation).cleanup();
+        verify(vaultClientService).replaceCorruptDocument(documentEntity, content);
     }
 }

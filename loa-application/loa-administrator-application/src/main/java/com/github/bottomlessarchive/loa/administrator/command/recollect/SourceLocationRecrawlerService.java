@@ -40,14 +40,15 @@ public class SourceLocationRecrawlerService {
                         .thenReturn(documentFileLocation)
                 )
                 .filterWhen(StageLocation::exists)
-                .map(location -> {
+                .flatMap(location -> {
                     try (final InputStream content = location.openStream()) {
-                        return vaultClientService.replaceCorruptDocument(documentEntity, content.readAllBytes());
+                        return vaultClientService.replaceCorruptDocument(documentEntity, content.readAllBytes())
+                                .then(Mono.just(location));
                     } catch (IOException e) {
                         throw new RuntimeException();
                     }
                 })
-                .flatMap(location -> cleanup(documentRecrawlId, documentEntity.getType()))
+                .flatMap(StageLocation::cleanup)
                 .onErrorResume(error -> {
                     if (log.isDebugEnabled()) {
                         log.debug("Error downloading a document: {}!", error.getMessage());
@@ -61,10 +62,5 @@ public class SourceLocationRecrawlerService {
     private Mono<StageLocation> acquireFile(final URL documentLocation, final StageLocation stageLocation) {
         return fileDownloadManager.downloadFile(documentLocation, stageLocation.getPath())
                 .thenReturn(stageLocation);
-    }
-
-    private Mono<Void> cleanup(final String documentRecrawlId, final DocumentType documentType) {
-        return stageLocationFactory.getLocation(documentRecrawlId, documentType)
-                .flatMap(StageLocation::cleanup);
     }
 }
