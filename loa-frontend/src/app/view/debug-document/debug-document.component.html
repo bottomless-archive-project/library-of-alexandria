@@ -33,8 +33,6 @@
           <dd>{{document.compression}}</dd>
           <dt>Is present in vault:</dt>
           <dd>{{document.inVault}}</dd>
-          <dt>Is present in index:</dt>
-          <dd>{{document.inIndex}}</dd>
         </dl>
       </div>
       <div class="col-6">
@@ -47,6 +45,19 @@
           <dd>{{document.downloadDate}}</dd>
           <dt>Download version:</dt>
           <dd>{{document.downloaderVersion}}</dd>
+          <dt>Is present in index:</dt>
+          <dd>{{document.inIndex}}</dd>
+        </dl>
+      </div>
+    </div>
+
+    <div class="row" *ngIf="document">
+      <div class="col-12">
+        <dl class="mb-0">
+          <dt>Source locations:</dt>
+          <dd *ngFor="let documentLocation of document.sourceLocations" class="mb-0">
+            <a [href]="documentLocation" target="_blank">{{documentLocation}}</a>
+          </dd>
         </dl>
       </div>
     </div>

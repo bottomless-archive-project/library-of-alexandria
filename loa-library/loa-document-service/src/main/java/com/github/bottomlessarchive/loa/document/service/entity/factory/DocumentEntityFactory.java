@@ -15,6 +15,7 @@ import reactor.core.publisher.Mono;
 
 import java.time.Instant;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -34,6 +35,13 @@ public class DocumentEntityFactory {
      */
     public Mono<DocumentEntity> getDocumentEntity(final UUID documentId) {
         return documentRepository.findById(documentId)
+                .map(documentEntityTransformer::transform);
+    }
+
+    public Mono<DocumentEntity> getDocumentEntity(final String checksum, final long fileSize, final String type) {
+        final byte[] checksumAsHex = hexConverter.decode(checksum);
+
+        return documentRepository.findByChecksumAndFileSizeAndType(checksumAsHex, fileSize, type)
                 .map(documentEntityTransformer::transform);
     }
 
@@ -123,6 +131,10 @@ public class DocumentEntityFactory {
         return documentRepository.updateStatus(documentStatus.name());
     }
 
+    public Mono<Void> addSourceLocation(final UUID documentId, final String documentLocationId) {
+        return documentRepository.addSourceLocation(documentId, documentLocationId);
+    }
+
     /**
      * Creates a new document. The document is persisted to the database.
      *
@@ -142,6 +154,9 @@ public class DocumentEntityFactory {
         documentDatabaseEntity.setCompression(documentCreationContext.getCompression().name());
         documentDatabaseEntity.setDownloadDate(Instant.now());
         documentDatabaseEntity.setSource(documentCreationContext.getSource());
+        documentDatabaseEntity.setSourceLocations(
+                Set.of(hexConverter.decode(documentCreationContext.getSourceLocationId()))
+        );
 
         return documentRepository.insertDocument(documentDatabaseEntity)
                 .map(documentEntityTransformer::transform);

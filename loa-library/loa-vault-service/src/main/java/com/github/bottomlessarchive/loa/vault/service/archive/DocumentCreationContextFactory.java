@@ -25,6 +25,7 @@ public class DocumentCreationContextFactory {
                         .type(documentArchivingContext.getType())
                         .status(DocumentStatus.DOWNLOADED)
                         .source(documentArchivingContext.getSource())
+                        .sourceLocationId(documentArchivingContext.getSourceLocationId())
                         .versionNumber(documentArchivingContext.getVersionNumber())
                         .compression(compressionConfigurationProperties.getAlgorithm())
                         .checksum(checksum)

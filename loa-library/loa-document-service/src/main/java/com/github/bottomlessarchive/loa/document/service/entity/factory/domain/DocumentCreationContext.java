@@ -16,6 +16,7 @@ public class DocumentCreationContext {
     private final String vault;
     private final DocumentType type;
     private final String source;
+    private final String sourceLocationId;
     private final String checksum;
     private final long fileSize;
     private final DocumentStatus status;
