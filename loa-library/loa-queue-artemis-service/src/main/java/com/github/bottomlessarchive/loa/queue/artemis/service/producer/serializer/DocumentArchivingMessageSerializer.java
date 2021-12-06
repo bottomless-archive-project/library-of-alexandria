@@ -38,6 +38,7 @@ public class DocumentArchivingMessageSerializer implements MessageSerializer<Doc
         bodyBuffer.writeString(documentArchivingMessage.getId());
         bodyBuffer.writeString(documentArchivingMessage.getType());
         bodyBuffer.writeString(documentArchivingMessage.getSource());
+        bodyBuffer.writeString(documentArchivingMessage.getSourceLocationId());
         bodyBuffer.writeInt(documentArchivingMessage.getContentLength());
         bodyBuffer.writeBytes(documentArchivingMessage.getContent());
     }

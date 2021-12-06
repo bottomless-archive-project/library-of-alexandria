@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Value;
 
 import java.time.Instant;
+import java.util.Set;
 import java.util.UUID;
 
 @Value
@@ -24,4 +25,5 @@ public class DebugDocumentResponse {
     int downloaderVersion;
     boolean isInIndex;
     boolean isInVault;
+    Set<String> sourceLocations;
 }

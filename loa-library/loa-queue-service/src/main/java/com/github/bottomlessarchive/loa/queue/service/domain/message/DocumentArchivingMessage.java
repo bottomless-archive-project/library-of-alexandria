@@ -12,6 +12,7 @@ public class DocumentArchivingMessage {
     private final String id;
     private final String type;
     private final String source;
+    private final String sourceLocationId;
     private final int contentLength;
     private final byte[] content;
 }

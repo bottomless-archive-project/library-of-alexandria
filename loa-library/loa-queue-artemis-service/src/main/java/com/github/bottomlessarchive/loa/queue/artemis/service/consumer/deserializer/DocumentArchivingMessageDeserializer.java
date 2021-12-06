@@ -19,6 +19,7 @@ public class DocumentArchivingMessageDeserializer implements MessageDeserializer
         final String id = contentBuffer.readString();
         final String type = contentBuffer.readString();
         final String source = contentBuffer.readString();
+        final String sourceLocationId = contentBuffer.readString();
 
         final int contentLength = contentBuffer.readInt();
         final byte[] content = new byte[contentLength];
@@ -28,6 +29,7 @@ public class DocumentArchivingMessageDeserializer implements MessageDeserializer
                 .id(id)
                 .type(type)
                 .source(source)
+                .sourceLocationId(sourceLocationId)
                 .contentLength(contentLength)
                 .content(content)
                 .build();
