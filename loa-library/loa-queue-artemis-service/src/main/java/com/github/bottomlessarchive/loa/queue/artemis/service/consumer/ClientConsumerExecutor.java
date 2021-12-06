@@ -5,6 +5,7 @@ import com.github.bottomlessarchive.loa.queue.artemis.configuration.QueueServerC
 import com.github.bottomlessarchive.loa.queue.service.domain.Queue;
 import com.github.bottomlessarchive.loa.queue.service.domain.QueueException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.artemis.api.core.client.ClientConsumer;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,7 @@ import stormpot.Timeout;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @ConditionalOnMissingBean(QueueServerConfiguration.class)
@@ -23,7 +25,20 @@ public class ClientConsumerExecutor {
 
     public <T> T invokeConsumer(final Queue queue, final Function<ClientConsumer, T> clientConsumerConsumer) {
         try (PoolableQueueConsumer poolableClientConsumer = claimClientConsumer(queue)) {
-            return clientConsumerConsumer.apply(poolableClientConsumer.getQueueConsumer().getClientConsumer());
+            try {
+                return clientConsumerConsumer.apply(poolableClientConsumer.getQueueConsumer().getClientConsumer());
+            } catch (final QueueException e) {
+                log.error("Unrecoverable error happened while reading from queue: " + queue + "! "
+                        + "Closing the connection to the Queue Application and will try to reconnect.", e);
+
+                // Artemis doesn't always properly reconnect, even when
+                // org.apache.activemq.artemis.api.core.client.ServerLocator#setReconnectAttempts is set to -1 (unlimited).
+                // In these cases we manually need to expire the poolable and re-request the previous method that was under applying.
+                // For example and more info see: https://issues.apache.org/jira/browse/ARTEMIS-3588
+                poolableClientConsumer.expire();
+
+                return invokeConsumer(queue, clientConsumerConsumer);
+            }
         }
     }
 
