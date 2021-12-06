@@ -28,8 +28,10 @@ public class ClientConsumerExecutor {
             try {
                 return clientConsumerConsumer.apply(poolableClientConsumer.getQueueConsumer().getClientConsumer());
             } catch (final QueueException e) {
-                log.error("Unrecoverable error happened while reading from queue: " + queue + "! "
-                        + "Closing the connection to the Queue Application and will try to reconnect.", e);
+                if (log.isErrorEnabled()) {
+                    log.error("Unrecoverable error happened while reading from queue: " + queue + "! "
+                            + "Closing the connection to the Queue Application and will try to reconnect.", e);
+                }
 
                 // Artemis doesn't always properly reconnect, even when
                 // org.apache.activemq.artemis.api.core.client.ServerLocator#setReconnectAttempts is set to -1 (unlimited).

@@ -152,7 +152,7 @@ public class ArtemisQueueManipulator implements QueueManipulator {
                 // Artemis sometimes throws a RuntimeException that wraps a named exception, even after a named exception happened
                 // inside the artemis client. See: https://issues.apache.org/jira/browse/ARTEMIS-3588
                 if (e.getCause() instanceof ActiveMQLargeMessageInterruptedException) {
-                    throw new QueueException("Unrecoverable error happened when reading a large message.");
+                    throw new QueueException("Unrecoverable error happened when reading a large message.", e);
                 } else {
                     throw e;
                 }
