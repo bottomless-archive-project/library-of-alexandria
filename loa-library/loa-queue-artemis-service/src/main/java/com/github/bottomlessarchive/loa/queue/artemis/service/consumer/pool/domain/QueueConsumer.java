@@ -1,5 +1,6 @@
 package com.github.bottomlessarchive.loa.queue.artemis.service.consumer.pool.domain;
 
+import com.github.bottomlessarchive.loa.queue.service.domain.QueueException;
 import lombok.Builder;
 import lombok.Getter;
 import org.apache.activemq.artemis.api.core.ActiveMQException;
@@ -14,8 +15,12 @@ public class QueueConsumer implements AutoCloseable {
     private final ClientConsumer clientConsumer;
 
     @Override
-    public void close() throws ActiveMQException {
-        clientConsumer.close();
-        clientSession.close();
+    public void close() {
+        try {
+            clientConsumer.close();
+            clientSession.close();
+        } catch (final ActiveMQException e) {
+            throw new QueueException("Failed to close queue consumer!", e);
+        }
     }
 }
