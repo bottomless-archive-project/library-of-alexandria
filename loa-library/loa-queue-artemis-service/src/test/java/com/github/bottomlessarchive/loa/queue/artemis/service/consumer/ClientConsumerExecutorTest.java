@@ -84,7 +84,7 @@ class ClientConsumerExecutorTest {
         when(queueConsumer.getClientConsumer())
                 .thenReturn(clientConsumer);
 
-        AtomicBoolean firstInvocation = new AtomicBoolean(true);
+        final AtomicBoolean firstInvocation = new AtomicBoolean(true);
         final String result = clientConsumerExecutor.invokeConsumer(Queue.DOCUMENT_ARCHIVING_QUEUE, consumer -> {
             if (firstInvocation.get()) {
                 firstInvocation.set(false);
@@ -98,7 +98,7 @@ class ClientConsumerExecutorTest {
         assertThat(result)
                 .isEqualTo("test-result-message");
 
-        InOrder poolableQueueConsumerCallOrder = Mockito.inOrder(poolableQueueConsumer);
+        final InOrder poolableQueueConsumerCallOrder = Mockito.inOrder(poolableQueueConsumer);
 
         poolableQueueConsumerCallOrder.verify(poolableQueueConsumer).getQueueConsumer();
         poolableQueueConsumerCallOrder.verify(poolableQueueConsumer).expire();

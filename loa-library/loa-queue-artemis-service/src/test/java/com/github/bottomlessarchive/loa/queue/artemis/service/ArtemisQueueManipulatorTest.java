@@ -52,14 +52,14 @@ class ArtemisQueueManipulatorTest {
         assertThat(result)
                 .isEqualTo("test-result-message");
 
-        Function<ClientConsumer, String> resultFunction = clientConsumerArgumentCaptor.getValue();
+        final Function<ClientConsumer, String> resultFunction = clientConsumerArgumentCaptor.getValue();
 
-        ClientConsumer clientConsumer = mock(ClientConsumer.class);
-        ClientMessage clientMessage = mock(ClientMessage.class);
+        final ClientConsumer clientConsumer = mock(ClientConsumer.class);
+        final ClientMessage clientMessage = mock(ClientMessage.class);
         when(clientConsumer.receive())
                 .thenReturn(clientMessage);
 
-        MessageDeserializer<String> messageDeserializer = mock(MessageDeserializer.class);
+        final MessageDeserializer<String> messageDeserializer = mock(MessageDeserializer.class);
         when(messageDeserializerProvider.getDeserializer(Queue.DOCUMENT_ARCHIVING_QUEUE))
                 .thenReturn(Optional.of(messageDeserializer));
         when(messageDeserializer.deserialize(clientMessage))
@@ -82,14 +82,14 @@ class ArtemisQueueManipulatorTest {
         assertThat(result)
                 .isEqualTo("test-result-message");
 
-        Function<ClientConsumer, String> resultFunction = clientConsumerArgumentCaptor.getValue();
+        final Function<ClientConsumer, String> resultFunction = clientConsumerArgumentCaptor.getValue();
 
-        ClientConsumer clientConsumer = mock(ClientConsumer.class);
-        ClientMessage clientMessage = mock(ClientMessage.class);
+        final ClientConsumer clientConsumer = mock(ClientConsumer.class);
+        final ClientMessage clientMessage = mock(ClientMessage.class);
         when(clientConsumer.receive())
                 .thenReturn(clientMessage);
 
-        MessageDeserializer<String> messageDeserializer = mock(MessageDeserializer.class);
+        final MessageDeserializer<String> messageDeserializer = mock(MessageDeserializer.class);
         when(messageDeserializerProvider.getDeserializer(Queue.DOCUMENT_ARCHIVING_QUEUE))
                 .thenReturn(Optional.of(messageDeserializer));
         when(messageDeserializer.deserialize(clientMessage))
@@ -108,9 +108,9 @@ class ArtemisQueueManipulatorTest {
         assertThat(result)
                 .isEqualTo("test-result-message");
 
-        Function<ClientConsumer, String> resultFunction = clientConsumerArgumentCaptor.getValue();
+        final Function<ClientConsumer, String> resultFunction = clientConsumerArgumentCaptor.getValue();
 
-        ClientConsumer clientConsumer = mock(ClientConsumer.class);
+        final ClientConsumer clientConsumer = mock(ClientConsumer.class);
         when(clientConsumer.receive())
                 .thenThrow(new ActiveMQException("large-message-error"));
 
