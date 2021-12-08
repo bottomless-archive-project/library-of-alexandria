@@ -22,7 +22,5 @@ public class PoolableQueueConsumer extends BasePoolable implements AutoCloseable
     @Override
     public void close() {
         release();
-
-        queueConsumer.close();
     }
 }
