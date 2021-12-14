@@ -1,11 +1,11 @@
-package com.github.bottomlessarchive.loa.downloader.service.file;
+package com.github.bottomlessarchive.loa.validator.service;
 
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentType;
 import com.github.bottomlessarchive.loa.parser.domain.ParsingResult;
 import com.github.bottomlessarchive.loa.parser.service.DocumentDataParser;
 import com.github.bottomlessarchive.loa.stage.service.StageLocationFactory;
 import com.github.bottomlessarchive.loa.stage.service.domain.StageLocation;
-import com.github.bottomlessarchive.loa.downloader.configuration.DownloaderConfigurationProperties;
+import com.github.bottomlessarchive.loa.validator.configuration.FileValidationConfigurationProperties;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,7 +30,7 @@ class DocumentFileValidatorTest {
     private static final DocumentType DOCUMENT_TYPE = DocumentType.DOC;
 
     @Mock
-    private DownloaderConfigurationProperties downloaderConfigurationProperties;
+    private FileValidationConfigurationProperties fileValidationConfigurationProperties;
 
     @Mock
     private DocumentDataParser documentDataParser;
@@ -63,7 +63,7 @@ class DocumentFileValidatorTest {
         when(stageLocationFactory.getLocation(DOCUMENT_ID.toString(), DOCUMENT_TYPE))
                 .thenReturn(Mono.just(stageLocation));
         when(stageLocation.size()).thenReturn(Mono.just(MAX_FILE_SIZE_IN_BYTES + 1));
-        when(downloaderConfigurationProperties.getMaximumArchiveSize()).thenReturn(MAX_FILE_SIZE_IN_BYTES);
+        when(fileValidationConfigurationProperties.getMaximumArchiveSize()).thenReturn(MAX_FILE_SIZE_IN_BYTES);
 
         final Mono<Boolean> result = underTest.isValidDocument(DOCUMENT_ID.toString(), DOCUMENT_TYPE);
 
@@ -79,7 +79,7 @@ class DocumentFileValidatorTest {
         when(stageLocationFactory.getLocation(DOCUMENT_ID.toString(), DOCUMENT_TYPE))
                 .thenReturn(Mono.just(stageLocation));
         when(stageLocation.size()).thenReturn(Mono.just(MAX_FILE_SIZE_IN_BYTES - 1));
-        when(downloaderConfigurationProperties.getMaximumArchiveSize()).thenReturn(MAX_FILE_SIZE_IN_BYTES);
+        when(fileValidationConfigurationProperties.getMaximumArchiveSize()).thenReturn(MAX_FILE_SIZE_IN_BYTES);
 
         final InputStream documentInputStream = mock(InputStream.class);
         when(stageLocation.openStream()).thenReturn(documentInputStream);
@@ -101,7 +101,7 @@ class DocumentFileValidatorTest {
         when(stageLocationFactory.getLocation(DOCUMENT_ID.toString(), DOCUMENT_TYPE))
                 .thenReturn(Mono.just(stageLocation));
         when(stageLocation.size()).thenReturn(Mono.just(MAX_FILE_SIZE_IN_BYTES - 1));
-        when(downloaderConfigurationProperties.getMaximumArchiveSize()).thenReturn(MAX_FILE_SIZE_IN_BYTES);
+        when(fileValidationConfigurationProperties.getMaximumArchiveSize()).thenReturn(MAX_FILE_SIZE_IN_BYTES);
 
         final InputStream documentInputStream = mock(InputStream.class);
         when(stageLocation.openStream()).thenReturn(documentInputStream);

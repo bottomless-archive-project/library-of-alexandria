@@ -1,16 +1,21 @@
 package com.github.bottomlessarchive.loa.vault.view.controller;
 
+import com.github.bottomlessarchive.loa.document.service.DocumentManipulator;
 import com.github.bottomlessarchive.loa.document.service.entity.factory.DocumentEntityFactory;
 import com.github.bottomlessarchive.loa.vault.configuration.VaultConfigurationProperties;
 import com.github.bottomlessarchive.loa.vault.service.RecompressorService;
 import com.github.bottomlessarchive.loa.vault.service.VaultDocumentManager;
+import com.github.bottomlessarchive.loa.vault.service.backend.service.VaultDocumentStorage;
+import com.github.bottomlessarchive.loa.vault.service.location.VaultLocation;
+import com.github.bottomlessarchive.loa.vault.service.location.VaultLocationFactory;
 import com.github.bottomlessarchive.loa.vault.view.request.domain.DeleteDocumentRequest;
+import com.github.bottomlessarchive.loa.vault.view.request.domain.DocumentExistsRequest;
 import com.github.bottomlessarchive.loa.vault.view.request.domain.QueryDocumentRequest;
+import com.github.bottomlessarchive.loa.vault.view.request.domain.RecompressDocumentRequest;
+import com.github.bottomlessarchive.loa.vault.view.request.domain.ReplaceCorruptDocumentRequest;
 import com.github.bottomlessarchive.loa.vault.view.response.domain.DocumentExistsResponse;
 import com.github.bottomlessarchive.loa.vault.view.response.domain.FreeSpaceResponse;
 import com.github.bottomlessarchive.loa.vault.view.domain.InvalidRequestException;
-import com.github.bottomlessarchive.loa.vault.view.request.DocumentExistsRequest;
-import com.github.bottomlessarchive.loa.vault.view.request.domain.RecompressDocumentRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
@@ -30,8 +35,11 @@ import java.util.UUID;
 public class VaultController {
 
     private final DocumentEntityFactory documentEntityFactory;
+    private final VaultLocationFactory vaultLocationFactory;
     private final VaultDocumentManager vaultDocumentManager;
+    private final VaultDocumentStorage vaultDocumentStorage;
     private final RecompressorService recompressorService;
+    private final DocumentManipulator documentManipulator;
     private final VaultConfigurationProperties vaultConfigurationProperties;
 
     /**
@@ -148,5 +156,36 @@ public class VaultController {
                         .exists(exists)
                         .build()
                 );
+    }
+
+    @MessageMapping("replaceCorruptDocument")
+    public Mono<Void> replaceCorruptDocument(final ReplaceCorruptDocumentRequest replaceCorruptDocumentRequest) {
+        if (!vaultConfigurationProperties.isModificationEnabled()) {
+            return Mono.error(new InvalidRequestException("Modification is disabled on this vault instance!"));
+        }
+
+        final String documentId = replaceCorruptDocumentRequest.getDocumentId();
+
+        log.info("Replacing corrupt document with id: {}.", documentId);
+
+        return documentEntityFactory.getDocumentEntity(UUID.fromString(documentId))
+                .flatMap(documentEntity -> {
+                    if (!documentEntity.isInVault(vaultConfigurationProperties.getName())) {
+                        throw new InvalidRequestException("Document with id " + documentId + " is available on a different vault!");
+                    }
+
+                    return vaultDocumentManager.removeDocument(documentEntity)
+                            .doOnNext(processedEntity -> {
+                                final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentEntity,
+                                        documentEntity.getCompression());
+
+                                vaultDocumentStorage.persistDocument(processedEntity, replaceCorruptDocumentRequest.getContent(),
+                                        vaultLocation);
+                            })
+                            .flatMap(finalEntity -> documentManipulator.markDownloaded(finalEntity.getId()))
+                            .then(Mono.just(documentEntity));
+                })
+                .switchIfEmpty(Mono.error(new InvalidRequestException("Document not found with id " + documentId + "!")))
+                .then();
     }
 }
