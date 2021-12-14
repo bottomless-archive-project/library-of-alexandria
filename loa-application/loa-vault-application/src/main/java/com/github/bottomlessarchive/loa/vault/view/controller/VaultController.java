@@ -1,5 +1,6 @@
 package com.github.bottomlessarchive.loa.vault.view.controller;
 
+import com.github.bottomlessarchive.loa.document.service.DocumentManipulator;
 import com.github.bottomlessarchive.loa.document.service.entity.factory.DocumentEntityFactory;
 import com.github.bottomlessarchive.loa.vault.configuration.VaultConfigurationProperties;
 import com.github.bottomlessarchive.loa.vault.service.RecompressorService;
@@ -38,6 +39,7 @@ public class VaultController {
     private final VaultDocumentManager vaultDocumentManager;
     private final VaultDocumentStorage vaultDocumentStorage;
     private final RecompressorService recompressorService;
+    private final DocumentManipulator documentManipulator;
     private final VaultConfigurationProperties vaultConfigurationProperties;
 
     /**
@@ -160,6 +162,8 @@ public class VaultController {
     public Mono<Void> replaceCorruptDocument(final ReplaceCorruptDocumentRequest replaceCorruptDocumentRequest) {
         final String documentId = replaceCorruptDocumentRequest.getDocumentId();
 
+        log.info("Replacing corrupt document with id: {}.", documentId);
+
         return documentEntityFactory.getDocumentEntity(UUID.fromString(documentId))
                 .flatMap(documentEntity -> {
                     if (!documentEntity.isInVault(vaultConfigurationProperties.getName())) {
@@ -173,7 +177,9 @@ public class VaultController {
 
                                 vaultDocumentStorage.persistDocument(processedEntity, replaceCorruptDocumentRequest.getContent(),
                                         vaultLocation);
-                            });
+                            })
+                            .flatMap(finalEntity -> documentManipulator.markDownloaded(finalEntity.getId()))
+                            .then(Mono.just(documentEntity));
                 })
                 .switchIfEmpty(Mono.error(new InvalidRequestException("Document not found with id " + documentId + "!")))
                 .then();

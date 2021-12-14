@@ -24,6 +24,7 @@ bootBuildImage {
 
 dependencies {
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-json'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-webflux'
 
     implementation group: 'org.elasticsearch.client', name: 'elasticsearch-rest-high-level-client'
 
@@ -32,4 +33,5 @@ dependencies {
     implementation project(':loa-library:loa-validator-service')
     implementation project(':loa-library:loa-vault-client-service')
     implementation project(':loa-library:loa-document-parser-service')
+    implementation project(':loa-library:loa-document-location-service')
 }
