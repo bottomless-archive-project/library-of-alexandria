@@ -31,7 +31,7 @@ public class DocumentRecollectorService {
         try {
             return new URL(sourceLocation);
         } catch (MalformedURLException e) {
-            throw new IllegalStateException("Illegal URL: " + sourceLocation + "!");
+            throw new IllegalStateException("Illegal URL: " + sourceLocation + "!", e);
         }
     }
 }

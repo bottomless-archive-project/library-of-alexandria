@@ -1,7 +1,6 @@
 package com.github.bottomlessarchive.loa.administrator.command.recollect;
 
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentEntity;
-import com.github.bottomlessarchive.loa.document.service.domain.DocumentType;
 import com.github.bottomlessarchive.loa.stage.service.StageLocationFactory;
 import com.github.bottomlessarchive.loa.stage.service.domain.StageLocation;
 import com.github.bottomlessarchive.loa.url.service.downloader.FileDownloadManager;
@@ -41,11 +40,11 @@ public class SourceLocationRecrawlerService {
                 )
                 .filterWhen(StageLocation::exists)
                 .flatMap(location -> {
-                    try (final InputStream content = location.openStream()) {
+                    try (InputStream content = location.openStream()) {
                         return vaultClientService.replaceCorruptDocument(documentEntity, content.readAllBytes())
                                 .then(Mono.just(location));
                     } catch (IOException e) {
-                        throw new RuntimeException();
+                        throw new IllegalStateException("Failed to replace document!", e);
                     }
                 })
                 .flatMap(StageLocation::cleanup)
