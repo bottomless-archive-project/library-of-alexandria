@@ -160,6 +160,10 @@ public class VaultController {
 
     @MessageMapping("replaceCorruptDocument")
     public Mono<Void> replaceCorruptDocument(final ReplaceCorruptDocumentRequest replaceCorruptDocumentRequest) {
+        if (!vaultConfigurationProperties.isModificationEnabled()) {
+            return Mono.error(new InvalidRequestException("Modification is disabled on this vault instance!"));
+        }
+
         final String documentId = replaceCorruptDocumentRequest.getDocumentId();
 
         log.info("Replacing corrupt document with id: {}.", documentId);

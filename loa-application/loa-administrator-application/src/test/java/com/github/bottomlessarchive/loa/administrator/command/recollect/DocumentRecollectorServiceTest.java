@@ -1,6 +1,8 @@
 package com.github.bottomlessarchive.loa.administrator.command.recollect;
 
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentEntity;
+import com.github.bottomlessarchive.loa.location.service.factory.DocumentLocationEntityFactory;
+import com.github.bottomlessarchive.loa.location.service.factory.domain.DocumentLocation;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,28 +27,38 @@ class DocumentRecollectorServiceTest {
     @Mock
     private SourceLocationRecrawlerService sourceLocationRecrawlerService;
 
+    @Mock
+    private DocumentLocationEntityFactory documentLocationEntityFactory;
+
     @InjectMocks
     private DocumentRecollectorService underTest;
 
     @Test
     void testRecollectCorruptDocumentOnlyDownloadsTheFirstOne() {
-        DocumentEntity documentEntity = DocumentEntity.builder()
-                .sourceLocations(
-                        Set.of(
-                                "http://abc1.com/",
-                                "http://abc2.com/",
-                                "http://abc3.com/"
-                        )
-                )
+        final String firstLocationId = "123";
+        final String secondLocationId = "456";
+        final String thirdLocationId = "789";
+        final DocumentEntity documentEntity = DocumentEntity.builder()
+                .sourceLocations(Set.of(firstLocationId, secondLocationId, thirdLocationId))
                 .build();
+        when(documentLocationEntityFactory.getDocumentLocation(any()))
+                .thenReturn(
+                        Mono.just(
+                                DocumentLocation.builder()
+                                        .id("first")
+                                        .url("http://abc1.com")
+                                        .build()
+                        )
+                );
         when(sourceLocationRecrawlerService.recrawlSourceLocation(any(), eq(documentEntity)))
                 .thenReturn(Mono.empty(), Mono.just(documentEntity));
 
-        Flux<DocumentEntity> result = underTest.recollectCorruptDocument(documentEntity);
+        final Flux<DocumentEntity> result = underTest.recollectCorruptDocument(documentEntity);
 
         StepVerifier.create(result)
                 .consumeNextWith(localDocumentEntity -> Assertions.assertEquals(documentEntity, localDocumentEntity))
                 .verifyComplete();
+
         verify(sourceLocationRecrawlerService, times(2)).recrawlSourceLocation(any(), any());
     }
 }

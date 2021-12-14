@@ -31,7 +31,9 @@ public class SourceLocationRecrawlerService {
     public Mono<DocumentEntity> recrawlSourceLocation(final URL sourceLocation, final DocumentEntity documentEntity) {
         final String documentRecrawlId = UUID.randomUUID().toString();
 
-        log.info("Downloading the recrawl target for document: {} with new staging id: {}.", documentEntity.getId(), documentRecrawlId);
+        if (log.isInfoEnabled()) {
+            log.info("Downloading the recrawl target for document: {} with new staging id: {}.", documentEntity.getId(), documentRecrawlId);
+        }
 
         return stageLocationFactory.getLocation(documentRecrawlId, documentEntity.getType())
                 .flatMap(stageFileLocation -> acquireFile(sourceLocation, stageFileLocation))

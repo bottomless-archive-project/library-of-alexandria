@@ -1,15 +1,20 @@
 package com.github.bottomlessarchive.loa.vault.view.controller;
 
 import com.github.bottomlessarchive.loa.compression.domain.DocumentCompression;
+import com.github.bottomlessarchive.loa.document.service.DocumentManipulator;
 import com.github.bottomlessarchive.loa.vault.service.RecompressorService;
 import com.github.bottomlessarchive.loa.vault.service.VaultDocumentManager;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentEntity;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentType;
 import com.github.bottomlessarchive.loa.document.service.entity.factory.DocumentEntityFactory;
 import com.github.bottomlessarchive.loa.vault.configuration.VaultConfigurationProperties;
+import com.github.bottomlessarchive.loa.vault.service.backend.service.VaultDocumentStorage;
+import com.github.bottomlessarchive.loa.vault.service.location.VaultLocation;
+import com.github.bottomlessarchive.loa.vault.service.location.VaultLocationFactory;
 import com.github.bottomlessarchive.loa.vault.view.request.domain.DeleteDocumentRequest;
 import com.github.bottomlessarchive.loa.vault.view.request.domain.QueryDocumentRequest;
 import com.github.bottomlessarchive.loa.vault.view.request.domain.RecompressDocumentRequest;
+import com.github.bottomlessarchive.loa.vault.view.request.domain.ReplaceCorruptDocumentRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -34,6 +39,7 @@ import java.util.UUID;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -57,6 +63,15 @@ class VaultControllerTest {
 
     @MockBean
     private VaultConfigurationProperties vaultConfigurationProperties;
+
+    @MockBean
+    private DocumentManipulator documentManipulator;
+
+    @MockBean
+    private VaultLocationFactory vaultLocationFactory;
+
+    @MockBean
+    private VaultDocumentStorage vaultDocumentStorage;
 
     @BeforeAll
     public static void setup(@Value("${spring.rsocket.server.port}") final int port) {
@@ -334,5 +349,91 @@ class VaultControllerTest {
 
         verify(vaultDocumentManager).removeDocument(documentEntity);
         verify(documentEntityFactory).removeDocumentEntity(documentEntity);
+    }
+
+    @Test
+    void testReplaceCorruptDocumentWhenModificationsAreDisabled() {
+        when(vaultConfigurationProperties.isModificationEnabled())
+                .thenReturn(false);
+
+        final Mono<Void> response = requester.route("replaceCorruptDocument")
+                .data(ReplaceCorruptDocumentRequest.builder()
+                        .documentId(TEST_DOCUMENT_ID)
+                        .content(new byte[]{})
+                        .build()
+                )
+                .retrieveMono(Void.class);
+
+        StepVerifier.create(response)
+                .expectErrorMessage("Modification is disabled on this vault instance!")
+                .verify();
+    }
+
+    @Test
+    void testReplaceCorruptDocumentWhenDocumentIsInADifferentVault() {
+        when(vaultConfigurationProperties.isModificationEnabled())
+                .thenReturn(true);
+        when(vaultConfigurationProperties.getName())
+                .thenReturn("my-vault");
+        when(documentEntityFactory.getDocumentEntity(UUID.fromString(TEST_DOCUMENT_ID)))
+                .thenReturn(
+                        Mono.just(
+                                DocumentEntity.builder()
+                                        .vault("different-vault")
+                                        .build()
+                        )
+                );
+
+        final Mono<Void> response = requester.route("replaceCorruptDocument")
+                .data(ReplaceCorruptDocumentRequest.builder()
+                        .documentId(TEST_DOCUMENT_ID)
+                        .content(new byte[]{})
+                        .build()
+                )
+                .retrieveMono(Void.class);
+
+        StepVerifier.create(response)
+                .expectErrorMessage("Document with id 123e4567-e89b-12d3-a456-556642440000 is available on a different vault!")
+                .verify();
+    }
+
+    @Test
+    void testReplaceCorruptDocumentReplacesTheDocument() {
+        when(vaultConfigurationProperties.isModificationEnabled())
+                .thenReturn(true);
+        when(vaultConfigurationProperties.getName())
+                .thenReturn("my-vault");
+        final DocumentEntity documentEntity = DocumentEntity.builder()
+                .id(UUID.fromString(TEST_DOCUMENT_ID))
+                .vault("my-vault")
+                .compression(DocumentCompression.GZIP)
+                .build();
+        when(documentEntityFactory.getDocumentEntity(UUID.fromString(TEST_DOCUMENT_ID)))
+                .thenReturn(Mono.just(documentEntity));
+        when(vaultDocumentManager.removeDocument(documentEntity))
+                .thenReturn(Mono.just(documentEntity));
+        final VaultLocation vaultLocation = mock(VaultLocation.class);
+        when(vaultLocationFactory.getLocation(documentEntity, documentEntity.getCompression()))
+                .thenReturn(vaultLocation);
+        when(documentManipulator.markDownloaded(UUID.fromString(TEST_DOCUMENT_ID)))
+                .thenReturn(Mono.empty());
+
+        final byte[] newDocumentContent = {1, 2, 3, 4};
+
+        final Mono<Void> response = requester.route("replaceCorruptDocument")
+                .data(ReplaceCorruptDocumentRequest.builder()
+                        .documentId(TEST_DOCUMENT_ID)
+                        .content(newDocumentContent)
+                        .build()
+                )
+                .retrieveMono(Void.class);
+
+        StepVerifier.create(response)
+                .verifyComplete();
+
+        verify(vaultDocumentStorage)
+                .persistDocument(documentEntity, newDocumentContent, vaultLocation);
+        verify(documentManipulator)
+                .markDownloaded(UUID.fromString(TEST_DOCUMENT_ID));
     }
 }

@@ -67,13 +67,13 @@ class SourceLocationRecrawlerServiceTest {
         when(documentFileValidator.isValidDocument(any(), eq(DocumentType.PDF)))
                 .thenReturn(Mono.just(true));
 
-        final byte[] content = new byte[]{1, 2, 3};
+        final byte[] content = {1, 2, 3};
         when(stageLocation.openStream())
                 .thenReturn(new ByteArrayInputStream(content));
         when(vaultClientService.replaceCorruptDocument(documentEntity, content))
                 .thenReturn(Mono.empty());
 
-        Mono<DocumentEntity> result = underTest.recrawlSourceLocation(sourceLocation, documentEntity);
+        final Mono<DocumentEntity> result = underTest.recrawlSourceLocation(sourceLocation, documentEntity);
 
         StepVerifier.create(result)
                 .consumeNextWith(localDocumentEntity -> Assertions.assertEquals(documentEntity, localDocumentEntity))
