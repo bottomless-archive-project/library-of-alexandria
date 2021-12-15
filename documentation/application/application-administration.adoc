@@ -13,6 +13,9 @@ include::../service/repository/repository-configuration.adoc[]
 
 | **loa.indexer.database.port**
 | The port of the Elasticsearch database.
+
+| **loa.stage.location**
+| Required only for the `recollect-corrupt-documents` command. The location where the document files are first downloaded. After some validation and occasionally modification (compression etc) it is moved to the vault. *(Default value: temp folder)*
 |===
 
 .Tasks
@@ -26,5 +29,8 @@ include::../service/repository/repository-configuration.adoc[]
 | This command will go through every document in the database and ask the <<Vault Application>> to recompress them when the compression is not the same as provided.
 
 | cleanup
-| Removes every document with status `CORRUPT` or `INDEXING_FAILURE`. The documents will be removed from the vault and the database too.
+| Removes every document with status `CORRUPT`. The documents will be removed from the vault and the database too.
+
+| recollect-corrupt-documents
+| Tries to recollect  every document with status `CORRUPT`. The document's `sourceLocations` variable stores the ids of the document locations where the document was collected from. This command will try to re-download the document from these source locations. If any of the downloads is successful, then the document's content will be replaced with non-corrupt data (effectively reconstructing the document), if all of the downloads are failed, then the `CORRUPT` status will be kept.
 |===
