@@ -69,11 +69,14 @@ public class ArchivingService {
 
     private void logAddingSourceLocation(final DocumentEntity originalDocumentEntity,
             final DocumentArchivingContext documentArchivingContext) {
-        if (log.isInfoEnabled()) {
-            if (documentArchivingContext.getSourceLocationId().isPresent()) {
+
+        if (documentArchivingContext.getSourceLocationId().isPresent()) {
+            if (log.isInfoEnabled()) {
                 log.info("Adding new source location: {} to document: {}.", documentArchivingContext.getSourceLocationId().get(),
                         originalDocumentEntity.getId());
-            } else {
+            }
+        } else {
+            if (log.isInfoEnabled()) {
                 log.info("Doesn't add a new source location to document: {} because it is null.", originalDocumentEntity.getId());
             }
         }
