@@ -29,7 +29,7 @@ public class PoolableClientConsumerPoolFactory {
 
     private Pool<PoolableQueueConsumer> createPool(final Queue queue) {
         return Pool.from(createAllocatorForQueue(queue))
-                .setSize(10)
+                .setSize(1)
                 .setExpiration(Expiration.never())
                 .build();
     }

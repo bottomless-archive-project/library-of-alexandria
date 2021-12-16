@@ -14,6 +14,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.Instant;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -154,9 +155,12 @@ public class DocumentEntityFactory {
         documentDatabaseEntity.setCompression(documentCreationContext.getCompression().name());
         documentDatabaseEntity.setDownloadDate(Instant.now());
         documentDatabaseEntity.setSource(documentCreationContext.getSource());
-        documentDatabaseEntity.setSourceLocations(
-                Set.of(hexConverter.decode(documentCreationContext.getSourceLocationId()))
-        );
+
+        if (documentCreationContext.getSourceLocationId().isPresent()) {
+            documentDatabaseEntity.setSourceLocations(Set.of(hexConverter.decode(documentCreationContext.getSourceLocationId().get())));
+        } else {
+            documentDatabaseEntity.setSourceLocations(Collections.emptySet());
+        }
 
         return documentRepository.insertDocument(documentDatabaseEntity)
                 .map(documentEntityTransformer::transform);

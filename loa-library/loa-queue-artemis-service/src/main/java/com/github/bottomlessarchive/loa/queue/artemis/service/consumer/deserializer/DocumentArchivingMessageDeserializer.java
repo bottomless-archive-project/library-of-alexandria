@@ -19,7 +19,8 @@ public class DocumentArchivingMessageDeserializer implements MessageDeserializer
         final String id = contentBuffer.readString();
         final String type = contentBuffer.readString();
         final String source = contentBuffer.readString();
-        final String sourceLocationId = contentBuffer.readString();
+        final boolean hasSourceLocationId = contentBuffer.readBoolean();
+        final String sourceLocationId = hasSourceLocationId ? contentBuffer.readString() : null;
 
         final int contentLength = contentBuffer.readInt();
         final byte[] content = new byte[contentLength];

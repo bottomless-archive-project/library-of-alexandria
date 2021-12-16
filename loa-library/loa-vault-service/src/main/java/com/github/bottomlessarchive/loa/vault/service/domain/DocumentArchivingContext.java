@@ -4,6 +4,7 @@ import com.github.bottomlessarchive.loa.document.service.domain.DocumentType;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Getter
@@ -18,4 +19,8 @@ public class DocumentArchivingContext {
     private final int contentLength;
     private final byte[] content;
     private final int versionNumber;
+
+    public Optional<String> getSourceLocationId() {
+        return Optional.ofNullable(sourceLocationId);
+    }
 }

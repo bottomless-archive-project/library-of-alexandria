@@ -70,14 +70,20 @@ public class ArchivingService {
     private void logAddingSourceLocation(final DocumentEntity originalDocumentEntity,
             final DocumentArchivingContext documentArchivingContext) {
         if (log.isInfoEnabled()) {
-            log.info("Adding new source location: {} to document: {}.", documentArchivingContext.getSourceLocationId(),
-                    originalDocumentEntity.getId());
+            if (documentArchivingContext.getSourceLocationId().isPresent()) {
+                log.info("Adding new source location: {} to document: {}.", documentArchivingContext.getSourceLocationId().get(),
+                        originalDocumentEntity.getId());
+            } else {
+                log.info("Doesn't add a new source location to document: {} because it is null.", originalDocumentEntity.getId());
+            }
         }
     }
 
     private Mono<Void> addSourceLocation(final DocumentEntity originalDocumentEntity,
             final DocumentArchivingContext documentArchivingContext) {
-        return documentEntityFactory.addSourceLocation(originalDocumentEntity.getId(), documentArchivingContext.getSourceLocationId());
+        return Mono.justOrEmpty(documentArchivingContext.getSourceLocationId())
+                .map(sourceLocationId -> documentEntityFactory.addSourceLocation(originalDocumentEntity.getId(), sourceLocationId))
+                .then();
     }
 
     private boolean isDuplicateIndexError(final Throwable throwable) {

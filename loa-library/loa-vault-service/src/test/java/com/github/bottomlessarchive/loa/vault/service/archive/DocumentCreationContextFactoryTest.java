@@ -44,6 +44,7 @@ class DocumentCreationContextFactoryTest {
                 .source("unknown")
                 .type(DocumentType.PDF)
                 .versionNumber(123)
+                .sourceLocationId("locationId")
                 .build();
         when(checksumProvider.checksum(content))
                 .thenReturn(Mono.just("textchecksum"));
@@ -62,6 +63,35 @@ class DocumentCreationContextFactoryTest {
                     assertThat(documentCreationContext.getVersionNumber(), is(123));
                     assertThat(documentCreationContext.getCompression(), is(DocumentCompression.GZIP));
                     assertThat(documentCreationContext.getStatus(), is(DocumentStatus.DOWNLOADED));
+                    assertThat(documentCreationContext.getSourceLocationId().isPresent(), is(true));
+                    assertThat(documentCreationContext.getSourceLocationId().get(), is("locationId"));
+                })
+                .verifyComplete();
+    }
+
+    @Test
+    void testNewContextWhenSourceLocationIdIsNull() {
+        final UUID id = UUID.randomUUID();
+        final byte[] content = {0, 1, 2, 3};
+        final DocumentArchivingContext documentArchivingContext = DocumentArchivingContext.builder()
+                .id(id)
+                .content(content)
+                .contentLength(4)
+                .source("unknown")
+                .type(DocumentType.PDF)
+                .versionNumber(123)
+                .sourceLocationId(null)
+                .build();
+        when(checksumProvider.checksum(content))
+                .thenReturn(Mono.just("textchecksum"));
+        when(compressionConfigurationProperties.getAlgorithm())
+                .thenReturn(DocumentCompression.GZIP);
+
+        final Mono<DocumentCreationContext> result = underTest.newContext(documentArchivingContext);
+
+        StepVerifier.create(result)
+                .consumeNextWith(documentCreationContext -> {
+                    assertThat(documentCreationContext.getSourceLocationId().isEmpty(), is(true));
                 })
                 .verifyComplete();
     }
