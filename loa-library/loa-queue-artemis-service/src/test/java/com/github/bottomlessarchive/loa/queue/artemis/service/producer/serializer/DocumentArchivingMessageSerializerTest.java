@@ -43,7 +43,7 @@ class DocumentArchivingMessageSerializerTest {
 
         underTest.serialize(documentArchivingMessage);
 
-        InOrder inOrder = Mockito.inOrder(bodyBuffer);
+        final InOrder inOrder = Mockito.inOrder(bodyBuffer);
 
         inOrder.verify(bodyBuffer).writeString("id");
         inOrder.verify(bodyBuffer).writeString("type");
@@ -74,7 +74,7 @@ class DocumentArchivingMessageSerializerTest {
 
         underTest.serialize(documentArchivingMessage);
 
-        InOrder inOrder = Mockito.inOrder(bodyBuffer);
+        final InOrder inOrder = Mockito.inOrder(bodyBuffer);
 
         inOrder.verify(bodyBuffer).writeString("id");
         inOrder.verify(bodyBuffer).writeString("type");
