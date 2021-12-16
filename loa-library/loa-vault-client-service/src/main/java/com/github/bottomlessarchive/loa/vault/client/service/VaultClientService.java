@@ -6,6 +6,7 @@ import com.github.bottomlessarchive.loa.vault.client.service.request.DeleteDocum
 import com.github.bottomlessarchive.loa.vault.client.service.request.DocumentExistsRequest;
 import com.github.bottomlessarchive.loa.vault.client.service.request.QueryDocumentRequest;
 import com.github.bottomlessarchive.loa.vault.client.service.request.RecompressRequest;
+import com.github.bottomlessarchive.loa.vault.client.service.request.ReplaceCorruptDocumentRequest;
 import com.github.bottomlessarchive.loa.vault.client.service.response.DocumentExistsResponse;
 import com.github.bottomlessarchive.loa.vault.client.service.response.FreeSpaceResponse;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentEntity;
@@ -123,5 +124,17 @@ public class VaultClientService {
                 )
                 .retrieveMono(DocumentExistsResponse.class)
                 .map(DocumentExistsResponse::isExists);
+    }
+
+    public Mono<Void> replaceCorruptDocument(final DocumentEntity documentEntity, final byte[] content) {
+        return rSocketRequester.get(documentEntity.getVault())
+                .route("replaceCorruptDocument")
+                .data(
+                        ReplaceCorruptDocumentRequest.builder()
+                                .documentId(documentEntity.getId().toString())
+                                .content(content)
+                                .build()
+                )
+                .retrieveMono(Void.class);
     }
 }

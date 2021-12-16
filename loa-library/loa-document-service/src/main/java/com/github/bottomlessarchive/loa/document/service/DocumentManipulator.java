@@ -4,6 +4,7 @@ import com.github.bottomlessarchive.loa.document.repository.DocumentRepository;
 import com.github.bottomlessarchive.loa.compression.domain.DocumentCompression;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentStatus;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -12,11 +13,21 @@ import java.util.UUID;
 /**
  * This service contains methods to manipulating documents.
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class DocumentManipulator {
 
     private final DocumentRepository documentRepository;
+
+    /**
+     * Set the document's status as {@link DocumentStatus#DOWNLOADED downloaded}.
+     *
+     * @param documentId the id of the document to mark as downloaded
+     */
+    public Mono<Void> markDownloaded(final UUID documentId) {
+        return updateStatus(documentId, DocumentStatus.DOWNLOADED);
+    }
 
     /**
      * Set the document's status as {@link DocumentStatus#INDEXED indexed}.
@@ -43,6 +54,8 @@ public class DocumentManipulator {
      * @param documentStatus the new status of the document
      */
     public Mono<Void> updateStatus(final UUID documentId, final DocumentStatus documentStatus) {
+        log.debug("Updating status of document with id: {} to: {}.", documentId, documentStatus);
+
         return documentRepository.updateStatus(documentId, documentStatus.toString());
     }
 

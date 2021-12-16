@@ -78,7 +78,11 @@ public class VaultDocumentManager {
         return Mono.just(documentEntity)
                 .map(vaultLocationFactory::getLocation)
                 .filter(VaultLocation::populated)
-                .doOnNext(VaultLocation::clear)
+                .doOnNext(vaultLocation -> {
+                    if (vaultLocation.populated()) {
+                        vaultLocation.clear();
+                    }
+                })
                 .thenReturn(documentEntity);
     }
 
