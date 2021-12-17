@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -42,23 +44,34 @@ public class DebugResponseFactory {
 
     private Mono<Void> fillEntityData(final DocumentEntity documentEntity,
             final DebugDocumentResponse.DebugDocumentResponseBuilder builder) {
+        // If the source locations are empty, then the Flux.fromIterable will not run
+        if (documentEntity.getSourceLocations().isEmpty()) {
+            return Mono.just(Collections.<String>emptyList())
+                    .doOnNext(documentSourceLocations -> populateEntityData(builder, documentEntity, documentSourceLocations))
+                    .then();
+        }
+
         return Flux.fromIterable(documentEntity.getSourceLocations())
                 .flatMap(documentLocationEntityFactory::getDocumentLocation)
                 .map(DocumentLocation::getUrl)
                 .buffer()
-                .map(documentSourceLocations -> builder
-                        .id(documentEntity.getId())
-                        .vault(documentEntity.getVault())
-                        .type(documentEntity.getType())
-                        .status(documentEntity.getStatus())
-                        .compression(documentEntity.getCompression())
-                        .checksum(documentEntity.getChecksum())
-                        .fileSize(documentEntity.getFileSize())
-                        .downloadDate(documentEntity.getDownloadDate())
-                        .downloaderVersion(documentEntity.getDownloaderVersion())
-                        .sourceLocations(Set.copyOf(documentSourceLocations))
-                )
+                .doOnNext(documentSourceLocations -> populateEntityData(builder, documentEntity, documentSourceLocations))
                 .then();
+    }
+
+    private void populateEntityData(final DebugDocumentResponse.DebugDocumentResponseBuilder builder,
+            final DocumentEntity documentEntity, final List<String> documentSourceLocations) {
+        builder
+                .id(documentEntity.getId())
+                .vault(documentEntity.getVault())
+                .type(documentEntity.getType())
+                .status(documentEntity.getStatus())
+                .compression(documentEntity.getCompression())
+                .checksum(documentEntity.getChecksum())
+                .fileSize(documentEntity.getFileSize())
+                .downloadDate(documentEntity.getDownloadDate())
+                .downloaderVersion(documentEntity.getDownloaderVersion())
+                .sourceLocations(Set.copyOf(documentSourceLocations));
     }
 
     private Mono<Void> fillExistsInVault(final DocumentEntity documentEntity,
