@@ -20,6 +20,7 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -112,8 +113,13 @@ class ArchivingServiceTest {
                 .thenReturn(Mono.just("test-checksum"));
         when(documentEntityFactory.getDocumentEntity("test-checksum", CONTENT.length, "PDF"))
                 .thenReturn(Mono.just(duplicateOf));
+
+        AtomicInteger timesInvoked = new AtomicInteger(0);
         when(documentEntityFactory.addSourceLocation(duplicateOfId, SOURCE_LOCATION_ID))
-                .thenReturn(Mono.empty());
+                .thenReturn(Mono.defer(() -> {
+                    timesInvoked.incrementAndGet();
+                    return Mono.empty();
+                }));
 
         final Mono<DocumentEntity> result = underTest.archiveDocument(documentArchivingContext);
 
@@ -122,6 +128,7 @@ class ArchivingServiceTest {
 
         verify(vaultDocumentStorage, times(2)).persistDocument(any(), any());
         verify(documentEntityFactory).addSourceLocation(duplicateOfId, SOURCE_LOCATION_ID);
+        assertThat(timesInvoked.get(), is(1));
     }
 
     @Test
