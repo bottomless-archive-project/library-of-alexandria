@@ -85,7 +85,7 @@ public class ArchivingService {
     private Mono<Void> addSourceLocation(final DocumentEntity originalDocumentEntity,
             final DocumentArchivingContext documentArchivingContext) {
         return Mono.justOrEmpty(documentArchivingContext.getSourceLocationId())
-                .map(sourceLocationId -> documentEntityFactory.addSourceLocation(originalDocumentEntity.getId(), sourceLocationId))
+                .flatMap(sourceLocationId -> documentEntityFactory.addSourceLocation(originalDocumentEntity.getId(), sourceLocationId))
                 .then();
     }
 
