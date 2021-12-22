@@ -17,10 +17,15 @@ public class ServiceContainer {
 
     private final Map<String, List<ServiceInstanceEntity>> serviceMap = new HashMap<>();
 
-    public UUID registerServiceInstance(final String serviceName, final ServiceInstanceRegistrationContext serviceInstanceRegistrationContext) {
+    public UUID registerServiceInstance(final String serviceName,
+            final ServiceInstanceRegistrationContext serviceInstanceRegistrationContext) {
         final UUID serviceInstanceId = UUID.randomUUID();
 
-        serviceMap.getOrDefault(serviceName, new LinkedList<>())
+        if (!serviceMap.containsKey(serviceName)) {
+            serviceMap.put(serviceName, new LinkedList<>());
+        }
+
+        serviceMap.get(serviceName)
                 .add(
                         ServiceInstanceEntity.builder()
                                 .id(serviceInstanceId)

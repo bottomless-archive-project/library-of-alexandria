@@ -8,12 +8,14 @@ import com.github.bottomlessarchive.loa.conductor.view.response.ServiceInstanceR
 import com.github.bottomlessarchive.loa.conductor.view.response.ServiceInstanceResponse;
 import com.github.bottomlessarchive.loa.conductor.view.response.ServiceResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.UUID;
@@ -27,7 +29,16 @@ public class ServiceRegistryController {
     @PostMapping("/{serviceName}")
     public ServiceInstanceRegistrationResponse registerServiceInstance(@PathVariable final String serviceName,
             @RequestBody final ServiceInstanceRegistrationRequest serviceInstanceRegistrationRequest) {
-        //TODO: validate the request!
+        if (serviceInstanceRegistrationRequest.getPort() > 65535) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Illegal port: "
+                    + serviceInstanceRegistrationRequest.getPort() + "!");
+        }
+
+        if (serviceInstanceRegistrationRequest.getLocation().isEmpty()
+                || serviceInstanceRegistrationRequest.getLocation().length() > 512) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Illegal location: "
+                    + serviceInstanceRegistrationRequest.getLocation() + "!");
+        }
 
         final UUID serviceInstanceId = serviceContainer.registerServiceInstance(serviceName,
                 ServiceInstanceRegistrationContext.builder()
