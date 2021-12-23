@@ -1,5 +1,6 @@
 package com.github.bottomlessarchive.loa.conductor.view.controller;
 
+import com.github.bottomlessarchive.loa.application.domain.ApplicationType;
 import com.github.bottomlessarchive.loa.conductor.service.ServiceContainer;
 import com.github.bottomlessarchive.loa.conductor.service.domain.ServiceInstanceEntity;
 import com.github.bottomlessarchive.loa.conductor.service.domain.ServiceInstanceRegistrationContext;
@@ -26,8 +27,8 @@ public class ServiceRegistryController {
 
     private final ServiceContainer serviceContainer;
 
-    @PostMapping("/{serviceName}")
-    public ServiceInstanceRegistrationResponse registerServiceInstance(@PathVariable final String serviceName,
+    @PostMapping("/{applicationType}")
+    public ServiceInstanceRegistrationResponse registerServiceInstance(@PathVariable final ApplicationType applicationType,
             @RequestBody final ServiceInstanceRegistrationRequest serviceInstanceRegistrationRequest) {
         if (serviceInstanceRegistrationRequest.getPort() > 65535) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Illegal port: "
@@ -40,7 +41,7 @@ public class ServiceRegistryController {
                     + serviceInstanceRegistrationRequest.getLocation() + "!");
         }
 
-        final UUID serviceInstanceId = serviceContainer.registerServiceInstance(serviceName,
+        final UUID serviceInstanceId = serviceContainer.registerServiceInstance(applicationType,
                 ServiceInstanceRegistrationContext.builder()
                         .location(serviceInstanceRegistrationRequest.getLocation())
                         .port(serviceInstanceRegistrationRequest.getPort())
@@ -52,9 +53,9 @@ public class ServiceRegistryController {
                 .build();
     }
 
-    @GetMapping("/{serviceName}")
-    public ServiceResponse queryServiceInstances(@PathVariable final String serviceName) {
-        final List<ServiceInstanceResponse> serviceInstanceResponses = serviceContainer.queryServiceInstances(serviceName).stream()
+    @GetMapping("/{applicationType}")
+    public ServiceResponse queryServiceInstances(@PathVariable final ApplicationType applicationType) {
+        final List<ServiceInstanceResponse> serviceInstanceResponses = serviceContainer.queryServiceInstances(applicationType).stream()
                 .map(serviceEntity -> ServiceInstanceResponse.builder()
                         .location(serviceEntity.getLocation())
                         .port(serviceEntity.getPort())
@@ -64,14 +65,14 @@ public class ServiceRegistryController {
                 .toList();
 
         return ServiceResponse.builder()
-                .name(serviceName)
+                .applicationType(applicationType)
                 .instances(serviceInstanceResponses)
                 .build();
     }
 
-    @PutMapping("/{serviceName}/{instanceId}")
-    public void refreshServiceInstance(@PathVariable final String serviceName, @PathVariable final UUID instanceId) {
-        serviceContainer.queryServiceInstances(serviceName).stream()
+    @PutMapping("/{applicationType}/{instanceId}")
+    public void refreshServiceInstance(@PathVariable final ApplicationType applicationType, @PathVariable final UUID instanceId) {
+        serviceContainer.queryServiceInstances(applicationType).stream()
                 .filter(serviceInstanceEntity -> serviceInstanceEntity.getId().equals(instanceId))
                 .findFirst()
                 .ifPresent(ServiceInstanceEntity::refreshHeartbeat);

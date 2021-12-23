@@ -1,5 +1,6 @@
 package com.github.bottomlessarchive.loa.conductor.service.domain;
 
+import com.github.bottomlessarchive.loa.application.domain.ApplicationType;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -11,7 +12,7 @@ import java.util.UUID;
 public class ServiceInstanceEntity {
 
     private final UUID id;
-    private final String name;
+    private final ApplicationType applicationType;
     private final String location;
     private final int port;
 

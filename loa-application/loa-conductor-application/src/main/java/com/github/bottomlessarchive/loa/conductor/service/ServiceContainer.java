@@ -1,12 +1,13 @@
 package com.github.bottomlessarchive.loa.conductor.service;
 
+import com.github.bottomlessarchive.loa.application.domain.ApplicationType;
 import com.github.bottomlessarchive.loa.conductor.service.domain.ServiceInstanceEntity;
 import com.github.bottomlessarchive.loa.conductor.service.domain.ServiceInstanceRegistrationContext;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -15,21 +16,21 @@ import java.util.UUID;
 @Service
 public class ServiceContainer {
 
-    private final Map<String, List<ServiceInstanceEntity>> serviceMap = new HashMap<>();
+    private final Map<ApplicationType, List<ServiceInstanceEntity>> serviceMap = new EnumMap<>(ApplicationType.class);
 
-    public UUID registerServiceInstance(final String serviceName,
+    public UUID registerServiceInstance(final ApplicationType applicationType,
             final ServiceInstanceRegistrationContext serviceInstanceRegistrationContext) {
         final UUID serviceInstanceId = UUID.randomUUID();
 
-        if (!serviceMap.containsKey(serviceName)) {
-            serviceMap.put(serviceName, new LinkedList<>());
+        if (!serviceMap.containsKey(applicationType)) {
+            serviceMap.put(applicationType, new LinkedList<>());
         }
 
-        serviceMap.get(serviceName)
+        serviceMap.get(applicationType)
                 .add(
                         ServiceInstanceEntity.builder()
                                 .id(serviceInstanceId)
-                                .name(serviceName)
+                                .applicationType(applicationType)
                                 .location(serviceInstanceRegistrationContext.getLocation())
                                 .port(serviceInstanceRegistrationContext.getPort())
                                 .lastHeartbeat(Instant.now())
@@ -39,7 +40,7 @@ public class ServiceContainer {
         return serviceInstanceId;
     }
 
-    public List<ServiceInstanceEntity> queryServiceInstances(final String serviceName) {
-        return Collections.unmodifiableList(serviceMap.getOrDefault(serviceName, Collections.emptyList()));
+    public List<ServiceInstanceEntity> queryServiceInstances(final ApplicationType applicationType) {
+        return Collections.unmodifiableList(serviceMap.getOrDefault(applicationType, Collections.emptyList()));
     }
 }

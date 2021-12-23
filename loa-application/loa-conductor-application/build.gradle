@@ -24,4 +24,6 @@ bootBuildImage {
 
 dependencies {
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
+
+    implementation project(':loa-library:loa-application-service')
 }
