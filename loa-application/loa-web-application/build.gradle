@@ -33,8 +33,8 @@ dependencies {
     implementation project(':loa-library:loa-indexer-client-service')
     implementation project(':loa-library:loa-document-location-service')
 
-    implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: '2.0.24'
-    implementation group: 'net.coobird', name: 'thumbnailator', version: '0.4.14'
+    implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: '2.0.25'
+    implementation group: 'net.coobird', name: 'thumbnailator', version: '0.4.15'
 
     implementation 'com.github.jai-imageio:jai-imageio-core:1.4.0'
     implementation 'com.github.jai-imageio:jai-imageio-jpeg2000:1.4.0'

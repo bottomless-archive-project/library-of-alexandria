@@ -1,11 +1,11 @@
 dependencies {
     api group: 'org.springframework.boot', name: 'spring-boot-starter-reactor-netty'
 
-    implementation group: 'com.github.pemistahl', name: 'lingua', version: '1.1.0'
-    implementation group: 'org.apache.tika', name: 'tika-core', version: '2.1.0'
-    implementation group: 'org.apache.tika', name: 'tika-parser-pdf-module', version: '2.1.0'
-    implementation group: 'org.apache.tika', name: 'tika-parser-microsoft-module', version: '2.1.0'
-    implementation group: 'org.apache.tika', name: 'tika-parser-miscoffice-module', version: '2.1.0'
+    implementation group: 'com.github.pemistahl', name: 'lingua', version: '1.1.1'
+    implementation group: 'org.apache.tika', name: 'tika-core', version: '2.2.0'
+    implementation group: 'org.apache.tika', name: 'tika-parser-pdf-module', version: '2.2.0'
+    implementation group: 'org.apache.tika', name: 'tika-parser-microsoft-module', version: '2.2.0'
+    implementation group: 'org.apache.tika', name: 'tika-parser-miscoffice-module', version: '2.2.0'
 
     api project(':loa-library:loa-document-service')
 }
