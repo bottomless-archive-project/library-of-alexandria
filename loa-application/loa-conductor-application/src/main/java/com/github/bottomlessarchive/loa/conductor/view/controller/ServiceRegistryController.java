@@ -21,6 +21,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 @RestController
 @RequestMapping("service")
@@ -53,6 +54,28 @@ public class ServiceRegistryController {
         return ServiceInstanceRegistrationResponse.builder()
                 .id(serviceInstanceId)
                 .build();
+    }
+
+    @GetMapping
+    public List<ServiceResponse> queryServices() {
+        return Stream.of(ApplicationType.values())
+                .map(applicationType -> {
+                    final List<ServiceInstanceResponse> serviceInstanceResponses = serviceContainer.queryServiceInstances(applicationType).stream()
+                            .map(serviceEntity -> ServiceInstanceResponse.builder()
+                                    .id(serviceEntity.getId())
+                                    .location(serviceEntity.getLocation())
+                                    .port(serviceEntity.getPort())
+                                    .lastHeartbeat(serviceEntity.getLastHeartbeat())
+                                    .build()
+                            )
+                            .toList();
+
+                    return ServiceResponse.builder()
+                            .applicationType(applicationType)
+                            .instances(serviceInstanceResponses)
+                            .build();
+                })
+                .toList();
     }
 
     @GetMapping("/{applicationType}")
