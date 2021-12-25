@@ -1,0 +1,5 @@
+dependencies {
+    implementation group: 'io.projectreactor', name: 'reactor-core'
+
+    implementation project(':loa-library:loa-conductor-domain')
+}
