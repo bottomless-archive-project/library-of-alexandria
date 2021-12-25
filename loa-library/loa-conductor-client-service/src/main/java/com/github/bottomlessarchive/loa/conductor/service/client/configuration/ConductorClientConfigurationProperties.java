@@ -15,6 +15,7 @@ public class ConductorClientConfigurationProperties {
     private final String host;
     private final int port;
     private final ApplicationType applicationType;
+    private final int applicationPort;
 
     public String getUrl() {
         return "http://" + host + ":" + port;

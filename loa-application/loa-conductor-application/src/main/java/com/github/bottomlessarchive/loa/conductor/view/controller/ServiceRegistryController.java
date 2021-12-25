@@ -75,9 +75,7 @@ public class ServiceRegistryController {
 
     @PutMapping("/{applicationType}/{instanceId}")
     public void refreshServiceInstance(@PathVariable final ApplicationType applicationType, @PathVariable final UUID instanceId) {
-        serviceContainer.queryServiceInstances(applicationType).stream()
-                .filter(serviceInstanceEntity -> serviceInstanceEntity.getId().equals(instanceId))
-                .findFirst()
+        serviceContainer.getServiceInstance(applicationType, instanceId)
                 .ifPresent(ServiceInstanceEntity::refreshHeartbeat);
     }
 }

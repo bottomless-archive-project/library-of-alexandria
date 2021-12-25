@@ -8,7 +8,8 @@ import com.github.bottomlessarchive.loa.conductor.service.client.response.Servic
 import com.github.bottomlessarchive.loa.conductor.service.client.response.ServiceResponse;
 import com.github.bottomlessarchive.loa.conductor.service.domain.ServiceInstanceEntity;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.autoconfigure.web.ServerProperties;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -18,12 +19,14 @@ import reactor.core.publisher.Mono;
 import java.util.Locale;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ConductorClient {
 
+    @Qualifier("conductorWebClient")
     private final WebClient webClient;
-    private final ServerProperties serverProperties;
+
     private final NetworkAddressCalculator networkAddressCalculator;
     private final ConductorClientConfigurationProperties conductorClientConfigurationProperties;
 
@@ -45,10 +48,15 @@ public class ConductorClient {
     }
 
     public Mono<UUID> registerInstance(final ApplicationType applicationType) {
+        final String hostAddress = networkAddressCalculator.calculateInetAddress().getHostAddress();
+
         final ServiceInstanceRegistrationRequest serviceInstanceRegistrationRequest = ServiceInstanceRegistrationRequest.builder()
-                .location(networkAddressCalculator.calculateInetAddress().getHostAddress())
-                .port(serverProperties.getPort())
+                .location(hostAddress)
+                .port(conductorClientConfigurationProperties.getPort())
                 .build();
+
+        log.info("Registering service {} with host address: {} and port: {} into the Conductor Application.", applicationType, hostAddress,
+                conductorClientConfigurationProperties.getPort());
 
         return webClient.post()
                 .uri(conductorClientConfigurationProperties.getUrl() + "/service/" + convertApplicationTypeToPath(applicationType))
@@ -59,9 +67,11 @@ public class ConductorClient {
     }
 
     public Mono<Void> refreshInstance(final UUID instanceId, final ApplicationType applicationType) {
+        log.info("Refreshing instance {} with instanceId {} into the Conductor Application.", applicationType, instanceId);
+
         return webClient.put()
                 .uri(conductorClientConfigurationProperties.getUrl() + "/service/" + convertApplicationTypeToPath(applicationType)
-                        + instanceId)
+                        + "/" + instanceId)
                 .retrieve()
                 .bodyToMono(Void.class)
                 .then();
