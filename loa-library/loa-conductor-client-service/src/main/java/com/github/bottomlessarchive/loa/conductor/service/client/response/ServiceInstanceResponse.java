@@ -1,4 +1,4 @@
-package com.github.bottomlessarchive.loa.conductor.view.response;
+package com.github.bottomlessarchive.loa.conductor.service.client.response;
 
 import lombok.Builder;
 import lombok.Getter;

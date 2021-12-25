@@ -1,4 +1,4 @@
-package com.github.bottomlessarchive.loa.conductor.service.configuration;
+package com.github.bottomlessarchive.loa.conductor.service.client.configuration;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -13,4 +13,8 @@ public class ConductorClientConfigurationProperties {
 
     private final String host;
     private final int port;
+
+    public String getUrl() {
+        return "http://" + host + ":" + port;
+    }
 }

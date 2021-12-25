@@ -59,6 +59,7 @@ public class ServiceRegistryController {
     public ServiceResponse queryServiceInstances(@PathVariable final ApplicationType applicationType) {
         final List<ServiceInstanceResponse> serviceInstanceResponses = serviceContainer.queryServiceInstances(applicationType).stream()
                 .map(serviceEntity -> ServiceInstanceResponse.builder()
+                        .id(serviceEntity.getId())
                         .location(serviceEntity.getLocation())
                         .port(serviceEntity.getPort())
                         .lastHeartbeat(serviceEntity.getLastHeartbeat())
