@@ -30,6 +30,11 @@ public class ConductorClient {
     private final NetworkAddressCalculator networkAddressCalculator;
     private final ConductorClientConfigurationProperties conductorClientConfigurationProperties;
 
+    public Mono<ServiceInstanceEntity> getInstance(final ApplicationType applicationType) {
+        return getInstances(applicationType)
+                .next();
+    }
+
     public Flux<ServiceInstanceEntity> getInstances(final ApplicationType applicationType) {
         return webClient.get()
                 .uri(conductorClientConfigurationProperties.getUrl() + "/service/" + convertApplicationTypeToPath(applicationType))
@@ -67,7 +72,8 @@ public class ConductorClient {
     }
 
     public Mono<Void> refreshInstance(final UUID instanceId, final ApplicationType applicationType) {
-        log.info("Refreshing instance {} with instanceId {} into the Conductor Application.", applicationType, instanceId);
+        log.info("Refreshing application instance type: {} with instanceId: {} in the Conductor Application.",
+                applicationType, instanceId);
 
         return webClient.put()
                 .uri(conductorClientConfigurationProperties.getUrl() + "/service/" + convertApplicationTypeToPath(applicationType)

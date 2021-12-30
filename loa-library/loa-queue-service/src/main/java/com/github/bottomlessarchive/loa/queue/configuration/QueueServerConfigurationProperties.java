@@ -9,9 +9,8 @@ import org.springframework.boot.context.properties.ConstructorBinding;
 @ConstructorBinding
 @RequiredArgsConstructor
 @ConfigurationProperties("loa.queue")
-public class QueueConfigurationProperties {
+public class QueueServerConfigurationProperties {
 
-    private final String host;
     private final int port;
     private final String dataDirectory;
 }

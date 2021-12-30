@@ -1,6 +1,6 @@
 package com.github.bottomlessarchive.loa.queue.artemis.configuration;
 
-import com.github.bottomlessarchive.loa.queue.configuration.QueueConfigurationProperties;
+import com.github.bottomlessarchive.loa.queue.configuration.QueueServerConfigurationProperties;
 import lombok.RequiredArgsConstructor;
 import org.apache.activemq.artemis.api.core.TransportConfiguration;
 import org.apache.activemq.artemis.core.config.Configuration;
@@ -22,7 +22,7 @@ public class QueueServerConfiguration {
 
     private static final String BIND_ALL_IP_ADDRESS = "0.0.0.0";
 
-    private final QueueConfigurationProperties queueConfigurationProperties;
+    private final QueueServerConfigurationProperties queueServerConfigurationProperties;
 
     @Bean
     public EmbeddedActiveMQ embeddedActiveMQ(final Configuration configuration) {
@@ -43,7 +43,7 @@ public class QueueServerConfiguration {
         configuration.addAcceptorConfiguration(new TransportConfiguration(NettyAcceptorFactory.class.getName(),
                         Map.of(
                                 TransportConstants.HOST_PROP_NAME, BIND_ALL_IP_ADDRESS,
-                                TransportConstants.PORT_PROP_NAME, queueConfigurationProperties.getPort()
+                                TransportConstants.PORT_PROP_NAME, queueServerConfigurationProperties.getPort()
                         )
                 )
         );
@@ -51,9 +51,9 @@ public class QueueServerConfiguration {
         configuration.setJournalSyncTransactional(false);
         configuration.setJournalSyncNonTransactional(false);
         configuration.setMaxDiskUsage(-1);
-        configuration.setJournalDirectory(queueConfigurationProperties.getDataDirectory() + "/journal");
-        configuration.setBindingsDirectory(queueConfigurationProperties.getDataDirectory() + "/bindings");
-        configuration.setLargeMessagesDirectory(queueConfigurationProperties.getDataDirectory() + "/largemessages");
+        configuration.setJournalDirectory(queueServerConfigurationProperties.getDataDirectory() + "/journal");
+        configuration.setBindingsDirectory(queueServerConfigurationProperties.getDataDirectory() + "/bindings");
+        configuration.setLargeMessagesDirectory(queueServerConfigurationProperties.getDataDirectory() + "/largemessages");
 
         return configuration;
     }

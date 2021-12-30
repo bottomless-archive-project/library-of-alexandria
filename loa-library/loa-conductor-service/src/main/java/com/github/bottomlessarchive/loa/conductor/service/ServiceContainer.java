@@ -61,10 +61,14 @@ public class ServiceContainer {
 
         serviceMap.values()
                 .forEach(list -> list.removeIf(instance -> {
-                    log.info("Removing timed-out instance for application type: {} and instanceId: {}.", instance.getApplicationType(),
-                            instance.getId());
+                    if (instance.getLastHeartbeat().isBefore(removeUntil)) {
+                        log.info("Removing timed-out instance for application type: {} and instanceId: {}.", instance.getApplicationType(),
+                                instance.getId());
 
-                    return instance.getLastHeartbeat().isBefore(removeUntil);
+                        return true;
+                    }
+
+                    return false;
                 }));
     }
 }
