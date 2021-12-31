@@ -45,8 +45,8 @@ public class VaultClientConfiguration {
         return serviceInstanceEntities.stream()
                 .map(serviceInstanceEntity -> {
                             final ServiceInstanceEntityProperty nameProperty = serviceInstanceEntity.getProperty("name")
-                                    .orElseThrow(() -> new IllegalStateException("Can't find the name property for one of the vaults at " +
-                                            "location: " + serviceInstanceEntity.getLocation() + " and port: "
+                                    .orElseThrow(() -> new IllegalStateException("Can't find the name property for one of the vaults at "
+                                            + "location: " + serviceInstanceEntity.getLocation() + " and port: "
                                             + serviceInstanceEntity.getPort() + " and id: " + serviceInstanceEntity.getId()));
 
                             log.info("Connecting to Vault Application - {} at location: {}, port: {}.", nameProperty.getName(),
