@@ -1,3 +1,5 @@
 dependencies {
     api project(':loa-library:loa-conductor-domain')
+
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-json'
 }

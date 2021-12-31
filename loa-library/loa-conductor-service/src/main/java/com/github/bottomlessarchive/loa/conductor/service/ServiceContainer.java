@@ -2,6 +2,7 @@ package com.github.bottomlessarchive.loa.conductor.service;
 
 import com.github.bottomlessarchive.loa.application.domain.ApplicationType;
 import com.github.bottomlessarchive.loa.conductor.service.domain.ServiceInstanceEntity;
+import com.github.bottomlessarchive.loa.conductor.service.domain.ServiceInstanceEntityProperty;
 import com.github.bottomlessarchive.loa.conductor.service.domain.ServiceInstanceRegistrationContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -38,6 +40,14 @@ public class ServiceContainer {
                                 .location(serviceInstanceRegistrationContext.getLocation())
                                 .port(serviceInstanceRegistrationContext.getPort())
                                 .lastHeartbeat(Instant.now())
+                                .properties(serviceInstanceRegistrationContext.getProperties().stream()
+                                        .map(serviceInstanceRegistrationProperty -> ServiceInstanceEntityProperty.builder()
+                                                .name(serviceInstanceRegistrationProperty.getName())
+                                                .value(serviceInstanceRegistrationProperty.getValue())
+                                                .build()
+                                        )
+                                        .collect(Collectors.toList())
+                                )
                                 .build()
                 );
 
@@ -62,8 +72,8 @@ public class ServiceContainer {
         serviceMap.values()
                 .forEach(list -> list.removeIf(instance -> {
                     if (instance.getLastHeartbeat().isBefore(removeUntil)) {
-                        log.info("Removing timed-out instance for application type: {} and instanceId: {}.", instance.getApplicationType(),
-                                instance.getId());
+                        log.info("Removing timed-out instance for application type: {} and instanceId: {} last heartbeat: {}.",
+                                instance.getApplicationType(), instance.getId(), instance.getLastHeartbeat());
 
                         return true;
                     }

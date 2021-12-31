@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.extern.jackson.Jacksonized;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -16,4 +17,5 @@ public class ServiceInstanceResponse {
     private final String location;
     private final int port;
     private final Instant lastHeartbeat;
+    private final List<ServiceInstancePropertyResponse> properties;
 }

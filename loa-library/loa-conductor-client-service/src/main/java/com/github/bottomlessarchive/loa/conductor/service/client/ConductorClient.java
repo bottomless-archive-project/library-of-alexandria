@@ -3,10 +3,14 @@ package com.github.bottomlessarchive.loa.conductor.service.client;
 import com.github.bottomlessarchive.loa.application.domain.ApplicationType;
 import com.github.bottomlessarchive.loa.conductor.service.NetworkAddressCalculator;
 import com.github.bottomlessarchive.loa.conductor.service.client.configuration.ConductorClientConfigurationProperties;
+import com.github.bottomlessarchive.loa.conductor.service.client.extension.InstanceRegistrationExtensionProvider;
+import com.github.bottomlessarchive.loa.conductor.service.client.extension.domain.InstanceRegistrationContext;
+import com.github.bottomlessarchive.loa.conductor.service.client.request.ServiceInstanceRegistrationPropertyRequest;
 import com.github.bottomlessarchive.loa.conductor.service.client.request.ServiceInstanceRegistrationRequest;
 import com.github.bottomlessarchive.loa.conductor.service.client.response.ServiceInstanceRegistrationResponse;
 import com.github.bottomlessarchive.loa.conductor.service.client.response.ServiceResponse;
 import com.github.bottomlessarchive.loa.conductor.service.domain.ServiceInstanceEntity;
+import com.github.bottomlessarchive.loa.conductor.service.domain.ServiceInstanceEntityProperty;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -16,6 +20,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
@@ -29,6 +34,7 @@ public class ConductorClient {
 
     private final NetworkAddressCalculator networkAddressCalculator;
     private final ConductorClientConfigurationProperties conductorClientConfigurationProperties;
+    private final List<InstanceRegistrationExtensionProvider> instanceRegistrationExtensionProviderList;
 
     public Mono<ServiceInstanceEntity> getInstance(final ApplicationType applicationType) {
         return getInstances(applicationType)
@@ -46,6 +52,14 @@ public class ConductorClient {
                                 .location(instance.getLocation())
                                 .port(instance.getPort())
                                 .applicationType(response.getApplicationType())
+                                .properties(instance.getProperties().stream()
+                                        .map(serviceInstancePropertyResponse -> ServiceInstanceEntityProperty.builder()
+                                                .name(serviceInstancePropertyResponse.getName())
+                                                .value(serviceInstancePropertyResponse.getValue())
+                                                .build()
+                                        )
+                                        .toList()
+                                )
                                 .lastHeartbeat(instance.getLastHeartbeat())
                                 .build()
                         )
@@ -55,9 +69,22 @@ public class ConductorClient {
     public Mono<UUID> registerInstance(final ApplicationType applicationType) {
         final String hostAddress = networkAddressCalculator.calculateInetAddress().getHostAddress();
 
+        final InstanceRegistrationContext instanceRegistrationContext = new InstanceRegistrationContext();
+
+        instanceRegistrationExtensionProviderList.forEach(instanceRegistrationExtensionProvider ->
+                instanceRegistrationExtensionProvider.extendRegistration(instanceRegistrationContext));
+
         final ServiceInstanceRegistrationRequest serviceInstanceRegistrationRequest = ServiceInstanceRegistrationRequest.builder()
                 .location(hostAddress)
                 .port(conductorClientConfigurationProperties.getApplicationPort())
+                .properties(instanceRegistrationContext.getProperties().entrySet().stream()
+                        .map(entry -> ServiceInstanceRegistrationPropertyRequest.builder()
+                                .name(entry.getKey())
+                                .value(entry.getValue())
+                                .build()
+                        )
+                        .toList()
+                )
                 .build();
 
         log.info("Registering service {} with host address: {} and port: {} into the Conductor Application.", applicationType, hostAddress,
