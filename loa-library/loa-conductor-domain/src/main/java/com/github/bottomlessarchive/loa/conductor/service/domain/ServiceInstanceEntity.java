@@ -6,8 +6,8 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.Instant;
-import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -20,7 +20,7 @@ public class ServiceInstanceEntity {
     private final ApplicationType applicationType;
     private final String location;
     private final int port;
-    private final List<ServiceInstanceEntityProperty> properties;
+    private final Map<String, String> properties;
 
     private Instant lastHeartbeat;
 
@@ -31,12 +31,30 @@ public class ServiceInstanceEntity {
     }
 
     public List<ServiceInstanceEntityProperty> getProperties() {
-        return Collections.unmodifiableList(properties);
+        return properties.entrySet().stream()
+                .map(entry -> ServiceInstanceEntityProperty.builder()
+                        .name(entry.getKey())
+                        .value(entry.getValue())
+                        .build()
+                )
+                .toList();
+    }
+
+    public void setProperties(final List<ServiceInstanceEntityProperty> serviceInstanceEntityProperties) {
+        serviceInstanceEntityProperties.forEach(serviceInstanceEntityProperty ->
+                properties.put(serviceInstanceEntityProperty.getName(), serviceInstanceEntityProperty.getValue()));
     }
 
     public Optional<ServiceInstanceEntityProperty> getProperty(final String name) {
-        return properties.stream()
-                .filter(property -> property.getName().equals(name))
-                .findFirst();
+        if (!properties.containsKey(name)) {
+            return Optional.empty();
+        }
+
+        return Optional.of(
+                ServiceInstanceEntityProperty.builder()
+                        .name(name)
+                        .value(properties.get(name))
+                        .build()
+        );
     }
 }

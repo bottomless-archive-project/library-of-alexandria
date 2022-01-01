@@ -3,9 +3,12 @@ package com.github.bottomlessarchive.loa.conductor.service.client;
 import com.github.bottomlessarchive.loa.application.domain.ApplicationType;
 import com.github.bottomlessarchive.loa.conductor.service.NetworkAddressCalculator;
 import com.github.bottomlessarchive.loa.conductor.service.client.configuration.ConductorClientConfigurationProperties;
+import com.github.bottomlessarchive.loa.conductor.service.client.extension.InstanceRefreshExtensionProvider;
 import com.github.bottomlessarchive.loa.conductor.service.client.extension.InstanceRegistrationExtensionProvider;
+import com.github.bottomlessarchive.loa.conductor.service.client.extension.domain.InstanceRefreshContext;
 import com.github.bottomlessarchive.loa.conductor.service.client.extension.domain.InstanceRegistrationContext;
-import com.github.bottomlessarchive.loa.conductor.service.client.request.ServiceInstanceRegistrationPropertyRequest;
+import com.github.bottomlessarchive.loa.conductor.service.client.request.ServiceInstancePropertyRequest;
+import com.github.bottomlessarchive.loa.conductor.service.client.request.ServiceInstanceRefreshRequest;
 import com.github.bottomlessarchive.loa.conductor.service.client.request.ServiceInstanceRegistrationRequest;
 import com.github.bottomlessarchive.loa.conductor.service.client.response.ServiceInstanceRegistrationResponse;
 import com.github.bottomlessarchive.loa.conductor.service.client.response.ServiceResponse;
@@ -23,6 +26,7 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -34,6 +38,7 @@ public class ConductorClient {
 
     private final NetworkAddressCalculator networkAddressCalculator;
     private final ConductorClientConfigurationProperties conductorClientConfigurationProperties;
+    private final List<InstanceRefreshExtensionProvider> instanceRefreshExtensionProviderList;
     private final List<InstanceRegistrationExtensionProvider> instanceRegistrationExtensionProviderList;
 
     public Mono<ServiceInstanceEntity> getInstance(final ApplicationType applicationType) {
@@ -58,7 +63,8 @@ public class ConductorClient {
                                                 .value(serviceInstancePropertyResponse.getValue())
                                                 .build()
                                         )
-                                        .toList()
+                                        .collect(Collectors.toMap(
+                                                ServiceInstanceEntityProperty::getName, ServiceInstanceEntityProperty::getValue))
                                 )
                                 .lastHeartbeat(instance.getLastHeartbeat())
                                 .build()
@@ -78,7 +84,7 @@ public class ConductorClient {
                 .location(hostAddress)
                 .port(conductorClientConfigurationProperties.getApplicationPort())
                 .properties(instanceRegistrationContext.getProperties().entrySet().stream()
-                        .map(entry -> ServiceInstanceRegistrationPropertyRequest.builder()
+                        .map(entry -> ServiceInstancePropertyRequest.builder()
                                 .name(entry.getKey())
                                 .value(entry.getValue())
                                 .build()
@@ -102,9 +108,26 @@ public class ConductorClient {
         log.info("Refreshing application instance type: {} with instanceId: {} in the Conductor Application.",
                 applicationType, instanceId);
 
+        final InstanceRefreshContext instanceRefreshContext = new InstanceRefreshContext();
+
+        instanceRefreshExtensionProviderList.forEach(instanceRefreshExtensionProvider ->
+                instanceRefreshExtensionProvider.extendRegistration(instanceRefreshContext));
+
+        final ServiceInstanceRefreshRequest serviceInstanceRefreshRequest = ServiceInstanceRefreshRequest.builder()
+                .properties(instanceRefreshContext.getProperties().entrySet().stream()
+                        .map(entry -> ServiceInstancePropertyRequest.builder()
+                                .name(entry.getKey())
+                                .value(entry.getValue())
+                                .build()
+                        )
+                        .toList()
+                )
+                .build();
+
         return webClient.put()
                 .uri(conductorClientConfigurationProperties.getUrl() + "/service/" + convertApplicationTypeToPath(applicationType)
                         + "/" + instanceId)
+                .body(BodyInserters.fromValue(serviceInstanceRefreshRequest))
                 .retrieve()
                 .bodyToMono(Void.class)
                 .then();

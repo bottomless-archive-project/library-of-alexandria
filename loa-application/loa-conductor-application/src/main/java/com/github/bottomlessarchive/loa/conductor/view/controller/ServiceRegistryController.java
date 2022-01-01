@@ -3,8 +3,11 @@ package com.github.bottomlessarchive.loa.conductor.view.controller;
 import com.github.bottomlessarchive.loa.application.domain.ApplicationType;
 import com.github.bottomlessarchive.loa.conductor.service.ServiceContainer;
 import com.github.bottomlessarchive.loa.conductor.service.domain.ServiceInstanceEntity;
+import com.github.bottomlessarchive.loa.conductor.service.domain.ServiceInstanceRefreshContext;
+import com.github.bottomlessarchive.loa.conductor.service.domain.ServiceInstanceRefreshProperty;
 import com.github.bottomlessarchive.loa.conductor.service.domain.ServiceInstanceRegistrationContext;
 import com.github.bottomlessarchive.loa.conductor.service.domain.ServiceInstanceRegistrationProperty;
+import com.github.bottomlessarchive.loa.conductor.view.request.ServiceInstanceRefreshRequest;
 import com.github.bottomlessarchive.loa.conductor.view.request.ServiceInstanceRegistrationRequest;
 import com.github.bottomlessarchive.loa.conductor.view.response.ServiceInstancePropertyResponse;
 import com.github.bottomlessarchive.loa.conductor.view.response.ServiceInstanceRegistrationResponse;
@@ -57,7 +60,7 @@ public class ServiceRegistryController {
                                         .value(serviceInstanceRegistrationPropertyRequest.getValue())
                                         .build()
                                 )
-                                .collect(Collectors.toList())
+                                .toList()
                         )
                         .build()
         );
@@ -67,9 +70,29 @@ public class ServiceRegistryController {
                 .build();
     }
 
+    @PutMapping("/{applicationType}/{instanceId}")
+    public void refreshServiceInstance(@PathVariable final ApplicationType applicationType, @PathVariable final UUID instanceId,
+            @RequestBody final ServiceInstanceRefreshRequest serviceInstanceRefreshRequest) {
+        serviceContainer.refreshServiceInstance(
+                ServiceInstanceRefreshContext.builder()
+                        .instanceId(instanceId)
+                        .applicationType(applicationType)
+                        .properties(serviceInstanceRefreshRequest.getProperties().stream()
+                                .map(serviceInstanceRegistrationPropertyRequest -> ServiceInstanceRefreshProperty.builder()
+                                        .name(serviceInstanceRegistrationPropertyRequest.getName())
+                                        .value(serviceInstanceRegistrationPropertyRequest.getValue())
+                                        .build()
+                                )
+                                .toList()
+                        )
+                        .build()
+        );
+    }
+
     @GetMapping
     public List<ServiceResponse> queryServices() {
         return Stream.of(ApplicationType.values())
+                .filter(ApplicationType::isReportStatusAndLocation)
                 .map(applicationType -> {
                     final List<ServiceInstanceResponse> serviceInstanceResponses =
                             serviceContainer.queryServiceInstances(applicationType).stream()
@@ -122,11 +145,5 @@ public class ServiceRegistryController {
                 .applicationType(applicationType)
                 .instances(serviceInstanceResponses)
                 .build();
-    }
-
-    @PutMapping("/{applicationType}/{instanceId}")
-    public void refreshServiceInstance(@PathVariable final ApplicationType applicationType, @PathVariable final UUID instanceId) {
-        serviceContainer.getServiceInstance(applicationType, instanceId)
-                .ifPresent(ServiceInstanceEntity::refreshHeartbeat);
     }
 }

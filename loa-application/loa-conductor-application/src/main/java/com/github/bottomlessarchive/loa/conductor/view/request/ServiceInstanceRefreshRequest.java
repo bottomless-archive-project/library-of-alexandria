@@ -1,17 +1,17 @@
 package com.github.bottomlessarchive.loa.conductor.view.request;
 
-import lombok.Getter;
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.jackson.Jacksonized;
 
 import java.util.Collections;
 import java.util.List;
 
-@Getter
+@Builder
+@Jacksonized
 @RequiredArgsConstructor
-public class ServiceInstanceRegistrationRequest {
+public class ServiceInstanceRefreshRequest {
 
-    private final String location;
-    private final int port;
     private final List<ServiceInstancePropertyRequest> properties;
 
     public List<ServiceInstancePropertyRequest> getProperties() {

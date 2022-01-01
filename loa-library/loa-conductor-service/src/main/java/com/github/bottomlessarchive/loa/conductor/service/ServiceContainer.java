@@ -3,6 +3,7 @@ package com.github.bottomlessarchive.loa.conductor.service;
 import com.github.bottomlessarchive.loa.application.domain.ApplicationType;
 import com.github.bottomlessarchive.loa.conductor.service.domain.ServiceInstanceEntity;
 import com.github.bottomlessarchive.loa.conductor.service.domain.ServiceInstanceEntityProperty;
+import com.github.bottomlessarchive.loa.conductor.service.domain.ServiceInstanceRefreshContext;
 import com.github.bottomlessarchive.loa.conductor.service.domain.ServiceInstanceRegistrationContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -46,7 +47,8 @@ public class ServiceContainer {
                                                 .value(serviceInstanceRegistrationProperty.getValue())
                                                 .build()
                                         )
-                                        .collect(Collectors.toList())
+                                        .collect(Collectors.toMap(
+                                                ServiceInstanceEntityProperty::getName, ServiceInstanceEntityProperty::getValue))
                                 )
                                 .build()
                 );
@@ -58,6 +60,23 @@ public class ServiceContainer {
         return serviceMap.getOrDefault(applicationType, Collections.emptyList()).stream()
                 .filter(serviceInstanceEntity -> serviceInstanceEntity.getId().equals(instanceId))
                 .findFirst();
+    }
+
+    public void refreshServiceInstance(final ServiceInstanceRefreshContext serviceInstanceRefreshContext) {
+        getServiceInstance(serviceInstanceRefreshContext.getApplicationType(), serviceInstanceRefreshContext.getInstanceId())
+                .ifPresent(serviceInstanceEntity -> {
+                    serviceInstanceEntity.refreshHeartbeat();
+
+                    serviceInstanceEntity.setProperties(
+                            serviceInstanceRefreshContext.getProperties().stream()
+                                    .map(serviceInstanceRefreshProperty -> ServiceInstanceEntityProperty.builder()
+                                            .name(serviceInstanceRefreshProperty.getName())
+                                            .value(serviceInstanceRefreshProperty.getValue())
+                                            .build()
+                                    )
+                                    .toList()
+                    );
+                });
     }
 
     public List<ServiceInstanceEntity> queryServiceInstances(final ApplicationType applicationType) {

@@ -9,9 +9,7 @@ import java.util.List;
 @Value
 @Builder
 @Jacksonized
-public class ServiceInstanceRegistrationRequest {
+public class ServiceInstanceRefreshRequest {
 
-    String location;
-    int port;
     List<ServiceInstancePropertyRequest> properties;
 }

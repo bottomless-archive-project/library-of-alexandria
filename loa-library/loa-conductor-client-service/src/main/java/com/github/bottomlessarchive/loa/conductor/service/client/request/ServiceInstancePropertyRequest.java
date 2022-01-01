@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class ServiceInstanceRegistrationPropertyRequest {
+public class ServiceInstancePropertyRequest {
 
     private final String name;
     private final String value;
