@@ -2,7 +2,6 @@ package com.github.bottomlessarchive.loa.conductor.view.controller;
 
 import com.github.bottomlessarchive.loa.application.domain.ApplicationType;
 import com.github.bottomlessarchive.loa.conductor.service.ServiceContainer;
-import com.github.bottomlessarchive.loa.conductor.service.domain.ServiceInstanceEntity;
 import com.github.bottomlessarchive.loa.conductor.service.domain.ServiceInstanceRefreshContext;
 import com.github.bottomlessarchive.loa.conductor.service.domain.ServiceInstanceRefreshProperty;
 import com.github.bottomlessarchive.loa.conductor.service.domain.ServiceInstanceRegistrationContext;

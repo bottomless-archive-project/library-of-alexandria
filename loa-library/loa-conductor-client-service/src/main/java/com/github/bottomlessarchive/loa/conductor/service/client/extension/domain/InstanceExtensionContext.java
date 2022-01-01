@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public class InstanceRegistrationContext {
+public class InstanceExtensionContext {
 
     private final Map<String, String> properties = new HashMap<>();
 

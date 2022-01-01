@@ -3,10 +3,8 @@ package com.github.bottomlessarchive.loa.conductor.service.client;
 import com.github.bottomlessarchive.loa.application.domain.ApplicationType;
 import com.github.bottomlessarchive.loa.conductor.service.NetworkAddressCalculator;
 import com.github.bottomlessarchive.loa.conductor.service.client.configuration.ConductorClientConfigurationProperties;
-import com.github.bottomlessarchive.loa.conductor.service.client.extension.InstanceRefreshExtensionProvider;
-import com.github.bottomlessarchive.loa.conductor.service.client.extension.InstanceRegistrationExtensionProvider;
-import com.github.bottomlessarchive.loa.conductor.service.client.extension.domain.InstanceRefreshContext;
-import com.github.bottomlessarchive.loa.conductor.service.client.extension.domain.InstanceRegistrationContext;
+import com.github.bottomlessarchive.loa.conductor.service.client.extension.InstancePropertyExtensionProvider;
+import com.github.bottomlessarchive.loa.conductor.service.client.extension.domain.InstanceExtensionContext;
 import com.github.bottomlessarchive.loa.conductor.service.client.request.ServiceInstancePropertyRequest;
 import com.github.bottomlessarchive.loa.conductor.service.client.request.ServiceInstanceRefreshRequest;
 import com.github.bottomlessarchive.loa.conductor.service.client.request.ServiceInstanceRegistrationRequest;
@@ -38,8 +36,7 @@ public class ConductorClient {
 
     private final NetworkAddressCalculator networkAddressCalculator;
     private final ConductorClientConfigurationProperties conductorClientConfigurationProperties;
-    private final List<InstanceRefreshExtensionProvider> instanceRefreshExtensionProviderList;
-    private final List<InstanceRegistrationExtensionProvider> instanceRegistrationExtensionProviderList;
+    private final List<InstancePropertyExtensionProvider> instancePropertyExtensionProviderList;
 
     public Mono<ServiceInstanceEntity> getInstance(final ApplicationType applicationType) {
         return getInstances(applicationType)
@@ -75,10 +72,10 @@ public class ConductorClient {
     public Mono<UUID> registerInstance(final ApplicationType applicationType) {
         final String hostAddress = networkAddressCalculator.calculateInetAddress().getHostAddress();
 
-        final InstanceRegistrationContext instanceRegistrationContext = new InstanceRegistrationContext();
+        final InstanceExtensionContext instanceRegistrationContext = new InstanceExtensionContext();
 
-        instanceRegistrationExtensionProviderList.forEach(instanceRegistrationExtensionProvider ->
-                instanceRegistrationExtensionProvider.extendRegistration(instanceRegistrationContext));
+        instancePropertyExtensionProviderList.forEach(instancePropertyExtensionProvider ->
+                instancePropertyExtensionProvider.extendInstanceWithProperty(instanceRegistrationContext));
 
         final ServiceInstanceRegistrationRequest serviceInstanceRegistrationRequest = ServiceInstanceRegistrationRequest.builder()
                 .location(hostAddress)
@@ -108,13 +105,13 @@ public class ConductorClient {
         log.info("Refreshing application instance type: {} with instanceId: {} in the Conductor Application.",
                 applicationType, instanceId);
 
-        final InstanceRefreshContext instanceRefreshContext = new InstanceRefreshContext();
+        final InstanceExtensionContext instanceExtensionContext = new InstanceExtensionContext();
 
-        instanceRefreshExtensionProviderList.forEach(instanceRefreshExtensionProvider ->
-                instanceRefreshExtensionProvider.extendRegistration(instanceRefreshContext));
+        instancePropertyExtensionProviderList.forEach(instancePropertyExtensionProvider ->
+                instancePropertyExtensionProvider.extendInstanceWithProperty(instanceExtensionContext));
 
         final ServiceInstanceRefreshRequest serviceInstanceRefreshRequest = ServiceInstanceRefreshRequest.builder()
-                .properties(instanceRefreshContext.getProperties().entrySet().stream()
+                .properties(instanceExtensionContext.getProperties().entrySet().stream()
                         .map(entry -> ServiceInstancePropertyRequest.builder()
                                 .name(entry.getKey())
                                 .value(entry.getValue())
