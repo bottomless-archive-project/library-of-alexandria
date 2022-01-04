@@ -70,7 +70,8 @@ class DocumentLocationValidatorTest {
     @ParameterizedTest
     @CsvSource(
             value = {
-                    "helloWorld"
+                    "helloWorld",
+                    "http://askdoctorkcom-back-strengthening-exercises-37d5.pdf/"
             }
     )
     void testInvalidDocumentLocation(final String documentLocation) {

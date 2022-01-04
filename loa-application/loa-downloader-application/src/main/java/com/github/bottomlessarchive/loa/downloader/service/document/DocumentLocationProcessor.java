@@ -3,10 +3,10 @@ package com.github.bottomlessarchive.loa.downloader.service.document;
 import com.github.bottomlessarchive.loa.document.service.DocumentTypeCalculator;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentType;
 import com.github.bottomlessarchive.loa.downloader.service.document.domain.DocumentArchivingContext;
-import com.github.bottomlessarchive.loa.stage.service.StageLocationFactory;
-import com.github.bottomlessarchive.loa.stage.service.domain.StageLocation;
 import com.github.bottomlessarchive.loa.downloader.service.file.FileCollector;
 import com.github.bottomlessarchive.loa.location.domain.DocumentLocation;
+import com.github.bottomlessarchive.loa.stage.service.StageLocationFactory;
+import com.github.bottomlessarchive.loa.stage.service.domain.StageLocation;
 import com.github.bottomlessarchive.loa.validator.service.DocumentFileValidator;
 import io.micrometer.core.instrument.Counter;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +17,7 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 import java.net.URL;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -40,8 +41,16 @@ public class DocumentLocationProcessor {
         processedDocumentCount.increment();
 
         final URL documentLocationURL = documentLocation.getLocation().toUrl().orElseThrow();
-        final DocumentType documentType = documentTypeCalculator.calculate(documentLocationURL)
-                .orElseThrow(() -> new RuntimeException("Unable to find valid document type for document: " + documentLocationURL));
+        final Optional<DocumentType> documentTypeOptional = documentTypeCalculator.calculate(documentLocationURL);
+
+        if (documentTypeOptional.isEmpty()) {
+            log.error("Invalid document location found: {}! This shouldn't normally happen! Please report it to the developers!",
+                    documentLocation);
+
+            return Mono.empty();
+        }
+
+        final DocumentType documentType = documentTypeOptional.get();
 
         log.debug("Starting to download document {}.", documentLocationURL);
 
