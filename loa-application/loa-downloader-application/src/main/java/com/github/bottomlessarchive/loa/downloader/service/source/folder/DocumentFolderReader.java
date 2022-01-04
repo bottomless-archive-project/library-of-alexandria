@@ -12,6 +12,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 import java.io.IOException;
@@ -36,15 +37,22 @@ public class DocumentFolderReader implements CommandLineRunner {
         Flux.fromStream(Files.list(sourceFolder))
                 .publishOn(Schedulers.boundedElastic())
                 .flatMap(path -> documentLocationProcessor.processDocumentLocation(buildDocumentSourceItem(path))
-                        .thenEmpty(result -> {
-                            if (downloaderFolderSourceConfiguration.isShouldRemove()) {
-                                try {
-                                    Files.delete(path);
-                                } catch (final IOException e) {
-                                    log.error("Failed to delete source file!", e);
-                                }
-                            }
-                        })
+                        .then(
+                                Mono.just(path)
+                                        .flatMap(path1 -> {
+                                            if (downloaderFolderSourceConfiguration.isShouldRemove()) {
+                                                try {
+                                                    log.debug("Deleting file at: {}.", path1);
+
+                                                    Files.deleteIfExists(path1);
+                                                } catch (final IOException e) {
+                                                    log.error("Failed to delete source file!", e);
+                                                }
+                                            }
+
+                                            return Mono.empty();
+                                        })
+                        )
                 )
                 .doFinally(result -> log.info("Finished processing the folder."))
                 .subscribe();
