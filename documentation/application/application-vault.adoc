@@ -15,6 +15,8 @@ If the application is not a duplicate then the staging file's contents will be m
 |===
 | Parameter | Description
 
+include::../service/conductor/conductor-configuration.adoc[]
+
 | **loa.vault.location.type**
 | Describes the type of the vault's location. At the moment it could be `file` only but in the future, we plan to support more location types. When it's set to `file` then the vault will be located on the local filesystem. *(Default value: file)*
 
@@ -22,7 +24,6 @@ If the application is not a duplicate then the staging file's contents will be m
 | Used only when `loa.vault.location.type` is set to `file`. Path to the location of the vault on the filesystem.
 
 include::../service/repository/repository-configuration.adoc[]
-include::../service/queue/queue-configuration.adoc[]
 
 | **loa.stage.location**
 | The location where the document files are first moved. After the checksum calculation and duplicate detection, they are moved to the vault.

@@ -10,13 +10,8 @@ The application looks for documents that has the `DOWNLOADED` status and indexes
 |===
 | Parameter | Description
 
+include::../service/conductor/conductor-configuration.adoc[]
 include::../service/repository/repository-configuration.adoc[]
-
-| **loa.vault.client.locations.{vault-name}.host**
-| The IP address of the <<Vault Application>> with the provided name, to grab the documents for displaying. If you use more than one vault, you need to list all of them!
-
-| **loa.vault.client.locations.{vault-name}.port**
-| The port of the <<Vault Application>> with the provided name, to grab the documents for displaying. If you use more than one vault, you need to list all of them!
 
 | **loa.indexer.database.host**
 | The host of the Elasticsearch database.

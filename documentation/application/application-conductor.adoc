@@ -1,0 +1,5 @@
+= Conductor Application
+
+== Workflow
+
+Every application that is the part of the Library of Alexandria suite uses this application for https://en.wikipedia.org/wiki/Service_discovery[service discovery] purposes.

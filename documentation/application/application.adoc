@@ -6,6 +6,7 @@ Some of them are created for administrating or maintenance purposes.
 
 include::application-architectural-overview.adoc[leveloffset=+1]
 include::application-administration.adoc[leveloffset=+1]
+include::application-conductor.adoc[leveloffset=+1]
 include::application-vault.adoc[leveloffset=+1]
 include::application-queue.adoc[leveloffset=+1]
 include::application-generator.adoc[leveloffset=+1]
