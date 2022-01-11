@@ -97,8 +97,8 @@ public class DocumentStatisticsResponseFactory {
                         .availableStorageInBytes(
                                 serviceInstanceEntity.getProperty("freeSpace")
                                         .map(ServiceInstanceEntityProperty::getValue)
-                                        .map(Integer::parseInt)
-                                        .orElse(-1)
+                                        .map(Long::parseLong)
+                                        .orElse(-1L)
                         )
                         .build()
                 )
