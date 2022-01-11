@@ -1,8 +1,8 @@
 | **loa.conductor.host**
-| The location (ip address or domain) of the Conductor Application. *(Default value: localhost)*
+| The location (ip address or domain) of the <<Conductor Application>>. *(Default value: localhost)*
 
 | **loa.conductor.port**
-| The port where the Conductor Application is listening for new connections. *(Default value: 8092)*
+| The port where the <<Conductor Application>> is listening for new connections. *(Default value: 8092)*
 
 | **loa.conductor.application-type**
 | Sets the type of the application. If this property is set to `WEB_APPLICATION` then this application will be registered as a Web Application. This property is pre-configured for each service. **Don't change it!**
