@@ -1,12 +1,13 @@
 package com.github.bottomlessarchive.loa.web.view.document.service;
 
+import com.github.bottomlessarchive.loa.application.domain.ApplicationType;
+import com.github.bottomlessarchive.loa.conductor.service.client.ConductorClient;
+import com.github.bottomlessarchive.loa.conductor.service.domain.ServiceInstanceEntityProperty;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentStatus;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentType;
 import com.github.bottomlessarchive.loa.document.service.entity.factory.DocumentEntityFactory;
 import com.github.bottomlessarchive.loa.queue.service.QueueManipulator;
 import com.github.bottomlessarchive.loa.statistics.service.entity.StatisticsEntityFactory;
-import com.github.bottomlessarchive.loa.vault.client.configuration.VaultClientConfigurationProperties;
-import com.github.bottomlessarchive.loa.vault.client.service.VaultClientService;
 import com.github.bottomlessarchive.loa.web.view.document.response.dashboard.DashboardDocumentStatisticsResponse;
 import com.github.bottomlessarchive.loa.web.view.document.response.dashboard.DashboardQueueStatisticsResponse;
 import com.github.bottomlessarchive.loa.web.view.document.response.dashboard.DashboardStatisticsResponse;
@@ -14,7 +15,6 @@ import com.github.bottomlessarchive.loa.web.view.document.response.dashboard.Das
 import com.github.bottomlessarchive.loa.queue.service.domain.Queue;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
@@ -27,11 +27,10 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class DocumentStatisticsResponseFactory {
 
+    private final ConductorClient conductorClient;
     private final QueueManipulator queueManipulator;
-    private final VaultClientService vaultClientService;
     private final DocumentEntityFactory documentEntityFactory;
     private final StatisticsEntityFactory statisticsEntityFactory;
-    private final VaultClientConfigurationProperties vaultClientConfigurationProperties;
 
     public Mono<DashboardDocumentStatisticsResponse> newStatisticsResponse() {
         final DashboardDocumentStatisticsResponse.DashboardDocumentStatisticsResponseBuilder builder =
@@ -88,18 +87,22 @@ public class DocumentStatisticsResponseFactory {
 
     private Mono<Void> fillVaultInstances(
             final DashboardDocumentStatisticsResponse.DashboardDocumentStatisticsResponseBuilder builder) {
-        return Mono.just(vaultClientConfigurationProperties.getLocations().keySet())
-                .flatMap(vaultNames -> Flux.fromIterable(vaultNames)
-                        .flatMap(vaultName -> vaultClientService.getAvailableSpace(vaultName)
-                                .onErrorReturn(-1L)
-                                .map(availableSpace -> DashboardVaultStatisticsResponse.builder()
-                                        .name(vaultName)
-                                        .availableStorageInBytes(availableSpace)
-                                        .build()
-                                )
+
+        return conductorClient.getInstances(ApplicationType.VAULT_APPLICATION)
+                .map(serviceInstanceEntity -> DashboardVaultStatisticsResponse.builder()
+                        .name(serviceInstanceEntity.getProperty("name")
+                                .map(ServiceInstanceEntityProperty::getValue)
+                                .orElse("Unknown Vault!")
                         )
-                        .collect(Collectors.toList())
+                        .availableStorageInBytes(
+                                serviceInstanceEntity.getProperty("freeSpace")
+                                        .map(ServiceInstanceEntityProperty::getValue)
+                                        .map(Long::parseLong)
+                                        .orElse(-1L)
+                        )
+                        .build()
                 )
+                .buffer()
                 .map(builder::vaultInstances)
                 .subscribeOn(Schedulers.boundedElastic())
                 .then();

@@ -1,5 +1,0 @@
-| **loa.queue.host**
-| The ip address of the Queue Application. *(Default value: localhost)*
-
-| **loa.queue.port**
-| The port where the Queue Application is listening for new connections. *(Default value: 61616)*

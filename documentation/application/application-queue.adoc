@@ -10,6 +10,8 @@ The Queue Application is a simple glue between the <<Vault Application>>, <<Down
 |===
 | Parameter | Description
 
+include::../service/conductor/conductor-configuration.adoc[]
+
 | **loa.queue.port**
 | The port where the application should listen. *(Default value: 61616)*
 

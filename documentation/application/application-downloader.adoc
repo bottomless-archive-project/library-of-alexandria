@@ -8,6 +8,8 @@ This application is responsible for reading out the document locations from the 
 |===
 | Parameter | Description
 
+include::../service/conductor/conductor-configuration.adoc[]
+
 | **loa.stage.location**
 | The location where the document files are first downloaded. After some validation and occasionally modification (compression etc) it is moved to the vault. *(Default value: temp folder)*
 
@@ -29,6 +31,5 @@ This application is responsible for reading out the document locations from the 
 | **loa.source.name**
 | The name of the source location. This name will be saved to the database for every crawled document. It could be helpful for statistics collection or in identifying bugs and errors with specific sources. Only used when the `loa.downloader.source` is set to `FOLDER`. When `QUEUE` is specified, then the value that is saved to the database will be sent by the <<Generator Application>>. *(Default value: unknown)*
 
-include::../service/queue/queue-configuration.adoc[]
 include::../service/repository/repository-configuration.adoc[]
 |===

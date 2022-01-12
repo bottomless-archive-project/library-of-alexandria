@@ -1,8 +1,11 @@
 package com.github.bottomlessarchive.loa.queue.artemis.configuration;
 
-import com.github.bottomlessarchive.loa.queue.configuration.QueueConfigurationProperties;
+import com.github.bottomlessarchive.loa.application.domain.ApplicationType;
+import com.github.bottomlessarchive.loa.conductor.service.client.ConductorClient;
+import com.github.bottomlessarchive.loa.conductor.service.domain.ServiceInstanceEntity;
 import com.github.bottomlessarchive.loa.queue.service.domain.QueueException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.artemis.api.core.TransportConfiguration;
 import org.apache.activemq.artemis.api.core.client.ActiveMQClient;
 import org.apache.activemq.artemis.api.core.client.ClientSession;
@@ -15,13 +18,15 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.Map;
+import java.util.Optional;
 
+@Slf4j
 @Configuration
 @RequiredArgsConstructor
 @ConditionalOnMissingClass("org.apache.activemq.artemis.core.server.embedded.EmbeddedActiveMQ")
 public class QueueClientConfiguration {
 
-    private final QueueConfigurationProperties queueConfigurationProperties;
+    private final ConductorClient conductorClient;
 
     /*
      * We create a default session that's necessary to create messages in the serializers/deserializers etc.
@@ -53,11 +58,29 @@ public class QueueClientConfiguration {
     }
 
     @Bean
-    protected TransportConfiguration serverTransportConfiguration() {
+    protected TransportConfiguration serverTransportConfiguration() throws InterruptedException {
+        ServiceInstanceEntity serviceInstanceEntity = null;
+
+        while (serviceInstanceEntity == null) {
+            final Optional<ServiceInstanceEntity> serviceInstanceEntityResponse = conductorClient.getInstance(
+                    ApplicationType.QUEUE_APPLICATION).blockOptional();
+
+            if (serviceInstanceEntityResponse.isPresent()) {
+                serviceInstanceEntity = serviceInstanceEntityResponse.get();
+            } else {
+                log.info("Failed to acquire connection to a Queue Application. Will retry in 5 seconds.");
+
+                Thread.sleep(5000L);
+            }
+        }
+
+        log.info("Connecting to Queue Application at location: {}, port: {}.", serviceInstanceEntity.getLocation(),
+                serviceInstanceEntity.getPort());
+
         return new TransportConfiguration(NettyConnectorFactory.class.getName(),
                 Map.of(
-                        TransportConstants.HOST_PROP_NAME, queueConfigurationProperties.getHost(),
-                        TransportConstants.PORT_PROP_NAME, queueConfigurationProperties.getPort()
+                        TransportConstants.HOST_PROP_NAME, serviceInstanceEntity.getLocation(),
+                        TransportConstants.PORT_PROP_NAME, serviceInstanceEntity.getPort()
                 )
         );
     }

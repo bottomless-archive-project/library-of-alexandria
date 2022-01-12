@@ -1,0 +1,7 @@
+dependencies {
+    api group: 'io.projectreactor', name: 'reactor-core'
+
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-webflux'
+
+    api project(':loa-library:loa-conductor-domain')
+}

@@ -3,4 +3,4 @@
  | |__| | '_ \ '_/ _` | '_| || | / _ \  _|  / _ \| / -_) \ / _` | ' \/ _` | '_| / _` |
  |____|_|_.__/_| \__,_|_|  \_, | \___/_|   /_/ \_\_\___/_\_\__,_|_||_\__,_|_| |_\__,_|
                            |__/                       ${application.formatted-version}
-       "If you have a garden and a library, you have everything you need." - Cicero
+       "If you have a garden and a library, you have everything you need." - Marcus Tullius Cicero

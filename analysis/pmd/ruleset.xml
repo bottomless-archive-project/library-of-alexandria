@@ -105,6 +105,7 @@
         <exclude name="JUnitTestContainsTooManyAsserts"/>
 
         <!-- Too many false positives. -->
+        <exclude name="GuardLogStatement"/>
         <exclude name="AvoidUsingHardCodedIP"/>
     </rule>
 
