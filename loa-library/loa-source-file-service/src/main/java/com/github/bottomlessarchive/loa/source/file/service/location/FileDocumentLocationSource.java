@@ -30,17 +30,17 @@ public class FileDocumentLocationSource implements DocumentLocationSource {
 
     @Override
     public Flux<DocumentLocation> streamLocations() {
-        if (fileDocumentSourceConfigurationProperties.getSkipLines() > 0 && log.isInfoEnabled()) {
-            log.info("Skipping the first {} lines.", fileDocumentSourceConfigurationProperties.getSkipLines());
+        if (fileDocumentSourceConfigurationProperties.skipLines() > 0 && log.isInfoEnabled()) {
+            log.info("Skipping the first {} lines.", fileDocumentSourceConfigurationProperties.skipLines());
         }
 
-        if (fileDocumentSourceConfigurationProperties.getSkipLines() < 0) {
+        if (fileDocumentSourceConfigurationProperties.skipLines() < 0) {
             throw new IllegalArgumentException("Skip lines shouldn't be negative! It is set to "
-                    + fileDocumentSourceConfigurationProperties.getSkipLines() + " lines.");
+                    + fileDocumentSourceConfigurationProperties.skipLines() + " lines.");
         }
 
         return Flux.using(fileSourceFactory::newSourceReader, adapter.consume(), adapter.close())
-                .skip(fileDocumentSourceConfigurationProperties.getSkipLines())
+                .skip(fileDocumentSourceConfigurationProperties.skipLines())
                 .doOnNext(line -> processedDocumentLocationCount.increment())
                 .map(link -> DocumentLocation.builder()
                         .location(

@@ -79,7 +79,7 @@ public class ConductorClient {
 
         final ServiceInstanceRegistrationRequest serviceInstanceRegistrationRequest = ServiceInstanceRegistrationRequest.builder()
                 .location(hostAddress)
-                .port(conductorClientConfigurationProperties.getApplicationPort())
+                .port(conductorClientConfigurationProperties.applicationPort())
                 .properties(instanceRegistrationContext.getProperties().entrySet().stream()
                         .map(entry -> ServiceInstancePropertyRequest.builder()
                                 .name(entry.getKey())
@@ -91,7 +91,7 @@ public class ConductorClient {
                 .build();
 
         log.info("Registering service {} with host address: {} and port: {} into the Conductor Application.", applicationType, hostAddress,
-                conductorClientConfigurationProperties.getApplicationPort());
+                conductorClientConfigurationProperties.applicationPort());
 
         return webClient.post()
                 .uri(conductorClientConfigurationProperties.getUrl() + "/service/" + convertApplicationTypeToPath(applicationType))

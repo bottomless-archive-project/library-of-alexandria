@@ -22,11 +22,11 @@ public class IndexDatabaseConfiguration {
     @Bean
     public HttpHost httpHost() {
         if (log.isInfoEnabled()) {
-            log.info("Connecting to ElasticSearch on host: {} port: {}!", indexDatabaseConfigurationProperties.getHost(),
-                    indexDatabaseConfigurationProperties.getPort());
+            log.info("Connecting to ElasticSearch on host: {} port: {}!", indexDatabaseConfigurationProperties.host(),
+                    indexDatabaseConfigurationProperties.port());
         }
 
-        return new HttpHost(indexDatabaseConfigurationProperties.getHost(), indexDatabaseConfigurationProperties.getPort());
+        return new HttpHost(indexDatabaseConfigurationProperties.host(), indexDatabaseConfigurationProperties.port());
     }
 
     @Bean

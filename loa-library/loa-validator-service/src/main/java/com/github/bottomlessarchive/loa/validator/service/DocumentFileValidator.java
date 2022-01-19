@@ -43,7 +43,7 @@ public class DocumentFileValidator {
 
     private boolean isValidFileSize(final long stageFileSize) {
         return stageFileSize > MINIMUM_FILE_LENGTH
-                && stageFileSize < fileValidationConfigurationProperties.getMaximumArchiveSize();
+                && stageFileSize < fileValidationConfigurationProperties.maximumArchiveSize();
     }
 
     private boolean isParsable(final String documentId, final DocumentType documentType,

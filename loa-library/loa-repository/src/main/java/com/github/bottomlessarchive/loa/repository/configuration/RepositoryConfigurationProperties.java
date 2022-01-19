@@ -1,20 +1,15 @@
 package com.github.bottomlessarchive.loa.repository.configuration;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.ConstructorBinding;
 
-@Getter
-@ConstructorBinding
-@RequiredArgsConstructor
 @ConfigurationProperties("loa.database")
-public class RepositoryConfigurationProperties {
+public record RepositoryConfigurationProperties(
 
-    private final String host;
-    private final int port;
-    private final boolean noCursorTimeout;
-    private final String uri;
+        String host,
+        int port,
+        boolean noCursorTimeout,
+        String uri
+) {
 
     public boolean isUriConfiguration() {
         return uri != null && !uri.isEmpty();

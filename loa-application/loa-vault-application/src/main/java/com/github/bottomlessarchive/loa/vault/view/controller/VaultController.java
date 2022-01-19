@@ -55,7 +55,7 @@ public class VaultController {
         return documentEntityFactory.getDocumentEntity(UUID.fromString(documentId))
                 .switchIfEmpty(Mono.error(new InvalidRequestException("Document not found with id " + documentId + " or already removed!")))
                 .flatMapMany(documentEntity -> {
-                    if (!documentEntity.isInVault(vaultConfigurationProperties.getName())) {
+                    if (!documentEntity.isInVault(vaultConfigurationProperties.name())) {
                         return Flux.error(new InvalidRequestException(
                                 "Document with id " + documentId + " is available on a different vault!"));
                     }
@@ -77,7 +77,7 @@ public class VaultController {
      */
     @MessageMapping("deleteDocument")
     public Mono<Void> deleteDocument(final DeleteDocumentRequest deleteDocumentRequest) {
-        if (!vaultConfigurationProperties.isModificationEnabled()) {
+        if (!vaultConfigurationProperties.modificationEnabled()) {
             return Mono.error(new InvalidRequestException("Modification is disabled on this vault instance!"));
         }
 
@@ -86,7 +86,7 @@ public class VaultController {
         return documentEntityFactory.getDocumentEntity(UUID.fromString(documentId))
                 .switchIfEmpty(Mono.error(new InvalidRequestException("Document not found with id " + documentId + " or already removed!")))
                 .flatMap(documentEntity -> {
-                    if (!documentEntity.isInVault(vaultConfigurationProperties.getName())) {
+                    if (!documentEntity.isInVault(vaultConfigurationProperties.name())) {
                         return Mono.error(new InvalidRequestException("Document with id " + documentId
                                 + " is available on a different vault!"));
                     }
@@ -107,7 +107,7 @@ public class VaultController {
      */
     @MessageMapping("recompressDocument")
     public Mono<Void> recompressDocument(final RecompressDocumentRequest recompressRequest) {
-        if (!vaultConfigurationProperties.isModificationEnabled()) {
+        if (!vaultConfigurationProperties.modificationEnabled()) {
             return Mono.error(new InvalidRequestException("Modification is disabled on this vault instance!"));
         }
 
@@ -115,7 +115,7 @@ public class VaultController {
 
         return documentEntityFactory.getDocumentEntity(UUID.fromString(documentId))
                 .doOnNext(documentEntity -> {
-                    if (!documentEntity.isInVault(vaultConfigurationProperties.getName())) {
+                    if (!documentEntity.isInVault(vaultConfigurationProperties.name())) {
                         throw new InvalidRequestException("Document with id " + documentId + " is available on a different vault!");
                     }
 
@@ -145,7 +145,7 @@ public class VaultController {
 
         return documentEntityFactory.getDocumentEntity(UUID.fromString(documentId))
                 .flatMap(documentEntity -> {
-                    if (!documentEntity.isInVault(vaultConfigurationProperties.getName())) {
+                    if (!documentEntity.isInVault(vaultConfigurationProperties.name())) {
                         return Mono.error(new InvalidRequestException("Document with id " + documentId
                                 + " is available on a different vault!"));
                     }
@@ -160,7 +160,7 @@ public class VaultController {
 
     @MessageMapping("replaceCorruptDocument")
     public Mono<Void> replaceCorruptDocument(final ReplaceCorruptDocumentRequest replaceCorruptDocumentRequest) {
-        if (!vaultConfigurationProperties.isModificationEnabled()) {
+        if (!vaultConfigurationProperties.modificationEnabled()) {
             return Mono.error(new InvalidRequestException("Modification is disabled on this vault instance!"));
         }
 
@@ -170,7 +170,7 @@ public class VaultController {
 
         return documentEntityFactory.getDocumentEntity(UUID.fromString(documentId))
                 .flatMap(documentEntity -> {
-                    if (!documentEntity.isInVault(vaultConfigurationProperties.getName())) {
+                    if (!documentEntity.isInVault(vaultConfigurationProperties.name())) {
                         throw new InvalidRequestException("Document with id " + documentId + " is available on a different vault!");
                     }
 

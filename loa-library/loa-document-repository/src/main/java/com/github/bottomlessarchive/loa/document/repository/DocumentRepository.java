@@ -62,7 +62,7 @@ public class DocumentRepository {
                 documentDatabaseEntityMongoCollection.find(eq("status", status))
                         // We don't want to have the cursor closed while processing. It would be a better idea to set
                         // a maximum timeout in milliseconds but that only configurable on the server side.
-                        .noCursorTimeout(repositoryConfigurationProperties.isNoCursorTimeout())
+                        .noCursorTimeout(repositoryConfigurationProperties.noCursorTimeout())
         );
     }
 
@@ -76,7 +76,7 @@ public class DocumentRepository {
                 documentDatabaseEntityMongoCollection.find()
                         // We don't want to have the cursor closed while processing. It would be a better idea to set
                         // a maximum timeout in milliseconds but that only configurable on the server side.
-                        .noCursorTimeout(repositoryConfigurationProperties.isNoCursorTimeout())
+                        .noCursorTimeout(repositoryConfigurationProperties.noCursorTimeout())
         );
     }
 

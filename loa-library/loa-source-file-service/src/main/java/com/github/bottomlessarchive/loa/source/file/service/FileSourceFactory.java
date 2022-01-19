@@ -22,14 +22,14 @@ public class FileSourceFactory {
 
     public BufferedReader newSourceReader() {
         return new BufferedReader(new InputStreamReader(newInputStream(
-                Path.of(fileDocumentSourceConfigurationProperties.getLocation()))));
+                Path.of(fileDocumentSourceConfigurationProperties.location()))));
     }
 
     private InputStream newInputStream(final Path fileLocation) {
         try {
             final InputStream fileStream = Files.newInputStream(fileLocation);
 
-            if (fileDocumentSourceConfigurationProperties.getEncoding() == FileEncodingType.GZIP) {
+            if (fileDocumentSourceConfigurationProperties.encoding() == FileEncodingType.GZIP) {
                 return new GZIPInputStream(fileStream);
             }
 

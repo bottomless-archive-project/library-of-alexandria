@@ -49,7 +49,7 @@ public class IndexerCommand implements CommandLineRunner {
         log.info("Start document indexing.");
 
         documentEntityFactory.getDocumentEntity(DocumentStatus.DOWNLOADED)
-                .flatMap(this::processDocument, indexerConfigurationProperties.getConcurrentIndexerThreads())
+                .flatMap(this::processDocument, indexerConfigurationProperties.concurrentIndexerThreads())
                 .subscribe();
     }
 

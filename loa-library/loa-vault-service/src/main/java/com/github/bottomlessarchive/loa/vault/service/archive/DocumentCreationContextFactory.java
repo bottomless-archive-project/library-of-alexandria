@@ -28,7 +28,7 @@ public class DocumentCreationContextFactory {
                         .sourceLocationId(documentArchivingContext.getSourceLocationId()
                                 .orElse(null))
                         .versionNumber(documentArchivingContext.getVersionNumber())
-                        .compression(compressionConfigurationProperties.getAlgorithm())
+                        .compression(compressionConfigurationProperties.algorithm())
                         .checksum(checksum)
                         .fileSize(documentArchivingContext.getContentLength())
                         .build()

@@ -43,7 +43,7 @@ public class QueueServerConfiguration {
         configuration.addAcceptorConfiguration(new TransportConfiguration(NettyAcceptorFactory.class.getName(),
                         Map.of(
                                 TransportConstants.HOST_PROP_NAME, BIND_ALL_IP_ADDRESS,
-                                TransportConstants.PORT_PROP_NAME, queueServerConfigurationProperties.getPort()
+                                TransportConstants.PORT_PROP_NAME, queueServerConfigurationProperties.port()
                         )
                 )
         );
@@ -51,9 +51,9 @@ public class QueueServerConfiguration {
         configuration.setJournalSyncTransactional(false);
         configuration.setJournalSyncNonTransactional(false);
         configuration.setMaxDiskUsage(-1);
-        configuration.setJournalDirectory(queueServerConfigurationProperties.getDataDirectory() + "/journal");
-        configuration.setBindingsDirectory(queueServerConfigurationProperties.getDataDirectory() + "/bindings");
-        configuration.setLargeMessagesDirectory(queueServerConfigurationProperties.getDataDirectory() + "/largemessages");
+        configuration.setJournalDirectory(queueServerConfigurationProperties.dataDirectory() + "/journal");
+        configuration.setBindingsDirectory(queueServerConfigurationProperties.dataDirectory() + "/bindings");
+        configuration.setLargeMessagesDirectory(queueServerConfigurationProperties.dataDirectory() + "/largemessages");
 
         return configuration;
     }

@@ -14,6 +14,6 @@ public class VaultNameInstanceRegistrationExtensionProvider implements InstanceP
 
     @Override
     public void extendInstanceWithProperty(final InstanceExtensionContext instanceExtensionContext) {
-        instanceExtensionContext.setProperty("name", vaultConfigurationProperties.getName());
+        instanceExtensionContext.setProperty("name", vaultConfigurationProperties.name());
     }
 }

@@ -29,7 +29,7 @@ class StageLocationFactoryTest {
 
     @Test
     void testGetLocation() {
-        when(stageConfigurationProperties.getLocation())
+        when(stageConfigurationProperties.location())
                 .thenReturn("testlocation");
 
         final StageLocation result = underTest.getLocation(TEST_DOCUMENT_ID, DocumentType.PDF)

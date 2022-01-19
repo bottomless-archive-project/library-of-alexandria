@@ -34,7 +34,7 @@ class DocumentLocationCreationContextFactoryTest {
                         .build()
                 )
                 .build();
-        when(downloaderConfigurationProperties.getVersionNumber())
+        when(downloaderConfigurationProperties.versionNumber())
                 .thenReturn(5);
 
         final DocumentLocationCreationContext result = documentLocationCreationContextFactory.newCreatingContext(documentLocation);

@@ -41,14 +41,14 @@ public class RepositoryConfiguration {
                 .uuidRepresentation(UuidRepresentation.JAVA_LEGACY);
 
         if (repositoryConfigurationProperties.isUriConfiguration()) {
-            builder.applyConnectionString(new ConnectionString(repositoryConfigurationProperties.getUri()));
+            builder.applyConnectionString(new ConnectionString(repositoryConfigurationProperties.uri()));
         } else {
             builder.applyToClusterSettings(clusterBuilder ->
                     clusterBuilder.hosts(
                             List.of(
                                     new ServerAddress(
-                                            repositoryConfigurationProperties.getHost(),
-                                            repositoryConfigurationProperties.getPort()
+                                            repositoryConfigurationProperties.host(),
+                                            repositoryConfigurationProperties.port()
                                     )
                             )
                     )

@@ -48,7 +48,7 @@ class DocumentCreationContextFactoryTest {
                 .build();
         when(checksumProvider.checksum(content))
                 .thenReturn(Mono.just("textchecksum"));
-        when(compressionConfigurationProperties.getAlgorithm())
+        when(compressionConfigurationProperties.algorithm())
                 .thenReturn(DocumentCompression.GZIP);
 
         final Mono<DocumentCreationContext> result = underTest.newContext(documentArchivingContext);
@@ -84,7 +84,7 @@ class DocumentCreationContextFactoryTest {
                 .build();
         when(checksumProvider.checksum(content))
                 .thenReturn(Mono.just("textchecksum"));
-        when(compressionConfigurationProperties.getAlgorithm())
+        when(compressionConfigurationProperties.algorithm())
                 .thenReturn(DocumentCompression.GZIP);
 
         final Mono<DocumentCreationContext> result = underTest.newContext(documentArchivingContext);

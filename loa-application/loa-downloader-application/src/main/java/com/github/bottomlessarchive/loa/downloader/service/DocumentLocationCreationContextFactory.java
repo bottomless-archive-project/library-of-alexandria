@@ -22,7 +22,7 @@ public class DocumentLocationCreationContextFactory {
                 .id(documentLocation.getId())
                 .url(documentLocationURL.toString())
                 .source(documentLocation.getSourceName())
-                .downloaderVersion(downloaderConfigurationProperties.getVersionNumber())
+                .downloaderVersion(downloaderConfigurationProperties.versionNumber())
                 .build();
     }
 }

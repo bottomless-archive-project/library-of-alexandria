@@ -18,7 +18,7 @@ public class DocumentArchivingContextTransformer {
     public DocumentArchivingContext transform(final DocumentArchivingMessage documentArchivingMessage) {
         return DocumentArchivingContext.builder()
                 .id(UUID.fromString(documentArchivingMessage.getId()))
-                .vault(vaultConfigurationProperties.getName())
+                .vault(vaultConfigurationProperties.name())
                 .type(DocumentType.valueOf(documentArchivingMessage.getType()))
                 .source(documentArchivingMessage.getSource())
                 .sourceLocationId(documentArchivingMessage.getSourceLocationId()
@@ -26,7 +26,7 @@ public class DocumentArchivingContextTransformer {
                 )
                 .contentLength(documentArchivingMessage.getContentLength())
                 .content(documentArchivingMessage.getContent())
-                .versionNumber(vaultConfigurationProperties.getVersionNumber())
+                .versionNumber(vaultConfigurationProperties.versionNumber())
                 .build();
     }
 }

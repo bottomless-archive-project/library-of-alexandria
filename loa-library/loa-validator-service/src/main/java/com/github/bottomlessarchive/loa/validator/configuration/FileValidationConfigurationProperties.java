@@ -1,18 +1,20 @@
 package com.github.bottomlessarchive.loa.validator.configuration;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.ConstructorBinding;
 
-@Getter
-@ConstructorBinding
-@RequiredArgsConstructor
+/**
+ * @param maximumArchiveSize Maximum file size to archive in bytes. Documents bigger than this in size are not archived.
+ */
 @ConfigurationProperties("loa.validation")
-public class FileValidationConfigurationProperties {
+public record FileValidationConfigurationProperties(
+        long maximumArchiveSize
+) {
 
-    /**
-     * Maximum file size to archive in bytes. Documents bigger than this in size are not archived.
-     */
-    private final long maximumArchiveSize = 8589934592L;
+    public FileValidationConfigurationProperties(final long maximumArchiveSize) {
+        if (maximumArchiveSize == 0) {
+            this.maximumArchiveSize = 8589934592L;
+        } else {
+            this.maximumArchiveSize = maximumArchiveSize;
+        }
+    }
 }

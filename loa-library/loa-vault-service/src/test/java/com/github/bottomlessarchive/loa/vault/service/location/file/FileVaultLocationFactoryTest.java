@@ -44,7 +44,7 @@ class FileVaultLocationFactoryTest {
 
     @BeforeEach
     void setup() {
-        when(fileConfigurationProperties.getPath())
+        when(fileConfigurationProperties.path())
                 .thenReturn(TEST_FILE_PATH);
     }
 

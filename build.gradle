@@ -81,6 +81,7 @@ configure(subprojects.findAll {it.name != 'loa-frontend'}) {
         // Testing
         testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
         testImplementation group: 'io.projectreactor', name: 'reactor-test'
+        testImplementation group: 'org.mockito', name: 'mockito-inline'
     }
 
     apply plugin: "com.github.ben-manes.versions"

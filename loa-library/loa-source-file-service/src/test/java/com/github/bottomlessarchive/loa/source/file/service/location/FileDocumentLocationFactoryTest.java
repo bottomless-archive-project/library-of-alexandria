@@ -49,7 +49,7 @@ class FileDocumentLocationFactoryTest {
 
     @Test
     void testWhenSkipLinesAreNegative() {
-        when(fileDocumentSourceConfigurationProperties.getSkipLines())
+        when(fileDocumentSourceConfigurationProperties.skipLines())
                 .thenReturn(-1L);
 
         assertThrows(IllegalArgumentException.class, () -> underTest.streamLocations());
@@ -57,7 +57,7 @@ class FileDocumentLocationFactoryTest {
 
     @Test
     void testWhenSkipLinesAreSet() {
-        when(fileDocumentSourceConfigurationProperties.getSkipLines())
+        when(fileDocumentSourceConfigurationProperties.skipLines())
                 .thenReturn(3L);
         final BufferedReader reader = mock(BufferedReader.class);
         when(fileSourceFactory.newSourceReader())

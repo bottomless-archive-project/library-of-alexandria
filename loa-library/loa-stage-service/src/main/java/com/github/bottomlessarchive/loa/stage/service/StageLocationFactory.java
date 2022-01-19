@@ -27,7 +27,7 @@ public class StageLocationFactory {
      * @return the location created in the staging area
      */
     public Mono<StageLocation> getLocation(final String documentId, final DocumentType documentType) {
-        return Mono.fromSupplier(() -> Path.of(stageConfigurationProperties.getLocation(), buildFileName(documentId, documentType)))
+        return Mono.fromSupplier(() -> Path.of(stageConfigurationProperties.location(), buildFileName(documentId, documentType)))
                 .map(path -> StageLocation.builder()
                         .path(path)
                         .build()
@@ -35,9 +35,6 @@ public class StageLocationFactory {
     }
 
     private String buildFileName(final String documentId, final DocumentType documentType) {
-        return new StringBuilder(documentId)
-                .append('.')
-                .append(documentType.getFileExtension())
-                .toString();
+        return documentId + '.' + documentType.getFileExtension();
     }
 }

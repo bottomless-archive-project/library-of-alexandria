@@ -21,7 +21,7 @@ public class S3Configuration {
     public S3Client s3Client(final StaticCredentialsProvider staticCredentialsProvider) {
         return S3Client.builder()
                 .endpointOverride(s3ConfigurationProperties.getEndpointLocation())
-                .region(Region.of(s3ConfigurationProperties.getRegion()))
+                .region(Region.of(s3ConfigurationProperties.region()))
                 .credentialsProvider(staticCredentialsProvider)
                 .build();
     }
@@ -33,7 +33,7 @@ public class S3Configuration {
 
     @Bean
     public AwsCredentials awsCredentials() {
-        return AwsBasicCredentials.create(s3ConfigurationProperties.getAccessKey(),
-                s3ConfigurationProperties.getSecretKey());
+        return AwsBasicCredentials.create(s3ConfigurationProperties.accessKey(),
+                s3ConfigurationProperties.secretKey());
     }
 }

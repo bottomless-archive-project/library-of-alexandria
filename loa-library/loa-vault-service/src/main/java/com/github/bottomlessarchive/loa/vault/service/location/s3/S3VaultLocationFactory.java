@@ -34,7 +34,7 @@ public class S3VaultLocationFactory implements VaultLocationFactory {
                 ? documentEntity.getType().getMimeType()
                 : compression.getMimeType();
 
-        return new S3VaultLocation(s3ConfigurationProperties.getBucketName(), fileName, contentType, s3Client, compression);
+        return new S3VaultLocation(s3ConfigurationProperties.bucketName(), fileName, contentType, s3Client, compression);
     }
 
     /**

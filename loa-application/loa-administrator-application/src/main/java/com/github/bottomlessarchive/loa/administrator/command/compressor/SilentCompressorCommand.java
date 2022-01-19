@@ -47,11 +47,11 @@ public class SilentCompressorCommand implements CommandLineRunner {
                 .filter(DocumentEntity::isArchived)
                 .filter(this::shouldCompress)
                 .doOnNext(documentEntity -> vaultClientService.recompressDocument(documentEntity,
-                        silentCompressorConfigurationProperties.getAlgorithm()).block())
+                        silentCompressorConfigurationProperties.algorithm()).block())
                 .subscribe();
     }
 
     private boolean shouldCompress(final DocumentEntity documentEntity) {
-        return documentEntity.getCompression() != silentCompressorConfigurationProperties.getAlgorithm();
+        return documentEntity.getCompression() != silentCompressorConfigurationProperties.algorithm();
     }
 }
