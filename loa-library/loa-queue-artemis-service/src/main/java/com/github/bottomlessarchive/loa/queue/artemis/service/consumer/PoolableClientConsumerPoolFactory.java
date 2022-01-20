@@ -4,6 +4,7 @@ import com.github.bottomlessarchive.loa.queue.artemis.service.consumer.pool.Queu
 import com.github.bottomlessarchive.loa.queue.artemis.service.consumer.pool.QueueConsumerFactory;
 import com.github.bottomlessarchive.loa.queue.artemis.service.consumer.pool.domain.PoolableQueueConsumer;
 import com.github.bottomlessarchive.loa.queue.artemis.configuration.QueueServerConfiguration;
+import com.github.bottomlessarchive.loa.queue.configuration.QueueServerConfigurationProperties;
 import com.github.bottomlessarchive.loa.queue.service.domain.Queue;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -21,6 +22,7 @@ import java.util.Map;
 public class PoolableClientConsumerPoolFactory {
 
     private final QueueConsumerFactory clientConsumerFactory;
+    private final QueueServerConfigurationProperties queueServerConfigurationProperties;
     private final Map<Queue, Pool<PoolableQueueConsumer>> clientConsumers = new EnumMap<>(Queue.class);
 
     public synchronized Pool<PoolableQueueConsumer> getPool(final Queue queue) {
@@ -29,7 +31,7 @@ public class PoolableClientConsumerPoolFactory {
 
     private Pool<PoolableQueueConsumer> createPool(final Queue queue) {
         return Pool.from(createAllocatorForQueue(queue))
-                .setSize(10)
+                .setSize(queueServerConfigurationProperties.consumerPoolSize())
                 .setExpiration(Expiration.never())
                 .build();
     }
