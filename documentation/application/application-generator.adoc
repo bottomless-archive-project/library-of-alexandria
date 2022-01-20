@@ -31,4 +31,7 @@ include::../service/repository/repository-configuration.adoc[]
 
 | **loa.source.file.skip-lines**
 | Skip the number of lines before starting to process the document locations in the file. Can be used to quickly get back to the last processed line if the application is restarted for any reason. *(Default value: 0)*
+
+| **loa.queue.producer-pool-size**
+| The number of consumer connections to the <<Queue Application>>.*(Default value: 10)*
 |===

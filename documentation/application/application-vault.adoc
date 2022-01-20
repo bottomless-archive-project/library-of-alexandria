@@ -48,4 +48,7 @@ include::../service/repository/repository-configuration.adoc[]
 
 | **loa.checksum.type**
 | The type of the hashing algorithm used to create the document's checksum. At the moment only `SHA-256` is available for this purpose. *(Default value: sha-256)*
+
+| **loa.queue.consumer-pool-size**
+| The port open for the MongoDB database server. *(Default value: 10)*
 |===
