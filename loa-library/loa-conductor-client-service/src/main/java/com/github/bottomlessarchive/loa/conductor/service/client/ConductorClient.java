@@ -105,12 +105,16 @@ public class ConductorClient {
         log.info("Refreshing application instance type: {} with instanceId: {} in the Conductor Application.",
                 applicationType, instanceId);
 
+        final String hostAddress = networkAddressCalculator.calculateInetAddress().getHostAddress();
+
         final InstanceExtensionContext instanceExtensionContext = new InstanceExtensionContext();
 
         instancePropertyExtensionProviderList.forEach(instancePropertyExtensionProvider ->
                 instancePropertyExtensionProvider.extendInstanceWithProperty(instanceExtensionContext));
 
         final ServiceInstanceRefreshRequest serviceInstanceRefreshRequest = ServiceInstanceRefreshRequest.builder()
+                .location(hostAddress)
+                .port(conductorClientConfigurationProperties.applicationPort())
                 .properties(instanceExtensionContext.getProperties().entrySet().stream()
                         .map(entry -> ServiceInstancePropertyRequest.builder()
                                 .name(entry.getKey())

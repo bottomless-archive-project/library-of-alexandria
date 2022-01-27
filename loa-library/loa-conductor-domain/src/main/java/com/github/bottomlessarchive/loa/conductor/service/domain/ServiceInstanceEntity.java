@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -56,5 +57,11 @@ public class ServiceInstanceEntity {
                         .value(properties.get(name))
                         .build()
         );
+    }
+
+    public boolean isHealthy() {
+        final Instant healthyUntil = Instant.now().minus(2, ChronoUnit.MINUTES);
+
+        return lastHeartbeat.isBefore(healthyUntil);
     }
 }

@@ -35,7 +35,7 @@ dependencies {
     implementation project(':loa-library:loa-conductor-client-service')
 
     implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: '2.0.25'
-    implementation group: 'net.coobird', name: 'thumbnailator', version: '0.4.15'
+    implementation group: 'net.coobird', name: 'thumbnailator', version: '0.4.16'
 
     implementation 'com.github.jai-imageio:jai-imageio-core:1.4.0'
     implementation 'com.github.jai-imageio:jai-imageio-jpeg2000:1.4.0'

@@ -7,7 +7,7 @@ import lombok.extern.jackson.Jacksonized;
 @Getter
 @Builder
 @Jacksonized
-public class ServiceInstanceRegistrationProperty {
+public class ServiceInstanceProperty {
 
     private final String name;
     private final String value;

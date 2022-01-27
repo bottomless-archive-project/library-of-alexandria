@@ -13,5 +13,5 @@ public class ServiceInstanceRefreshContext {
 
     private final UUID instanceId;
     private final ApplicationType applicationType;
-    private final List<ServiceInstanceRefreshProperty> properties;
+    private final List<ServiceInstanceProperty> properties;
 }

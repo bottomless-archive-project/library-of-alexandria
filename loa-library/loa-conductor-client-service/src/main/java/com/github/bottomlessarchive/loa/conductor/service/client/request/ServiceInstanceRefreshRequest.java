@@ -11,5 +11,7 @@ import java.util.List;
 @Jacksonized
 public class ServiceInstanceRefreshRequest {
 
+    String location;
+    int port;
     List<ServiceInstancePropertyRequest> properties;
 }
