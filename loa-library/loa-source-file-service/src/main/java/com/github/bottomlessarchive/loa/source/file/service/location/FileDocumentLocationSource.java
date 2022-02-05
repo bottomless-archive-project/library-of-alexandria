@@ -12,7 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
+
+import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -22,14 +23,13 @@ public class FileDocumentLocationSource implements DocumentLocationSource {
 
     private final DocumentSourceConfiguration documentSourceConfiguration;
     private final FileDocumentSourceConfigurationProperties fileDocumentSourceConfigurationProperties;
-    private final BufferedReaderAdapter adapter;
     private final FileSourceFactory fileSourceFactory;
 
     @Qualifier("processedDocumentLocationCount")
     private final Counter processedDocumentLocationCount;
 
     @Override
-    public Flux<DocumentLocation> streamLocations() {
+    public Stream<DocumentLocation> streamLocations() {
         if (fileDocumentSourceConfigurationProperties.skipLines() > 0 && log.isInfoEnabled()) {
             log.info("Skipping the first {} lines.", fileDocumentSourceConfigurationProperties.skipLines());
         }
@@ -39,17 +39,20 @@ public class FileDocumentLocationSource implements DocumentLocationSource {
                     + fileDocumentSourceConfigurationProperties.skipLines() + " lines.");
         }
 
-        return Flux.using(fileSourceFactory::newSourceReader, adapter.consume(), adapter.close())
+        return fileSourceFactory.newSourceReader()
+                .lines()
                 .skip(fileDocumentSourceConfigurationProperties.skipLines())
-                .doOnNext(line -> processedDocumentLocationCount.increment())
-                .map(link -> DocumentLocation.builder()
-                        .location(
-                                StringLink.builder()
-                                        .link(link)
-                                        .build()
-                        )
-                        .sourceName(documentSourceConfiguration.getName())
-                        .build()
-                );
+                .map(link -> {
+                    processedDocumentLocationCount.increment();
+
+                    return DocumentLocation.builder()
+                            .location(
+                                    StringLink.builder()
+                                            .link(link)
+                                            .build()
+                            )
+                            .sourceName(documentSourceConfiguration.getName())
+                            .build();
+                });
     }
 }

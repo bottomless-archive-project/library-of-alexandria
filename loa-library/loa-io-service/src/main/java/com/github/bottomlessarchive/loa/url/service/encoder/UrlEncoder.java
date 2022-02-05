@@ -2,12 +2,12 @@ package com.github.bottomlessarchive.loa.url.service.encoder;
 
 import io.mola.galimatias.GalimatiasParseException;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Mono;
 
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Optional;
 
 /**
  * This service is responsible for encoding existing {@link URL} instances to valid
@@ -24,14 +24,14 @@ public class UrlEncoder {
      * @param url the url to encode
      * @return the encoded url
      */
-    public Mono<URL> encode(final URL url) {
+    public Optional<URL> encode(final URL url) {
         try {
             // We need to further validate the URL because the java.net.URL's validation is inadequate.
             validateUrl(url);
 
-            return Mono.just(encodeUrl(url));
+            return Optional.of(encodeUrl(url));
         } catch (GalimatiasParseException | MalformedURLException | URISyntaxException e) {
-            return Mono.empty();
+            return Optional.empty();
         }
     }
 

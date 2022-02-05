@@ -2,13 +2,12 @@ package com.github.bottomlessarchive.loa.url.service.encoder;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import reactor.core.publisher.Mono;
-import reactor.test.StepVerifier;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class UrlEncoderTest {
 
@@ -28,11 +27,9 @@ class UrlEncoderTest {
             }
     )
     void testEncodeWhenUsingValidUrls(final String urlToEncode, final String expected) throws MalformedURLException {
-        final Mono<URL> result = underTest.encode(new URL(urlToEncode));
+        final Optional<URL> result = underTest.encode(new URL(urlToEncode));
 
-        StepVerifier.create(result)
-                .consumeNextWith(resultValue -> assertEquals(expected, resultValue.toString()))
-                .verifyComplete();
+        assertThat(result).contains(new URL(expected));
     }
 
     @ParameterizedTest
@@ -42,9 +39,8 @@ class UrlEncoderTest {
             }
     )
     void testEncodeWhenUsingInvalidUrls(final String urlToEncode) throws MalformedURLException {
-        final Mono<URL> result = underTest.encode(new URL(urlToEncode));
+        final Optional<URL> result = underTest.encode(new URL(urlToEncode));
 
-        StepVerifier.create(result)
-                .verifyComplete();
+        assertThat(result).isEmpty();
     }
 }

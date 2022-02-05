@@ -10,10 +10,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import reactor.core.publisher.Flux;
-import reactor.test.StepVerifier;
 
 import java.io.BufferedReader;
+import java.io.CharArrayReader;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -39,9 +38,6 @@ class FileDocumentLocationFactoryTest {
     private Counter processedDocumentLocationCount;
 
     @Mock
-    private BufferedReaderAdapter adapter;
-
-    @Mock
     private DocumentSourceConfiguration documentSourceConfiguration;
 
     @InjectMocks
@@ -59,26 +55,25 @@ class FileDocumentLocationFactoryTest {
     void testWhenSkipLinesAreSet() {
         when(fileDocumentSourceConfigurationProperties.skipLines())
                 .thenReturn(3L);
-        final BufferedReader reader = mock(BufferedReader.class);
         when(fileSourceFactory.newSourceReader())
-                .thenReturn(reader);
-        when(adapter.consume())
-                .thenReturn((newReader) -> {
-                    assertThat(reader, is(newReader));
+                .thenReturn(
+                        new BufferedReader(
+                                new CharArrayReader(
+                                        """
+                                                http://www.example.com/1
+                                                http://www.example.com/2
+                                                http://www.example.com/3
+                                                http://www.example.com/4
+                                                http://www.example.com/5
+                                                """
+                                                .toCharArray()
+                                )
+                        )
+                );
 
-                    return Flux.fromIterable(List.of("http://www.example.com/1", "http://www.example.com/2", "http://www.example.com/3",
-                            "http://www.example.com/4", "http://www.example.com/5"));
-                });
-        when(adapter.close())
-                .thenReturn((newReader) -> {
-                });
+        final List<DocumentLocation> result = underTest.streamLocations().toList();
 
-        final Flux<DocumentLocation> result = underTest.streamLocations();
-
-        StepVerifier.create(result)
-                .expectNextCount(2)
-                .verifyComplete();
-
+        assertThat(result.size(), is(2));
         verify(processedDocumentLocationCount, times(2)).increment();
     }
 
@@ -87,48 +82,50 @@ class FileDocumentLocationFactoryTest {
         final BufferedReader reader = mock(BufferedReader.class);
         when(fileSourceFactory.newSourceReader())
                 .thenReturn(reader);
-        when(adapter.consume())
-                .thenReturn((newReader) -> {
-                    assertThat(reader, is(newReader));
-
-                    return Flux.fromIterable(List.of("http://www.example.com/1", "http://www.example.com/2", "http://www.example.com/3",
-                            "http://www.example.com/4", "http://www.example.com/5"));
-                });
-        when(adapter.close())
-                .thenReturn((newReader) -> {
-                });
+        when(fileSourceFactory.newSourceReader())
+                .thenReturn(
+                        new BufferedReader(
+                                new CharArrayReader(
+                                        """
+                                                http://www.example.com/1
+                                                http://www.example.com/2
+                                                http://www.example.com/3
+                                                http://www.example.com/4
+                                                http://www.example.com/5
+                                                """
+                                                .toCharArray()
+                                )
+                        )
+                );
         when(documentSourceConfiguration.getName())
                 .thenReturn("test-source");
 
-        final Flux<DocumentLocation> result = underTest.streamLocations();
+        final List<DocumentLocation> result = underTest.streamLocations().toList();
 
-        StepVerifier.create(result)
-                .consumeNextWith(documentLocation -> {
-                    assertTrue(documentLocation.getLocation().toUrl().isPresent());
-                    assertEquals("http://www.example.com/1", documentLocation.getLocation().toUrl().get().toString());
-                    assertEquals("test-source", documentLocation.getSourceName());
-                })
-                .consumeNextWith(documentLocation -> {
-                    assertTrue(documentLocation.getLocation().toUrl().isPresent());
-                    assertEquals("http://www.example.com/2", documentLocation.getLocation().toUrl().get().toString());
-                    assertEquals("test-source", documentLocation.getSourceName());
-                })
-                .consumeNextWith(documentLocation -> {
-                    assertTrue(documentLocation.getLocation().toUrl().isPresent());
-                    assertEquals("http://www.example.com/3", documentLocation.getLocation().toUrl().get().toString());
-                    assertEquals("test-source", documentLocation.getSourceName());
-                })
-                .consumeNextWith(documentLocation -> {
-                    assertTrue(documentLocation.getLocation().toUrl().isPresent());
-                    assertEquals("http://www.example.com/4", documentLocation.getLocation().toUrl().get().toString());
-                    assertEquals("test-source", documentLocation.getSourceName());
-                })
-                .consumeNextWith(documentLocation -> {
-                    assertTrue(documentLocation.getLocation().toUrl().isPresent());
-                    assertEquals("http://www.example.com/5", documentLocation.getLocation().toUrl().get().toString());
-                    assertEquals("test-source", documentLocation.getSourceName());
-                })
-                .verifyComplete();
+        final DocumentLocation firstDocumentLocation = result.get(0);
+        assertTrue(firstDocumentLocation.getLocation().toUrl().isPresent());
+        assertEquals("http://www.example.com/1", firstDocumentLocation.getLocation().toUrl().get().toString());
+        assertEquals("test-source", firstDocumentLocation.getSourceName());
+
+        final DocumentLocation secondDocumentLocation = result.get(1);
+        assertTrue(secondDocumentLocation.getLocation().toUrl().isPresent());
+        assertEquals("http://www.example.com/2", secondDocumentLocation.getLocation().toUrl().get().toString());
+        assertEquals("test-source", secondDocumentLocation.getSourceName());
+
+        final DocumentLocation thirdDocumentLocation = result.get(2);
+        assertTrue(thirdDocumentLocation.getLocation().toUrl().isPresent());
+        assertEquals("http://www.example.com/3", thirdDocumentLocation.getLocation().toUrl().get().toString());
+        assertEquals("test-source", thirdDocumentLocation.getSourceName());
+
+        final DocumentLocation fourthDocumentLocation = result.get(3);
+        assertTrue(fourthDocumentLocation.getLocation().toUrl().isPresent());
+        assertEquals("http://www.example.com/4", fourthDocumentLocation.getLocation().toUrl().get().toString());
+        assertEquals("test-source", fourthDocumentLocation.getSourceName());
+
+        final DocumentLocation fifthDocumentLocation = result.get(4);
+        assertTrue(fifthDocumentLocation.getLocation().toUrl().isPresent());
+        assertEquals("http://www.example.com/5", fifthDocumentLocation.getLocation().toUrl().get().toString());
+        assertEquals("test-source", fifthDocumentLocation.getSourceName());
 
         verify(processedDocumentLocationCount, times(5)).increment();
     }

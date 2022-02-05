@@ -11,7 +11,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Mono;
+
+import java.util.Optional;
 
 @Slf4j
 @Component
@@ -35,18 +36,18 @@ public class GeneratorCommand implements CommandLineRunner {
         }
 
         documentLocationFactory.streamLocations()
-                .filterWhen(this::validate)
-                .flatMap(this::transform)
-                .doOnNext(this::sendMessage)
-                .subscribe();
+                .filter(this::validate)
+                .map(this::transform)
+                .flatMap(Optional::stream)
+                .forEach(this::sendMessage);
     }
 
-    private Mono<Boolean> validate(final DocumentLocation documentLocation) {
-        return Mono.just(documentLocationValidator.validDocumentLocation(documentLocation));
+    private boolean validate(final DocumentLocation documentLocation) {
+        return documentLocationValidator.validDocumentLocation(documentLocation);
     }
 
-    private Mono<DocumentLocationMessage> transform(final DocumentLocation documentLocation) {
-        return Mono.justOrEmpty(documentLocation.getLocation().toUrl())
+    private Optional<DocumentLocationMessage> transform(final DocumentLocation documentLocation) {
+        return documentLocation.getLocation().toUrl()
                 .flatMap(urlEncoder::encode)
                 .map(url -> DocumentLocationMessage.builder()
                         .sourceName(documentLocation.getSourceName())

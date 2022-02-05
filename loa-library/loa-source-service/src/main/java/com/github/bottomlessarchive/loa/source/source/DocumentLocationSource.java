@@ -1,7 +1,8 @@
 package com.github.bottomlessarchive.loa.source.source;
 
 import com.github.bottomlessarchive.loa.location.domain.DocumentLocation;
-import reactor.core.publisher.Flux;
+
+import java.util.stream.Stream;
 
 /**
  * This class is streaming new URLs that should be checked for new documents.
@@ -13,5 +14,5 @@ public interface DocumentLocationSource {
      *
      * @return document locations that should be checked for new documents
      */
-    Flux<DocumentLocation> streamLocations();
+    Stream<DocumentLocation> streamLocations();
 }
