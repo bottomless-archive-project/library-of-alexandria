@@ -1,6 +1,7 @@
 package com.github.bottomlessarchive.loa.document.service.entity.factory;
 
 import com.github.bottomlessarchive.loa.document.repository.DocumentRepository;
+import com.github.bottomlessarchive.loa.document.repository.DocumentRepositorySync;
 import com.github.bottomlessarchive.loa.document.service.entity.factory.domain.DocumentCreationContext;
 import com.github.bottomlessarchive.loa.repository.service.HexConverter;
 import com.github.bottomlessarchive.loa.document.repository.domain.DocumentDatabaseEntity;
@@ -16,6 +17,7 @@ import reactor.core.publisher.Mono;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -26,6 +28,7 @@ public class DocumentEntityFactory {
 
     private final HexConverter hexConverter;
     private final DocumentRepository documentRepository;
+    private final DocumentRepositorySync documentRepositorySync;
     private final DocumentEntityTransformer documentEntityTransformer;
 
     /**
@@ -39,10 +42,10 @@ public class DocumentEntityFactory {
                 .map(documentEntityTransformer::transform);
     }
 
-    public Mono<DocumentEntity> getDocumentEntity(final String checksum, final long fileSize, final String type) {
+    public Optional<DocumentEntity> getDocumentEntity(final String checksum, final long fileSize, final String type) {
         final byte[] checksumAsHex = hexConverter.decode(checksum);
 
-        return documentRepository.findByChecksumAndFileSizeAndType(checksumAsHex, fileSize, type)
+        return documentRepositorySync.findByChecksumAndFileSizeAndType(checksumAsHex, fileSize, type)
                 .map(documentEntityTransformer::transform);
     }
 
@@ -132,8 +135,8 @@ public class DocumentEntityFactory {
         return documentRepository.updateStatus(documentStatus.name());
     }
 
-    public Mono<Void> addSourceLocation(final UUID documentId, final String documentLocationId) {
-        return documentRepository.addSourceLocation(documentId, documentLocationId);
+    public void addSourceLocation(final UUID documentId, final String documentLocationId) {
+        documentRepositorySync.addSourceLocation(documentId, documentLocationId);
     }
 
     /**
@@ -142,7 +145,7 @@ public class DocumentEntityFactory {
      * @param documentCreationContext the parameters of the document to create
      * @return the freshly created document
      */
-    public Mono<DocumentEntity> newDocumentEntity(final DocumentCreationContext documentCreationContext) {
+    public DocumentEntity newDocumentEntity(final DocumentCreationContext documentCreationContext) {
         final DocumentDatabaseEntity documentDatabaseEntity = new DocumentDatabaseEntity();
 
         documentDatabaseEntity.setId(documentCreationContext.getId());
@@ -162,7 +165,8 @@ public class DocumentEntityFactory {
             documentDatabaseEntity.setSourceLocations(Collections.emptySet());
         }
 
-        return documentRepository.insertDocument(documentDatabaseEntity)
-                .map(documentEntityTransformer::transform);
+        documentRepositorySync.insertDocument(documentDatabaseEntity);
+
+        return documentEntityTransformer.transform(documentDatabaseEntity);
     }
 }

@@ -16,10 +16,8 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import reactor.core.publisher.Mono;
-import reactor.test.StepVerifier;
-import reactor.test.publisher.PublisherProbe;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -66,29 +64,20 @@ class ArchivingServiceTest {
         final DocumentArchivingContext documentArchivingContext = createDocumentArchivingContext();
         final DocumentCreationContext documentCreationContext = DocumentCreationContext.builder()
                 .build();
-        final PublisherProbe<DocumentCreationContext> newContextPublisherProbe = PublisherProbe.of(Mono.just(documentCreationContext));
         when(documentCreationContextFactory.newContext(documentArchivingContext))
-                .thenReturn(newContextPublisherProbe.mono());
+                .thenReturn(documentCreationContext);
 
         final DocumentEntity documentEntity = DocumentEntity.builder()
                 .build();
-        final PublisherProbe<DocumentEntity> newDocumentEntityPublisherProbe = PublisherProbe.of(Mono.just(documentEntity));
         when(documentEntityFactory.newDocumentEntity(documentCreationContext))
-                .thenReturn(newDocumentEntityPublisherProbe.mono());
+                .thenReturn(documentEntity);
 
-        final Mono<DocumentEntity> result = underTest.archiveDocument(documentArchivingContext);
-
-        StepVerifier.create(result)
-                .consumeNextWith(documentEntity1 -> assertThat(documentEntity1, is(documentEntity)))
-                .verifyComplete();
+        underTest.archiveDocument(documentArchivingContext);
 
         verify(vaultDocumentStorage).persistDocument(eq(documentEntity), documentContent.capture());
         assertThat(documentContent.getValue(), is(CONTENT));
         verify(documentCreationContextFactory).newContext(documentArchivingContext);
         verify(documentEntityFactory).newDocumentEntity(documentCreationContext);
-
-        newContextPublisherProbe.assertWasSubscribed();
-        newDocumentEntityPublisherProbe.assertWasSubscribed();
     }
 
     @Test
@@ -96,15 +85,13 @@ class ArchivingServiceTest {
         final DocumentArchivingContext documentArchivingContext = createDocumentArchivingContext();
         final DocumentCreationContext documentCreationContext = DocumentCreationContext.builder()
                 .build();
-        final PublisherProbe<DocumentCreationContext> newContextPublisherProbe = PublisherProbe.of(Mono.just(documentCreationContext));
         when(documentCreationContextFactory.newContext(documentArchivingContext))
-                .thenReturn(newContextPublisherProbe.mono());
+                .thenReturn(documentCreationContext);
 
         final DocumentEntity documentEntity = DocumentEntity.builder()
                 .build();
-        final PublisherProbe<DocumentEntity> newDocumentEntityPublisherProbe = PublisherProbe.of(Mono.just(documentEntity));
         when(documentEntityFactory.newDocumentEntity(documentCreationContext))
-                .thenReturn(newDocumentEntityPublisherProbe.mono());
+                .thenReturn(documentEntity);
 
         final MongoWriteException mongoWriteException = mock(MongoWriteException.class);
         final WriteError writeError = mock(WriteError.class);
@@ -120,31 +107,16 @@ class ArchivingServiceTest {
                 .id(duplicateOfId)
                 .build();
 
-        final PublisherProbe<String> checksumPublisherProbe = PublisherProbe.of(Mono.just("test-checksum"));
         when(checksumProvider.checksum(documentArchivingContext.getContent()))
-                .thenReturn(checksumPublisherProbe.mono());
+                .thenReturn("test-checksum");
 
-        final PublisherProbe<DocumentEntity> getDocumentEntityPublisherProbe = PublisherProbe.of(Mono.just(duplicateOf));
         when(documentEntityFactory.getDocumentEntity("test-checksum", CONTENT.length, "PDF"))
-                .thenReturn(getDocumentEntityPublisherProbe.mono());
+                .thenReturn(Optional.of(duplicateOf));
 
-        final PublisherProbe<Void> addSourceLocationPublisherProbe = PublisherProbe.empty();
-        when(documentEntityFactory.addSourceLocation(duplicateOfId, SOURCE_LOCATION_ID))
-                .thenReturn(addSourceLocationPublisherProbe.mono());
-
-        final Mono<DocumentEntity> result = underTest.archiveDocument(documentArchivingContext);
-
-        StepVerifier.create(result)
-                .verifyError(MongoWriteException.class);
+        underTest.archiveDocument(documentArchivingContext);
 
         verify(vaultDocumentStorage, times(2)).persistDocument(any(), any());
         verify(documentEntityFactory).addSourceLocation(duplicateOfId, SOURCE_LOCATION_ID);
-
-        newContextPublisherProbe.assertWasSubscribed();
-        newDocumentEntityPublisherProbe.assertWasSubscribed();
-        checksumPublisherProbe.assertWasSubscribed();
-        getDocumentEntityPublisherProbe.assertWasSubscribed();
-        addSourceLocationPublisherProbe.assertWasSubscribed();
     }
 
     @Test
@@ -159,11 +131,11 @@ class ArchivingServiceTest {
         final DocumentCreationContext documentCreationContext = DocumentCreationContext.builder()
                 .build();
         when(documentCreationContextFactory.newContext(documentArchivingContext))
-                .thenReturn(Mono.just(documentCreationContext));
+                .thenReturn(documentCreationContext);
         final DocumentEntity documentEntity = DocumentEntity.builder()
                 .build();
         when(documentEntityFactory.newDocumentEntity(documentCreationContext))
-                .thenReturn(Mono.just(documentEntity));
+                .thenReturn(documentEntity);
         final MongoWriteException mongoWriteException = mock(MongoWriteException.class);
         final WriteError writeError = mock(WriteError.class);
         when(writeError.getCode())
@@ -178,14 +150,11 @@ class ArchivingServiceTest {
                 .id(duplicateOfId)
                 .build();
         when(checksumProvider.checksum(documentArchivingContext.getContent()))
-                .thenReturn(Mono.just("test-checksum"));
+                .thenReturn("test-checksum");
         when(documentEntityFactory.getDocumentEntity("test-checksum", CONTENT.length, "PDF"))
-                .thenReturn(Mono.just(duplicateOf));
+                .thenReturn(Optional.of(duplicateOf));
 
-        final Mono<DocumentEntity> result = underTest.archiveDocument(documentArchivingContext);
-
-        StepVerifier.create(result)
-                .verifyError(MongoWriteException.class);
+        underTest.archiveDocument(documentArchivingContext);
 
         verify(vaultDocumentStorage, times(2)).persistDocument(any(), any());
         verify(documentEntityFactory, never()).addSourceLocation(any(), anyString());

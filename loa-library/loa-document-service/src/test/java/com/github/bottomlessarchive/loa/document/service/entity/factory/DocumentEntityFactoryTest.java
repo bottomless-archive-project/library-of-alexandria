@@ -1,7 +1,7 @@
 package com.github.bottomlessarchive.loa.document.service.entity.factory;
 
 import com.github.bottomlessarchive.loa.compression.domain.DocumentCompression;
-import com.github.bottomlessarchive.loa.document.repository.DocumentRepository;
+import com.github.bottomlessarchive.loa.document.repository.DocumentRepositorySync;
 import com.github.bottomlessarchive.loa.document.repository.domain.DocumentDatabaseEntity;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentEntity;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentStatus;
@@ -16,8 +16,6 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import reactor.core.publisher.Mono;
-import reactor.test.StepVerifier;
 
 import java.util.ArrayList;
 import java.util.UUID;
@@ -35,7 +33,7 @@ class DocumentEntityFactoryTest {
     private HexConverter hexConverter;
 
     @Mock
-    private DocumentRepository documentRepository;
+    private DocumentRepositorySync documentRepositorySync;
 
     @Mock
     private DocumentEntityTransformer documentEntityTransformer;
@@ -65,20 +63,15 @@ class DocumentEntityFactoryTest {
                 .thenReturn(new byte[]{5, 6, 7});
         when(hexConverter.decode("test-location-id"))
                 .thenReturn(new byte[]{7, 8, 9});
-        final DocumentDatabaseEntity savedDocumentDatabaseEntity = mock(DocumentDatabaseEntity.class);
-        when(documentRepository.insertDocument(any()))
-                .thenReturn(Mono.just(savedDocumentDatabaseEntity));
         final DocumentEntity transformedEntity = mock(DocumentEntity.class);
         when(documentEntityTransformer.transform(any()))
                 .thenReturn(transformedEntity);
 
-        final Mono<DocumentEntity> result = documentEntityFactory.newDocumentEntity(documentCreationContext);
+        final DocumentEntity result = documentEntityFactory.newDocumentEntity(documentCreationContext);
 
-        StepVerifier.create(result)
-                .consumeNextWith(documentEntity -> assertThat(transformedEntity).isEqualTo(documentEntity))
-                .verifyComplete();
+        assertThat(result).isEqualTo(transformedEntity);
 
-        verify(documentRepository).insertDocument(documentDatabaseEntityArgumentCaptor.capture());
+        verify(documentRepositorySync).insertDocument(documentDatabaseEntityArgumentCaptor.capture());
         final DocumentDatabaseEntity insertedDocumentDatabaseEntity = documentDatabaseEntityArgumentCaptor.getValue();
         assertThat(insertedDocumentDatabaseEntity.getId())
                 .isEqualTo(documentId);
@@ -121,20 +114,15 @@ class DocumentEntityFactoryTest {
                 .build();
         when(hexConverter.decode("12345"))
                 .thenReturn(new byte[]{5, 6, 7});
-        final DocumentDatabaseEntity savedDocumentDatabaseEntity = mock(DocumentDatabaseEntity.class);
-        when(documentRepository.insertDocument(any()))
-                .thenReturn(Mono.just(savedDocumentDatabaseEntity));
         final DocumentEntity transformedEntity = mock(DocumentEntity.class);
         when(documentEntityTransformer.transform(any()))
                 .thenReturn(transformedEntity);
 
-        final Mono<DocumentEntity> result = documentEntityFactory.newDocumentEntity(documentCreationContext);
+        final DocumentEntity result = documentEntityFactory.newDocumentEntity(documentCreationContext);
 
-        StepVerifier.create(result)
-                .consumeNextWith(documentEntity -> assertThat(transformedEntity).isEqualTo(documentEntity))
-                .verifyComplete();
+        assertThat(result).isEqualTo(transformedEntity);
 
-        verify(documentRepository).insertDocument(documentDatabaseEntityArgumentCaptor.capture());
+        verify(documentRepositorySync).insertDocument(documentDatabaseEntityArgumentCaptor.capture());
         final DocumentDatabaseEntity insertedDocumentDatabaseEntity = documentDatabaseEntityArgumentCaptor.getValue();
         assertThat(insertedDocumentDatabaseEntity.getSourceLocations().size())
                 .isEqualTo(0);

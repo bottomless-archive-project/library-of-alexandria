@@ -1,5 +1,6 @@
 dependencies {
     api group: 'org.mongodb', name: 'mongodb-driver-reactivestreams'
+    api group: 'org.mongodb', name: 'mongodb-driver-sync'
     api group: 'org.springframework.boot', name: 'spring-boot-starter-reactor-netty'
 
     implementation group: 'commons-codec', name: 'commons-codec', version: '1.15'
