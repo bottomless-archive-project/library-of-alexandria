@@ -30,20 +30,6 @@ public class DocumentRepository {
     private final MongoCollection<DocumentDatabaseEntity> documentDatabaseEntityMongoCollection;
 
     /**
-     * Returns a {@link Flux} that will emit all the documents that have the provided status in the database.
-     *
-     * @return a flux emitting every elements in the database
-     */
-    public Flux<DocumentDatabaseEntity> findByStatus(final String status) {
-        return Flux.from(
-                documentDatabaseEntityMongoCollection.find(eq("status", status))
-                        // We don't want to have the cursor closed while processing. It would be a better idea to set
-                        // a maximum timeout in milliseconds but that only configurable on the server side.
-                        .noCursorTimeout(repositoryConfigurationProperties.noCursorTimeout())
-        );
-    }
-
-    /**
      * Returns a {@link Flux} that will emit all the documents that are available in the database.
      *
      * @return a flux emitting every elements in the database

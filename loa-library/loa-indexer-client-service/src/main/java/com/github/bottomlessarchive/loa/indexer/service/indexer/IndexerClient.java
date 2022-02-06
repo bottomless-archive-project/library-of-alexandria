@@ -35,7 +35,7 @@ public class IndexerClient {
                             log.info("Failed to index document {}! Cause: '{}'.", documentId, e.getMessage());
                         }
 
-                        documentManipulator.markCorrupt(documentId).subscribe();
+                        documentManipulator.markCorrupt(documentId);
                     }
                 });
     }

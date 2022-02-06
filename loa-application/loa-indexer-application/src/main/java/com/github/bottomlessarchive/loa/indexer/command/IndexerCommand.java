@@ -1,8 +1,7 @@
 package com.github.bottomlessarchive.loa.indexer.command;
 
-import com.github.bottomlessarchive.loa.document.service.DocumentManipulator;
-import com.github.bottomlessarchive.loa.indexer.configuration.IndexerConfigurationProperties;
 import com.github.bottomlessarchive.loa.indexer.service.indexer.domain.IndexingContext;
+import com.github.bottomlessarchive.loa.parser.domain.ParsingResult;
 import com.github.bottomlessarchive.loa.parser.service.DocumentDataParser;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentEntity;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentStatus;
@@ -10,33 +9,24 @@ import com.github.bottomlessarchive.loa.document.service.entity.factory.Document
 import com.github.bottomlessarchive.loa.indexer.service.indexer.IndexerClient;
 import com.github.bottomlessarchive.loa.indexer.service.search.DocumentSearchClient;
 import com.github.bottomlessarchive.loa.vault.client.service.VaultClientService;
-import com.github.bottomlessarchive.loa.vault.client.service.domain.VaultAccessException;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.net.ConnectException;
-import java.util.UUID;
+import java.io.InputStream;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class IndexerCommand implements CommandLineRunner {
 
-    private final DocumentEntityFactory documentEntityFactory;
-    private final IndexerConfigurationProperties indexerConfigurationProperties;
     private final IndexerClient indexerClient;
     private final VaultClientService vaultClientService;
     private final DocumentDataParser documentDataParser;
-    private final DocumentManipulator documentManipulator;
     private final DocumentSearchClient documentSearchClient;
+    private final DocumentEntityFactory documentEntityFactory;
 
     @Override
     public void run(final String... args) {
@@ -49,55 +39,27 @@ public class IndexerCommand implements CommandLineRunner {
         log.info("Start document indexing.");
 
         documentEntityFactory.getDocumentEntity(DocumentStatus.DOWNLOADED)
-                .flatMap(this::processDocument, indexerConfigurationProperties.concurrentIndexerThreads())
-                .subscribe();
+                .forEach(this::processDocument);
     }
 
     @SneakyThrows
-    private Mono<Void> processDocument(final DocumentEntity documentEntity) {
-        return vaultClientService.queryDocument(documentEntity)
-                .reduce(new ByteArrayOutputStream(), (outputStream, value) -> {
-                    try {
-                        outputStream.write(value.asInputStream().readAllBytes());
+    private void processDocument(final DocumentEntity documentEntity) {
+        try (final InputStream documentContent = vaultClientService.queryDocument(documentEntity)) {
+            final ParsingResult documentMetadata = documentDataParser.parseDocumentMetadata(documentEntity.getId(),
+                    documentEntity.getType(), documentContent);
 
-                        DataBufferUtils.release(value);
-                    } catch (IOException e) {
-                        throw new IllegalStateException(e);
-                    }
-
-                    return outputStream;
-                })
-                .map(ByteArrayOutputStream::toByteArray)
-                .publishOn(Schedulers.parallel())
-                .map(documentContent -> documentDataParser.parseDocumentMetadata(
-                        documentEntity.getId(), documentEntity.getType(), documentContent))
-                .onErrorContinue((throwable, document) -> {
-                    final UUID documentId = documentEntity.getId();
-
-                    //TODO: This should be handled in the VaultClientService but we are unable to do so
-                    // because of this onErrorContinue here (no sufficient operator in the reactive toolset).
-                    if (throwable instanceof ConnectException) {
-                        throw new VaultAccessException("Error while connecting to the vault for document: "
-                                + documentId + "!", throwable);
-                    }
-
-                    documentManipulator.markCorrupt(documentId)
-                            .subscribe();
-
-                    log.info("Failed to parse document with id: {}!", documentId);
-                })
-                .map(documentMetadata -> IndexingContext.builder()
-                        .id(documentMetadata.getId())
-                        .author(documentMetadata.getAuthor())
-                        .content(documentMetadata.getContent())
-                        .date(documentMetadata.getDate())
-                        .language(documentMetadata.getLanguage())
-                        .pageCount(documentMetadata.getPageCount())
-                        .title(documentMetadata.getTitle())
-                        .type(documentMetadata.getType())
-                        .build()
-                )
-                .doOnNext(indexerClient::indexDocument)
-                .then();
+            indexerClient.indexDocument(
+                    IndexingContext.builder()
+                            .id(documentMetadata.getId())
+                            .author(documentMetadata.getAuthor())
+                            .content(documentMetadata.getContent())
+                            .date(documentMetadata.getDate())
+                            .language(documentMetadata.getLanguage())
+                            .pageCount(documentMetadata.getPageCount())
+                            .title(documentMetadata.getTitle())
+                            .type(documentMetadata.getType())
+                            .build()
+            );
+        }
     }
 }

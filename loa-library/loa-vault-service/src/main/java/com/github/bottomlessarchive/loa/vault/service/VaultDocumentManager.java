@@ -1,6 +1,7 @@
 package com.github.bottomlessarchive.loa.vault.service;
 
 import com.github.bottomlessarchive.loa.compression.service.provider.CompressionServiceProvider;
+import com.github.bottomlessarchive.loa.document.service.DocumentManipulator;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentEntity;
 import com.github.bottomlessarchive.loa.vault.service.archive.ArchivingService;
 import com.github.bottomlessarchive.loa.vault.service.domain.DocumentArchivingContext;
@@ -23,6 +24,7 @@ import java.io.InputStream;
 public class VaultDocumentManager {
 
     private final ArchivingService archivingService;
+    private final DocumentManipulator documentManipulator;
     private final VaultLocationFactory vaultLocationFactory;
     private final CompressionServiceProvider compressionServiceProvider;
 
@@ -48,15 +50,24 @@ public class VaultDocumentManager {
 
         // The non-compressed entries will be served via a zero-copy response
         // See: https://developer.ibm.com/articles/j-zerocopy/
-        final InputStream documentContentsInputStream = vaultLocation.download();
+        try {
+            final InputStream documentContentsInputStream = vaultLocation.download();
 
-        if (documentEntity.isCompressed()) {
-            final InputStream decompressedInputStream = compressionServiceProvider.getCompressionService(
-                    documentEntity.getCompression()).decompress(documentContentsInputStream);
+            if (documentEntity.isCompressed()) {
+                final InputStream decompressedInputStream = compressionServiceProvider.getCompressionService(
+                        documentEntity.getCompression()).decompress(documentContentsInputStream);
 
-            return new InputStreamResource(decompressedInputStream);
-        } else {
-            return new InputStreamResource(documentContentsInputStream);
+                return new InputStreamResource(decompressedInputStream);
+            } else {
+                return new InputStreamResource(documentContentsInputStream);
+            }
+        } catch (final Exception error) {
+            if (error.getMessage().contains("Unable to get document content on a vault location!")
+                    || error.getMessage().contains("Error while decompressing document!")) {
+                documentManipulator.markCorrupt(documentEntity.getId());
+            }
+
+            throw error;
         }
     }
 

@@ -1,8 +1,7 @@
 package com.github.bottomlessarchive.loa.vault.client.service.domain;
 
-public class VaultAccessException extends RuntimeException {
+import lombok.experimental.StandardException;
 
-    public VaultAccessException(final String message, final Throwable throwable) {
-        super(message, throwable);
-    }
+@StandardException
+public class VaultAccessException extends RuntimeException {
 }

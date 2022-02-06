@@ -54,8 +54,8 @@ public class DocumentManipulator {
      *
      * @param documentId the id of the document to mark as corrupt
      */
-    public Mono<Void> markCorrupt(final UUID documentId) {
-        return updateStatus(documentId, DocumentStatus.CORRUPT);
+    public void markCorrupt(final UUID documentId) {
+        updateStatusSync(documentId, DocumentStatus.CORRUPT);
     }
 
     /**

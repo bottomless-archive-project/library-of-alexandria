@@ -6,7 +6,6 @@ import com.github.bottomlessarchive.loa.document.view.service.MediaTypeCalculato
 import com.github.bottomlessarchive.loa.vault.client.service.VaultClientService;
 import com.github.bottomlessarchive.loa.web.view.document.service.DocumentRenderer;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,9 +13,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.UUID;
 
 /**
@@ -38,34 +37,34 @@ public class DocumentQueryController {
      * @return the returned document's content
      */
     @GetMapping("/document/{documentId}")
-    public Mono<ResponseEntity<Flux<DataBuffer>>> queryDocument(@PathVariable final String documentId) {
-        return Mono.justOrEmpty(documentEntityFactory.getDocumentEntity(UUID.fromString(documentId)))
-                .zipWhen(documentEntity -> Mono.just(vaultClientService.queryDocument(documentEntity)))
-                .map(documentEntity -> ResponseEntity.ok()
-                        .contentType(mediaTypeCalculator.calculateMediaType(documentEntity.getT1().getType()))
-                        .cacheControl(CacheControl.noCache())
-                        .body(documentEntity.getT2())
-                )
-                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "Document not found with id " + documentId + "!")));
+    public ResponseEntity<InputStream> queryDocument(@PathVariable final String documentId) {
+        return documentEntityFactory.getDocumentEntity(UUID.fromString(documentId))
+                .map(documentEntity -> {
+                    final InputStream documentContent = vaultClientService.queryDocument(documentEntity);
+
+                    return ResponseEntity.ok()
+                            .contentType(mediaTypeCalculator.calculateMediaType(documentEntity.getType()))
+                            .cacheControl(CacheControl.noCache())
+                            .body(documentContent);
+                })
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Document not found with id " + documentId + "!"));
     }
 
     @GetMapping(path = "/document/{documentId}/image", produces = "image/png")
-    public Mono<byte[]> queryDocumentImage(@PathVariable final String documentId) {
-        return Mono.justOrEmpty(documentEntityFactory.getDocumentEntity(UUID.fromString(documentId)))
-                .zipWhen(documentEntity -> Mono.just(vaultClientService.queryDocumentAsInputStream(documentEntity)))
-                .flatMap(value -> {
-                            if (value.getT1().getType() != DocumentType.PDF) {
-                                return Mono.error(new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                                        "Images can only be rendered for documents that are in a PDF format."));
-                            }
+    public byte[] queryDocumentImage(@PathVariable final String documentId) {
+        return documentEntityFactory.getDocumentEntity(UUID.fromString(documentId))
+                .map(documentEntity -> {
+                    if (documentEntity.getType() != DocumentType.PDF) {
+                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                                "Images can only be rendered for documents that are in a PDF format.");
+                    }
 
-                            return value.getT2().flatMap(documentContent ->
-                                    Mono.fromSupplier(() -> documentRenderer.renderFirstPage(documentContent))
-                            );
-                        }
-                )
-                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "Document not found with id " + documentId + "!")));
+                    try (final InputStream documentContent = vaultClientService.queryDocument(documentEntity)) {
+                        return documentRenderer.renderFirstPage(documentContent);
+                    } catch (IOException e) {
+                        throw new IllegalStateException("Failed to query document from vault!");
+                    }
+                })
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Document not found with id " + documentId + "!"));
     }
 }

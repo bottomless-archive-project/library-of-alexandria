@@ -21,6 +21,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 @Service
 @RequiredArgsConstructor
@@ -55,8 +57,8 @@ public class DocumentEntityFactory {
      * @param documentStatus the status to query for
      * @return the list of documents with the provided values
      */
-    public Flux<DocumentEntity> getDocumentEntity(final DocumentStatus documentStatus) {
-        return documentRepository.findByStatus(documentStatus.toString())
+    public Stream<DocumentEntity> getDocumentEntity(final DocumentStatus documentStatus) {
+        return StreamSupport.stream(documentRepositorySync.findByStatus(documentStatus.toString()).spliterator(), false)
                 .map(documentEntityTransformer::transform);
     }
 
@@ -76,6 +78,16 @@ public class DocumentEntityFactory {
      */
     public Flux<DocumentEntity> getDocumentEntities() {
         return documentRepository.findAll()
+                .map(documentEntityTransformer::transform);
+    }
+
+    /**
+     * Return all documents available in the database.
+     *
+     * @return all documents available in the database
+     */
+    public Stream<DocumentEntity> getDocumentEntitiesSync() {
+        return StreamSupport.stream(documentRepositorySync.findAll().spliterator(), false)
                 .map(documentEntityTransformer::transform);
     }
 

@@ -1,5 +1,6 @@
 package com.github.bottomlessarchive.loa.administrator.command.validator;
 
+import com.github.bottomlessarchive.loa.parser.domain.ParsingException;
 import com.github.bottomlessarchive.loa.parser.service.DocumentDataParser;
 import com.github.bottomlessarchive.loa.document.service.entity.factory.DocumentEntityFactory;
 import com.github.bottomlessarchive.loa.vault.client.service.VaultClientService;
@@ -8,9 +9,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Mono;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
@@ -28,32 +29,21 @@ public class DocumentValidatorCommand implements CommandLineRunner {
 
     @Override
     public void run(final String... args) {
-        documentEntityFactory.getDocumentEntities()
-                .doOnNext(documentEntity -> {
+        documentEntityFactory.getDocumentEntitiesSync()
+                .forEach(documentEntity -> {
                     final int processed = processedCount.incrementAndGet();
 
                     if (processed % 10 == 0) {
                         log.info("Processed: {} documents!", processed);
                     }
-                })
-                .flatMap(documentEntity ->
-                        vaultClientService.queryDocumentAsInputStream(documentEntity)
-                                .flatMap(documentContent ->
-                                        Mono.using(
-                                                () -> documentContent,
-                                                content -> Mono.just(documentDataParser.parseDocumentMetadata(
-                                                        documentEntity.getId(), documentEntity.getType(), content)),
-                                                content -> {
-                                                    try {
-                                                        content.close();
-                                                    } catch (IOException e) {
-                                                        log.error("Failed to close vault response!", e);
-                                                    }
-                                                })
-                                )
-                                .doOnError(error -> log.info("New error! Error count: {}.", errorCount.incrementAndGet()))
-                                .onErrorResume(error -> Mono.empty())
-                )
-                .subscribe();
+
+                    try (final InputStream documentLocation = vaultClientService.queryDocument(documentEntity)) {
+                        documentDataParser.parseDocumentMetadata(documentEntity.getId(), documentEntity.getType(), documentLocation);
+                    } catch (IOException e) {
+                        log.error("Failed to close vault response!", e);
+                    } catch (ParsingException e) {
+                        log.info("New error! Error count: {}.", errorCount.incrementAndGet());
+                    }
+                });
     }
 }
