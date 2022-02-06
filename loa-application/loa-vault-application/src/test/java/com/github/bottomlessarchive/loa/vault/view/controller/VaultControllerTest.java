@@ -17,6 +17,7 @@ import com.github.bottomlessarchive.loa.vault.view.request.domain.ReplaceDocumen
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -32,7 +33,6 @@ import reactor.core.publisher.Mono;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -71,7 +71,7 @@ class VaultControllerTest {
     @Test
     @SneakyThrows
     void testQueryDocumentWhenDocumentNotFound() {
-        when(documentEntityFactory.getDocumentEntity(UUID.fromString(TEST_DOCUMENT_ID)))
+        Mockito.when(documentEntityFactory.getDocumentEntity(UUID.fromString(TEST_DOCUMENT_ID)))
                 .thenReturn(Optional.empty());
 
         mockMvc.perform(MockMvcRequestBuilders.get("/document/" + TEST_DOCUMENT_ID))
@@ -82,9 +82,9 @@ class VaultControllerTest {
     @Test
     @SneakyThrows
     void testQueryDocumentWhenDocumentIsInADifferentVault() {
-        when(vaultConfigurationProperties.name())
+        Mockito.when(vaultConfigurationProperties.name())
                 .thenReturn("my-vault");
-        when(documentEntityFactory.getDocumentEntity(UUID.fromString(TEST_DOCUMENT_ID)))
+        Mockito.when(documentEntityFactory.getDocumentEntity(UUID.fromString(TEST_DOCUMENT_ID)))
                 .thenReturn(Optional.of(
                                 DocumentEntity.builder()
                                         .vault("different-vault")
@@ -100,16 +100,16 @@ class VaultControllerTest {
     @Test
     @SneakyThrows
     void testQueryDocumentWhenRequestIsSuccessful() {
-        when(vaultConfigurationProperties.name())
+        Mockito.when(vaultConfigurationProperties.name())
                 .thenReturn("my-vault");
         final DocumentEntity documentEntity = DocumentEntity.builder()
                 .vault("my-vault")
                 .type(DocumentType.PDF)
                 .build();
-        when(documentEntityFactory.getDocumentEntity(UUID.fromString(TEST_DOCUMENT_ID)))
+        Mockito.when(documentEntityFactory.getDocumentEntity(UUID.fromString(TEST_DOCUMENT_ID)))
                 .thenReturn(Optional.of(documentEntity));
         final Resource documentResource = new ByteArrayResource(new byte[]{0, 1, 2});
-        when(vaultDocumentManager.readDocument(documentEntity))
+        Mockito.when(vaultDocumentManager.readDocument(documentEntity))
                 .thenReturn(documentResource);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/document/" + TEST_DOCUMENT_ID))
@@ -120,7 +120,7 @@ class VaultControllerTest {
     @Test
     @SneakyThrows
     void testRecompressWhenModificationsAreDisabled() {
-        when(vaultConfigurationProperties.modificationEnabled())
+        Mockito.when(vaultConfigurationProperties.modificationEnabled())
                 .thenReturn(false);
 
         mockMvc.perform(MockMvcRequestBuilders.put("/document/" + TEST_DOCUMENT_ID + "/recompress")
@@ -138,9 +138,9 @@ class VaultControllerTest {
     @Test
     @SneakyThrows
     void testRecompressWhenDocumentNotFound() {
-        when(vaultConfigurationProperties.modificationEnabled())
+        Mockito.when(vaultConfigurationProperties.modificationEnabled())
                 .thenReturn(true);
-        when(documentEntityFactory.getDocumentEntity(UUID.fromString(TEST_DOCUMENT_ID)))
+        Mockito.when(documentEntityFactory.getDocumentEntity(UUID.fromString(TEST_DOCUMENT_ID)))
                 .thenReturn(Optional.empty());
 
         mockMvc.perform(MockMvcRequestBuilders.put("/document/" + TEST_DOCUMENT_ID + "/recompress")
@@ -158,11 +158,11 @@ class VaultControllerTest {
     @Test
     @SneakyThrows
     void testRecompressWhenDocumentIsInADifferentVault() {
-        when(vaultConfigurationProperties.modificationEnabled())
+        Mockito.when(vaultConfigurationProperties.modificationEnabled())
                 .thenReturn(true);
-        when(vaultConfigurationProperties.name())
+        Mockito.when(vaultConfigurationProperties.name())
                 .thenReturn("my-vault");
-        when(documentEntityFactory.getDocumentEntity(UUID.fromString(TEST_DOCUMENT_ID)))
+        Mockito.when(documentEntityFactory.getDocumentEntity(UUID.fromString(TEST_DOCUMENT_ID)))
                 .thenReturn(
                         Optional.of(
                                 DocumentEntity.builder()
@@ -186,14 +186,14 @@ class VaultControllerTest {
     @Test
     @SneakyThrows
     void testRecompressWhenRequestIsSuccessful() {
-        when(vaultConfigurationProperties.modificationEnabled())
+        Mockito.when(vaultConfigurationProperties.modificationEnabled())
                 .thenReturn(true);
-        when(vaultConfigurationProperties.name())
+        Mockito.when(vaultConfigurationProperties.name())
                 .thenReturn("my-vault");
         final DocumentEntity documentEntity = DocumentEntity.builder()
                 .vault("my-vault")
                 .build();
-        when(documentEntityFactory.getDocumentEntity(UUID.fromString(TEST_DOCUMENT_ID)))
+        Mockito.when(documentEntityFactory.getDocumentEntity(UUID.fromString(TEST_DOCUMENT_ID)))
                 .thenReturn(Optional.of(documentEntity));
 
         mockMvc.perform(MockMvcRequestBuilders.put("/document/" + TEST_DOCUMENT_ID + "/recompress")
@@ -206,13 +206,13 @@ class VaultControllerTest {
                 )
                 .andExpect(status().isOk());
 
-        verify(recompressorService).recompress(documentEntity, DocumentCompression.GZIP);
+        Mockito.verify(recompressorService).recompress(documentEntity, DocumentCompression.GZIP);
     }
 
     @Test
     @SneakyThrows
     void testRemoveWhenModificationsAreDisabled() {
-        when(vaultConfigurationProperties.modificationEnabled())
+        Mockito.when(vaultConfigurationProperties.modificationEnabled())
                 .thenReturn(false);
 
         mockMvc.perform(MockMvcRequestBuilders.delete("/document/" + TEST_DOCUMENT_ID))
@@ -223,9 +223,9 @@ class VaultControllerTest {
     @Test
     @SneakyThrows
     void testRemoveWhenDocumentNotFound() {
-        when(vaultConfigurationProperties.modificationEnabled())
+        Mockito.when(vaultConfigurationProperties.modificationEnabled())
                 .thenReturn(true);
-        when(documentEntityFactory.getDocumentEntity(UUID.fromString(TEST_DOCUMENT_ID)))
+        Mockito.when(documentEntityFactory.getDocumentEntity(UUID.fromString(TEST_DOCUMENT_ID)))
                 .thenReturn(Optional.empty());
 
         mockMvc.perform(MockMvcRequestBuilders.delete("/document/" + TEST_DOCUMENT_ID))
@@ -236,11 +236,11 @@ class VaultControllerTest {
     @Test
     @SneakyThrows
     void testRemoveWhenDocumentIsInADifferentVault() {
-        when(vaultConfigurationProperties.modificationEnabled())
+        Mockito.when(vaultConfigurationProperties.modificationEnabled())
                 .thenReturn(true);
-        when(vaultConfigurationProperties.name())
+        Mockito.when(vaultConfigurationProperties.name())
                 .thenReturn("my-vault");
-        when(documentEntityFactory.getDocumentEntity(UUID.fromString(TEST_DOCUMENT_ID)))
+        Mockito.when(documentEntityFactory.getDocumentEntity(UUID.fromString(TEST_DOCUMENT_ID)))
                 .thenReturn(
                         Optional.of(
                                 DocumentEntity.builder()
@@ -257,28 +257,28 @@ class VaultControllerTest {
     @Test
     @SneakyThrows
     void testRemoveWhenRequestIsSuccessful() {
-        when(vaultConfigurationProperties.modificationEnabled())
+        Mockito.when(vaultConfigurationProperties.modificationEnabled())
                 .thenReturn(true);
-        when(vaultConfigurationProperties.name())
+        Mockito.when(vaultConfigurationProperties.name())
                 .thenReturn("my-vault");
         final DocumentEntity documentEntity = DocumentEntity.builder()
                 .id(UUID.fromString(TEST_DOCUMENT_ID))
                 .vault("my-vault")
                 .build();
-        when(documentEntityFactory.getDocumentEntity(UUID.fromString(TEST_DOCUMENT_ID)))
+        Mockito.when(documentEntityFactory.getDocumentEntity(UUID.fromString(TEST_DOCUMENT_ID)))
                 .thenReturn(Optional.of(documentEntity));
 
         mockMvc.perform(MockMvcRequestBuilders.delete("/document/" + TEST_DOCUMENT_ID))
                 .andExpect(status().isOk());
 
-        verify(vaultDocumentManager).removeDocument(documentEntity);
-        verify(documentEntityFactory).removeDocumentEntity(documentEntity);
+        Mockito.verify(vaultDocumentManager).removeDocument(documentEntity);
+        Mockito.verify(documentEntityFactory).removeDocumentEntity(documentEntity);
     }
 
     @Test
     @SneakyThrows
     void testReplaceCorruptDocumentWhenModificationsAreDisabled() {
-        when(vaultConfigurationProperties.modificationEnabled())
+        Mockito.when(vaultConfigurationProperties.modificationEnabled())
                 .thenReturn(false);
 
         mockMvc.perform(MockMvcRequestBuilders.put("/document/" + TEST_DOCUMENT_ID + "/replace")
@@ -296,11 +296,11 @@ class VaultControllerTest {
     @Test
     @SneakyThrows
     void testReplaceCorruptDocumentWhenDocumentIsInADifferentVault() {
-        when(vaultConfigurationProperties.modificationEnabled())
+        Mockito.when(vaultConfigurationProperties.modificationEnabled())
                 .thenReturn(true);
-        when(vaultConfigurationProperties.name())
+        Mockito.when(vaultConfigurationProperties.name())
                 .thenReturn("my-vault");
-        when(documentEntityFactory.getDocumentEntity(UUID.fromString(TEST_DOCUMENT_ID)))
+        Mockito.when(documentEntityFactory.getDocumentEntity(UUID.fromString(TEST_DOCUMENT_ID)))
                 .thenReturn(
                         Optional.of(
                                 DocumentEntity.builder()
@@ -324,21 +324,21 @@ class VaultControllerTest {
     @Test
     @SneakyThrows
     void testReplaceCorruptDocumentReplacesTheDocument() {
-        when(vaultConfigurationProperties.modificationEnabled())
+        Mockito.when(vaultConfigurationProperties.modificationEnabled())
                 .thenReturn(true);
-        when(vaultConfigurationProperties.name())
+        Mockito.when(vaultConfigurationProperties.name())
                 .thenReturn("my-vault");
         final DocumentEntity documentEntity = DocumentEntity.builder()
                 .id(UUID.fromString(TEST_DOCUMENT_ID))
                 .vault("my-vault")
                 .compression(DocumentCompression.GZIP)
                 .build();
-        when(documentEntityFactory.getDocumentEntity(UUID.fromString(TEST_DOCUMENT_ID)))
+        Mockito.when(documentEntityFactory.getDocumentEntity(UUID.fromString(TEST_DOCUMENT_ID)))
                 .thenReturn(Optional.of(documentEntity));
-        final VaultLocation vaultLocation = mock(VaultLocation.class);
-        when(vaultLocationFactory.getLocation(documentEntity, documentEntity.getCompression()))
+        final VaultLocation vaultLocation = Mockito.mock(VaultLocation.class);
+        Mockito.when(vaultLocationFactory.getLocation(documentEntity, documentEntity.getCompression()))
                 .thenReturn(vaultLocation);
-        when(documentManipulator.markDownloaded(UUID.fromString(TEST_DOCUMENT_ID)))
+        Mockito.when(documentManipulator.markDownloaded(UUID.fromString(TEST_DOCUMENT_ID)))
                 .thenReturn(Mono.empty());
 
         final byte[] newDocumentContent = {1, 2, 3, 4};
@@ -354,9 +354,9 @@ class VaultControllerTest {
                 )
                 .andExpect(status().isOk());
 
-        verify(vaultDocumentStorage)
+        Mockito.verify(vaultDocumentStorage)
                 .persistDocument(documentEntity, newDocumentContent, vaultLocation);
-        verify(documentManipulator)
+        Mockito.verify(documentManipulator)
                 .markDownloadedSync(UUID.fromString(TEST_DOCUMENT_ID));
     }
 
@@ -364,7 +364,7 @@ class VaultControllerTest {
         try {
             return new ObjectMapper().writeValueAsString(obj);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException(e);
         }
     }
 }

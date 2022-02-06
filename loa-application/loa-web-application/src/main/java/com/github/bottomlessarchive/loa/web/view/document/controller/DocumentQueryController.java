@@ -39,7 +39,7 @@ public class DocumentQueryController {
      */
     @GetMapping("/document/{documentId}")
     public Mono<ResponseEntity<Flux<DataBuffer>>> queryDocument(@PathVariable final String documentId) {
-        return documentEntityFactory.getDocumentEntity(UUID.fromString(documentId))
+        return Mono.justOrEmpty(documentEntityFactory.getDocumentEntity(UUID.fromString(documentId)))
                 .zipWhen(documentEntity -> Mono.just(vaultClientService.queryDocument(documentEntity)))
                 .map(documentEntity -> ResponseEntity.ok()
                         .contentType(mediaTypeCalculator.calculateMediaType(documentEntity.getT1().getType()))
@@ -52,7 +52,7 @@ public class DocumentQueryController {
 
     @GetMapping(path = "/document/{documentId}/image", produces = "image/png")
     public Mono<byte[]> queryDocumentImage(@PathVariable final String documentId) {
-        return documentEntityFactory.getDocumentEntity(UUID.fromString(documentId))
+        return Mono.justOrEmpty(documentEntityFactory.getDocumentEntity(UUID.fromString(documentId)))
                 .zipWhen(documentEntity -> Mono.just(vaultClientService.queryDocumentAsInputStream(documentEntity)))
                 .flatMap(value -> {
                             if (value.getT1().getType() != DocumentType.PDF) {

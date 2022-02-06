@@ -24,7 +24,7 @@ public class DebugController {
 
     @GetMapping("/document/{documentId}/debug")
     public Mono<DebugDocumentResponse> getDocumentById(@PathVariable final String documentId) {
-        return documentEntityFactory.getDocumentEntity(UUID.fromString(documentId))
+        return Mono.justOrEmpty(documentEntityFactory.getDocumentEntity(UUID.fromString(documentId)))
                 .flatMap(debugResponseFactory::newDebugDocumentResponse)
                 .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Document not found with id " + documentId + "!")));
