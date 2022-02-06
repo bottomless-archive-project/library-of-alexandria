@@ -28,7 +28,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import reactor.core.publisher.Mono;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -338,8 +337,6 @@ class VaultControllerTest {
         final VaultLocation vaultLocation = Mockito.mock(VaultLocation.class);
         Mockito.when(vaultLocationFactory.getLocation(documentEntity, documentEntity.getCompression()))
                 .thenReturn(vaultLocation);
-        Mockito.when(documentManipulator.markDownloaded(UUID.fromString(TEST_DOCUMENT_ID)))
-                .thenReturn(Mono.empty());
 
         final byte[] newDocumentContent = {1, 2, 3, 4};
 
