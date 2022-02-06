@@ -34,15 +34,13 @@ public class RecompressorService {
                 .getInputStream()) {
             final byte[] documentContent = documentContentInputStream.readAllBytes();
 
-            vaultDocumentManager.removeDocument(documentEntity)
-                    .doOnNext(processedEntity -> {
-                        final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentEntity, documentCompression);
+            vaultDocumentManager.removeDocument(documentEntity);
 
-                        vaultDocumentStorage.persistDocument(processedEntity, documentContent, vaultLocation);
-                    })
-                    .subscribe();
+            final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentEntity, documentCompression);
 
-            documentManipulator.updateCompression(documentEntity.getId(), documentCompression).subscribe();
+            vaultDocumentStorage.persistDocument(documentEntity, documentContent, vaultLocation);
+
+            documentManipulator.updateCompression(documentEntity.getId(), documentCompression);
         } catch (final IOException e) {
             throw new StorageAccessException("Unable to load document " + documentEntity.getId() + "!", e);
         }

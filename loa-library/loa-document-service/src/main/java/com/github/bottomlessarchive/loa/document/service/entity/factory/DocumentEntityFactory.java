@@ -37,8 +37,8 @@ public class DocumentEntityFactory {
      * @param documentId the id of the document
      * @return the document that belongs to the provided id
      */
-    public Mono<DocumentEntity> getDocumentEntity(final UUID documentId) {
-        return documentRepository.findById(documentId)
+    public Optional<DocumentEntity> getDocumentEntity(final UUID documentId) {
+        return documentRepositorySync.findById(documentId)
                 .map(documentEntityTransformer::transform);
     }
 
@@ -64,10 +64,9 @@ public class DocumentEntityFactory {
      * Remove a document by its id.
      *
      * @param documentEntity the document to remove
-     * @return the result of the removal
      */
-    public Mono<Void> removeDocumentEntity(final DocumentEntity documentEntity) {
-        return documentRepository.removeDocument(documentEntity.getId());
+    public void removeDocumentEntity(final DocumentEntity documentEntity) {
+        documentRepositorySync.removeDocument(documentEntity.getId());
     }
 
     /**

@@ -10,6 +10,5 @@ import lombok.extern.jackson.Jacksonized;
 @Jacksonized
 public class RecompressDocumentRequest {
 
-    String documentId;
     DocumentCompression compression;
 }

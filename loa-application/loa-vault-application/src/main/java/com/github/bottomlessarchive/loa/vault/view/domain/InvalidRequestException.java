@@ -1,7 +1,11 @@
 package com.github.bottomlessarchive.loa.vault.view.domain;
 
-import lombok.experimental.StandardException;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
-@StandardException
-public class InvalidRequestException extends RuntimeException {
+public class InvalidRequestException extends ResponseStatusException {
+
+    public InvalidRequestException(final String message) {
+        super(HttpStatus.BAD_REQUEST, message);
+    }
 }

@@ -11,7 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Mono;
 
 import java.io.InputStream;
 
@@ -61,27 +60,21 @@ public class VaultDocumentManager {
         }
     }
 
-    public Mono<Boolean> documentExists(final DocumentEntity documentEntity) {
-        return Mono.just(vaultLocationFactory.getLocation(documentEntity))
-                .map(VaultLocation::populated);
+    public boolean documentExists(final DocumentEntity documentEntity) {
+        return vaultLocationFactory.getLocation(documentEntity).populated();
     }
 
     /**
      * Remove the content of a document from the vault.
      *
      * @param documentEntity the document to remove
-     * @return the document that was removed
      */
-    public Mono<DocumentEntity> removeDocument(final DocumentEntity documentEntity) {
-        return Mono.just(documentEntity)
-                .map(vaultLocationFactory::getLocation)
-                .filter(VaultLocation::populated)
-                .doOnNext(vaultLocation -> {
-                    if (vaultLocation.populated()) {
-                        vaultLocation.clear();
-                    }
-                })
-                .thenReturn(documentEntity);
+    public void removeDocument(final DocumentEntity documentEntity) {
+        final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentEntity);
+
+        if (vaultLocation.populated()) {
+            vaultLocation.clear();
+        }
     }
 
     /**
@@ -89,7 +82,7 @@ public class VaultDocumentManager {
      *
      * @return the free bytes available
      */
-    public Mono<Long> getAvailableSpace() {
-        return Mono.fromSupplier(vaultLocationFactory::getAvailableSpace);
+    public long getAvailableSpace() {
+        return vaultLocationFactory.getAvailableSpace();
     }
 }

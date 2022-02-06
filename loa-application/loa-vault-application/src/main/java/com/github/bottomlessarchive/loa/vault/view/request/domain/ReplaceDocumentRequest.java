@@ -7,8 +7,7 @@ import lombok.extern.jackson.Jacksonized;
 @Value
 @Builder
 @Jacksonized
-public class ReplaceCorruptDocumentRequest {
+public class ReplaceDocumentRequest {
 
-    String documentId;
     byte[] content;
 }

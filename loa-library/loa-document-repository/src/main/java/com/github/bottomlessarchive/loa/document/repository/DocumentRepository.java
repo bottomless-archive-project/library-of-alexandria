@@ -29,15 +29,6 @@ public class DocumentRepository {
     private final RepositoryConfigurationProperties repositoryConfigurationProperties;
     private final MongoCollection<DocumentDatabaseEntity> documentDatabaseEntityMongoCollection;
 
-    public Mono<Void> removeDocument(final UUID documentId) {
-        return Mono.from(documentDatabaseEntityMongoCollection.deleteOne(eq("_id", documentId)))
-                .then();
-    }
-
-    public Mono<DocumentDatabaseEntity> findById(final UUID documentId) {
-        return Mono.from(documentDatabaseEntityMongoCollection.find(eq("_id", documentId)));
-    }
-
     /**
      * Returns a {@link Flux} that will emit all the documents that have the provided status in the database.
      *
