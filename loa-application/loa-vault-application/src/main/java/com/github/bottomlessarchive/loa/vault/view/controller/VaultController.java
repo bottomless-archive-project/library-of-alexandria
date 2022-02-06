@@ -138,7 +138,8 @@ public class VaultController {
     }
 
     @PutMapping("/document/{documentId}/replace")
-    public void replaceCorruptDocument(@PathVariable final String documentId, final ReplaceDocumentRequest replaceDocumentRequest) {
+    public void replaceCorruptDocument(@PathVariable final String documentId,
+            @RequestBody final ReplaceDocumentRequest replaceDocumentRequest) {
         if (!vaultConfigurationProperties.modificationEnabled()) {
             throw new InvalidRequestException("Modification is disabled on this vault instance!");
         }

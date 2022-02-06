@@ -3,12 +3,12 @@ package com.github.bottomlessarchive.loa.vault.view.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.bottomlessarchive.loa.compression.domain.DocumentCompression;
 import com.github.bottomlessarchive.loa.document.service.DocumentManipulator;
-import com.github.bottomlessarchive.loa.vault.service.RecompressorService;
-import com.github.bottomlessarchive.loa.vault.service.VaultDocumentManager;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentEntity;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentType;
 import com.github.bottomlessarchive.loa.document.service.entity.factory.DocumentEntityFactory;
 import com.github.bottomlessarchive.loa.vault.configuration.VaultConfigurationProperties;
+import com.github.bottomlessarchive.loa.vault.service.RecompressorService;
+import com.github.bottomlessarchive.loa.vault.service.VaultDocumentManager;
 import com.github.bottomlessarchive.loa.vault.service.backend.service.VaultDocumentStorage;
 import com.github.bottomlessarchive.loa.vault.service.location.VaultLocation;
 import com.github.bottomlessarchive.loa.vault.service.location.VaultLocationFactory;
@@ -16,38 +16,23 @@ import com.github.bottomlessarchive.loa.vault.view.request.domain.RecompressDocu
 import com.github.bottomlessarchive.loa.vault.view.request.domain.ReplaceDocumentRequest;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.MediaType;
-import org.springframework.http.codec.json.Jackson2JsonDecoder;
-import org.springframework.http.codec.json.Jackson2JsonEncoder;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.RequestBuilder;
-import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.test.StepVerifier;
 
-import java.io.IOException;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -138,7 +123,14 @@ class VaultControllerTest {
         when(vaultConfigurationProperties.modificationEnabled())
                 .thenReturn(false);
 
-        mockMvc.perform(MockMvcRequestBuilders.put("/document/" + TEST_DOCUMENT_ID + "/recompress"))
+        mockMvc.perform(MockMvcRequestBuilders.put("/document/" + TEST_DOCUMENT_ID + "/recompress")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(asJsonString(
+                                RecompressDocumentRequest.builder()
+                                        .compression(DocumentCompression.GZIP)
+                                        .build()
+                        ))
+                )
                 .andExpect(status().isBadRequest())
                 .andExpect(status().reason("Modification is disabled on this vault instance!"));
     }
@@ -151,7 +143,14 @@ class VaultControllerTest {
         when(documentEntityFactory.getDocumentEntity(UUID.fromString(TEST_DOCUMENT_ID)))
                 .thenReturn(Optional.empty());
 
-        mockMvc.perform(MockMvcRequestBuilders.put("/document/" + TEST_DOCUMENT_ID + "/recompress"))
+        mockMvc.perform(MockMvcRequestBuilders.put("/document/" + TEST_DOCUMENT_ID + "/recompress")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(asJsonString(
+                                RecompressDocumentRequest.builder()
+                                        .compression(DocumentCompression.GZIP)
+                                        .build()
+                        ))
+                )
                 .andExpect(status().isBadRequest())
                 .andExpect(status().reason("Document not found with id 123e4567-e89b-12d3-a456-556642440000!"));
     }
@@ -172,7 +171,14 @@ class VaultControllerTest {
                         )
                 );
 
-        mockMvc.perform(MockMvcRequestBuilders.put("/document/" + TEST_DOCUMENT_ID + "/recompress"))
+        mockMvc.perform(MockMvcRequestBuilders.put("/document/" + TEST_DOCUMENT_ID + "/recompress")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(asJsonString(
+                                RecompressDocumentRequest.builder()
+                                        .compression(DocumentCompression.GZIP)
+                                        .build()
+                        ))
+                )
                 .andExpect(status().isBadRequest())
                 .andExpect(status().reason("Document with id 123e4567-e89b-12d3-a456-556642440000 is available on a different vault!"));
     }
@@ -227,7 +233,8 @@ class VaultControllerTest {
                 .andExpect(status().reason("Document not found with id 123e4567-e89b-12d3-a456-556642440000 or already removed!"));
     }
 
-    /*@Test
+    @Test
+    @SneakyThrows
     void testRemoveWhenDocumentIsInADifferentVault() {
         when(vaultConfigurationProperties.modificationEnabled())
                 .thenReturn(true);
@@ -235,26 +242,20 @@ class VaultControllerTest {
                 .thenReturn("my-vault");
         when(documentEntityFactory.getDocumentEntity(UUID.fromString(TEST_DOCUMENT_ID)))
                 .thenReturn(
-                        Mono.just(
+                        Optional.of(
                                 DocumentEntity.builder()
                                         .vault("different-vault")
                                         .build()
                         )
                 );
 
-        final Mono<Void> response = requester.route("deleteDocument")
-                .data(DeleteDocumentRequest.builder()
-                        .documentId(TEST_DOCUMENT_ID)
-                        .build()
-                )
-                .retrieveMono(Void.class);
-
-        StepVerifier.create(response)
-                .expectErrorMessage("Document with id 123e4567-e89b-12d3-a456-556642440000 is available on a different vault!")
-                .verify();
+        mockMvc.perform(MockMvcRequestBuilders.delete("/document/" + TEST_DOCUMENT_ID))
+                .andExpect(status().isBadRequest())
+                .andExpect(status().reason("Document with id 123e4567-e89b-12d3-a456-556642440000 is available on a different vault!"));
     }
 
     @Test
+    @SneakyThrows
     void testRemoveWhenRequestIsSuccessful() {
         when(vaultConfigurationProperties.modificationEnabled())
                 .thenReturn(true);
@@ -265,45 +266,35 @@ class VaultControllerTest {
                 .vault("my-vault")
                 .build();
         when(documentEntityFactory.getDocumentEntity(UUID.fromString(TEST_DOCUMENT_ID)))
-                .thenReturn(Mono.just(documentEntity));
-        when(documentEntityFactory.removeDocumentEntity(documentEntity))
-                .thenReturn(Mono.empty());
-        when(vaultDocumentManager.removeDocument(documentEntity))
-                .thenReturn(Mono.empty());
+                .thenReturn(Optional.of(documentEntity));
 
-        final Mono<Void> response = requester.route("deleteDocument")
-                .data(DeleteDocumentRequest.builder()
-                        .documentId(TEST_DOCUMENT_ID)
-                        .build()
-                )
-                .retrieveMono(Void.class);
-
-        StepVerifier.create(response)
-                .verifyComplete();
+        mockMvc.perform(MockMvcRequestBuilders.delete("/document/" + TEST_DOCUMENT_ID))
+                .andExpect(status().isOk());
 
         verify(vaultDocumentManager).removeDocument(documentEntity);
         verify(documentEntityFactory).removeDocumentEntity(documentEntity);
     }
 
     @Test
+    @SneakyThrows
     void testReplaceCorruptDocumentWhenModificationsAreDisabled() {
         when(vaultConfigurationProperties.modificationEnabled())
                 .thenReturn(false);
 
-        final Mono<Void> response = requester.route("replaceCorruptDocument")
-                .data(ReplaceDocumentRequest.builder()
-                        .documentId(TEST_DOCUMENT_ID)
-                        .content(new byte[]{})
-                        .build()
+        mockMvc.perform(MockMvcRequestBuilders.put("/document/" + TEST_DOCUMENT_ID + "/replace")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(asJsonString(
+                                ReplaceDocumentRequest.builder()
+                                        .content(new byte[]{})
+                                        .build()
+                        ))
                 )
-                .retrieveMono(Void.class);
-
-        StepVerifier.create(response)
-                .expectErrorMessage("Modification is disabled on this vault instance!")
-                .verify();
+                .andExpect(status().isBadRequest())
+                .andExpect(status().reason("Modification is disabled on this vault instance!"));
     }
 
     @Test
+    @SneakyThrows
     void testReplaceCorruptDocumentWhenDocumentIsInADifferentVault() {
         when(vaultConfigurationProperties.modificationEnabled())
                 .thenReturn(true);
@@ -311,27 +302,27 @@ class VaultControllerTest {
                 .thenReturn("my-vault");
         when(documentEntityFactory.getDocumentEntity(UUID.fromString(TEST_DOCUMENT_ID)))
                 .thenReturn(
-                        Mono.just(
+                        Optional.of(
                                 DocumentEntity.builder()
                                         .vault("different-vault")
                                         .build()
                         )
                 );
 
-        final Mono<Void> response = requester.route("replaceCorruptDocument")
-                .data(ReplaceDocumentRequest.builder()
-                        .documentId(TEST_DOCUMENT_ID)
-                        .content(new byte[]{})
-                        .build()
+        mockMvc.perform(MockMvcRequestBuilders.put("/document/" + TEST_DOCUMENT_ID + "/replace")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(asJsonString(
+                                ReplaceDocumentRequest.builder()
+                                        .content(new byte[]{})
+                                        .build()
+                        ))
                 )
-                .retrieveMono(Void.class);
-
-        StepVerifier.create(response)
-                .expectErrorMessage("Document with id 123e4567-e89b-12d3-a456-556642440000 is available on a different vault!")
-                .verify();
+                .andExpect(status().isBadRequest())
+                .andExpect(status().reason("Document with id 123e4567-e89b-12d3-a456-556642440000 is available on a different vault!"));
     }
 
     @Test
+    @SneakyThrows
     void testReplaceCorruptDocumentReplacesTheDocument() {
         when(vaultConfigurationProperties.modificationEnabled())
                 .thenReturn(true);
@@ -343,9 +334,7 @@ class VaultControllerTest {
                 .compression(DocumentCompression.GZIP)
                 .build();
         when(documentEntityFactory.getDocumentEntity(UUID.fromString(TEST_DOCUMENT_ID)))
-                .thenReturn(Mono.just(documentEntity));
-        when(vaultDocumentManager.removeDocument(documentEntity))
-                .thenReturn(Mono.just(documentEntity));
+                .thenReturn(Optional.of(documentEntity));
         final VaultLocation vaultLocation = mock(VaultLocation.class);
         when(vaultLocationFactory.getLocation(documentEntity, documentEntity.getCompression()))
                 .thenReturn(vaultLocation);
@@ -354,22 +343,22 @@ class VaultControllerTest {
 
         final byte[] newDocumentContent = {1, 2, 3, 4};
 
-        final Mono<Void> response = requester.route("replaceCorruptDocument")
-                .data(ReplaceDocumentRequest.builder()
-                        .documentId(TEST_DOCUMENT_ID)
-                        .content(newDocumentContent)
-                        .build()
-                )
-                .retrieveMono(Void.class);
 
-        StepVerifier.create(response)
-                .verifyComplete();
+        mockMvc.perform(MockMvcRequestBuilders.put("/document/" + TEST_DOCUMENT_ID + "/replace")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(asJsonString(
+                                ReplaceDocumentRequest.builder()
+                                        .content(newDocumentContent)
+                                        .build()
+                        ))
+                )
+                .andExpect(status().isOk());
 
         verify(vaultDocumentStorage)
                 .persistDocument(documentEntity, newDocumentContent, vaultLocation);
         verify(documentManipulator)
-                .markDownloaded(UUID.fromString(TEST_DOCUMENT_ID));
-    }*/
+                .markDownloadedSync(UUID.fromString(TEST_DOCUMENT_ID));
+    }
 
     private static String asJsonString(final Object obj) {
         try {
