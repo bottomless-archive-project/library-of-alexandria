@@ -8,7 +8,6 @@ import com.github.bottomlessarchive.loa.validator.configuration.FileValidationCo
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Mono;
 
 import java.io.InputStream;
 import java.util.UUID;
@@ -34,11 +33,10 @@ public class DocumentFileValidator {
      * @param documentId   the id of the document to validate
      * @param documentType the type of the document to validate
      */
-    public Mono<Boolean> isValidDocument(final String documentId, final DocumentType documentType) {
-        return stageLocationFactory.getLocation(documentId, documentType)
-                .flatMap(stageFileLocation -> stageFileLocation.size()
-                        .map(size -> isValidFileSize(size) && isParsable(documentId, documentType, stageFileLocation))
-                );
+    public boolean isValidDocument(final String documentId, final DocumentType documentType) {
+        final StageLocation stageLocation = stageLocationFactory.getLocation(documentId, documentType);
+
+        return isValidFileSize(stageLocation.size()) && isParsable(documentId, documentType, stageLocation);
     }
 
     private boolean isValidFileSize(final long stageFileSize) {

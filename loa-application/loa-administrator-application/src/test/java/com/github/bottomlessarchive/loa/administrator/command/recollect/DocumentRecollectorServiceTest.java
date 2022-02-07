@@ -13,6 +13,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+import java.util.Optional;
 import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -43,22 +44,16 @@ class DocumentRecollectorServiceTest {
                 .build();
         when(documentLocationEntityFactory.getDocumentLocation(any()))
                 .thenReturn(
-                        Mono.just(
+                        Optional.of(
                                 DocumentLocation.builder()
                                         .id("first")
                                         .url("http://abc1.com")
                                         .build()
                         )
                 );
-        when(sourceLocationRecrawlerService.recrawlSourceLocation(any(), eq(documentEntity)))
-                .thenReturn(Mono.empty(), Mono.just(documentEntity));
 
-        final Flux<DocumentEntity> result = underTest.recollectCorruptDocument(documentEntity);
+        underTest.recollectCorruptDocument(documentEntity);
 
-        StepVerifier.create(result)
-                .consumeNextWith(localDocumentEntity -> Assertions.assertEquals(documentEntity, localDocumentEntity))
-                .verifyComplete();
-
-        verify(sourceLocationRecrawlerService, times(2)).recrawlSourceLocation(any(), any());
+        verify(sourceLocationRecrawlerService, times(2)).recrawlSourceLocation(any(), eq(documentEntity));
     }
 }

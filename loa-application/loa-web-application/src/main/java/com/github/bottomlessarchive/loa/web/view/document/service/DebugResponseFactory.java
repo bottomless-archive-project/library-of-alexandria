@@ -8,10 +8,7 @@ import com.github.bottomlessarchive.loa.vault.client.service.VaultClientService;
 import com.github.bottomlessarchive.loa.web.view.document.response.DebugDocumentResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -23,46 +20,19 @@ public class DebugResponseFactory {
     private final DocumentSearchClient documentSearchClient;
     private final DocumentLocationEntityFactory documentLocationEntityFactory;
 
-    public Mono<DebugDocumentResponse> newDebugDocumentResponse(final DocumentEntity documentEntity) {
-        final DebugDocumentResponse.DebugDocumentResponseBuilder builder =
-                DebugDocumentResponse.builder();
+    public DebugDocumentResponse newDebugDocumentResponse(final DocumentEntity documentEntity) {
+        final boolean isInIndex = documentSearchClient.isDocumentInIndex(documentEntity.getId());
+        final boolean isInVault = vaultClientService.documentExists(documentEntity);
 
-        return Mono.when(
-                        this.fillIndexData(documentEntity, builder),
-                        this.fillEntityData(documentEntity, builder),
-                        this.fillExistsInVault(documentEntity, builder)
-                )
-                .then(Mono.defer(() -> Mono.just(builder.build())));
-    }
-
-    private Mono<Void> fillIndexData(final DocumentEntity documentEntity,
-            final DebugDocumentResponse.DebugDocumentResponseBuilder builder) {
-        return Mono.fromCallable(() -> documentSearchClient.isDocumentInIndex(documentEntity.getId()))
-                .map(builder::isInIndex)
-                .then();
-    }
-
-    private Mono<Void> fillEntityData(final DocumentEntity documentEntity,
-            final DebugDocumentResponse.DebugDocumentResponseBuilder builder) {
-        // If the source locations are empty, then the Flux.fromIterable will not run
-        if (documentEntity.getSourceLocations().isEmpty()) {
-            return Mono.just(Collections.<String>emptyList())
-                    .doOnNext(documentSourceLocations -> populateEntityData(builder, documentEntity, documentSourceLocations))
-                    .then();
-        }
-
-        return Flux.fromIterable(documentEntity.getSourceLocations())
-                .flatMap(documentLocationEntityFactory::getDocumentLocation)
+        final List<String> documentLocations = documentEntity.getSourceLocations().stream()
+                .flatMap(id -> documentLocationEntityFactory.getDocumentLocation(id).stream())
                 .map(DocumentLocation::getUrl)
-                .buffer()
-                .doOnNext(documentSourceLocations -> populateEntityData(builder, documentEntity, documentSourceLocations))
-                .then();
-    }
+                .toList();
 
-    private void populateEntityData(final DebugDocumentResponse.DebugDocumentResponseBuilder builder,
-            final DocumentEntity documentEntity, final List<String> documentSourceLocations) {
-        builder
+        return DebugDocumentResponse.builder()
                 .id(documentEntity.getId())
+                .isInIndex(isInIndex)
+                .isInVault(isInVault)
                 .vault(documentEntity.getVault())
                 .type(documentEntity.getType())
                 .status(documentEntity.getStatus())
@@ -71,14 +41,7 @@ public class DebugResponseFactory {
                 .fileSize(documentEntity.getFileSize())
                 .downloadDate(documentEntity.getDownloadDate())
                 .downloaderVersion(documentEntity.getDownloaderVersion())
-                .sourceLocations(Set.copyOf(documentSourceLocations));
-    }
-
-    private Mono<Void> fillExistsInVault(final DocumentEntity documentEntity,
-            final DebugDocumentResponse.DebugDocumentResponseBuilder builder) {
-        return Mono.just(documentEntity)
-                .flatMap(vaultClientService::documentExists)
-                .map(builder::isInVault)
-                .then();
+                .sourceLocations(Set.copyOf(documentLocations))
+                .build();
     }
 }

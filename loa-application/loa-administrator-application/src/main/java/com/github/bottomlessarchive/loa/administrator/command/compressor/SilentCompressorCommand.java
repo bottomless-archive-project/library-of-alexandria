@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
-import reactor.core.scheduler.Schedulers;
 
 /**
  * This command will go through every {@link DocumentEntity} in the database and ask the Vault Application to recompress them when the
@@ -41,14 +40,12 @@ public class SilentCompressorCommand implements CommandLineRunner {
             throw new IllegalArgumentException("The loa.command.silent-compressor.algorithm command-line argument must be set!");
         }
 
-        documentEntityFactory.getDocumentEntities()
+        documentEntityFactory.getDocumentEntitiesSync()
                 .parallel()
-                .runOn(Schedulers.boundedElastic())
                 .filter(DocumentEntity::isArchived)
                 .filter(this::shouldCompress)
-                .doOnNext(documentEntity -> vaultClientService.recompressDocument(documentEntity,
-                        silentCompressorConfigurationProperties.algorithm()).block())
-                .subscribe();
+                .forEach(documentEntity -> vaultClientService.recompressDocument(documentEntity,
+                        silentCompressorConfigurationProperties.algorithm()));
     }
 
     private boolean shouldCompress(final DocumentEntity documentEntity) {

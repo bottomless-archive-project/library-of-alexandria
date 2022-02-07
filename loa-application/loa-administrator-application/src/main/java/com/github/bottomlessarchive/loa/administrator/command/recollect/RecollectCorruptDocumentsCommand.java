@@ -21,9 +21,8 @@ public class RecollectCorruptDocumentsCommand implements CommandLineRunner {
     public void run(final String... args) {
         log.info("Started to run the recollect corrupt documents command!");
 
-        documentEntityFactory.getDocumentEntities()
+        documentEntityFactory.getDocumentEntitiesSync()
                 .filter(DocumentEntity::isCorrupt)
-                .flatMap(documentRecollectorService::recollectCorruptDocument)
-                .subscribe();
+                .forEach(documentRecollectorService::recollectCorruptDocument);
     }
 }

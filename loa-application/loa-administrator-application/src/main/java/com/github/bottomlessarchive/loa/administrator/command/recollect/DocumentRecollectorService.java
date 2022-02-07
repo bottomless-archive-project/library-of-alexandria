@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -21,14 +20,13 @@ public class DocumentRecollectorService {
     private final DocumentLocationEntityFactory documentLocationEntityFactory;
     private final SourceLocationRecrawlerService sourceLocationRecrawlerService;
 
-    public Flux<DocumentEntity> recollectCorruptDocument(final DocumentEntity documentEntity) {
+    public void recollectCorruptDocument(final DocumentEntity documentEntity) {
         log.info("Recollecting document entity: {}.", documentEntity);
 
-        return Flux.fromIterable(documentEntity.getSourceLocations())
-                .flatMap(documentLocationEntityFactory::getDocumentLocation)
+        documentEntity.getSourceLocations().stream()
+                .flatMap(id -> documentLocationEntityFactory.getDocumentLocation(id).stream())
                 .map(this::convertToURL)
-                .flatMap(sourceLocation -> sourceLocationRecrawlerService.recrawlSourceLocation(sourceLocation, documentEntity))
-                .take(1, true);
+                .forEach(sourceLocation -> sourceLocationRecrawlerService.recrawlSourceLocation(sourceLocation, documentEntity));
     }
 
     private URL convertToURL(final DocumentLocation sourceLocation) {

@@ -6,8 +6,7 @@ import lombok.Value;
 
 @Value
 @Builder
-public class RecompressRequest {
+public class RecompressDocumentRequest {
 
-    String documentId;
     DocumentCompression compression;
 }

@@ -5,7 +5,6 @@ import com.github.bottomlessarchive.loa.document.service.domain.DocumentType;
 import com.github.bottomlessarchive.loa.stage.service.domain.StageLocation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Mono;
 
 import java.nio.file.Path;
 
@@ -26,12 +25,12 @@ public class StageLocationFactory {
      * @param documentType the type of the document that we need to create the location for
      * @return the location created in the staging area
      */
-    public Mono<StageLocation> getLocation(final String documentId, final DocumentType documentType) {
-        return Mono.fromSupplier(() -> Path.of(stageConfigurationProperties.location(), buildFileName(documentId, documentType)))
-                .map(path -> StageLocation.builder()
-                        .path(path)
-                        .build()
-                );
+    public StageLocation getLocation(final String documentId, final DocumentType documentType) {
+        final Path path = Path.of(stageConfigurationProperties.location(), buildFileName(documentId, documentType));
+
+        return StageLocation.builder()
+                .path(path)
+                .build();
     }
 
     private String buildFileName(final String documentId, final DocumentType documentType) {

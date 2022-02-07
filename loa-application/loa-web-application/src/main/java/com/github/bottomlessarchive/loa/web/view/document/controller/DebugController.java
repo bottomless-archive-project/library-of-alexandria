@@ -23,10 +23,10 @@ public class DebugController {
     private final DocumentEntityFactory documentEntityFactory;
 
     @GetMapping("/document/{documentId}/debug")
-    public Mono<DebugDocumentResponse> getDocumentById(@PathVariable final String documentId) {
-        return Mono.justOrEmpty(documentEntityFactory.getDocumentEntity(UUID.fromString(documentId)))
-                .flatMap(debugResponseFactory::newDebugDocumentResponse)
-                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "Document not found with id " + documentId + "!")));
+    public DebugDocumentResponse getDocumentById(@PathVariable final String documentId) {
+        return documentEntityFactory.getDocumentEntity(UUID.fromString(documentId))
+                .map(debugResponseFactory::newDebugDocumentResponse)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Document not found with id " + documentId + "!"));
     }
 }

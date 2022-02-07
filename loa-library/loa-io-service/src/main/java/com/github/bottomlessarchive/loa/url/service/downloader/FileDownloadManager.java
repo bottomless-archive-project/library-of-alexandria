@@ -2,16 +2,14 @@ package com.github.bottomlessarchive.loa.url.service.downloader;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.core.io.buffer.DataBuffer;
-import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
+import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -25,7 +23,7 @@ import java.nio.file.Path;
 @ConditionalOnBean(WebClient.class)
 public class FileDownloadManager {
 
-    private final FileDownloadRequestFactory fileDownloadRequestFactory;
+    private final OkHttpClient okHttpClient;
 
     /**
      * Download a file from the provided url to the provided file location.
@@ -33,24 +31,26 @@ public class FileDownloadManager {
      * @param downloadTarget the url to download the file from
      * @param resultLocation the location to download the file to
      */
-    public Mono<Path> downloadFile(final URL downloadTarget, final Path resultLocation) {
+    public void downloadFile(final URL downloadTarget, final Path resultLocation) {
+        final Request request = new Request.Builder()
+                .get()
+                .url(downloadTarget)
+                .build();
+
         try {
-            final Flux<DataBuffer> dataBufferFlux =
-                    fileDownloadRequestFactory.newDownloadRequest(downloadTarget.toURI());
+            //TODO: Re-add the retry logic when the response is HttpStatus.TOO_MANY_REQUESTS
+            final InputStream fileInputStream = okHttpClient.newCall(request)
+                    .execute()
+                    .body()
+                    .byteStream();
 
-            return DataBufferUtils.write(dataBufferFlux, resultLocation)
-                    .doOnError(error -> {
-                        try {
-                            Files.delete(resultLocation);
-                        } catch (final IOException e) {
-                            log.error("Failed to delete file at the staging location!", e);
-                        }
-                    })
-                    .thenReturn(resultLocation);
-        } catch (final URISyntaxException e) {
-            log.debug("Failed to download document from location: {}.", downloadTarget, e);
-
-            return Mono.empty();
+            Files.copy(fileInputStream, resultLocation);
+        } catch (final IOException e) {
+            try {
+                Files.delete(resultLocation);
+            } catch (final IOException e2) {
+                log.error("Failed to delete file at the staging location!", e2);
+            }
         }
     }
 }

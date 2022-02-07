@@ -35,14 +35,12 @@ public class StageLocation {
      *
      * @return the file size at the stage location
      */
-    public Mono<Long> size() {
-        return Mono.fromSupplier(() -> {
-            try {
-                return Files.size(path);
-            } catch (final IOException e) {
-                throw new StageAccessException("Unable to get the size of staged document!", e);
-            }
-        });
+    public long size() {
+        try {
+            return Files.size(path);
+        } catch (final IOException e) {
+            throw new StageAccessException("Unable to get the size of staged document!", e);
+        }
     }
 
     /**
@@ -63,13 +61,11 @@ public class StageLocation {
      *
      * @return result of the operation
      */
-    public Mono<Void> cleanup() {
-        return Mono.fromRunnable(() -> {
-            try {
-                Files.delete(path);
-            } catch (final IOException e) {
-                throw new StageAccessException("Unable to delete staged document!", e);
-            }
-        });
+    public void cleanup() {
+        try {
+            Files.delete(path);
+        } catch (final IOException e) {
+            throw new StageAccessException("Unable to delete staged document!", e);
+        }
     }
 }

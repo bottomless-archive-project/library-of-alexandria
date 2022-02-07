@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,42 +27,31 @@ public class SourceLocationRecrawlerService {
     private final VaultClientService vaultClientService;
     private final FileDownloadManager fileDownloadManager;
 
-    public Mono<DocumentEntity> recrawlSourceLocation(final URL sourceLocation, final DocumentEntity documentEntity) {
+    public void recrawlSourceLocation(final URL sourceLocation, final DocumentEntity documentEntity) {
         final String documentRecrawlId = UUID.randomUUID().toString();
 
         if (log.isInfoEnabled()) {
             log.info("Downloading the recrawl target for document: {} with new staging id: {}.", documentEntity.getId(), documentRecrawlId);
         }
 
-        return stageLocationFactory.getLocation(documentRecrawlId, documentEntity.getType())
-                .flatMap(stageFileLocation -> acquireFile(sourceLocation, stageFileLocation))
-                .flatMap(documentFileLocation -> documentFileValidator.isValidDocument(documentRecrawlId, documentEntity.getType())
-                        .filter(validationResult -> !validationResult)
-                        .flatMap(validationResult -> documentFileLocation.cleanup())
-                        .thenReturn(documentFileLocation)
-                )
-                .filterWhen(StageLocation::exists)
-                .flatMap(location -> {
-                    try (InputStream content = location.openStream()) {
-                        return vaultClientService.replaceCorruptDocument(documentEntity, content.readAllBytes())
-                                .then(Mono.just(location));
-                    } catch (IOException e) {
-                        throw new IllegalStateException("Failed to replace document!", e);
-                    }
-                })
-                .flatMap(StageLocation::cleanup)
-                .onErrorResume(error -> {
-                    if (log.isDebugEnabled()) {
-                        log.debug("Error downloading a document: {}!", error.getMessage());
-                    }
+        final StageLocation stageLocation = stageLocationFactory.getLocation(documentRecrawlId, documentEntity.getType());
 
-                    return Mono.empty();
-                })
-                .then(Mono.just(documentEntity));
-    }
+        try {
+            fileDownloadManager.downloadFile(sourceLocation, stageLocation.getPath());
 
-    private Mono<StageLocation> acquireFile(final URL documentLocation, final StageLocation stageLocation) {
-        return fileDownloadManager.downloadFile(documentLocation, stageLocation.getPath())
-                .thenReturn(stageLocation);
+            final boolean isValidDocument = documentFileValidator.isValidDocument(documentRecrawlId, documentEntity.getType());
+
+            if (isValidDocument) {
+                try (InputStream content = stageLocation.openStream()) {
+                    vaultClientService.replaceCorruptDocument(documentEntity, content.readAllBytes());
+                } catch (IOException e) {
+                    throw new IllegalStateException("Failed to replace document!", e);
+                }
+            }
+
+            stageLocation.cleanup();
+        } catch (final Exception e) {
+            log.debug("Error downloading a document: {}!", e.getMessage());
+        }
     }
 }

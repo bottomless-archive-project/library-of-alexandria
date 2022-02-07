@@ -7,6 +7,5 @@ import lombok.Value;
 @Builder
 public class ReplaceCorruptDocumentRequest {
 
-    String documentId;
     byte[] content;
 }
