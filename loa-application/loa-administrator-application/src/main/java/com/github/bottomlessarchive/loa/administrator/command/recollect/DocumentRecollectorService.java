@@ -29,7 +29,7 @@ public class DocumentRecollectorService {
                 .map(this::convertToURL)
                 .toList();
 
-        for (URL location : sourceLocations) {
+        for (final URL location : sourceLocations) {
             try {
                 sourceLocationRecrawlerService.recrawlSourceLocation(location, documentEntity);
 

@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
@@ -14,7 +15,6 @@ import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class DocumentRecollectorServiceTest {
@@ -36,7 +36,7 @@ class DocumentRecollectorServiceTest {
         final DocumentEntity documentEntity = DocumentEntity.builder()
                 .sourceLocations(Set.of(firstLocationId, secondLocationId, thirdLocationId))
                 .build();
-        when(documentLocationEntityFactory.getDocumentLocation(any()))
+        Mockito.when(documentLocationEntityFactory.getDocumentLocation(any()))
                 .thenReturn(
                         Optional.of(
                                 DocumentLocation.builder()
@@ -45,12 +45,12 @@ class DocumentRecollectorServiceTest {
                                         .build()
                         )
                 );
-        doThrow(new RuntimeException())
+        Mockito.doThrow(new RuntimeException())
                 .doNothing()
                 .when(sourceLocationRecrawlerService).recrawlSourceLocation(any(), any());
 
         underTest.recollectCorruptDocument(documentEntity);
 
-        verify(sourceLocationRecrawlerService, times(2)).recrawlSourceLocation(any(), eq(documentEntity));
+        Mockito.verify(sourceLocationRecrawlerService, Mockito.times(2)).recrawlSourceLocation(any(), eq(documentEntity));
     }
 }

@@ -42,7 +42,7 @@ public class VaultClientService {
      */
     public InputStream queryDocument(final DocumentEntity documentEntity) {
         if (!vaultLocations.containsKey(documentEntity.getVault())) {
-            throw new IllegalStateException("Vault " + documentEntity.getVault() + " is not found!");
+            throw new VaultAccessException("Vault " + documentEntity.getVault() + " is not found!");
         }
 
         final VaultLocation vaultLocation = vaultLocations.get(documentEntity.getVault());

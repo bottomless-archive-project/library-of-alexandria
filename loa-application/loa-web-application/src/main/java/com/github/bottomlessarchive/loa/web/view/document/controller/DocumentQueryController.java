@@ -59,10 +59,10 @@ public class DocumentQueryController {
                                 "Images can only be rendered for documents that are in a PDF format.");
                     }
 
-                    try (final InputStream documentContent = vaultClientService.queryDocument(documentEntity)) {
+                    try (InputStream documentContent = vaultClientService.queryDocument(documentEntity)) {
                         return documentRenderer.renderFirstPage(documentContent);
                     } catch (IOException e) {
-                        throw new IllegalStateException("Failed to query document from vault!");
+                        throw new IllegalStateException("Failed to query document from vault!", e);
                     }
                 })
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Document not found with id " + documentId + "!"));
