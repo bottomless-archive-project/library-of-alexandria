@@ -7,7 +7,10 @@
 
     <rule ref="category/java/security.xml"/>
 
-    <rule ref="category/java/performance.xml"/>
+    <rule ref="category/java/performance.xml">
+        <!-- Too many false positives. -->
+        <exclude name="AvoidInstantiatingObjectsInLoops" />
+    </rule>
 
     <rule ref="category/java/multithreading.xml">
         <!-- Too many false positives. -->

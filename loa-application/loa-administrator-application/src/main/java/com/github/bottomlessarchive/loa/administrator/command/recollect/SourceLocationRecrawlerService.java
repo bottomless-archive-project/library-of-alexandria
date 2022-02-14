@@ -36,22 +36,18 @@ public class SourceLocationRecrawlerService {
 
         final StageLocation stageLocation = stageLocationFactory.getLocation(documentRecrawlId, documentEntity.getType());
 
-        try {
-            fileDownloadManager.downloadFile(sourceLocation, stageLocation.getPath());
+        fileDownloadManager.downloadFile(sourceLocation, stageLocation.getPath());
 
-            final boolean isValidDocument = documentFileValidator.isValidDocument(documentRecrawlId, documentEntity.getType());
+        final boolean isValidDocument = documentFileValidator.isValidDocument(documentRecrawlId, documentEntity.getType());
 
-            if (isValidDocument) {
-                try (InputStream content = stageLocation.openStream()) {
-                    vaultClientService.replaceCorruptDocument(documentEntity, content.readAllBytes());
-                } catch (IOException e) {
-                    throw new IllegalStateException("Failed to replace document!", e);
-                }
+        if (isValidDocument) {
+            try (InputStream content = stageLocation.openStream()) {
+                vaultClientService.replaceCorruptDocument(documentEntity, content.readAllBytes());
+            } catch (IOException e) {
+                throw new IllegalStateException("Failed to replace document!", e);
             }
-
-            stageLocation.cleanup();
-        } catch (final Exception e) {
-            log.debug("Error downloading a document: {}!", e.getMessage());
         }
+
+        stageLocation.cleanup();
     }
 }

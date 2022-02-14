@@ -13,7 +13,6 @@ import java.util.Map;
 public class DashboardDocumentStatisticsResponse {
 
     private final long documentCount;
-    private final List<DashboardStatisticsResponse> statistics;
     private final List<DashboardVaultStatisticsResponse> vaultInstances;
     private final List<DashboardQueueStatisticsResponse> queues;
     private final Map<DocumentType, Integer> documentCountByType;

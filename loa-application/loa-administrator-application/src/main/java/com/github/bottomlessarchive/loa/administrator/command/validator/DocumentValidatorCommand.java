@@ -37,7 +37,7 @@ public class DocumentValidatorCommand implements CommandLineRunner {
                         log.info("Processed: {} documents!", processed);
                     }
 
-                    try (final InputStream documentLocation = vaultClientService.queryDocument(documentEntity)) {
+                    try (InputStream documentLocation = vaultClientService.queryDocument(documentEntity)) {
                         documentDataParser.parseDocumentMetadata(documentEntity.getId(), documentEntity.getType(), documentLocation);
                     } catch (IOException e) {
                         log.error("Failed to close vault response!", e);

@@ -7,10 +7,8 @@ import com.github.bottomlessarchive.loa.document.service.domain.DocumentStatus;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentType;
 import com.github.bottomlessarchive.loa.document.service.entity.factory.DocumentEntityFactory;
 import com.github.bottomlessarchive.loa.queue.service.QueueManipulator;
-import com.github.bottomlessarchive.loa.statistics.service.entity.StatisticsEntityFactory;
 import com.github.bottomlessarchive.loa.web.view.document.response.dashboard.DashboardDocumentStatisticsResponse;
 import com.github.bottomlessarchive.loa.web.view.document.response.dashboard.DashboardQueueStatisticsResponse;
-import com.github.bottomlessarchive.loa.web.view.document.response.dashboard.DashboardStatisticsResponse;
 import com.github.bottomlessarchive.loa.web.view.document.response.dashboard.DashboardVaultStatisticsResponse;
 import com.github.bottomlessarchive.loa.queue.service.domain.Queue;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +16,6 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
-import java.time.Duration;
 import java.util.Arrays;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
@@ -30,7 +27,6 @@ public class DocumentStatisticsResponseFactory {
     private final ConductorClient conductorClient;
     private final QueueManipulator queueManipulator;
     private final DocumentEntityFactory documentEntityFactory;
-    private final StatisticsEntityFactory statisticsEntityFactory;
 
     public Mono<DashboardDocumentStatisticsResponse> newStatisticsResponse() {
         final DashboardDocumentStatisticsResponse.DashboardDocumentStatisticsResponseBuilder builder =
@@ -38,7 +34,6 @@ public class DocumentStatisticsResponseFactory {
 
         return Mono.when(
                         this.fillDocumentCount(builder),
-                        this.fillStatistics(builder),
                         this.fillQueues(builder),
                         this.fillDocumentCountByStatus(builder),
                         this.fillDocumentCountByType(builder),
@@ -51,21 +46,6 @@ public class DocumentStatisticsResponseFactory {
             final DashboardDocumentStatisticsResponse.DashboardDocumentStatisticsResponseBuilder builder) {
         return documentEntityFactory.getEstimatedDocumentCount()
                 .map(builder::documentCount)
-                .subscribeOn(Schedulers.boundedElastic())
-                .then();
-    }
-
-    private Mono<Void> fillStatistics(
-            final DashboardDocumentStatisticsResponse.DashboardDocumentStatisticsResponseBuilder builder) {
-        return statisticsEntityFactory.getStatisticsBetween(Duration.ofDays(1))
-                .map(statisticsEntity -> DashboardStatisticsResponse.builder()
-                        .createdAt(statisticsEntity.getCreatedAt())
-                        .documentCount(statisticsEntity.getDocumentCount())
-                        .documentLocationCount(statisticsEntity.getDocumentLocationCount())
-                        .build()
-                )
-                .collectList()
-                .map(builder::statistics)
                 .subscribeOn(Schedulers.boundedElastic())
                 .then();
     }

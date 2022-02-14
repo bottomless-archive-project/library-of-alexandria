@@ -7,14 +7,11 @@ import com.github.bottomlessarchive.loa.stage.service.domain.StageLocation;
 import com.github.bottomlessarchive.loa.url.service.downloader.FileDownloadManager;
 import com.github.bottomlessarchive.loa.validator.service.DocumentFileValidator;
 import com.github.bottomlessarchive.loa.vault.client.service.VaultClientService;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import reactor.core.publisher.Mono;
-import reactor.test.StepVerifier;
 
 import java.io.ByteArrayInputStream;
 import java.net.MalformedURLException;
@@ -53,8 +50,6 @@ class SourceLocationRecrawlerServiceTest {
                 .build();
 
         final StageLocation stageLocation = mock(StageLocation.class);
-        when(stageLocation.exists())
-                .thenReturn(Mono.just(true));
         when(stageLocationFactory.getLocation(any(), eq(DocumentType.PDF)))
                 .thenReturn(stageLocation);
 
@@ -72,6 +67,7 @@ class SourceLocationRecrawlerServiceTest {
         underTest.recrawlSourceLocation(sourceLocation, documentEntity);
 
         verify(stageLocation).cleanup();
+        verify(fileDownloadManager).downloadFile(sourceLocation, mockPath);
         verify(vaultClientService).replaceCorruptDocument(documentEntity, content);
     }
 }

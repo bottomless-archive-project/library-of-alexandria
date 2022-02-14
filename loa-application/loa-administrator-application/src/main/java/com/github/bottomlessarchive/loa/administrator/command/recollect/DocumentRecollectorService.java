@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -23,10 +24,21 @@ public class DocumentRecollectorService {
     public void recollectCorruptDocument(final DocumentEntity documentEntity) {
         log.info("Recollecting document entity: {}.", documentEntity);
 
-        documentEntity.getSourceLocations().stream()
+        final List<URL> sourceLocations = documentEntity.getSourceLocations().stream()
                 .flatMap(id -> documentLocationEntityFactory.getDocumentLocation(id).stream())
                 .map(this::convertToURL)
-                .forEach(sourceLocation -> sourceLocationRecrawlerService.recrawlSourceLocation(sourceLocation, documentEntity));
+                .toList();
+
+        for (URL location : sourceLocations) {
+            try {
+                sourceLocationRecrawlerService.recrawlSourceLocation(location, documentEntity);
+
+                // Downloading only until one of the recrawls is successful.
+                break;
+            } catch (final Exception e) {
+                log.debug("Failed to recrawl from location: " + location + "!", e);
+            }
+        }
     }
 
     private URL convertToURL(final DocumentLocation sourceLocation) {

@@ -44,7 +44,7 @@ public class IndexerCommand implements CommandLineRunner {
 
     @SneakyThrows
     private void processDocument(final DocumentEntity documentEntity) {
-        try (final InputStream documentContent = vaultClientService.queryDocument(documentEntity)) {
+        try (InputStream documentContent = vaultClientService.queryDocument(documentEntity)) {
             final ParsingResult documentMetadata = documentDataParser.parseDocumentMetadata(documentEntity.getId(),
                     documentEntity.getType(), documentContent);
 
