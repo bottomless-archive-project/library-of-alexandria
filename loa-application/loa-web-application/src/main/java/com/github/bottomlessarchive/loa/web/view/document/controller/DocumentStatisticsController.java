@@ -6,7 +6,6 @@ import com.github.bottomlessarchive.loa.web.view.document.response.DocumentStati
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Mono;
 
 @RestController
 @RequiredArgsConstructor
@@ -16,12 +15,10 @@ public class DocumentStatisticsController {
     private final DocumentSearchClient documentSearchClient;
 
     @GetMapping("/statistics")
-    public Mono<DocumentStatisticsResponse> documentStatistics() {
-        return documentEntityFactory.getEstimatedDocumentCount()
-                .map(count -> DocumentStatisticsResponse.builder()
-                        .documentCount(count)
-                        .indexedDocumentCount(documentSearchClient.countDocuments())
-                        .build()
-                );
+    public DocumentStatisticsResponse documentStatistics() {
+        return DocumentStatisticsResponse.builder()
+                .documentCount(documentEntityFactory.getEstimatedDocumentCount())
+                .indexedDocumentCount(documentSearchClient.countDocuments())
+                .build();
     }
 }

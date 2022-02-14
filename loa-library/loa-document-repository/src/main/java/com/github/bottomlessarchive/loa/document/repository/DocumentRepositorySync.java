@@ -1,17 +1,27 @@
 package com.github.bottomlessarchive.loa.document.repository;
 
 import com.github.bottomlessarchive.loa.document.repository.domain.DocumentDatabaseEntity;
+import com.github.bottomlessarchive.loa.document.repository.domain.DocumentStatusAggregateEntity;
+import com.github.bottomlessarchive.loa.document.repository.domain.DocumentTypeAggregateEntity;
 import com.github.bottomlessarchive.loa.repository.configuration.RepositoryConfigurationProperties;
 import com.github.bottomlessarchive.loa.repository.service.HexConverter;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Updates;
 import lombok.RequiredArgsConstructor;
+import org.bson.conversions.Bson;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
+import static com.mongodb.client.model.Accumulators.sum;
+import static com.mongodb.client.model.Aggregates.group;
 import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Updates.set;
@@ -77,5 +87,25 @@ public class DocumentRepositorySync {
                 // We don't want to have the cursor closed while processing. It would be a better idea to set
                 // a maximum timeout in milliseconds but that only configurable on the server side.
                 .noCursorTimeout(repositoryConfigurationProperties.noCursorTimeout());
+    }
+
+    public long estimateCount() {
+        return documentDatabaseEntityMongoCollection.estimatedDocumentCount();
+    }
+
+    public Map<String, Integer> countByType() {
+        final List<Bson> countByStatusAggregate = Collections.singletonList(group("$type", sum("count", 1L)));
+
+        return StreamSupport.stream(documentDatabaseEntityMongoCollection.aggregate(countByStatusAggregate,
+                        DocumentTypeAggregateEntity.class).spliterator(), false)
+                .collect(Collectors.toMap(DocumentTypeAggregateEntity::getId, DocumentTypeAggregateEntity::getCount));
+    }
+
+    public Map<String, Integer> countByStatus() {
+        final List<Bson> countByStatusAggregate = Collections.singletonList(group("$status", sum("count", 1L)));
+
+        return StreamSupport.stream(documentDatabaseEntityMongoCollection.aggregate(countByStatusAggregate,
+                        DocumentStatusAggregateEntity.class).spliterator(), false)
+                .collect(Collectors.toMap(DocumentStatusAggregateEntity::getId, DocumentStatusAggregateEntity::getCount));
     }
 }

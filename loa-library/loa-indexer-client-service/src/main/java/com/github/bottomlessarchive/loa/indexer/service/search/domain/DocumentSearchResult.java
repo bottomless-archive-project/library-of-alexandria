@@ -2,7 +2,8 @@ package com.github.bottomlessarchive.loa.indexer.service.search.domain;
 
 import lombok.Builder;
 import lombok.Getter;
-import reactor.core.publisher.Flux;
+
+import java.util.List;
 
 /**
  * Contains the result of a document search in the indexer repository.
@@ -12,5 +13,5 @@ import reactor.core.publisher.Flux;
 public class DocumentSearchResult {
 
     private final long totalHitCount;
-    private final Flux<DocumentSearchEntity> searchHits;
+    private final List<DocumentSearchEntity> searchHits;
 }

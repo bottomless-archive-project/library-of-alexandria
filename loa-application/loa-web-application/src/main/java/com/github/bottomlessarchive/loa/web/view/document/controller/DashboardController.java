@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/dashboard")
@@ -16,7 +15,7 @@ public class DashboardController {
     private final DocumentStatisticsResponseFactory documentStatisticsResponseFactory;
 
     @GetMapping("/statistics")
-    public Mono<DashboardDocumentStatisticsResponse> documentStatistics() {
+    public DashboardDocumentStatisticsResponse documentStatistics() {
         return documentStatisticsResponseFactory.newStatisticsResponse();
     }
 }

@@ -11,7 +11,6 @@ import com.github.bottomlessarchive.loa.document.service.domain.DocumentType;
 import com.github.bottomlessarchive.loa.document.service.entity.transformer.DocumentEntityTransformer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.Instant;
@@ -76,38 +75,18 @@ public class DocumentEntityFactory {
      *
      * @return all documents available in the database
      */
-    public Flux<DocumentEntity> getDocumentEntities() {
-        return documentRepository.findAll()
-                .map(documentEntityTransformer::transform);
-    }
-
-    /**
-     * Return all documents available in the database.
-     *
-     * @return all documents available in the database
-     */
     public Stream<DocumentEntity> getDocumentEntitiesSync() {
         return StreamSupport.stream(documentRepositorySync.findAll().spliterator(), false)
                 .map(documentEntityTransformer::transform);
     }
 
     /**
-     * Return the number of documents available in the database.
-     *
-     * @return the count of documents available in the database
-     */
-    public Mono<Long> getDocumentCount() {
-        return documentRepository.count();
-    }
-
-    /**
-     * Return the approximate number of documents available in the database. It is much faster than
-     * {@link #getDocumentCount()} but not accurate.
+     * Return the approximate number of documents available in the database.
      *
      * @return the approximate count of documents available in the database
      */
-    public Mono<Long> getEstimatedDocumentCount() {
-        return documentRepository.estimateCount();
+    public long getEstimatedDocumentCount() {
+        return documentRepositorySync.estimateCount();
     }
 
     /**
@@ -115,12 +94,9 @@ public class DocumentEntityFactory {
      *
      * @return the count of documents grouped by status
      */
-    public Mono<Map<DocumentStatus, Integer>> getCountByStatus() {
-        return documentRepository.countByStatus()
-                .map(result -> result.entrySet().stream()
-                        .collect(Collectors.toMap(entry ->
-                                DocumentStatus.valueOf(entry.getKey()), Map.Entry::getValue))
-                );
+    public Map<DocumentStatus, Integer> getCountByStatus() {
+        return documentRepositorySync.countByStatus().entrySet().stream()
+                .collect(Collectors.toMap(entry -> DocumentStatus.valueOf(entry.getKey()), Map.Entry::getValue));
     }
 
     /**
@@ -128,12 +104,9 @@ public class DocumentEntityFactory {
      *
      * @return the count of documents grouped by type
      */
-    public Mono<Map<DocumentType, Integer>> getCountByType() {
-        return documentRepository.countByType()
-                .map(result -> result.entrySet().stream()
-                        .collect(Collectors.toMap(entry ->
-                                DocumentType.valueOf(entry.getKey()), Map.Entry::getValue))
-                );
+    public Map<DocumentType, Integer> getCountByType() {
+        return documentRepositorySync.countByType().entrySet().stream()
+                .collect(Collectors.toMap(entry -> DocumentType.valueOf(entry.getKey()), Map.Entry::getValue));
     }
 
     /**
