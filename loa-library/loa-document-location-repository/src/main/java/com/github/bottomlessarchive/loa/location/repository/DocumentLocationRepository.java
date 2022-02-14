@@ -2,10 +2,11 @@ package com.github.bottomlessarchive.loa.location.repository;
 
 import com.github.bottomlessarchive.loa.location.repository.domain.DocumentLocationDatabaseEntity;
 import com.mongodb.MongoWriteException;
-import com.mongodb.reactivestreams.client.MongoCollection;
+import com.mongodb.client.MongoCollection;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Mono;
+
+import java.util.Optional;
 
 import static com.mongodb.client.model.Filters.eq;
 
@@ -17,22 +18,21 @@ public class DocumentLocationRepository {
 
     private final MongoCollection<DocumentLocationDatabaseEntity> documentLocationDatabaseEntityMongoCollection;
 
-    public Mono<DocumentLocationDatabaseEntity> getById(final byte[] id) {
-        return Mono.from(documentLocationDatabaseEntityMongoCollection.find(eq("_id", id)));
+    public Optional<DocumentLocationDatabaseEntity> getById(final byte[] id) {
+        return Optional.ofNullable(documentLocationDatabaseEntityMongoCollection.find(eq("_id", id)).first());
     }
 
-    public Mono<Boolean> existsOrInsert(final DocumentLocationDatabaseEntity documentLocationDatabaseEntity) {
-        return Mono.from(documentLocationDatabaseEntityMongoCollection.insertOne(documentLocationDatabaseEntity))
-                .map(result -> Boolean.FALSE)
-                .onErrorReturn(this::isDuplicateDocumentIdError, Boolean.TRUE);
-    }
+    public boolean existsOrInsert(final DocumentLocationDatabaseEntity documentLocationDatabaseEntity) {
+        try {
+            documentLocationDatabaseEntityMongoCollection.insertOne(documentLocationDatabaseEntity);
 
-    public Mono<Long> count() {
-        return Mono.from(documentLocationDatabaseEntityMongoCollection.countDocuments());
-    }
+            return false;
+        } catch (final MongoWriteException e) {
+            if (e.getError().getCode() == DUPLICATE_DOCUMENT_ID_ERROR_CODE) {
+                return true;
+            }
 
-    private boolean isDuplicateDocumentIdError(final Throwable throwable) {
-        return throwable instanceof MongoWriteException mongoWriteException
-                && mongoWriteException.getError().getCode() == DUPLICATE_DOCUMENT_ID_ERROR_CODE;
+            throw e;
+        }
     }
 }

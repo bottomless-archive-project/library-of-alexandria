@@ -1,9 +1,9 @@
 package com.github.bottomlessarchive.loa.downloader.service.source.folder;
 
-import com.github.bottomlessarchive.loa.downloader.service.source.configuration.DownloaderFolderSourceConfiguration;
-import com.github.bottomlessarchive.loa.location.domain.link.UrlLink;
 import com.github.bottomlessarchive.loa.downloader.service.document.DocumentLocationProcessor;
+import com.github.bottomlessarchive.loa.downloader.service.source.configuration.DownloaderFolderSourceConfiguration;
 import com.github.bottomlessarchive.loa.location.domain.DocumentLocation;
+import com.github.bottomlessarchive.loa.location.domain.link.UrlLink;
 import com.github.bottomlessarchive.loa.source.configuration.DocumentSourceConfiguration;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -11,9 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -34,28 +31,22 @@ public class DocumentFolderReader implements CommandLineRunner {
     public void run(final String... args) {
         final Path sourceFolder = Path.of(downloaderFolderSourceConfiguration.getLocation());
 
-        Flux.fromStream(Files.list(sourceFolder))
-                .publishOn(Schedulers.boundedElastic())
-                .flatMap(path -> documentLocationProcessor.processDocumentLocation(buildDocumentSourceItem(path))
-                        .then(
-                                Mono.just(path)
-                                        .flatMap(path1 -> {
-                                            if (downloaderFolderSourceConfiguration.isShouldRemove()) {
-                                                try {
-                                                    log.debug("Deleting file at: {}.", path1);
+        Files.list(sourceFolder)
+                .forEach(path -> {
+                    documentLocationProcessor.processDocumentLocation(buildDocumentSourceItem(path));
 
-                                                    Files.deleteIfExists(path1);
-                                                } catch (final IOException e) {
-                                                    log.error("Failed to delete source file!", e);
-                                                }
-                                            }
+                    if (downloaderFolderSourceConfiguration.isShouldRemove()) {
+                        try {
+                            log.debug("Deleting file at: {}.", path);
 
-                                            return Mono.empty();
-                                        })
-                        )
-                )
-                .doFinally(result -> log.info("Finished processing the folder."))
-                .subscribe();
+                            Files.deleteIfExists(path);
+                        } catch (final IOException e) {
+                            log.error("Failed to delete source file!", e);
+                        }
+                    }
+                });
+
+        log.info("Finished processing the folder.");
     }
 
     @SneakyThrows

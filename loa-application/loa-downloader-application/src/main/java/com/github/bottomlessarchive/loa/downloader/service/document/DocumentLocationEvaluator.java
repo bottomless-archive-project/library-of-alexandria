@@ -6,7 +6,6 @@ import com.github.bottomlessarchive.loa.downloader.service.DocumentLocationCreat
 import com.github.bottomlessarchive.loa.location.domain.DocumentLocation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Mono;
 
 @Service
 @RequiredArgsConstructor
@@ -15,12 +14,10 @@ public class DocumentLocationEvaluator {
     private final DocumentLocationEntityFactory documentLocationEntityFactory;
     private final DocumentLocationCreationContextFactory documentLocationCreationContextFactory;
 
-    public Mono<DocumentLocation> evaluateDocumentLocation(final DocumentLocation documentLocation) {
+    public boolean shouldProcessDocumentLocation(final DocumentLocation documentLocation) {
         final DocumentLocationCreationContext documentLocationCreationContext =
                 documentLocationCreationContextFactory.newCreatingContext(documentLocation);
 
-        return documentLocationEntityFactory.isDocumentLocationExistsOrCreate(documentLocationCreationContext)
-                .filter(exists -> !exists)
-                .map(result -> documentLocation);
+        return !documentLocationEntityFactory.isDocumentLocationExistsOrCreate(documentLocationCreationContext);
     }
 }

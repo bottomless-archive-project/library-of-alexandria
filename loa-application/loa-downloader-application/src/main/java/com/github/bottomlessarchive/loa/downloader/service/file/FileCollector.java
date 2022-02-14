@@ -19,18 +19,14 @@ public class FileCollector {
 
     private final FileDownloadManager fileDownloadManager;
 
-    public Mono<Path> acquireFile(final URL fileLocation, final Path resultLocation) {
+    public void acquireFile(final URL fileLocation, final Path resultLocation) {
         final String protocol = fileLocation.getProtocol();
 
         if ("http".equals(protocol) || "https".equals(protocol)) {
-            return fileDownloadManager.downloadFile(fileLocation, resultLocation);
+            fileDownloadManager.downloadFile(fileLocation, resultLocation);
         } else if ("file".equals(protocol)) {
             copyFile(fileLocation, resultLocation);
-
-            return Mono.just(resultLocation);
         }
-
-        return Mono.empty();
     }
 
     @SneakyThrows

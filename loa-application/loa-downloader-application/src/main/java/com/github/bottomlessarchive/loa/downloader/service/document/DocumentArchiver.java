@@ -26,7 +26,7 @@ public class DocumentArchiver {
     @Qualifier("archivedDocumentCount")
     private final Counter archivedDocumentCount;
 
-    public Mono<DocumentArchivingContext> archiveDocument(final DocumentArchivingContext documentArchivingContext) {
+    public void archiveDocument(final DocumentArchivingContext documentArchivingContext) {
         try (InputStream documentContent = Files.newInputStream(documentArchivingContext.getContents())) {
             archivedDocumentCount.increment();
 
@@ -41,8 +41,6 @@ public class DocumentArchiver {
         } catch (final IOException e) {
             throw new ArchivingException("Failed to send document for archiving!", e);
         }
-
-        return Mono.just(documentArchivingContext);
     }
 
     private DocumentArchivingMessage newDocumentArchivingMessage(final DocumentArchivingContext documentArchivingContext,

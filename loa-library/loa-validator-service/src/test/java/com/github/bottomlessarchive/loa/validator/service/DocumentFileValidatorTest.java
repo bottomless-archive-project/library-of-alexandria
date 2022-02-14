@@ -6,18 +6,16 @@ import com.github.bottomlessarchive.loa.parser.service.DocumentDataParser;
 import com.github.bottomlessarchive.loa.stage.service.StageLocationFactory;
 import com.github.bottomlessarchive.loa.stage.service.domain.StageLocation;
 import com.github.bottomlessarchive.loa.validator.configuration.FileValidationConfigurationProperties;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import reactor.core.publisher.Mono;
-import reactor.test.StepVerifier;
 
 import java.io.InputStream;
 import java.util.UUID;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -46,14 +44,13 @@ class DocumentFileValidatorTest {
         final StageLocation stageLocation = mock(StageLocation.class);
 
         when(stageLocationFactory.getLocation(DOCUMENT_ID.toString(), DOCUMENT_TYPE))
-                .thenReturn(Mono.just(stageLocation));
-        when(stageLocation.size()).thenReturn(Mono.just(0L));
+                .thenReturn(stageLocation);
+        when(stageLocation.size())
+                .thenReturn(0L);
 
-        final Mono<Boolean> result = underTest.isValidDocument(DOCUMENT_ID.toString(), DOCUMENT_TYPE);
+        final boolean result = underTest.isValidDocument(DOCUMENT_ID.toString(), DOCUMENT_TYPE);
 
-        StepVerifier.create(result)
-                .consumeNextWith(Assertions::assertFalse)
-                .verifyComplete();
+        assertThat(result).isFalse();
     }
 
     @Test
@@ -61,15 +58,15 @@ class DocumentFileValidatorTest {
         final StageLocation stageLocation = mock(StageLocation.class);
 
         when(stageLocationFactory.getLocation(DOCUMENT_ID.toString(), DOCUMENT_TYPE))
-                .thenReturn(Mono.just(stageLocation));
-        when(stageLocation.size()).thenReturn(Mono.just(MAX_FILE_SIZE_IN_BYTES + 1));
-        when(fileValidationConfigurationProperties.maximumArchiveSize()).thenReturn(MAX_FILE_SIZE_IN_BYTES);
+                .thenReturn(stageLocation);
+        when(stageLocation.size())
+                .thenReturn(MAX_FILE_SIZE_IN_BYTES + 1);
+        when(fileValidationConfigurationProperties.maximumArchiveSize())
+                .thenReturn(MAX_FILE_SIZE_IN_BYTES);
 
-        final Mono<Boolean> result = underTest.isValidDocument(DOCUMENT_ID.toString(), DOCUMENT_TYPE);
+        final boolean result = underTest.isValidDocument(DOCUMENT_ID.toString(), DOCUMENT_TYPE);
 
-        StepVerifier.create(result)
-                .consumeNextWith(Assertions::assertFalse)
-                .verifyComplete();
+        assertThat(result).isFalse();
     }
 
     @Test
@@ -77,20 +74,20 @@ class DocumentFileValidatorTest {
         final StageLocation stageLocation = mock(StageLocation.class);
 
         when(stageLocationFactory.getLocation(DOCUMENT_ID.toString(), DOCUMENT_TYPE))
-                .thenReturn(Mono.just(stageLocation));
-        when(stageLocation.size()).thenReturn(Mono.just(MAX_FILE_SIZE_IN_BYTES - 1));
-        when(fileValidationConfigurationProperties.maximumArchiveSize()).thenReturn(MAX_FILE_SIZE_IN_BYTES);
+                .thenReturn(stageLocation);
+        when(stageLocation.size())
+                .thenReturn(MAX_FILE_SIZE_IN_BYTES - 1);
+        when(fileValidationConfigurationProperties.maximumArchiveSize())
+                .thenReturn(MAX_FILE_SIZE_IN_BYTES);
 
         final InputStream documentInputStream = mock(InputStream.class);
         when(stageLocation.openStream()).thenReturn(documentInputStream);
         when(documentDataParser.parseDocumentMetadata(DOCUMENT_ID, DOCUMENT_TYPE, documentInputStream))
                 .thenThrow(new RuntimeException("Some error!"));
 
-        final Mono<Boolean> result = underTest.isValidDocument(DOCUMENT_ID.toString(), DOCUMENT_TYPE);
+        final boolean result = underTest.isValidDocument(DOCUMENT_ID.toString(), DOCUMENT_TYPE);
 
-        StepVerifier.create(result)
-                .consumeNextWith(Assertions::assertFalse)
-                .verifyComplete();
+        assertThat(result).isFalse();
         verify(documentDataParser).parseDocumentMetadata(DOCUMENT_ID, DOCUMENT_TYPE, documentInputStream);
     }
 
@@ -99,9 +96,11 @@ class DocumentFileValidatorTest {
         final StageLocation stageLocation = mock(StageLocation.class);
 
         when(stageLocationFactory.getLocation(DOCUMENT_ID.toString(), DOCUMENT_TYPE))
-                .thenReturn(Mono.just(stageLocation));
-        when(stageLocation.size()).thenReturn(Mono.just(MAX_FILE_SIZE_IN_BYTES - 1));
-        when(fileValidationConfigurationProperties.maximumArchiveSize()).thenReturn(MAX_FILE_SIZE_IN_BYTES);
+                .thenReturn(stageLocation);
+        when(stageLocation.size())
+                .thenReturn(MAX_FILE_SIZE_IN_BYTES - 1);
+        when(fileValidationConfigurationProperties.maximumArchiveSize())
+                .thenReturn(MAX_FILE_SIZE_IN_BYTES);
 
         final InputStream documentInputStream = mock(InputStream.class);
         when(stageLocation.openStream()).thenReturn(documentInputStream);
@@ -111,10 +110,8 @@ class DocumentFileValidatorTest {
                                 .build()
                 );
 
-        final Mono<Boolean> result = underTest.isValidDocument(DOCUMENT_ID.toString(), DOCUMENT_TYPE);
+        final boolean result = underTest.isValidDocument(DOCUMENT_ID.toString(), DOCUMENT_TYPE);
 
-        StepVerifier.create(result)
-                .consumeNextWith(Assertions::assertTrue)
-                .verifyComplete();
+        assertThat(result).isTrue();
     }
 }

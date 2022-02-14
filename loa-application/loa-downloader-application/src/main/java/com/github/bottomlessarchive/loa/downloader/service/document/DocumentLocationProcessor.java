@@ -13,8 +13,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 
 import java.net.URL;
 import java.util.Optional;
@@ -37,7 +35,7 @@ public class DocumentLocationProcessor {
     @Qualifier("processedDocumentCount")
     private final Counter processedDocumentCount;
 
-    public Mono<Void> processDocumentLocation(final DocumentLocation documentLocation) {
+    public void processDocumentLocation(final DocumentLocation documentLocation) {
         processedDocumentCount.increment();
 
         final URL documentLocationURL = documentLocation.getLocation().toUrl().orElseThrow();
@@ -47,53 +45,39 @@ public class DocumentLocationProcessor {
             log.error("Invalid document location found: {}! This shouldn't normally happen! Please report it to the developers!",
                     documentLocation);
 
-            return Mono.empty();
+            return;
         }
 
         final DocumentType documentType = documentTypeOptional.get();
 
         log.debug("Starting to download document {}.", documentLocationURL);
 
-        return Mono.just(UUID.randomUUID())
-                .flatMap(documentId -> stageLocationFactory.getLocation(documentId.toString(), documentType)
-                        .flatMap(stageFileLocation -> acquireFile(documentLocationURL, stageFileLocation))
-                        .publishOn(Schedulers.parallel())
-                        .flatMap(documentFileLocation -> documentFileValidator.isValidDocument(documentId.toString(), documentType)
-                                .filter(validationResult -> !validationResult)
-                                .flatMap(validationResult -> documentFileLocation.cleanup())
-                                .thenReturn(documentFileLocation)
-                        )
-                        .publishOn(Schedulers.boundedElastic())
-                        .filterWhen(StageLocation::exists)
-                        .flatMap(stageLocation -> Mono.just(
-                                DocumentArchivingContext.builder()
-                                        .id(documentId)
-                                        .type(documentType)
-                                        .source(documentLocation.getSourceName())
-                                        .sourceLocationId(documentLocation.getId())
-                                        .contents(stageLocation.getPath())
-                                        .build()
-                                )
-                        )
-                        .flatMap(documentArchiver::archiveDocument)
-                        .flatMap(this::cleanup)
-                        .onErrorResume(error -> {
-                            if (log.isDebugEnabled()) {
-                                log.debug("Error downloading a document: {}!", error.getMessage());
-                            }
+        final UUID documentId = UUID.randomUUID();
 
-                            return Mono.empty();
-                        })
-                );
+        final StageLocation stageLocation = stageLocationFactory.getLocation(documentId.toString(), documentType);
+
+        try {
+            acquireFile(documentLocationURL, stageLocation);
+
+            if (documentFileValidator.isValidDocument(documentId.toString(), documentType)) {
+                final DocumentArchivingContext documentArchivingContext = DocumentArchivingContext.builder()
+                        .id(documentId)
+                        .type(documentType)
+                        .source(documentLocation.getSourceName())
+                        .sourceLocationId(documentLocation.getId())
+                        .contents(stageLocation.getPath())
+                        .build();
+
+                documentArchiver.archiveDocument(documentArchivingContext);
+            }
+        } catch (final Exception e) {
+            log.debug("Error downloading a document: {}!", e.getMessage());
+        }
+
+        stageLocation.cleanup();
     }
 
-    private Mono<StageLocation> acquireFile(final URL documentLocation, final StageLocation stageLocation) {
-        return fileCollector.acquireFile(documentLocation, stageLocation.getPath())
-                .thenReturn(stageLocation);
-    }
-
-    private Mono<Void> cleanup(final DocumentArchivingContext documentArchivingContext) {
-        return stageLocationFactory.getLocation(documentArchivingContext.getId().toString(), documentArchivingContext.getType())
-                .flatMap(StageLocation::cleanup);
+    private void acquireFile(final URL documentLocation, final StageLocation stageLocation) {
+        fileCollector.acquireFile(documentLocation, stageLocation.getPath());
     }
 }

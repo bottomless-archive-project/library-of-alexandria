@@ -56,28 +56,20 @@ class SourceLocationRecrawlerServiceTest {
         when(stageLocation.exists())
                 .thenReturn(Mono.just(true));
         when(stageLocationFactory.getLocation(any(), eq(DocumentType.PDF)))
-                .thenReturn(Mono.just(stageLocation));
+                .thenReturn(stageLocation);
 
         final Path mockPath = mock(Path.class);
         when(stageLocation.getPath())
                 .thenReturn(mockPath);
-        when(fileDownloadManager.downloadFile(sourceLocation, mockPath))
-                .thenReturn(Mono.just(mockPath));
 
         when(documentFileValidator.isValidDocument(any(), eq(DocumentType.PDF)))
-                .thenReturn(Mono.just(true));
+                .thenReturn(true);
 
         final byte[] content = {1, 2, 3};
         when(stageLocation.openStream())
                 .thenReturn(new ByteArrayInputStream(content));
-        when(vaultClientService.replaceCorruptDocument(documentEntity, content))
-                .thenReturn(Mono.empty());
 
-        final Mono<DocumentEntity> result = underTest.recrawlSourceLocation(sourceLocation, documentEntity);
-
-        StepVerifier.create(result)
-                .consumeNextWith(localDocumentEntity -> Assertions.assertEquals(documentEntity, localDocumentEntity))
-                .verifyComplete();
+        underTest.recrawlSourceLocation(sourceLocation, documentEntity);
 
         verify(stageLocation).cleanup();
         verify(vaultClientService).replaceCorruptDocument(documentEntity, content);

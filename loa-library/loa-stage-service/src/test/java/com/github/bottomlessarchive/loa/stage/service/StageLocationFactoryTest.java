@@ -32,8 +32,7 @@ class StageLocationFactoryTest {
         when(stageConfigurationProperties.location())
                 .thenReturn("testlocation");
 
-        final StageLocation result = underTest.getLocation(TEST_DOCUMENT_ID, DocumentType.PDF)
-                .block();
+        final StageLocation result = underTest.getLocation(TEST_DOCUMENT_ID, DocumentType.PDF);
 
         assertThat(result.getPath().toString(), is(TEST_LOCATION + FileSystems.getDefault().getSeparator()
                 + TEST_DOCUMENT_ID + ".pdf"));
