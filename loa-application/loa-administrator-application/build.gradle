@@ -24,7 +24,6 @@ bootBuildImage {
 
 dependencies {
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-json'
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-webflux'
 
     implementation group: 'org.elasticsearch.client', name: 'elasticsearch-rest-high-level-client'
 
