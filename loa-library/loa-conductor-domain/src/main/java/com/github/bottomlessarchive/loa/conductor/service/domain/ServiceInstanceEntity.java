@@ -60,8 +60,6 @@ public class ServiceInstanceEntity {
     }
 
     public boolean isHealthy() {
-        final Instant healthyUntil = Instant.now().minus(2, ChronoUnit.MINUTES);
-
-        return lastHeartbeat.isBefore(healthyUntil);
+        return lastHeartbeat.plus(2, ChronoUnit.MINUTES).isAfter(Instant.now());
     }
 }
