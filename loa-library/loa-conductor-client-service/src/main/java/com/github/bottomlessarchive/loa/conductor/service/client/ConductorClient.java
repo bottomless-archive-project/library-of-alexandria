@@ -1,5 +1,6 @@
 package com.github.bottomlessarchive.loa.conductor.service.client;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.bottomlessarchive.loa.application.domain.ApplicationType;
 import com.github.bottomlessarchive.loa.conductor.service.NetworkAddressCalculator;
 import com.github.bottomlessarchive.loa.conductor.service.client.configuration.ConductorClientConfigurationProperties;
@@ -13,16 +14,17 @@ import com.github.bottomlessarchive.loa.conductor.service.client.response.Servic
 import com.github.bottomlessarchive.loa.conductor.service.domain.ServiceInstanceEntity;
 import com.github.bottomlessarchive.loa.conductor.service.domain.ServiceInstanceEntityProperty;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.BodyInserters;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -32,44 +34,53 @@ import java.util.stream.Collectors;
 public class ConductorClient {
 
     @Qualifier("conductorWebClient")
-    private final WebClient webClient;
+    private final OkHttpClient okHttpClient;
 
+    private final ObjectMapper objectMapper;
     private final NetworkAddressCalculator networkAddressCalculator;
     private final ConductorClientConfigurationProperties conductorClientConfigurationProperties;
     private final List<InstancePropertyExtensionProvider> instancePropertyExtensionProviderList;
 
-    public Mono<ServiceInstanceEntity> getInstance(final ApplicationType applicationType) {
-        return getInstances(applicationType)
-                .next();
+    public Optional<ServiceInstanceEntity> getInstance(final ApplicationType applicationType) {
+        return getInstances(applicationType).stream()
+                .findFirst();
     }
 
-    public Flux<ServiceInstanceEntity> getInstances(final ApplicationType applicationType) {
-        return webClient.get()
-                .uri(conductorClientConfigurationProperties.getUrl() + "/service/" + convertApplicationTypeToPath(applicationType))
-                .retrieve()
-                .bodyToFlux(ServiceResponse.class)
-                .flatMap(response -> Flux.fromIterable(response.getInstances())
-                        .map(instance -> ServiceInstanceEntity.builder()
-                                .id(instance.getId())
-                                .location(instance.getLocation())
-                                .port(instance.getPort())
-                                .applicationType(response.getApplicationType())
-                                .properties(instance.getProperties().stream()
-                                        .map(serviceInstancePropertyResponse -> ServiceInstanceEntityProperty.builder()
-                                                .name(serviceInstancePropertyResponse.getName())
-                                                .value(serviceInstancePropertyResponse.getValue())
-                                                .build()
-                                        )
-                                        .collect(Collectors.toMap(
-                                                ServiceInstanceEntityProperty::getName, ServiceInstanceEntityProperty::getValue))
+    @SneakyThrows //TODO: Use ConductorClientException instead
+    public List<ServiceInstanceEntity> getInstances(final ApplicationType applicationType) {
+        final Request request = new Request.Builder()
+                .url(conductorClientConfigurationProperties.getUrl() + "/service/" + convertApplicationTypeToPath(applicationType))
+                .get()
+                .build();
+
+        final String response = okHttpClient.newCall(request)
+                .execute()
+                .body()
+                .string();
+
+        return objectMapper.readValue(response, ServiceResponse.class).getInstances().stream()
+                .map(instance -> ServiceInstanceEntity.builder()
+                        .id(instance.getId())
+                        .location(instance.getLocation())
+                        .port(instance.getPort())
+                        .applicationType(applicationType)
+                        .properties(instance.getProperties().stream()
+                                .map(serviceInstancePropertyResponse -> ServiceInstanceEntityProperty.builder()
+                                        .name(serviceInstancePropertyResponse.getName())
+                                        .value(serviceInstancePropertyResponse.getValue())
+                                        .build()
                                 )
-                                .lastHeartbeat(instance.getLastHeartbeat())
-                                .build()
+                                .collect(Collectors.toMap(
+                                        ServiceInstanceEntityProperty::getName, ServiceInstanceEntityProperty::getValue))
                         )
-                );
+                        .lastHeartbeat(instance.getLastHeartbeat())
+                        .build()
+                )
+                .toList();
     }
 
-    public Mono<UUID> registerInstance(final ApplicationType applicationType) {
+    @SneakyThrows //TODO: Use ConductorClientException instead
+    public UUID registerInstance(final ApplicationType applicationType) {
         final String hostAddress = networkAddressCalculator.calculateInetAddress().getHostAddress();
 
         final InstanceExtensionContext instanceRegistrationContext = new InstanceExtensionContext();
@@ -93,15 +104,23 @@ public class ConductorClient {
         log.info("Registering service {} with host address: {} and port: {} into the Conductor Application.", applicationType, hostAddress,
                 conductorClientConfigurationProperties.applicationPort());
 
-        return webClient.post()
-                .uri(conductorClientConfigurationProperties.getUrl() + "/service/" + convertApplicationTypeToPath(applicationType))
-                .body(BodyInserters.fromValue(serviceInstanceRegistrationRequest))
-                .retrieve()
-                .bodyToMono(ServiceInstanceRegistrationResponse.class)
-                .map(ServiceInstanceRegistrationResponse::getId);
+
+        final Request request = new Request.Builder()
+                .url(conductorClientConfigurationProperties.getUrl() + "/service/" + convertApplicationTypeToPath(applicationType))
+                .post(RequestBody.create(objectMapper.writeValueAsBytes(serviceInstanceRegistrationRequest)))
+                .build();
+
+        final String response = okHttpClient.newCall(request)
+                .execute()
+                .body()
+                .string();
+
+        return objectMapper.readValue(response, ServiceInstanceRegistrationResponse.class)
+                .getId();
     }
 
-    public Mono<Void> refreshInstance(final UUID instanceId, final ApplicationType applicationType) {
+    @SneakyThrows //TODO: Use ConductorClientException instead
+    public void refreshInstance(final UUID instanceId, final ApplicationType applicationType) {
         log.info("Refreshing application instance type: {} with instanceId: {} in the Conductor Application.",
                 applicationType, instanceId);
 
@@ -125,13 +144,16 @@ public class ConductorClient {
                 )
                 .build();
 
-        return webClient.put()
-                .uri(conductorClientConfigurationProperties.getUrl() + "/service/" + convertApplicationTypeToPath(applicationType)
+
+        final Request request = new Request.Builder()
+                .url(conductorClientConfigurationProperties.getUrl() + "/service/" + convertApplicationTypeToPath(applicationType)
                         + "/" + instanceId)
-                .body(BodyInserters.fromValue(serviceInstanceRefreshRequest))
-                .retrieve()
-                .bodyToMono(Void.class)
-                .then();
+                .put(RequestBody.create(objectMapper.writeValueAsBytes(serviceInstanceRefreshRequest)))
+                .build();
+
+        okHttpClient.newCall(request)
+                .execute()
+                .close();
     }
 
     private String convertApplicationTypeToPath(final ApplicationType applicationType) {

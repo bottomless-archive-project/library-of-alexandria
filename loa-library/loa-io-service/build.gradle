@@ -1,5 +1,5 @@
 dependencies {
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-webflux'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter'
     implementation group: 'io.projectreactor.addons', name: 'reactor-extra'
 
     implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.9.3'

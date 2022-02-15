@@ -1,7 +1,7 @@
 dependencies {
-    api group: 'io.projectreactor', name: 'reactor-core'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-json'
 
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-webflux'
+    implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.9.3'
 
     api project(':loa-library:loa-conductor-domain')
 }

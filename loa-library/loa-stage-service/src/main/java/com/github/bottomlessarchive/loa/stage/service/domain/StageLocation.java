@@ -4,7 +4,6 @@ import com.github.bottomlessarchive.loa.stage.service.domain.exception.StageAcce
 import lombok.Builder;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,15 +19,6 @@ import java.nio.file.Path;
 public class StageLocation {
 
     private final Path path;
-
-    /**
-     * Return if the stage location already exists.
-     *
-     * @return true if the location exists, false otherwise
-     */
-    public Mono<Boolean> exists() {
-        return Mono.fromSupplier(() -> Files.exists(path));
-    }
 
     /**
      * Return the size of the content at the stage location.
@@ -58,8 +48,6 @@ public class StageLocation {
 
     /**
      * Removes the content of the stage location.
-     *
-     * @return result of the operation
      */
     public void cleanup() {
         try {

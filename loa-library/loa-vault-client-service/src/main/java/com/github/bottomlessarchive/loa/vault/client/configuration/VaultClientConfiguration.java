@@ -35,9 +35,7 @@ public class VaultClientConfiguration {
 
         while (serviceInstanceEntities == null) {
             final List<ServiceInstanceEntity> serviceInstanceEntitiesResponse = conductorClient.getInstances(
-                            ApplicationType.VAULT_APPLICATION)
-                    .collect(Collectors.toList())
-                    .block();
+                            ApplicationType.VAULT_APPLICATION);
 
             if (serviceInstanceEntitiesResponse == null || serviceInstanceEntitiesResponse.isEmpty()) {
                 log.info("Failed to acquire connection to a Vault Application. Will retry in 5 seconds.");

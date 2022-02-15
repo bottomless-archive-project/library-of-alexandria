@@ -21,11 +21,9 @@ public class InstanceRefreshSchedulerService {
     @Scheduled(fixedRate = 60, timeUnit = TimeUnit.SECONDS)
     public void refreshInstance() {
         if (instanceId == null) {
-            instanceId = conductorClient.registerInstance(conductorClientConfigurationProperties.applicationType())
-                    .block();
+            instanceId = conductorClient.registerInstance(conductorClientConfigurationProperties.applicationType());
         } else {
-            conductorClient.refreshInstance(instanceId, conductorClientConfigurationProperties.applicationType())
-                    .block();
+            conductorClient.refreshInstance(instanceId, conductorClientConfigurationProperties.applicationType());
         }
     }
 }

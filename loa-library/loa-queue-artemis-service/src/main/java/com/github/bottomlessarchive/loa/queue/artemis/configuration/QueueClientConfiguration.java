@@ -63,7 +63,7 @@ public class QueueClientConfiguration {
 
         while (serviceInstanceEntity == null) {
             final Optional<ServiceInstanceEntity> serviceInstanceEntityResponse = conductorClient.getInstance(
-                    ApplicationType.QUEUE_APPLICATION).blockOptional();
+                    ApplicationType.QUEUE_APPLICATION);
 
             if (serviceInstanceEntityResponse.isPresent()) {
                 serviceInstanceEntity = serviceInstanceEntityResponse.get();

@@ -53,8 +53,7 @@ public class DocumentStatisticsResponseFactory {
             final DashboardDocumentStatisticsResponse.DashboardDocumentStatisticsResponseBuilder builder) {
 
         final List<DashboardVaultStatisticsResponse> serviceInstanceEntityList =
-                conductorClient.getInstances(ApplicationType.VAULT_APPLICATION)
-                        .toStream()
+                conductorClient.getInstances(ApplicationType.VAULT_APPLICATION).stream()
                         .map(serviceInstanceEntity -> DashboardVaultStatisticsResponse.builder()
                                 .name(serviceInstanceEntity.getProperty("name")
                                         .map(ServiceInstanceEntityProperty::getValue)
