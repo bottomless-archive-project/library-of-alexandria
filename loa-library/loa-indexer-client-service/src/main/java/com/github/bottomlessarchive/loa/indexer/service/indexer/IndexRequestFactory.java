@@ -1,13 +1,11 @@
 package com.github.bottomlessarchive.loa.indexer.service.indexer;
 
-import com.github.bottomlessarchive.loa.document.service.DocumentManipulator;
 import com.github.bottomlessarchive.loa.indexer.service.indexer.domain.IndexingContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.core.TimeValue;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Mono;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,24 +15,11 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class IndexRequestFactory {
 
-    private final DocumentManipulator documentManipulator;
-
-    public Mono<IndexRequest> newIndexRequest(final IndexingContext indexingContext) {
-        if (indexingContext.getContent() == null) {
-            if (log.isInfoEnabled()) {
-                log.info("Marking {} as indexed, even if it has no parsable content!", indexingContext.getId());
-            }
-
-            return documentManipulator.markIndexed(indexingContext.getId())
-                    .then(Mono.empty());
-        }
-
-        return Mono.just(
-                new IndexRequest("vault_documents")
-                        .id(indexingContext.getId().toString())
-                        .source(buildSourceContent(indexingContext))
-                        .timeout(TimeValue.timeValueMinutes(30))
-        );
+    public IndexRequest newIndexRequest(final IndexingContext indexingContext) {
+        return new IndexRequest("vault_documents")
+                .id(indexingContext.getId().toString())
+                .source(buildSourceContent(indexingContext))
+                .timeout(TimeValue.timeValueMinutes(30));
     }
 
     private Map<String, Object> buildSourceContent(final IndexingContext indexingContext) {

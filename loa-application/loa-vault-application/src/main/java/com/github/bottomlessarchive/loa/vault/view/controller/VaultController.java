@@ -165,7 +165,7 @@ public class VaultController {
                     vaultDocumentStorage.persistDocument(documentEntity, replaceDocumentRequest.getContent(),
                             vaultLocation);
 
-                    documentManipulator.markDownloadedSync(documentEntity.getId());
+                    documentManipulator.markDownloaded(documentEntity.getId());
                 }, () -> {
                     throw new InvalidRequestException("Document not found with id " + documentId + "!");
                 });

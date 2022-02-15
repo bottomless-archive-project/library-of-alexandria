@@ -1,7 +1,7 @@
 package com.github.bottomlessarchive.loa.document.service.entity.factory;
 
 import com.github.bottomlessarchive.loa.compression.domain.DocumentCompression;
-import com.github.bottomlessarchive.loa.document.repository.DocumentRepositorySync;
+import com.github.bottomlessarchive.loa.document.repository.DocumentRepository;
 import com.github.bottomlessarchive.loa.document.repository.domain.DocumentDatabaseEntity;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentEntity;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentStatus;
@@ -33,7 +33,7 @@ class DocumentEntityFactoryTest {
     private HexConverter hexConverter;
 
     @Mock
-    private DocumentRepositorySync documentRepositorySync;
+    private DocumentRepository documentRepository;
 
     @Mock
     private DocumentEntityTransformer documentEntityTransformer;
@@ -71,7 +71,7 @@ class DocumentEntityFactoryTest {
 
         assertThat(result).isEqualTo(transformedEntity);
 
-        verify(documentRepositorySync).insertDocument(documentDatabaseEntityArgumentCaptor.capture());
+        verify(documentRepository).insertDocument(documentDatabaseEntityArgumentCaptor.capture());
         final DocumentDatabaseEntity insertedDocumentDatabaseEntity = documentDatabaseEntityArgumentCaptor.getValue();
         assertThat(insertedDocumentDatabaseEntity.getId())
                 .isEqualTo(documentId);
@@ -122,7 +122,7 @@ class DocumentEntityFactoryTest {
 
         assertThat(result).isEqualTo(transformedEntity);
 
-        verify(documentRepositorySync).insertDocument(documentDatabaseEntityArgumentCaptor.capture());
+        verify(documentRepository).insertDocument(documentDatabaseEntityArgumentCaptor.capture());
         final DocumentDatabaseEntity insertedDocumentDatabaseEntity = documentDatabaseEntityArgumentCaptor.getValue();
         assertThat(insertedDocumentDatabaseEntity.getSourceLocations().size())
                 .isEqualTo(0);

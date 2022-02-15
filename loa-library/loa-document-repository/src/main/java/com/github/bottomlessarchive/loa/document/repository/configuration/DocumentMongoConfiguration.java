@@ -1,13 +1,12 @@
 package com.github.bottomlessarchive.loa.document.repository.configuration;
 
 import com.github.bottomlessarchive.loa.document.repository.domain.DocumentDatabaseEntity;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
-import com.mongodb.reactivestreams.client.MongoCollection;
-import com.mongodb.reactivestreams.client.MongoDatabase;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import reactor.core.publisher.Mono;
 
 @Configuration
 public class DocumentMongoConfiguration {
@@ -20,17 +19,15 @@ public class DocumentMongoConfiguration {
         final IndexOptions statusIndexOptions = new IndexOptions()
                 .name("status_index");
 
-        Mono.from(documentDatabaseEntityMongoCollection
-                .createIndex(Indexes.ascending("status"), statusIndexOptions))
-                .subscribe();
+        documentDatabaseEntityMongoCollection
+                .createIndex(Indexes.ascending("status"), statusIndexOptions);
 
         final IndexOptions uniqueFileIndexOptions = new IndexOptions()
                 .name("unique_file")
                 .unique(true);
 
-        Mono.from(documentDatabaseEntityMongoCollection
-                .createIndex(Indexes.ascending("checksum", "fileSize", "type"), uniqueFileIndexOptions))
-                .subscribe();
+        documentDatabaseEntityMongoCollection
+                .createIndex(Indexes.ascending("checksum", "fileSize", "type"), uniqueFileIndexOptions);
 
         return documentDatabaseEntityMongoCollection;
     }

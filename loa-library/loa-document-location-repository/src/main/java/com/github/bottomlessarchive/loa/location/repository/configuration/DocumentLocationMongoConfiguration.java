@@ -1,8 +1,8 @@
 package com.github.bottomlessarchive.loa.location.repository.configuration;
 
 import com.github.bottomlessarchive.loa.location.repository.domain.DocumentLocationDatabaseEntity;
-import com.mongodb.reactivestreams.client.MongoCollection;
-import com.mongodb.reactivestreams.client.MongoDatabase;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

@@ -30,8 +30,7 @@ public class ReindexCommand implements CommandLineRunner {
     public void run(final String... args) {
         log.info("Running the reindex command!");
 
-        documentEntityFactory.updateStatus(DocumentStatus.DOWNLOADED)
-                .subscribe();
+        documentEntityFactory.updateStatus(DocumentStatus.DOWNLOADED);
 
         log.info("Running the reindex command finished!");
     }

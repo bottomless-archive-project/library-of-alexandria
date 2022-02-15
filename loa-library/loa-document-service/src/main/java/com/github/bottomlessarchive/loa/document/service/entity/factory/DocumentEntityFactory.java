@@ -1,7 +1,6 @@
 package com.github.bottomlessarchive.loa.document.service.entity.factory;
 
 import com.github.bottomlessarchive.loa.document.repository.DocumentRepository;
-import com.github.bottomlessarchive.loa.document.repository.DocumentRepositorySync;
 import com.github.bottomlessarchive.loa.document.service.entity.factory.domain.DocumentCreationContext;
 import com.github.bottomlessarchive.loa.repository.service.HexConverter;
 import com.github.bottomlessarchive.loa.document.repository.domain.DocumentDatabaseEntity;
@@ -11,7 +10,6 @@ import com.github.bottomlessarchive.loa.document.service.domain.DocumentType;
 import com.github.bottomlessarchive.loa.document.service.entity.transformer.DocumentEntityTransformer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Mono;
 
 import java.time.Instant;
 import java.util.Collections;
@@ -29,7 +27,6 @@ public class DocumentEntityFactory {
 
     private final HexConverter hexConverter;
     private final DocumentRepository documentRepository;
-    private final DocumentRepositorySync documentRepositorySync;
     private final DocumentEntityTransformer documentEntityTransformer;
 
     /**
@@ -39,14 +36,14 @@ public class DocumentEntityFactory {
      * @return the document that belongs to the provided id
      */
     public Optional<DocumentEntity> getDocumentEntity(final UUID documentId) {
-        return documentRepositorySync.findById(documentId)
+        return documentRepository.findById(documentId)
                 .map(documentEntityTransformer::transform);
     }
 
     public Optional<DocumentEntity> getDocumentEntity(final String checksum, final long fileSize, final String type) {
         final byte[] checksumAsHex = hexConverter.decode(checksum);
 
-        return documentRepositorySync.findByChecksumAndFileSizeAndType(checksumAsHex, fileSize, type)
+        return documentRepository.findByChecksumAndFileSizeAndType(checksumAsHex, fileSize, type)
                 .map(documentEntityTransformer::transform);
     }
 
@@ -57,7 +54,7 @@ public class DocumentEntityFactory {
      * @return the list of documents with the provided values
      */
     public Stream<DocumentEntity> getDocumentEntity(final DocumentStatus documentStatus) {
-        return StreamSupport.stream(documentRepositorySync.findByStatus(documentStatus.toString()).spliterator(), false)
+        return StreamSupport.stream(documentRepository.findByStatus(documentStatus.toString()).spliterator(), false)
                 .map(documentEntityTransformer::transform);
     }
 
@@ -67,7 +64,7 @@ public class DocumentEntityFactory {
      * @param documentEntity the document to remove
      */
     public void removeDocumentEntity(final DocumentEntity documentEntity) {
-        documentRepositorySync.removeDocument(documentEntity.getId());
+        documentRepository.removeDocument(documentEntity.getId());
     }
 
     /**
@@ -76,7 +73,7 @@ public class DocumentEntityFactory {
      * @return all documents available in the database
      */
     public Stream<DocumentEntity> getDocumentEntitiesSync() {
-        return StreamSupport.stream(documentRepositorySync.findAll().spliterator(), false)
+        return StreamSupport.stream(documentRepository.findAll().spliterator(), false)
                 .map(documentEntityTransformer::transform);
     }
 
@@ -86,7 +83,7 @@ public class DocumentEntityFactory {
      * @return the approximate count of documents available in the database
      */
     public long getEstimatedDocumentCount() {
-        return documentRepositorySync.estimateCount();
+        return documentRepository.estimateCount();
     }
 
     /**
@@ -95,7 +92,7 @@ public class DocumentEntityFactory {
      * @return the count of documents grouped by status
      */
     public Map<DocumentStatus, Integer> getCountByStatus() {
-        return documentRepositorySync.countByStatus().entrySet().stream()
+        return documentRepository.countByStatus().entrySet().stream()
                 .collect(Collectors.toMap(entry -> DocumentStatus.valueOf(entry.getKey()), Map.Entry::getValue));
     }
 
@@ -105,7 +102,7 @@ public class DocumentEntityFactory {
      * @return the count of documents grouped by type
      */
     public Map<DocumentType, Integer> getCountByType() {
-        return documentRepositorySync.countByType().entrySet().stream()
+        return documentRepository.countByType().entrySet().stream()
                 .collect(Collectors.toMap(entry -> DocumentType.valueOf(entry.getKey()), Map.Entry::getValue));
     }
 
@@ -113,14 +110,13 @@ public class DocumentEntityFactory {
      * Update the status field of all the documents available in the database.
      *
      * @param documentStatus the status to update the documents to
-     * @return the result of the update
      */
-    public Mono<Void> updateStatus(final DocumentStatus documentStatus) {
-        return documentRepository.updateStatus(documentStatus.name());
+    public void updateStatus(final DocumentStatus documentStatus) {
+        documentRepository.updateStatus(documentStatus.name());
     }
 
     public void addSourceLocation(final UUID documentId, final String documentLocationId) {
-        documentRepositorySync.addSourceLocation(documentId, documentLocationId);
+        documentRepository.addSourceLocation(documentId, documentLocationId);
     }
 
     /**
@@ -149,7 +145,7 @@ public class DocumentEntityFactory {
             documentDatabaseEntity.setSourceLocations(Collections.emptySet());
         }
 
-        documentRepositorySync.insertDocument(documentDatabaseEntity);
+        documentRepository.insertDocument(documentDatabaseEntity);
 
         return documentEntityTransformer.transform(documentDatabaseEntity);
     }

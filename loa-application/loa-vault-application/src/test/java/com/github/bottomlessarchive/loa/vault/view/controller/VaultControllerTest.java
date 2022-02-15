@@ -354,7 +354,7 @@ class VaultControllerTest {
         Mockito.verify(vaultDocumentStorage)
                 .persistDocument(documentEntity, newDocumentContent, vaultLocation);
         Mockito.verify(documentManipulator)
-                .markDownloadedSync(UUID.fromString(TEST_DOCUMENT_ID));
+                .markDownloaded(UUID.fromString(TEST_DOCUMENT_ID));
     }
 
     private static String asJsonString(final Object obj) {
