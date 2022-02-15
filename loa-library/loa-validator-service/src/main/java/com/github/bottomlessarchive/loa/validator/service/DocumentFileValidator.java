@@ -36,7 +36,7 @@ public class DocumentFileValidator {
     public boolean isValidDocument(final String documentId, final DocumentType documentType) {
         final StageLocation stageLocation = stageLocationFactory.getLocation(documentId, documentType);
 
-        return isValidFileSize(stageLocation.size()) && isParsable(documentId, documentType, stageLocation);
+        return stageLocation.exists() && isValidFileSize(stageLocation.size()) && isParsable(documentId, documentType, stageLocation);
     }
 
     private boolean isValidFileSize(final long stageFileSize) {

@@ -1,8 +1,7 @@
 dependencies {
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter'
-    implementation group: 'io.projectreactor.addons', name: 'reactor-extra'
 
-    implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.9.3'
+    implementation group: 'com.squareup.okhttp3', name: 'okhttp'
     implementation group: 'com.github.davidmoten', name: 'io-extras', version: '0.1.4'
 
     implementation group: 'io.mola.galimatias', name: 'galimatias', version: '0.2.1'

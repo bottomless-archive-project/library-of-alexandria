@@ -74,7 +74,9 @@ public class DocumentLocationProcessor {
             log.debug("Error downloading a document: {}!", e.getMessage());
         }
 
-        stageLocation.cleanup();
+        if (stageLocation.exists()) {
+            stageLocation.cleanup();
+        }
     }
 
     private void acquireFile(final URL documentLocation, final StageLocation stageLocation) {

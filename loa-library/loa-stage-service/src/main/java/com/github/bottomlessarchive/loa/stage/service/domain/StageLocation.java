@@ -21,6 +21,15 @@ public class StageLocation {
     private final Path path;
 
     /**
+     * Return if the stage location already exists.
+     *
+     * @return true if the location exists, false otherwise
+     */
+    public boolean exists() {
+        return Files.exists(path);
+    }
+
+    /**
      * Return the size of the content at the stage location.
      *
      * @return the file size at the stage location

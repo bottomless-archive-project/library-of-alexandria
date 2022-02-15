@@ -32,9 +32,7 @@ public class VaultDocumentManager {
      * Archive the document provided in the context.
      */
     public void archiveDocument(final DocumentArchivingContext documentArchivingContext) {
-        if (log.isInfoEnabled()) {
-            log.info("Archiving document with id: {}.", documentArchivingContext.getId());
-        }
+        log.info("Archiving document with id: {}.", documentArchivingContext.getId());
 
         archivingService.archiveDocument(documentArchivingContext);
     }

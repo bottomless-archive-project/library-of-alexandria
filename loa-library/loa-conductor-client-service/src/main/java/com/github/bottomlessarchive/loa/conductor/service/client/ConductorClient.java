@@ -1,5 +1,6 @@
 package com.github.bottomlessarchive.loa.conductor.service.client;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.bottomlessarchive.loa.application.domain.ApplicationType;
 import com.github.bottomlessarchive.loa.conductor.service.NetworkAddressCalculator;
@@ -16,6 +17,7 @@ import com.github.bottomlessarchive.loa.conductor.service.domain.ServiceInstance
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -107,7 +109,7 @@ public class ConductorClient {
 
         final Request request = new Request.Builder()
                 .url(conductorClientConfigurationProperties.getUrl() + "/service/" + convertApplicationTypeToPath(applicationType))
-                .post(RequestBody.create(objectMapper.writeValueAsBytes(serviceInstanceRegistrationRequest)))
+                .post(createJsonBody(serviceInstanceRegistrationRequest))
                 .build();
 
         final String response = okHttpClient.newCall(request)
@@ -115,8 +117,12 @@ public class ConductorClient {
                 .body()
                 .string();
 
-        return objectMapper.readValue(response, ServiceInstanceRegistrationResponse.class)
-                .getId();
+        final ServiceInstanceRegistrationResponse serviceInstanceRegistrationResponse = objectMapper.readValue(
+                response, ServiceInstanceRegistrationResponse.class);
+
+        log.info("Registration was successful! Instance id: {}.", serviceInstanceRegistrationResponse.getId());
+
+        return serviceInstanceRegistrationResponse.getId();
     }
 
     @SneakyThrows //TODO: Use ConductorClientException instead
@@ -148,12 +154,16 @@ public class ConductorClient {
         final Request request = new Request.Builder()
                 .url(conductorClientConfigurationProperties.getUrl() + "/service/" + convertApplicationTypeToPath(applicationType)
                         + "/" + instanceId)
-                .put(RequestBody.create(objectMapper.writeValueAsBytes(serviceInstanceRefreshRequest)))
+                .put(createJsonBody(serviceInstanceRefreshRequest))
                 .build();
 
         okHttpClient.newCall(request)
                 .execute()
                 .close();
+    }
+
+    private RequestBody createJsonBody(final Object requestBody) throws JsonProcessingException {
+        return RequestBody.create(objectMapper.writeValueAsBytes(requestBody), MediaType.get("application/json"));
     }
 
     private String convertApplicationTypeToPath(final ApplicationType applicationType) {

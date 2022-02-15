@@ -5,6 +5,7 @@ buildscript {
         set('artemis.version', '2.20.0')
         set('elasticsearch.version', '7.16.3')
         set('mongodb.version', '4.4.1')
+        set('okhttp3.version', '4.9.3')
     }
     repositories {
         mavenCentral()
@@ -80,7 +81,6 @@ configure(subprojects.findAll {it.name != 'loa-frontend'}) {
 
         // Testing
         testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
-        testImplementation group: 'io.projectreactor', name: 'reactor-test'
         testImplementation group: 'org.mockito', name: 'mockito-inline'
     }
 

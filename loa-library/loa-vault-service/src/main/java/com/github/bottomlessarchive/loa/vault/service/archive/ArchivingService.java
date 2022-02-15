@@ -36,10 +36,10 @@ public class ArchivingService {
         final DocumentCreationContext documentCreationContext = documentCreationContextFactory.newContext(
                 documentArchivingContext);
 
-        final DocumentEntity documentEntity = documentEntityFactory.newDocumentEntity(documentCreationContext);
-
         while (true) {
             try {
+                final DocumentEntity documentEntity = documentEntityFactory.newDocumentEntity(documentCreationContext);
+
                 vaultDocumentStorage.persistDocument(documentEntity, documentArchivingContext.getContent());
 
                 break;

@@ -32,4 +32,6 @@ dependencies {
     implementation project(':loa-library:loa-stage-service')
     implementation project(':loa-library:loa-logging-service')
     implementation project(':loa-library:loa-conductor-client-service')
+
+    implementation group: 'com.squareup.okhttp3', name: 'okhttp'
 }

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.stereotype.Service;
 
@@ -19,10 +20,11 @@ import java.nio.file.Path;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@ConditionalOnBean(OkHttpClient.class)
+@ConditionalOnBean(name = "downloaderClient")
 public class FileDownloadManager {
 
-    private final OkHttpClient okHttpClient;
+    @Qualifier("downloaderClient")
+    private final OkHttpClient downloaderClient;
 
     /**
      * Download a file from the provided url to the provided file location.
@@ -38,7 +40,7 @@ public class FileDownloadManager {
 
         try {
             //TODO: Re-add the retry logic when the response is HttpStatus.TOO_MANY_REQUESTS
-            final InputStream fileInputStream = okHttpClient.newCall(request)
+            final InputStream fileInputStream = downloaderClient.newCall(request)
                     .execute()
                     .body()
                     .byteStream();
@@ -46,7 +48,9 @@ public class FileDownloadManager {
             Files.copy(fileInputStream, resultLocation);
         } catch (final IOException e) {
             try {
-                Files.delete(resultLocation);
+                if (Files.exists(resultLocation)) {
+                    Files.delete(resultLocation);
+                }
             } catch (final IOException e2) {
                 log.error("Failed to delete file at the staging location!", e2);
             }

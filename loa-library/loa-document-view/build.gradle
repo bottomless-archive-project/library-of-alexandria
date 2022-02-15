@@ -1,6 +1,6 @@
 dependencies {
     api group: 'org.springframework', name: 'spring-web'
-    api group: 'org.springframework.boot', name: 'spring-boot-starter-reactor-netty'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter'
 
     api project(':loa-library:loa-document-service')
 }
