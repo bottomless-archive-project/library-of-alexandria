@@ -6,6 +6,7 @@ import com.github.bottomlessarchive.loa.document.view.service.MediaTypeCalculato
 import com.github.bottomlessarchive.loa.vault.client.service.VaultClientService;
 import com.github.bottomlessarchive.loa.web.view.document.service.DocumentRenderer;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,7 +38,7 @@ public class DocumentQueryController {
      * @return the returned document's content
      */
     @GetMapping("/document/{documentId}")
-    public ResponseEntity<InputStream> queryDocument(@PathVariable final String documentId) {
+    public ResponseEntity<InputStreamResource> queryDocument(@PathVariable final String documentId) {
         return documentEntityFactory.getDocumentEntity(UUID.fromString(documentId))
                 .map(documentEntity -> {
                     final InputStream documentContent = vaultClientService.queryDocument(documentEntity);
@@ -45,7 +46,7 @@ public class DocumentQueryController {
                     return ResponseEntity.ok()
                             .contentType(mediaTypeCalculator.calculateMediaType(documentEntity.getType()))
                             .cacheControl(CacheControl.noCache())
-                            .body(documentContent);
+                            .body(new InputStreamResource(documentContent));
                 })
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Document not found with id " + documentId + "!"));
     }

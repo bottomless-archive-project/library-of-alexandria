@@ -2,6 +2,7 @@ package com.github.bottomlessarchive.loa.vault.view.controller;
 
 import com.github.bottomlessarchive.loa.document.service.DocumentManipulator;
 import com.github.bottomlessarchive.loa.document.service.entity.factory.DocumentEntityFactory;
+import com.github.bottomlessarchive.loa.document.view.service.MediaTypeCalculator;
 import com.github.bottomlessarchive.loa.vault.configuration.VaultConfigurationProperties;
 import com.github.bottomlessarchive.loa.vault.service.RecompressorService;
 import com.github.bottomlessarchive.loa.vault.service.VaultDocumentManager;
@@ -17,7 +18,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
 import org.springframework.http.CacheControl;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,6 +39,7 @@ public class VaultController {
     private final VaultDocumentStorage vaultDocumentStorage;
     private final RecompressorService recompressorService;
     private final DocumentManipulator documentManipulator;
+    private final MediaTypeCalculator mediaTypeCalculator;
     private final VaultConfigurationProperties vaultConfigurationProperties;
 
     /**
@@ -56,7 +57,7 @@ public class VaultController {
                     }
 
                     return ResponseEntity.ok()
-                            .contentType(MediaType.valueOf(documentEntity.getType().getMimeType()))
+                            .contentType(mediaTypeCalculator.calculateMediaType(documentEntity.getType()))
                             .header("Content-Disposition", "attachment; filename=" + documentId + "."
                                     + documentEntity.getType().getFileExtension())
                             .cacheControl(CacheControl.noCache())
