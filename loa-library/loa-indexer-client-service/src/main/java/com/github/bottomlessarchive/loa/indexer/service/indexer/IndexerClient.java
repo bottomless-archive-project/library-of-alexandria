@@ -1,16 +1,16 @@
 package com.github.bottomlessarchive.loa.indexer.service.indexer;
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.ElasticsearchException;
+import co.elastic.clients.elasticsearch.core.IndexRequest;
 import com.github.bottomlessarchive.loa.document.service.DocumentManipulator;
 import com.github.bottomlessarchive.loa.indexer.service.indexer.domain.IndexingContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.elasticsearch.ElasticsearchException;
-import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.client.RequestOptions;
-import org.elasticsearch.client.RestHighLevelClient;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.UUID;
 
 @Slf4j
@@ -19,7 +19,7 @@ import java.util.UUID;
 public class IndexerClient {
 
     private final IndexRequestFactory indexRequestFactory;
-    private final RestHighLevelClient restHighLevelClient;
+    private final ElasticsearchClient elasticsearchClient;
     private final DocumentManipulator documentManipulator;
 
     public void indexDocument(final IndexingContext documentMetadata) {
@@ -45,8 +45,8 @@ public class IndexerClient {
     }
 
     private void sendIndexRequest(final IndexingContext documentMetadata) throws IOException {
-        final IndexRequest indexRequest = indexRequestFactory.newIndexRequest(documentMetadata);
+        final IndexRequest<Map<String, Object>> indexRequest = indexRequestFactory.newIndexRequest(documentMetadata);
 
-        restHighLevelClient.index(indexRequest, RequestOptions.DEFAULT);
+        elasticsearchClient.index(indexRequest);
     }
 }

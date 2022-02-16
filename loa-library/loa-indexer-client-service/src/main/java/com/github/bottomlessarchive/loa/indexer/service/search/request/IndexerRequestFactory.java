@@ -1,22 +1,29 @@
 package com.github.bottomlessarchive.loa.indexer.service.search.request;
 
-import com.github.bottomlessarchive.loa.indexer.service.search.request.mapping.MappingConfigurationFactory;
+import co.elastic.clients.elasticsearch._types.Time;
+import co.elastic.clients.elasticsearch._types.mapping.DateProperty;
+import co.elastic.clients.elasticsearch._types.mapping.IndexOptions;
+import co.elastic.clients.elasticsearch._types.mapping.KeywordProperty;
+import co.elastic.clients.elasticsearch._types.mapping.LongNumberProperty;
+import co.elastic.clients.elasticsearch._types.mapping.Property;
+import co.elastic.clients.elasticsearch._types.mapping.TextProperty;
+import co.elastic.clients.elasticsearch._types.mapping.TypeMapping;
+import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
+import co.elastic.clients.elasticsearch.core.CountRequest;
+import co.elastic.clients.elasticsearch.core.SearchRequest;
+import co.elastic.clients.elasticsearch.core.search.Highlight;
+import co.elastic.clients.elasticsearch.core.search.HighlightField;
+import co.elastic.clients.elasticsearch.core.search.HighlighterOrder;
+import co.elastic.clients.elasticsearch.indices.CreateIndexRequest;
+import co.elastic.clients.elasticsearch.indices.ExistsRequest;
+import co.elastic.clients.elasticsearch.indices.IndexSettings;
 import com.github.bottomlessarchive.loa.indexer.service.search.domain.SearchContext;
 import com.github.bottomlessarchive.loa.indexer.service.search.domain.SearchField;
 import lombok.RequiredArgsConstructor;
-import org.elasticsearch.action.get.GetRequest;
-import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.client.core.CountRequest;
-import org.elasticsearch.client.indices.CreateIndexRequest;
-import org.elasticsearch.client.indices.GetIndexRequest;
-import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.elasticsearch.search.fetch.subphase.FetchSourceContext;
-import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
-import org.elasticsearch.xcontent.XContentType;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * Create the requests to the search engine, to query data about the indexed documents.
@@ -27,7 +34,6 @@ public class IndexerRequestFactory {
 
     private static final String DOCUMENT_INDEX = "vault_documents";
 
-    private final MappingConfigurationFactory mappingConfigurationFactory;
     private final QueryBuilderFactory queryBuilderFactory;
 
     /**
@@ -36,8 +42,10 @@ public class IndexerRequestFactory {
      * @return the created request
      */
     public CountRequest newCountDocumentsRequest() {
-        return new CountRequest(DOCUMENT_INDEX)
-                .query(QueryBuilders.matchAllQuery());
+        return new CountRequest.Builder()
+                .index(DOCUMENT_INDEX)
+                .query(QueryBuilders.matchAll().build()._toQuery())
+                .build();
     }
 
     /**
@@ -46,13 +54,12 @@ public class IndexerRequestFactory {
      * @param documentId the id of the document to check
      * @return the created request
      */
-    public GetRequest newDocumentExistsRequest(final String documentId) {
-        final GetRequest getRequest = new GetRequest(DOCUMENT_INDEX, documentId);
-
-        getRequest.fetchSourceContext(new FetchSourceContext(false));
-        getRequest.storedFields("_none_");
-
-        return getRequest;
+    public co.elastic.clients.elasticsearch.core.ExistsRequest newDocumentExistsRequest(final String documentId) {
+        return new co.elastic.clients.elasticsearch.core.ExistsRequest.Builder()
+                .index(DOCUMENT_INDEX)
+                .id(documentId)
+                .storedFields(List.of("_none_"))
+                .build();
     }
 
     /**
@@ -61,16 +68,70 @@ public class IndexerRequestFactory {
      * @return the created request
      */
     public CreateIndexRequest newCreateIndexRequest() {
-        final String mappingConfiguration = mappingConfigurationFactory.newDocumentMappingConfiguration();
-
-        return new CreateIndexRequest(DOCUMENT_INDEX)
-                .mapping(mappingConfiguration, XContentType.JSON)
+        return new CreateIndexRequest.Builder()
+                .index(DOCUMENT_INDEX)
+                .mappings(new TypeMapping.Builder()
+                        .properties(
+                                Map.of(
+                                        "author", new Property.Builder()
+                                                .text(
+                                                        new TextProperty.Builder()
+                                                                .build()
+                                                )
+                                                .build(),
+                                        "content", new Property.Builder()
+                                                .text(
+                                                        new TextProperty.Builder()
+                                                                .indexOptions(IndexOptions.Offsets)
+                                                                .build()
+                                                )
+                                                .build(),
+                                        "title", new Property.Builder()
+                                                .text(
+                                                        new TextProperty.Builder()
+                                                                .build()
+                                                )
+                                                .build(),
+                                        "date", new Property.Builder()
+                                                .date(
+                                                        new DateProperty.Builder()
+                                                                .build()
+                                                )
+                                                .build(),
+                                        "language", new Property.Builder()
+                                                .keyword(
+                                                        new KeywordProperty.Builder()
+                                                                .build()
+                                                )
+                                                .build(),
+                                        "type", new Property.Builder()
+                                                .keyword(
+                                                        new KeywordProperty.Builder()
+                                                                .build()
+                                                )
+                                                .build(),
+                                        "page_count", new Property.Builder()
+                                                .long_(
+                                                        new LongNumberProperty.Builder()
+                                                                .build()
+                                                )
+                                                .build()
+                                )
+                        )
+                        .build()
+                )
                 .settings(
-                        Settings.builder()
-                                .put("index.number_of_shards", 10)
-                                .put("index.codec", "best_compression")
-                                .put("index.refresh_interval", "60s")
-                );
+                        new IndexSettings.Builder()
+                                .numberOfShards("10")
+                                .codec("best_compression")
+                                .refreshInterval(
+                                        new Time.Builder()
+                                                .time("60s")
+                                                .build()
+                                )
+                                .build()
+                )
+                .build();
     }
 
     /**
@@ -78,8 +139,10 @@ public class IndexerRequestFactory {
      *
      * @return the created request
      */
-    public GetIndexRequest newIndexExistsRequest() {
-        return new GetIndexRequest(DOCUMENT_INDEX);
+    public ExistsRequest newIndexExistsRequest() {
+        return new ExistsRequest.Builder()
+                .index(DOCUMENT_INDEX)
+                .build();
     }
 
     /**
@@ -89,23 +152,24 @@ public class IndexerRequestFactory {
      * @return the created request
      */
     public SearchRequest newKeywordSearchRequest(final SearchContext searchContext) {
-        return new SearchRequest(new String[]{DOCUMENT_INDEX}, newDocumentContentQuery(searchContext));
-    }
-
-    private SearchSourceBuilder newDocumentContentQuery(final SearchContext searchContext) {
-        final QueryBuilder queryBuilder = queryBuilderFactory.newQueryBuilder(searchContext);
-
-        return new SearchSourceBuilder()
+        return new SearchRequest.Builder()
+                .index(DOCUMENT_INDEX)
                 .from(searchContext.getPageNumber())
-                .query(queryBuilder)
                 .size(searchContext.getResultSize())
-                .highlighter(newHighlightBuilder());
+                .highlight(newHighlightBuilder())
+                .query(queryBuilderFactory.newQueryBuilder(searchContext))
+                .build();
     }
 
-
-    private HighlightBuilder newHighlightBuilder() {
-        return new HighlightBuilder()
-                .field(SearchField.CONTENT.getName(), 350, 3)
-                .order("score");
+    private Highlight newHighlightBuilder() {
+        return new Highlight.Builder()
+                .fields(SearchField.CONTENT.getName(), new HighlightField.Builder()
+                        .field(SearchField.CONTENT.getName())
+                        .fragmentSize(350)
+                        .numberOfFragments(3)
+                        .build()
+                )
+                .order(HighlighterOrder.Score)
+                .build();
     }
 }

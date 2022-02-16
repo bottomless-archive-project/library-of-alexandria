@@ -1,22 +1,23 @@
 package com.github.bottomlessarchive.loa.indexer.service.search;
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch.core.CountRequest;
+import co.elastic.clients.elasticsearch.core.SearchRequest;
+import co.elastic.clients.elasticsearch.core.SearchResponse;
+import co.elastic.clients.elasticsearch.core.search.TotalHits;
+import co.elastic.clients.elasticsearch.indices.CreateIndexRequest;
+import co.elastic.clients.elasticsearch.indices.ExistsRequest;
 import com.github.bottomlessarchive.loa.indexer.service.search.domain.DocumentSearchResult;
 import com.github.bottomlessarchive.loa.indexer.service.search.domain.IndexerAccessException;
 import com.github.bottomlessarchive.loa.indexer.service.search.domain.SearchContext;
+import com.github.bottomlessarchive.loa.indexer.service.search.domain.SearchDatabaseEntity;
 import com.github.bottomlessarchive.loa.indexer.service.search.request.IndexerRequestFactory;
 import com.github.bottomlessarchive.loa.indexer.service.search.transformer.DocumentSearchEntityTransformer;
 import lombok.RequiredArgsConstructor;
-import org.elasticsearch.action.get.GetRequest;
-import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.client.RequestOptions;
-import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.client.core.CountRequest;
-import org.elasticsearch.client.indices.CreateIndexRequest;
-import org.elasticsearch.client.indices.GetIndexRequest;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -26,7 +27,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class DocumentSearchClient {
 
-    private final RestHighLevelClient restHighLevelClient;
+    private final ElasticsearchClient elasticsearchClient;
     private final IndexerRequestFactory indexerRequestFactory;
     private final DocumentSearchEntityTransformer documentSearchEntityTransformer;
 
@@ -40,11 +41,16 @@ public class DocumentSearchClient {
         final SearchRequest searchRequest = indexerRequestFactory.newKeywordSearchRequest(searchContext);
 
         try {
-            final SearchResponse searchResponse = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
+            final SearchResponse<SearchDatabaseEntity> searchResponse = elasticsearchClient.search(searchRequest,
+                    SearchDatabaseEntity.class);
 
             return DocumentSearchResult.builder()
-                    .searchHits(documentSearchEntityTransformer.transform(searchResponse.getHits()))
-                    .totalHitCount(searchResponse.getHits().getTotalHits().value)
+                    .searchHits(documentSearchEntityTransformer.transform(searchResponse.hits()))
+                    .totalHitCount(
+                            Optional.ofNullable(searchResponse.hits().total())
+                                    .map(TotalHits::value)
+                                    .orElse(0L)
+                    )
                     .build();
         } catch (final IOException e) {
             throw new IndexerAccessException("Failed to search in the indexer!", e);
@@ -60,7 +66,7 @@ public class DocumentSearchClient {
         final CountRequest countRequest = indexerRequestFactory.newCountDocumentsRequest();
 
         try {
-            return restHighLevelClient.count(countRequest, RequestOptions.DEFAULT).getCount();
+            return elasticsearchClient.count(countRequest).count();
         } catch (final IOException e) {
             throw new IndexerAccessException("Failed to search in the indexer!", e);
         }
@@ -73,10 +79,11 @@ public class DocumentSearchClient {
      * @return true if the document exists, false otherwise
      */
     public boolean isDocumentInIndex(final UUID documentId) {
-        final GetRequest hasDocumentsRequest = indexerRequestFactory.newDocumentExistsRequest(documentId.toString());
+        final co.elastic.clients.elasticsearch.core.ExistsRequest hasDocumentsRequest =
+                indexerRequestFactory.newDocumentExistsRequest(documentId.toString());
 
         try {
-            return restHighLevelClient.exists(hasDocumentsRequest, RequestOptions.DEFAULT);
+            return elasticsearchClient.exists(hasDocumentsRequest).value();
         } catch (final IOException e) {
             throw new IndexerAccessException("Failed to search in the indexer!", e);
         }
@@ -89,7 +96,7 @@ public class DocumentSearchClient {
         final CreateIndexRequest createIndexRequest = indexerRequestFactory.newCreateIndexRequest();
 
         try {
-            restHighLevelClient.indices().create(createIndexRequest, RequestOptions.DEFAULT);
+            elasticsearchClient.indices().create(createIndexRequest);
         } catch (final IOException e) {
             throw new IndexerAccessException("Failed to initialize the search engine!", e);
         }
@@ -101,10 +108,12 @@ public class DocumentSearchClient {
      * @return true if the search engine is initialized, false otherwise
      */
     public boolean isSearchEngineInitialized() {
-        final GetIndexRequest getIndexRequest = indexerRequestFactory.newIndexExistsRequest();
+        final ExistsRequest existsRequest = indexerRequestFactory.newIndexExistsRequest();
 
         try {
-            final boolean exists = restHighLevelClient.indices().exists(getIndexRequest, RequestOptions.DEFAULT);
+            final boolean exists = elasticsearchClient.indices()
+                    .exists(existsRequest)
+                    .value();
 
             if (exists) {
                 return true;

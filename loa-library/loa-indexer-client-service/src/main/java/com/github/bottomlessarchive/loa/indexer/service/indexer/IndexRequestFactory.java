@@ -1,10 +1,9 @@
 package com.github.bottomlessarchive.loa.indexer.service.indexer;
 
+import co.elastic.clients.elasticsearch.core.IndexRequest;
 import com.github.bottomlessarchive.loa.indexer.service.indexer.domain.IndexingContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.core.TimeValue;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -15,11 +14,13 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class IndexRequestFactory {
 
-    public IndexRequest newIndexRequest(final IndexingContext indexingContext) {
-        return new IndexRequest("vault_documents")
+    public IndexRequest<Map<String, Object>> newIndexRequest(final IndexingContext indexingContext) {
+        return new IndexRequest.Builder<Map<String, Object>>()
                 .id(indexingContext.getId().toString())
-                .source(buildSourceContent(indexingContext))
-                .timeout(TimeValue.timeValueMinutes(30));
+                .index("vault_documents")
+                .document(buildSourceContent(indexingContext))
+                //.timeout() //TODO: Figure this out!
+                .build();
     }
 
     private Map<String, Object> buildSourceContent(final IndexingContext indexingContext) {

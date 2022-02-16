@@ -6,6 +6,7 @@ import com.github.bottomlessarchive.loa.document.service.DocumentManipulator;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentEntity;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentType;
 import com.github.bottomlessarchive.loa.document.service.entity.factory.DocumentEntityFactory;
+import com.github.bottomlessarchive.loa.document.view.service.MediaTypeCalculator;
 import com.github.bottomlessarchive.loa.vault.configuration.VaultConfigurationProperties;
 import com.github.bottomlessarchive.loa.vault.service.RecompressorService;
 import com.github.bottomlessarchive.loa.vault.service.VaultDocumentManager;
@@ -38,7 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Slf4j
 @AutoConfigureMockMvc
 @EnableAutoConfiguration
-@SpringBootTest(classes = VaultController.class)
+@SpringBootTest(classes = {VaultController.class, MediaTypeCalculator.class})
 class VaultControllerTest {
 
     private static final String TEST_DOCUMENT_ID = "123e4567-e89b-12d3-a456-556642440000";
@@ -112,7 +113,7 @@ class VaultControllerTest {
                 .thenReturn(documentResource);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/document/" + TEST_DOCUMENT_ID))
-                .andExpect(content().contentType(MediaType.APPLICATION_OCTET_STREAM))
+                .andExpect(content().contentType(MediaType.APPLICATION_PDF))
                 .andExpect(content().bytes(new byte[]{0, 1, 2}));
     }
 

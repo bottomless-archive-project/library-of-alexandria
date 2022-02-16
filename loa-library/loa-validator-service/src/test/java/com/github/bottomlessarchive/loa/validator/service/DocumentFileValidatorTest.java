@@ -45,6 +45,8 @@ class DocumentFileValidatorTest {
 
         when(stageLocationFactory.getLocation(DOCUMENT_ID.toString(), DOCUMENT_TYPE))
                 .thenReturn(stageLocation);
+        when(stageLocation.exists())
+                .thenReturn(true);
         when(stageLocation.size())
                 .thenReturn(0L);
 
@@ -59,6 +61,8 @@ class DocumentFileValidatorTest {
 
         when(stageLocationFactory.getLocation(DOCUMENT_ID.toString(), DOCUMENT_TYPE))
                 .thenReturn(stageLocation);
+        when(stageLocation.exists())
+                .thenReturn(true);
         when(stageLocation.size())
                 .thenReturn(MAX_FILE_SIZE_IN_BYTES + 1);
         when(fileValidationConfigurationProperties.maximumArchiveSize())
@@ -75,6 +79,8 @@ class DocumentFileValidatorTest {
 
         when(stageLocationFactory.getLocation(DOCUMENT_ID.toString(), DOCUMENT_TYPE))
                 .thenReturn(stageLocation);
+        when(stageLocation.exists())
+                .thenReturn(true);
         when(stageLocation.size())
                 .thenReturn(MAX_FILE_SIZE_IN_BYTES - 1);
         when(fileValidationConfigurationProperties.maximumArchiveSize())
@@ -97,6 +103,8 @@ class DocumentFileValidatorTest {
 
         when(stageLocationFactory.getLocation(DOCUMENT_ID.toString(), DOCUMENT_TYPE))
                 .thenReturn(stageLocation);
+        when(stageLocation.exists())
+                .thenReturn(true);
         when(stageLocation.size())
                 .thenReturn(MAX_FILE_SIZE_IN_BYTES - 1);
         when(fileValidationConfigurationProperties.maximumArchiveSize())
