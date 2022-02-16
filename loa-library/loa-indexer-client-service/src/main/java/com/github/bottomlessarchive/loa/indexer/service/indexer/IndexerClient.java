@@ -22,10 +22,10 @@ public class IndexerClient {
     private final ElasticsearchClient elasticsearchClient;
     private final DocumentManipulator documentManipulator;
 
-    public void indexDocument(final IndexingContext documentMetadata) {
-        final UUID documentId = documentMetadata.getId();
+    public void indexDocument(final IndexingContext indexingContext) {
+        final UUID documentId = indexingContext.getId();
 
-        if (documentMetadata.getContent() == null) {
+        if (indexingContext.getContent() == null) {
             log.info("Marking {} as indexed, even if it has no parsable content!", documentId);
 
             documentManipulator.markIndexed(documentId);
@@ -34,7 +34,9 @@ public class IndexerClient {
         }
 
         try {
-            sendIndexRequest(documentMetadata);
+            log.info("Indexing document with id: {}.", indexingContext.getId());
+
+            sendIndexRequest(indexingContext);
 
             documentManipulator.markIndexed(documentId);
         } catch (final IOException | ElasticsearchException e) {

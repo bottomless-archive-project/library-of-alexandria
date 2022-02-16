@@ -6,7 +6,9 @@ import co.elastic.clients.transport.rest_client.RestClientTransport;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpHost;
+import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
 import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestClientBuilder;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,6 +36,11 @@ public class IndexDatabaseConfiguration {
     @Bean
     public RestClient restClient(final HttpHost httpHost) {
         return RestClient.builder(httpHost)
+                .setHttpClientConfigCallback(httpClientBuilder -> {
+                    httpClientBuilder.disableAuthCaching();
+
+                    return httpClientBuilder;
+                })
                 .setRequestConfigCallback(
                         requestConfigBuilder -> requestConfigBuilder
                                 .setConnectTimeout((int) TimeUnit.MINUTES.toMillis(1))

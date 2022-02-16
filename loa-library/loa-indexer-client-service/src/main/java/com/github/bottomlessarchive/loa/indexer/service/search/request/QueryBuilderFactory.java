@@ -44,11 +44,12 @@ public class QueryBuilderFactory {
 
     private void initializeLanguageQuery(final BoolQuery.Builder parentQuery, final SearchContext searchContext) {
         searchContext.getLanguage().ifPresent(language ->
-                parentQuery.filter(QueryBuilders.matchPhrase()
-                        .field(SearchField.LANGUAGE.getName())
-                        .query(language)
-                        .build()
-                        ._toQuery()
+                parentQuery.filter(
+                        QueryBuilders.matchPhrase()
+                                .field(SearchField.LANGUAGE.getName())
+                                .query(language)
+                                .build()
+                                ._toQuery()
                 )
         );
     }
@@ -85,13 +86,15 @@ public class QueryBuilderFactory {
     }
 
     private Query newContentQuery(final boolean exactMatch, final String keyword) {
-        return exactMatch
-                ? QueryBuilders.matchPhrase()
-                .field(SearchField.CONTENT.getName())
-                .query(keyword)
-                .build()
-                ._toQuery()
-                : QueryBuilders.match()
+        if (exactMatch) {
+            return QueryBuilders.matchPhrase()
+                    .field(SearchField.CONTENT.getName())
+                    .query(keyword)
+                    .build()
+                    ._toQuery();
+        }
+
+        return QueryBuilders.match()
                 .field(SearchField.CONTENT.getName())
                 .query(FieldValue.of(keyword))
                 .build()

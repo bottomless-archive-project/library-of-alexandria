@@ -163,11 +163,11 @@ public class IndexerRequestFactory {
 
     private Highlight newHighlightBuilder() {
         return new Highlight.Builder()
-                .fields(SearchField.CONTENT.getName(), new HighlightField.Builder()
-                        .field(SearchField.CONTENT.getName())
-                        .fragmentSize(350)
-                        .numberOfFragments(3)
-                        .build()
+                .fields(SearchField.CONTENT.getName(),
+                        new HighlightField.Builder()
+                                .fragmentSize(350)
+                                .numberOfFragments(3)
+                                .build()
                 )
                 .order(HighlighterOrder.Score)
                 .build();
