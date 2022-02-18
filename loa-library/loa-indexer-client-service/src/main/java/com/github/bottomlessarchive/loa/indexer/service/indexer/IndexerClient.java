@@ -46,8 +46,8 @@ public class IndexerClient {
         }
     }
 
-    private void sendIndexRequest(final IndexingContext documentMetadata) throws IOException {
-        final IndexRequest<Map<String, Object>> indexRequest = indexRequestFactory.newIndexRequest(documentMetadata);
+    private void sendIndexRequest(final IndexingContext indexingContext) throws IOException {
+        final IndexRequest<Map<String, Object>> indexRequest = indexRequestFactory.newIndexRequest(indexingContext);
 
         elasticsearchClient.index(indexRequest);
     }

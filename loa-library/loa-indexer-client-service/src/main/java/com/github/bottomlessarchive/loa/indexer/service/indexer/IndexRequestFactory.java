@@ -1,5 +1,6 @@
 package com.github.bottomlessarchive.loa.indexer.service.indexer;
 
+import co.elastic.clients.elasticsearch._types.Time;
 import co.elastic.clients.elasticsearch.core.IndexRequest;
 import com.github.bottomlessarchive.loa.indexer.service.indexer.domain.IndexingContext;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +20,11 @@ public class IndexRequestFactory {
                 .id(indexingContext.getId().toString())
                 .index("vault_documents")
                 .document(buildSourceContent(indexingContext))
-                //.timeout() //TODO: Figure this out!
+                .timeout(
+                        new Time.Builder()
+                                .time("30s")
+                                .build()
+                )
                 .build();
     }
 
