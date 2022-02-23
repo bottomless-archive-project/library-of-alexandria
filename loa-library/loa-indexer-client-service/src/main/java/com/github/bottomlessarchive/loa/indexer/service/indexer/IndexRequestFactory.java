@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
@@ -15,43 +14,18 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class IndexRequestFactory {
 
+    private final IndexDocumentFactory indexDocumentFactory;
+
     public IndexRequest<Map<String, Object>> newIndexRequest(final IndexingContext indexingContext) {
         return new IndexRequest.Builder<Map<String, Object>>()
                 .id(indexingContext.getId().toString())
                 .index("vault_documents")
-                .document(buildSourceContent(indexingContext))
+                .document(indexDocumentFactory.buildIndexDocument(indexingContext))
                 .timeout(
                         new Time.Builder()
                                 .time("30s")
                                 .build()
                 )
                 .build();
-    }
-
-    private Map<String, Object> buildSourceContent(final IndexingContext indexingContext) {
-        final Map<String, Object> sourceContent = new HashMap<>();
-
-        sourceContent.put("content", indexingContext.getContent().trim());
-
-        if (indexingContext.getTitle() != null && !indexingContext.getTitle().isBlank()) {
-            sourceContent.put("title", indexingContext.getTitle().trim());
-        }
-
-        if (indexingContext.getAuthor() != null && !indexingContext.getAuthor().isBlank()) {
-            sourceContent.put("author", indexingContext.getAuthor().trim());
-        }
-
-        if (indexingContext.getDate() != null && !indexingContext.getDate().isBlank()) {
-            sourceContent.put("date", indexingContext.getDate().trim());
-        }
-
-        if (indexingContext.getLanguage() != null && !indexingContext.getLanguage().isBlank()) {
-            sourceContent.put("language", indexingContext.getLanguage().trim());
-        }
-
-        sourceContent.put("page_count", indexingContext.getPageCount());
-        sourceContent.put("type", indexingContext.getType());
-
-        return sourceContent;
     }
 }
