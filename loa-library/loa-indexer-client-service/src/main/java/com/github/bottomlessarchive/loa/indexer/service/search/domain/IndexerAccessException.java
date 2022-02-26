@@ -1,8 +1,7 @@
 package com.github.bottomlessarchive.loa.indexer.service.search.domain;
 
-public class IndexerAccessException extends RuntimeException {
+import lombok.experimental.StandardException;
 
-    public IndexerAccessException(final String message, final Throwable throwable) {
-        super(message, throwable);
-    }
+@StandardException
+public class IndexerAccessException extends RuntimeException {
 }

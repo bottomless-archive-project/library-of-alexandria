@@ -11,16 +11,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class IndexDocumentFactoryTest {
 
-    private IndexDocumentFactory indexDocumentFactory;
+    private IndexDocumentFactory underTest;
 
     @BeforeEach
     void setup() {
-        indexDocumentFactory = new IndexDocumentFactory();
+        underTest = new IndexDocumentFactory();
     }
 
     @Test
     void testThatOptionalParametersWereNotAddedWhenTheyAreNull() {
-        final Map<String, Object> result = indexDocumentFactory.buildIndexDocument(
+        final Map<String, Object> result = underTest.buildIndexDocument(
                 IndexingContext.builder()
                         .content("")
                         .build()
@@ -32,7 +32,7 @@ class IndexDocumentFactoryTest {
 
     @Test
     void testThatOptionalParametersWereNotAddedWhenTheyAreBlank() {
-        final Map<String, Object> result = indexDocumentFactory.buildIndexDocument(
+        final Map<String, Object> result = underTest.buildIndexDocument(
                 IndexingContext.builder()
                         .content("")
                         .title("  ")
@@ -48,7 +48,7 @@ class IndexDocumentFactoryTest {
 
     @Test
     void testParametersAreSanitizedAndAddedCorrectly() {
-        final Map<String, Object> result = indexDocumentFactory.buildIndexDocument(
+        final Map<String, Object> result = underTest.buildIndexDocument(
                 IndexingContext.builder()
                         .content(" test-content ")
                         .title(" test-title ")

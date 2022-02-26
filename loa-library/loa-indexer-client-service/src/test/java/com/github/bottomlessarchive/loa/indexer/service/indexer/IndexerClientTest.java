@@ -15,7 +15,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Map;
 import java.util.UUID;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.only;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class IndexerClientTest {
@@ -57,7 +61,7 @@ class IndexerClientTest {
                 .id(documentId)
                 .content("some content")
                 .build();
-        IndexRequest<Map<String, Object>> result = new IndexRequest.Builder<Map<String, Object>>()
+        final IndexRequest<Map<String, Object>> result = new IndexRequest.Builder<Map<String, Object>>()
                 .index("test")
                 .document(Map.of())
                 .build();
@@ -80,7 +84,7 @@ class IndexerClientTest {
                 .id(documentId)
                 .content("some content")
                 .build();
-        IndexRequest<Map<String, Object>> result = new IndexRequest.Builder<Map<String, Object>>()
+        final IndexRequest<Map<String, Object>> result = new IndexRequest.Builder<Map<String, Object>>()
                 .index("test")
                 .document(Map.of())
                 .build();

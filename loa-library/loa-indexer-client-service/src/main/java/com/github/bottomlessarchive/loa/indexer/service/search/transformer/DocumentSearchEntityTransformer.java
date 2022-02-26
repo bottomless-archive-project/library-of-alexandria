@@ -24,6 +24,10 @@ public class DocumentSearchEntityTransformer {
     public DocumentSearchEntity transform(final Hit<SearchDatabaseEntity> searchHit) {
         final SearchDatabaseEntity searchDatabaseEntity = searchHit.source();
 
+        if (searchDatabaseEntity == null) {
+            throw new IllegalStateException("Document source is null in the index for document with id: " + searchHit.id() + "!");
+        }
+
         return DocumentSearchEntity.builder()
                 .id(searchHit.id())
                 .title(searchDatabaseEntity.getTitle())

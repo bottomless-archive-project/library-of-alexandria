@@ -22,6 +22,11 @@ public class IndexerClient {
     private final ElasticsearchClient elasticsearchClient;
     private final DocumentManipulator documentManipulator;
 
+    /**
+     * Add a document into the index.
+     *
+     * @param indexingContext the parameters of the document to add
+     */
     public void indexDocument(final IndexingContext indexingContext) {
         final UUID documentId = indexingContext.getId();
 
