@@ -7,6 +7,9 @@ import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.HitsMetadata;
 import co.elastic.clients.elasticsearch.core.search.TotalHitsRelation;
+import co.elastic.clients.elasticsearch.indices.CreateIndexRequest;
+import co.elastic.clients.elasticsearch.indices.ElasticsearchIndicesClient;
+import co.elastic.clients.elasticsearch.indices.ExistsRequest;
 import co.elastic.clients.transport.endpoints.BooleanResponse;
 import com.github.bottomlessarchive.loa.indexer.service.search.domain.DocumentSearchEntity;
 import com.github.bottomlessarchive.loa.indexer.service.search.domain.DocumentSearchResult;
@@ -30,6 +33,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -198,6 +202,59 @@ class DocumentSearchClientTest {
                 .thenReturn(new BooleanResponse(true));
 
         final boolean result = underTest.isDocumentInIndex(documentId);
+
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    @SneakyThrows
+    void testInitializeSearchEngineWhenExceptionIsThrown() {
+        final CreateIndexRequest createIndexRequest = CreateIndexRequest.of(builder ->
+                builder.index("test")
+        );
+        when(indexerRequestFactory.newCreateIndexRequest())
+                .thenReturn(createIndexRequest);
+        final ElasticsearchIndicesClient elasticsearchIndicesClient = mock(ElasticsearchIndicesClient.class);
+        when(elasticsearchClient.indices())
+                .thenReturn(elasticsearchIndicesClient);
+        when(elasticsearchIndicesClient.create(createIndexRequest))
+                .thenThrow(new IOException());
+
+        assertThrows(IndexerAccessException.class, () -> underTest.initializeSearchEngine());
+    }
+
+    @Test
+    @SneakyThrows
+    void testInitializeSearchEngineWhenInitializationIsSuccessful() {
+        final CreateIndexRequest createIndexRequest = CreateIndexRequest.of(builder ->
+                builder.index("test")
+        );
+        when(indexerRequestFactory.newCreateIndexRequest())
+                .thenReturn(createIndexRequest);
+        final ElasticsearchIndicesClient elasticsearchIndicesClient = mock(ElasticsearchIndicesClient.class);
+        when(elasticsearchClient.indices())
+                .thenReturn(elasticsearchIndicesClient);
+
+        underTest.initializeSearchEngine();
+
+        verify(elasticsearchIndicesClient).create(createIndexRequest);
+    }
+
+    @Test
+    @SneakyThrows
+    void testIsSearchEngineInitializedWhenExceptionIsThrown() {
+        final ExistsRequest existsRequest = ExistsRequest.of(builder ->
+                builder.index("test")
+        );
+        when(indexerRequestFactory.newIndexExistsRequest())
+                .thenReturn(existsRequest);
+        final ElasticsearchIndicesClient elasticsearchIndicesClient = mock(ElasticsearchIndicesClient.class);
+        when(elasticsearchClient.indices())
+                .thenReturn(elasticsearchIndicesClient);
+        when(elasticsearchIndicesClient.exists(existsRequest))
+                .thenReturn(new BooleanResponse(true));
+
+        final boolean result = underTest.isSearchEngineInitialized();
 
         assertThat(result).isTrue();
     }

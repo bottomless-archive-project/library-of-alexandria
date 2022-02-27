@@ -111,17 +111,11 @@ public class DocumentSearchClient {
         final ExistsRequest existsRequest = indexerRequestFactory.newIndexExistsRequest();
 
         try {
-            final boolean exists = elasticsearchClient.indices()
+            return elasticsearchClient.indices()
                     .exists(existsRequest)
                     .value();
-
-            if (exists) {
-                return true;
-            }
         } catch (final IOException e) {
             throw new IndexerAccessException("Failed to verify if search engine initialization is needed!", e);
         }
-
-        return false;
     }
 }
