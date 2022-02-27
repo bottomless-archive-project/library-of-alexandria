@@ -7,7 +7,6 @@ import lombok.Data;
 @Data
 public class SearchDatabaseEntity {
 
-    private String content;
     private String title;
     private String language;
     private String author;

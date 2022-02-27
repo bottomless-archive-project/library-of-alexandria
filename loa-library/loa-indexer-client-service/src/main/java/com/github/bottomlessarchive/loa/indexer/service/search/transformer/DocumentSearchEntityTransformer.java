@@ -21,7 +21,7 @@ public class DocumentSearchEntityTransformer {
                 .toList();
     }
 
-    public DocumentSearchEntity transform(final Hit<SearchDatabaseEntity> searchHit) {
+    private DocumentSearchEntity transform(final Hit<SearchDatabaseEntity> searchHit) {
         final SearchDatabaseEntity searchDatabaseEntity = searchHit.source();
 
         if (searchDatabaseEntity == null) {
@@ -38,6 +38,7 @@ public class DocumentSearchEntityTransformer {
                                 .map(fragment -> fragment
                                         .replaceAll("(\\r\\n|\\n)", "")
                                         .replace("•", "")
+                                        .trim()
                                 )
                                 .toList()
                 )
