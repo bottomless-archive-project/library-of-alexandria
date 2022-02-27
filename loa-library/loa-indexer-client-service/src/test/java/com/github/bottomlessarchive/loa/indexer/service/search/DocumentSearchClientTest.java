@@ -171,7 +171,10 @@ class DocumentSearchClientTest {
     void testIsDocumentInIndexWhenExceptionIsThrown() {
         final UUID documentId = UUID.randomUUID();
         final co.elastic.clients.elasticsearch.core.ExistsRequest hasDocumentsRequest =
-                co.elastic.clients.elasticsearch.core.ExistsRequest.of(builder -> builder);
+                co.elastic.clients.elasticsearch.core.ExistsRequest.of(builder ->
+                        builder.id(documentId.toString())
+                                .index("test")
+                );
         when(indexerRequestFactory.newDocumentExistsRequest(documentId))
                 .thenReturn(hasDocumentsRequest);
         when(elasticsearchClient.exists(hasDocumentsRequest))
