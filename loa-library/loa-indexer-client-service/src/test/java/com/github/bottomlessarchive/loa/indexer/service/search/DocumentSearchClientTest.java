@@ -1,10 +1,13 @@
 package com.github.bottomlessarchive.loa.indexer.service.search;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch.core.CountRequest;
+import co.elastic.clients.elasticsearch.core.CountResponse;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.HitsMetadata;
 import co.elastic.clients.elasticsearch.core.search.TotalHitsRelation;
+import co.elastic.clients.transport.endpoints.BooleanResponse;
 import com.github.bottomlessarchive.loa.indexer.service.search.domain.DocumentSearchEntity;
 import com.github.bottomlessarchive.loa.indexer.service.search.domain.DocumentSearchResult;
 import com.github.bottomlessarchive.loa.indexer.service.search.domain.IndexerAccessException;
@@ -22,6 +25,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -127,5 +131,71 @@ class DocumentSearchClientTest {
                 .isEqualTo(0);
         assertThat(result.getSearchHits())
                 .isSameAs(searchEntities);
+    }
+
+    @Test
+    @SneakyThrows
+    void testCountDocumentsWhenExceptionIsThrown() {
+        final CountRequest countRequest = CountRequest.of(builder -> builder);
+        when(indexerRequestFactory.newCountDocumentsRequest())
+                .thenReturn(countRequest);
+        when(elasticsearchClient.count(countRequest))
+                .thenThrow(new IOException());
+
+        assertThrows(IndexerAccessException.class, () -> underTest.countDocuments());
+    }
+
+    @Test
+    @SneakyThrows
+    void testCountDocumentsWhenCountIsSuccessful() {
+        final CountRequest countRequest = CountRequest.of(builder -> builder);
+        when(indexerRequestFactory.newCountDocumentsRequest())
+                .thenReturn(countRequest);
+        final CountResponse countResponse = CountResponse.of(countBuilder ->
+                countBuilder.count(222)
+                        .shards(builder -> builder.failed(0)
+                                .successful(10)
+                                .total(10)
+                        )
+        );
+        when(elasticsearchClient.count(countRequest))
+                .thenReturn(countResponse);
+
+        final long result = underTest.countDocuments();
+
+        assertThat(result).isEqualTo(222);
+    }
+
+    @Test
+    @SneakyThrows
+    void testIsDocumentInIndexWhenExceptionIsThrown() {
+        final UUID documentId = UUID.randomUUID();
+        final co.elastic.clients.elasticsearch.core.ExistsRequest hasDocumentsRequest =
+                co.elastic.clients.elasticsearch.core.ExistsRequest.of(builder -> builder);
+        when(indexerRequestFactory.newDocumentExistsRequest(documentId))
+                .thenReturn(hasDocumentsRequest);
+        when(elasticsearchClient.exists(hasDocumentsRequest))
+                .thenThrow(new IOException());
+
+        assertThrows(IndexerAccessException.class, () -> underTest.isDocumentInIndex(documentId));
+    }
+
+    @Test
+    @SneakyThrows
+    void testIsDocumentInIndexWhenExistsIsSuccessful() {
+        final UUID documentId = UUID.randomUUID();
+        final co.elastic.clients.elasticsearch.core.ExistsRequest hasDocumentsRequest =
+                co.elastic.clients.elasticsearch.core.ExistsRequest.of(builder ->
+                        builder.id(documentId.toString())
+                                .index("test")
+                );
+        when(indexerRequestFactory.newDocumentExistsRequest(documentId))
+                .thenReturn(hasDocumentsRequest);
+        when(elasticsearchClient.exists(hasDocumentsRequest))
+                .thenReturn(new BooleanResponse(true));
+
+        final boolean result = underTest.isDocumentInIndex(documentId);
+
+        assertThat(result).isTrue();
     }
 }

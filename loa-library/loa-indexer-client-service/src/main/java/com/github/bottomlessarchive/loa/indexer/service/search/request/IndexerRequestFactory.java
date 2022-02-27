@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Create the requests to the search engine, to query data about the indexed documents.
@@ -54,10 +55,10 @@ public class IndexerRequestFactory {
      * @param documentId the id of the document to check
      * @return the created request
      */
-    public co.elastic.clients.elasticsearch.core.ExistsRequest newDocumentExistsRequest(final String documentId) {
+    public co.elastic.clients.elasticsearch.core.ExistsRequest newDocumentExistsRequest(final UUID documentId) {
         return new co.elastic.clients.elasticsearch.core.ExistsRequest.Builder()
                 .index(DOCUMENT_INDEX)
-                .id(documentId)
+                .id(documentId.toString())
                 .storedFields(List.of("_none_"))
                 .build();
     }

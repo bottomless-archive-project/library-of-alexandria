@@ -80,7 +80,7 @@ public class DocumentSearchClient {
      */
     public boolean isDocumentInIndex(final UUID documentId) {
         final co.elastic.clients.elasticsearch.core.ExistsRequest hasDocumentsRequest =
-                indexerRequestFactory.newDocumentExistsRequest(documentId.toString());
+                indexerRequestFactory.newDocumentExistsRequest(documentId);
 
         try {
             return elasticsearchClient.exists(hasDocumentsRequest).value();
