@@ -1,11 +1,15 @@
 package com.github.bottomlessarchive.loa.indexer.service.search.request;
 
+import co.elastic.clients.elasticsearch._types.mapping.IndexOptions;
+import co.elastic.clients.elasticsearch._types.mapping.Property;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.CountRequest;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.search.Highlight;
 import co.elastic.clients.elasticsearch.core.search.HighlightField;
+import co.elastic.clients.elasticsearch.indices.CreateIndexRequest;
 import co.elastic.clients.elasticsearch.indices.ExistsRequest;
+import co.elastic.clients.elasticsearch.indices.IndexSettings;
 import com.github.bottomlessarchive.loa.indexer.service.search.domain.SearchContext;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,6 +17,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Map;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -92,5 +97,39 @@ class IndexerRequestFactoryTest {
                 .isEqualTo(350);
         assertThat(highlightField.numberOfFragments())
                 .isEqualTo(3);
+    }
+
+    @Test
+    void testCreateIndexRequest() {
+        final CreateIndexRequest createIndexRequest = underTest.newCreateIndexRequest();
+
+        assertThat(createIndexRequest.index())
+                .isEqualTo(DOCUMENT_INDEX);
+
+        final Map<String, Property> properties = createIndexRequest.mappings().properties();
+        assertThat(properties.get("author").isText())
+                .isTrue();
+        assertThat(properties.get("title").isText())
+                .isTrue();
+        assertThat(properties.get("date").isDate())
+                .isTrue();
+        assertThat(properties.get("language").isKeyword())
+                .isTrue();
+        assertThat(properties.get("type").isKeyword())
+                .isTrue();
+        assertThat(properties.get("page_count").isLong())
+                .isTrue();
+        assertThat(properties.get("content").isText())
+                .isTrue();
+        assertThat(properties.get("content").text().indexOptions())
+                .isEqualTo(IndexOptions.Offsets);
+
+        final IndexSettings indexSettings = createIndexRequest.settings();
+        assertThat(indexSettings.numberOfShards())
+                .isEqualTo("10");
+        assertThat(indexSettings.codec())
+                .isEqualTo("best_compression");
+        assertThat(indexSettings.refreshInterval().time())
+                .isEqualTo("60s");
     }
 }
