@@ -1,4 +1,4 @@
-package com.github.bottomlessarchive.loa.repository.configuration;
+package com.github.bottomlessarchive.loa.conductor.configuration;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 

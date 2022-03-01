@@ -3,7 +3,7 @@ package com.github.bottomlessarchive.loa.document.repository;
 import com.github.bottomlessarchive.loa.document.repository.domain.DocumentDatabaseEntity;
 import com.github.bottomlessarchive.loa.document.repository.domain.DocumentStatusAggregateEntity;
 import com.github.bottomlessarchive.loa.document.repository.domain.DocumentTypeAggregateEntity;
-import com.github.bottomlessarchive.loa.repository.configuration.RepositoryConfigurationProperties;
+import com.github.bottomlessarchive.loa.repository.configuration.RepositoryMetadataContainer;
 import com.github.bottomlessarchive.loa.repository.service.HexConverter;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
@@ -31,7 +31,7 @@ import static com.mongodb.client.model.Updates.set;
 public class DocumentRepository {
 
     private final HexConverter hexConverter;
-    private final RepositoryConfigurationProperties repositoryConfigurationProperties;
+    private final RepositoryMetadataContainer repositoryMetadataContainer;
     private final MongoCollection<DocumentDatabaseEntity> documentDatabaseEntityMongoCollection;
 
     public void insertDocument(final DocumentDatabaseEntity documentDatabaseEntity) {
@@ -83,7 +83,7 @@ public class DocumentRepository {
         return documentDatabaseEntityMongoCollection.find(eq("status", status))
                 // We don't want to have the cursor closed while processing. It would be a better idea to set
                 // a maximum timeout in milliseconds but that only configurable on the server side.
-                .noCursorTimeout(repositoryConfigurationProperties.noCursorTimeout());
+                .noCursorTimeout(repositoryMetadataContainer.isNoCursorTimeout());
     }
 
     /**
@@ -95,7 +95,7 @@ public class DocumentRepository {
         return documentDatabaseEntityMongoCollection.find()
                 // We don't want to have the cursor closed while processing. It would be a better idea to set
                 // a maximum timeout in milliseconds but that only configurable on the server side.
-                .noCursorTimeout(repositoryConfigurationProperties.noCursorTimeout());
+                .noCursorTimeout(repositoryMetadataContainer.isNoCursorTimeout());
     }
 
     public long estimateCount() {

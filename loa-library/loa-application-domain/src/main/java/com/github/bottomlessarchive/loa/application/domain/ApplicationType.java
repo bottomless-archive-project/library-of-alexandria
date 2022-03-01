@@ -14,7 +14,9 @@ public enum ApplicationType {
     INDEXER_APPLICATION(true),
     QUEUE_APPLICATION(true),
     VAULT_APPLICATION(true),
-    WEB_APPLICATION(true);
+    WEB_APPLICATION(true),
+    DOCUMENT_DATABASE(true),
+    DOCUMENT_INDEX(true);
 
     private final boolean reportStatusAndLocation;
 }

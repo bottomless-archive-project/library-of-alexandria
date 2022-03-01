@@ -47,7 +47,7 @@ public class ServiceInstanceEntity {
     }
 
     public Optional<ServiceInstanceEntityProperty> getProperty(final String name) {
-        if (!properties.containsKey(name)) {
+        if (!properties.containsKey(name) || properties.get(name).isBlank()) {
             return Optional.empty();
         }
 
@@ -60,6 +60,8 @@ public class ServiceInstanceEntity {
     }
 
     public boolean isHealthy() {
-        return lastHeartbeat.plus(2, ChronoUnit.MINUTES).isAfter(Instant.now());
+        return lastHeartbeat.plus(2, ChronoUnit.MINUTES).isAfter(Instant.now())
+                || applicationType.equals(ApplicationType.DOCUMENT_DATABASE)
+                || applicationType.equals(ApplicationType.DOCUMENT_INDEX);
     }
 }

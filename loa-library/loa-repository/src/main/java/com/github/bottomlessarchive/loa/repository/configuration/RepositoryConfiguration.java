@@ -1,5 +1,8 @@
 package com.github.bottomlessarchive.loa.repository.configuration;
 
+import com.github.bottomlessarchive.loa.application.domain.ApplicationType;
+import com.github.bottomlessarchive.loa.conductor.service.client.ConductorClient;
+import com.github.bottomlessarchive.loa.conductor.service.domain.ServiceInstanceEntity;
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.ServerAddress;
@@ -22,7 +25,7 @@ import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 @RequiredArgsConstructor
 public class RepositoryConfiguration {
 
-    private final RepositoryConfigurationProperties repositoryConfigurationProperties;
+    private final ConductorClient conductorClient;
 
     @Bean
     public MongoDatabase mongoDatabase(final MongoClient mongoClient) {
@@ -36,19 +39,22 @@ public class RepositoryConfiguration {
 
     @Bean
     public MongoClientSettings mongoClientSettings(final CodecRegistry codecRegistry) {
+        final ServiceInstanceEntity serviceInstanceEntity = conductorClient.getInstance(ApplicationType.DOCUMENT_DATABASE)
+                .orElseThrow(() -> new IllegalStateException("Document database (MongoDB) server is not available!"));
+
         final MongoClientSettings.Builder builder = MongoClientSettings.builder()
                 .codecRegistry(codecRegistry)
                 .uuidRepresentation(UuidRepresentation.JAVA_LEGACY);
 
-        if (repositoryConfigurationProperties.isUriConfiguration()) {
-            builder.applyConnectionString(new ConnectionString(repositoryConfigurationProperties.uri()));
+        if (serviceInstanceEntity.getProperty("uri").isPresent()) {
+            builder.applyConnectionString(new ConnectionString(serviceInstanceEntity.getProperty("uri").get().getValue()));
         } else {
             builder.applyToClusterSettings(clusterBuilder ->
                     clusterBuilder.hosts(
                             List.of(
                                     new ServerAddress(
-                                            repositoryConfigurationProperties.host(),
-                                            repositoryConfigurationProperties.port()
+                                            serviceInstanceEntity.getLocation(),
+                                            serviceInstanceEntity.getPort()
                                     )
                             )
                     )
