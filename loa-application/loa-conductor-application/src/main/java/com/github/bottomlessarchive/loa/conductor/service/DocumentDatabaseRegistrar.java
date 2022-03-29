@@ -1,6 +1,7 @@
 package com.github.bottomlessarchive.loa.conductor.service;
 
 import com.github.bottomlessarchive.loa.application.domain.ApplicationType;
+import com.github.bottomlessarchive.loa.conductor.configuration.IndexDatabaseConfigurationProperties;
 import com.github.bottomlessarchive.loa.conductor.configuration.RepositoryConfigurationProperties;
 import com.github.bottomlessarchive.loa.conductor.service.domain.ServiceInstanceProperty;
 import com.github.bottomlessarchive.loa.conductor.service.domain.ServiceInstanceRegistrationContext;
@@ -18,6 +19,7 @@ public class DocumentDatabaseRegistrar implements ApplicationListener<ContextRef
 
     private final ServiceInstanceContainer serviceInstanceContainer;
     private final RepositoryConfigurationProperties repositoryConfigurationProperties;
+    private final IndexDatabaseConfigurationProperties indexDatabaseConfigurationProperties;
 
     @Override
     public void onApplicationEvent(@NonNull final ContextRefreshedEvent event) {
@@ -37,6 +39,13 @@ public class DocumentDatabaseRegistrar implements ApplicationListener<ContextRef
                                                 .build()
                                 )
                         )
+                        .build()
+        );
+
+        serviceInstanceContainer.registerServiceInstance(ApplicationType.DOCUMENT_INDEX,
+                ServiceInstanceRegistrationContext.builder()
+                        .location(indexDatabaseConfigurationProperties.host())
+                        .port(indexDatabaseConfigurationProperties.port())
                         .build()
         );
     }
