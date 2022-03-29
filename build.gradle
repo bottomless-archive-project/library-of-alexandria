@@ -4,7 +4,7 @@ buildscript {
     ext {
         set('artemis.version', '2.20.0')
         set('elasticsearch.version', '8.0.0')
-        set('mongodb.version', '4.4.1')
+        set('mongodb.version', '4.5.1')
         set('okhttp3.version', '4.9.3')
     }
     repositories {
@@ -14,7 +14,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath('org.springframework.boot:spring-boot-gradle-plugin:2.6.3')
+        classpath('org.springframework.boot:spring-boot-gradle-plugin:2.6.5')
         classpath('com.adarshr:gradle-test-logger-plugin:2.0.0')
         classpath('com.github.ben-manes:gradle-versions-plugin:0.29.0')
         classpath('com.palantir.gradle.docker:gradle-docker:0.25.0')

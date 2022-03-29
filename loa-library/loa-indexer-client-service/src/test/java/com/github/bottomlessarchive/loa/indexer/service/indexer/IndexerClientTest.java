@@ -38,6 +38,7 @@ class IndexerClientTest {
 
     @Test
     @SneakyThrows
+    @SuppressWarnings("unchecked")
     void testStatusSetToIndexedWhenContentIsNull() {
         final UUID documentId = UUID.randomUUID();
         final IndexingContext indexingContext = IndexingContext.builder()
