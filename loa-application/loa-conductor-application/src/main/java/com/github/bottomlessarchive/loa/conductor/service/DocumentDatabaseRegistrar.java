@@ -11,6 +11,7 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
+import java.util.LinkedList;
 import java.util.List;
 
 @Component
@@ -23,25 +24,39 @@ public class DocumentDatabaseRegistrar implements ApplicationListener<ContextRef
 
     @Override
     public void onApplicationEvent(@NonNull final ContextRefreshedEvent event) {
+        registerDocumentDatabase();
+        registerDocumentIndex();
+    }
+
+    private void registerDocumentDatabase() {
+        final List<ServiceInstanceProperty> properties = new LinkedList<>();
+
+        if (repositoryConfigurationProperties.uri() != null) {
+            properties.add(
+                    ServiceInstanceProperty.builder()
+                            .name("uri")
+                            .value(repositoryConfigurationProperties.uri())
+                            .build()
+            );
+        }
+
+        properties.add(
+                ServiceInstanceProperty.builder()
+                        .name("noCursorTimeout")
+                        .value(String.valueOf(repositoryConfigurationProperties.noCursorTimeout()))
+                        .build()
+        );
+
         serviceInstanceContainer.registerServiceInstance(ApplicationType.DOCUMENT_DATABASE,
                 ServiceInstanceRegistrationContext.builder()
                         .location(repositoryConfigurationProperties.host())
                         .port(repositoryConfigurationProperties.port())
-                        .properties(
-                                List.of(
-                                        ServiceInstanceProperty.builder()
-                                                .name("uri")
-                                                .value(repositoryConfigurationProperties.uri())
-                                                .build(),
-                                        ServiceInstanceProperty.builder()
-                                                .name("noCursorTimeout")
-                                                .value(String.valueOf(repositoryConfigurationProperties.noCursorTimeout()))
-                                                .build()
-                                )
-                        )
+                        .properties(properties)
                         .build()
         );
+    }
 
+    private void registerDocumentIndex() {
         // Running Elasticsearch is not mandatory for the application
         if (!indexDatabaseConfigurationProperties.host().isBlank()) {
             serviceInstanceContainer.registerServiceInstance(ApplicationType.DOCUMENT_INDEX,

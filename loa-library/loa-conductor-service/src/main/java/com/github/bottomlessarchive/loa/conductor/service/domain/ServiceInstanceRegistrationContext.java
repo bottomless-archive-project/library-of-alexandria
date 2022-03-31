@@ -12,7 +12,9 @@ public class ServiceInstanceRegistrationContext {
 
     private final String location;
     private final int port;
-    private final List<ServiceInstanceProperty> properties;
+
+    @Builder.Default
+    private final List<ServiceInstanceProperty> properties = Collections.emptyList();
 
     public List<ServiceInstanceProperty> getProperties() {
         return Collections.unmodifiableList(properties);
