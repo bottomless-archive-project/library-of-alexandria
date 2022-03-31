@@ -42,11 +42,14 @@ public class DocumentDatabaseRegistrar implements ApplicationListener<ContextRef
                         .build()
         );
 
-        serviceInstanceContainer.registerServiceInstance(ApplicationType.DOCUMENT_INDEX,
-                ServiceInstanceRegistrationContext.builder()
-                        .location(indexDatabaseConfigurationProperties.host())
-                        .port(indexDatabaseConfigurationProperties.port())
-                        .build()
-        );
+        // Running Elasticsearch is not mandatory for the application
+        if (!indexDatabaseConfigurationProperties.host().isBlank()) {
+            serviceInstanceContainer.registerServiceInstance(ApplicationType.DOCUMENT_INDEX,
+                    ServiceInstanceRegistrationContext.builder()
+                            .location(indexDatabaseConfigurationProperties.host())
+                            .port(indexDatabaseConfigurationProperties.port())
+                            .build()
+            );
+        }
     }
 }

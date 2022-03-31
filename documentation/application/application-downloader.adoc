@@ -35,7 +35,6 @@ include::../service/conductor/conductor-configuration.adoc[]
 | The number of consumer connections to the <<Queue Application>>.*(Default value: 10)*
 
 | **loa.queue.consumer-pool-size**
-| The port open for the MongoDB database server. *(Default value: 10)*
+| The number of producer connections to the <<Queue Application>>.*(Default value: 10)*
 
-include::../service/repository/repository-configuration.adoc[]
 |===

@@ -7,7 +7,6 @@ This application's goal is to provide basic database administrator tasks (query 
 | Parameter | Description
 
 include::../service/conductor/conductor-configuration.adoc[]
-include::../service/repository/repository-configuration.adoc[]
 
 | **loa.indexer.database.host**
 | The host of the Elasticsearch database.

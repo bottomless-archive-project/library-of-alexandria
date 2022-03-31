@@ -23,8 +23,6 @@ include::../service/conductor/conductor-configuration.adoc[]
 | **loa.vault.location.file.path**
 | Used only when `loa.vault.location.type` is set to `file`. Path to the location of the vault on the filesystem.
 
-include::../service/repository/repository-configuration.adoc[]
-
 | **loa.stage.location**
 | The location where the document files are first moved. After the checksum calculation and duplicate detection, they are moved to the vault.
 

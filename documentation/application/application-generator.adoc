@@ -15,7 +15,6 @@ NOTE: If you do not have a lot of URLs ready at hand, take a look into the https
 | Parameter | Description
 
 include::../service/conductor/conductor-configuration.adoc[]
-include::../service/repository/repository-configuration.adoc[]
 
 | **loa.source.name**
 | The name of the source location. This name will be saved to the database for every crawled document. It could be helpful for statistics collection or in identifying bugs and errors with specific sources. *(Default value: unknown)*

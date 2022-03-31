@@ -11,13 +11,6 @@ The application run queries on the Elasticsearch cluster and display the results
 | Parameter | Description
 
 include::../service/conductor/conductor-configuration.adoc[]
-include::../service/repository/repository-configuration.adoc[]
-
-| **loa.indexer.database.host**
-| The host of the Elasticsearch database.
-
-| **loa.indexer.database.port**
-| The port of the Elasticsearch database.
 
 | **loa.indexer.database.enabled**
 | If the Elasticsearch connection should be enabled. Sometimes you want to run the application without connecting to Elasticsearch (just to view the dashboard etc). *(Default value: true)*
