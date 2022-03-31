@@ -5,8 +5,8 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class DashboardQueueStatisticsResponse {
+public class QueueServiceInstance {
 
-    private final String name;
-    private final long messageCount;
+    private final long documentLocationQueueCount;
+    private final long documentArchivingQueueCount;
 }

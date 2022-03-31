@@ -3,10 +3,11 @@ package com.github.bottomlessarchive.loa.web.view.document.response.dashboard;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.util.List;
+
 @Getter
 @Builder
-public class DashboardVaultStatisticsResponse {
+public class DashboardServicesResponse {
 
-    private final String name;
-    private final long availableStorageInBytes;
+    private final List<QueueServiceInstance> queues;
 }

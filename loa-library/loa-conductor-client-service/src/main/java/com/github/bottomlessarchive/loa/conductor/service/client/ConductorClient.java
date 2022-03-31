@@ -1,6 +1,7 @@
 package com.github.bottomlessarchive.loa.conductor.service.client;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.bottomlessarchive.loa.application.domain.ApplicationType;
 import com.github.bottomlessarchive.loa.conductor.service.NetworkAddressCalculator;
@@ -11,6 +12,7 @@ import com.github.bottomlessarchive.loa.conductor.service.client.request.Service
 import com.github.bottomlessarchive.loa.conductor.service.client.request.ServiceInstanceRefreshRequest;
 import com.github.bottomlessarchive.loa.conductor.service.client.request.ServiceInstanceRegistrationRequest;
 import com.github.bottomlessarchive.loa.conductor.service.client.response.ServiceInstanceRegistrationResponse;
+import com.github.bottomlessarchive.loa.conductor.service.client.response.ServiceInstanceResponse;
 import com.github.bottomlessarchive.loa.conductor.service.client.response.ServiceResponse;
 import com.github.bottomlessarchive.loa.conductor.service.domain.ServiceInstanceEntity;
 import com.github.bottomlessarchive.loa.conductor.service.domain.ServiceInstanceEntityProperty;
@@ -49,6 +51,26 @@ public class ConductorClient {
     }
 
     @SneakyThrows //TODO: Use ConductorClientException instead
+    public List<ServiceInstanceEntity> getInstances() {
+        final Request request = new Request.Builder()
+                .url(conductorClientConfigurationProperties.getUrl() + "/service")
+                .get()
+                .build();
+
+        final String response = okHttpClient.newCall(request)
+                .execute()
+                .body()
+                .string();
+
+        return objectMapper.readValue(response, new TypeReference<List<ServiceResponse>>() {
+                }).stream()
+                .flatMap(serviceResponse -> serviceResponse.getInstances().stream()
+                        .map(instance -> transform(serviceResponse.getApplicationType(), instance))
+                )
+                .toList();
+    }
+
+    @SneakyThrows //TODO: Use ConductorClientException instead
     public List<ServiceInstanceEntity> getInstances(final ApplicationType applicationType) {
         final Request request = new Request.Builder()
                 .url(conductorClientConfigurationProperties.getUrl() + "/service/" + convertApplicationTypeToPath(applicationType))
@@ -61,23 +83,7 @@ public class ConductorClient {
                 .string();
 
         return objectMapper.readValue(response, ServiceResponse.class).getInstances().stream()
-                .map(instance -> ServiceInstanceEntity.builder()
-                        .id(instance.getId())
-                        .location(instance.getLocation())
-                        .port(instance.getPort())
-                        .applicationType(applicationType)
-                        .properties(instance.getProperties().stream()
-                                .map(serviceInstancePropertyResponse -> ServiceInstanceEntityProperty.builder()
-                                        .name(serviceInstancePropertyResponse.getName())
-                                        .value(serviceInstancePropertyResponse.getValue())
-                                        .build()
-                                )
-                                .collect(Collectors.toMap(
-                                        ServiceInstanceEntityProperty::getName, ServiceInstanceEntityProperty::getValue))
-                        )
-                        .lastHeartbeat(instance.getLastHeartbeat())
-                        .build()
-                )
+                .map(instance -> transform(applicationType, instance))
                 .toList();
     }
 
@@ -168,5 +174,24 @@ public class ConductorClient {
 
     private String convertApplicationTypeToPath(final ApplicationType applicationType) {
         return applicationType.name().replaceAll("_", "-").toLowerCase(Locale.ENGLISH);
+    }
+
+    public ServiceInstanceEntity transform(final ApplicationType applicationType, final ServiceInstanceResponse instance) {
+        return ServiceInstanceEntity.builder()
+                .id(instance.getId())
+                .location(instance.getLocation())
+                .port(instance.getPort())
+                .applicationType(applicationType)
+                .properties(instance.getProperties().stream()
+                        .map(serviceInstancePropertyResponse -> ServiceInstanceEntityProperty.builder()
+                                .name(serviceInstancePropertyResponse.getName())
+                                .value(serviceInstancePropertyResponse.getValue())
+                                .build()
+                        )
+                        .collect(Collectors.toMap(
+                                ServiceInstanceEntityProperty::getName, ServiceInstanceEntityProperty::getValue))
+                )
+                .lastHeartbeat(instance.getLastHeartbeat())
+                .build();
     }
 }
