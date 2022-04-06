@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Optional;
@@ -32,11 +31,6 @@ public class DocumentDataParser {
 
     private final Parser documentParser;
     private final LanguageDetector languageDetector;
-
-    public ParsingResult parseDocumentMetadata(final UUID documentId, final DocumentType documentType,
-            final byte[] documentContents) {
-        return parseDocumentMetadata(documentId, documentType, new ByteArrayInputStream(documentContents));
-    }
 
     public ParsingResult parseDocumentMetadata(final UUID documentId, final DocumentType documentType,
             final InputStream documentContents) {
