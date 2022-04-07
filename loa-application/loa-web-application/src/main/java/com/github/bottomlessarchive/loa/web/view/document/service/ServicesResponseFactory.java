@@ -5,6 +5,7 @@ import com.github.bottomlessarchive.loa.conductor.service.client.ConductorClient
 import com.github.bottomlessarchive.loa.conductor.service.domain.ServiceInstanceEntity;
 import com.github.bottomlessarchive.loa.web.view.document.response.dashboard.DashboardServicesResponse;
 import com.github.bottomlessarchive.loa.web.view.document.response.dashboard.QueueServiceInstance;
+import com.github.bottomlessarchive.loa.web.view.document.response.dashboard.VaultServiceInstance;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +22,7 @@ public class ServicesResponseFactory {
 
         return DashboardServicesResponse.builder()
                 .queues(buildQueues(serviceInstanceEntities))
+                .vaults(buildVaults(serviceInstanceEntities))
                 .build();
     }
 
@@ -28,6 +30,8 @@ public class ServicesResponseFactory {
         return serviceInstanceEntities.stream()
                 .filter(instance -> instance.getApplicationType().equals(ApplicationType.QUEUE_APPLICATION))
                 .map(instance -> QueueServiceInstance.builder()
+                        .host(instance.getLocation())
+                        .port(instance.getPort())
                         .documentLocationQueueCount(
                                 instance.getProperty("locationQueueCount")
                                         .map(property -> Long.valueOf(property.getValue()))
@@ -35,6 +39,22 @@ public class ServicesResponseFactory {
                         )
                         .documentArchivingQueueCount(
                                 instance.getProperty("archivingQueueCount")
+                                        .map(property -> Long.valueOf(property.getValue()))
+                                        .orElse(-1L)
+                        )
+                        .build()
+                )
+                .toList();
+    }
+
+    private List<VaultServiceInstance> buildVaults(final List<ServiceInstanceEntity> serviceInstanceEntities) {
+        return serviceInstanceEntities.stream()
+                .filter(instance -> instance.getApplicationType().equals(ApplicationType.VAULT_APPLICATION))
+                .map(instance -> VaultServiceInstance.builder()
+                        .host(instance.getLocation())
+                        .port(instance.getPort())
+                        .freeSpace(
+                                instance.getProperty("freeSpace")
                                         .map(property -> Long.valueOf(property.getValue()))
                                         .orElse(-1L)
                         )

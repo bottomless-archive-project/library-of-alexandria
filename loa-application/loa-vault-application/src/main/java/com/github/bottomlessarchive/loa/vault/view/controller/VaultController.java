@@ -12,7 +12,6 @@ import com.github.bottomlessarchive.loa.vault.service.location.VaultLocationFact
 import com.github.bottomlessarchive.loa.vault.view.request.domain.RecompressDocumentRequest;
 import com.github.bottomlessarchive.loa.vault.view.request.domain.ReplaceDocumentRequest;
 import com.github.bottomlessarchive.loa.vault.view.response.domain.DocumentExistsResponse;
-import com.github.bottomlessarchive.loa.vault.view.response.domain.FreeSpaceResponse;
 import com.github.bottomlessarchive.loa.vault.view.domain.InvalidRequestException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -114,18 +113,6 @@ public class VaultController {
                 }, () -> {
                     throw new InvalidRequestException("Document not found with id " + documentId + "!");
                 });
-    }
-
-    /**
-     * Return the free space available on this vault instance.
-     *
-     * @return the free space available on this instance
-     */
-    @GetMapping("/vault/free-space")
-    public FreeSpaceResponse getFreeSpace() {
-        return FreeSpaceResponse.builder()
-                .freeSpace(vaultDocumentManager.getAvailableSpace())
-                .build();
     }
 
     @GetMapping("/document/{documentId}/exists")

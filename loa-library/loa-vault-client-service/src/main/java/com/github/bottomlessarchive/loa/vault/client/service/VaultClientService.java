@@ -8,7 +8,6 @@ import com.github.bottomlessarchive.loa.vault.client.service.domain.VaultLocatio
 import com.github.bottomlessarchive.loa.vault.client.service.request.RecompressDocumentRequest;
 import com.github.bottomlessarchive.loa.vault.client.service.request.ReplaceCorruptDocumentRequest;
 import com.github.bottomlessarchive.loa.vault.client.service.response.DocumentExistsResponse;
-import com.github.bottomlessarchive.loa.vault.client.service.response.FreeSpaceResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -117,31 +116,6 @@ public class VaultClientService {
                     .close();
         } catch (final IOException e) {
             throw new VaultAccessException("Error while connecting to the vault for document:  " + documentEntity.getId() + "!", e);
-        }
-    }
-
-    public long getAvailableSpace(final String vaultName) {
-        if (!vaultLocations.containsKey(vaultName)) {
-            throw new IllegalStateException("Vault " + vaultName + " is not found!");
-        }
-
-        final VaultLocation vaultLocation = vaultLocations.get(vaultName);
-
-        final Request request = new Request.Builder()
-                .url("http://" + vaultLocation.getLocation() + ":" + vaultLocation.getPort() + "/vault/free-space")
-                .get()
-                .build();
-
-        try {
-            final String response = okHttpClient.newCall(request)
-                    .execute()
-                    .body()
-                    .string();
-
-            return objectMapper.readValue(response, FreeSpaceResponse.class)
-                    .getFreeSpace();
-        } catch (final IOException e) {
-            throw new VaultAccessException("Error while connecting to the vault: " + vaultName + "!", e);
         }
     }
 
