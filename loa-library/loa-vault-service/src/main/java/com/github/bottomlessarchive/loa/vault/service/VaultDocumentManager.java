@@ -85,13 +85,4 @@ public class VaultDocumentManager {
             vaultLocation.clear();
         }
     }
-
-    /**
-     * Return the available free space in the vault in bytes.
-     *
-     * @return the free bytes available
-     */
-    public long getAvailableSpace() {
-        return vaultLocationFactory.getAvailableSpace();
-    }
 }
