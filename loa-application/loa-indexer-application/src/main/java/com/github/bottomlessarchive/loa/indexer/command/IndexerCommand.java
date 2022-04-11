@@ -1,5 +1,6 @@
 package com.github.bottomlessarchive.loa.indexer.command;
 
+import com.github.bottomlessarchive.loa.document.service.DocumentManipulator;
 import com.github.bottomlessarchive.loa.indexer.service.indexer.domain.IndexingContext;
 import com.github.bottomlessarchive.loa.parser.domain.ParsingResult;
 import com.github.bottomlessarchive.loa.parser.service.DocumentDataParser;
@@ -27,6 +28,7 @@ public class IndexerCommand implements CommandLineRunner {
     private final DocumentDataParser documentDataParser;
     private final DocumentSearchClient documentSearchClient;
     private final DocumentEntityFactory documentEntityFactory;
+    private final DocumentManipulator documentManipulator;
 
     @Override
     public void run(final String... args) {
@@ -39,7 +41,16 @@ public class IndexerCommand implements CommandLineRunner {
         log.info("Start document indexing.");
 
         documentEntityFactory.getDocumentEntity(DocumentStatus.DOWNLOADED)
-                .forEach(this::processDocument);
+                .forEach(documentEntity -> {
+                            try {
+                                processDocument(documentEntity);
+                            } catch (Exception e) {
+                                log.warn("Failed to index document {}! Cause: '{}'.", documentEntity.getId(), e.getMessage());
+
+                                documentManipulator.markCorrupt(documentEntity.getId());
+                            }
+                        }
+                );
     }
 
     @SneakyThrows

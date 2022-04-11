@@ -53,7 +53,7 @@ public class IndexDatabaseConfiguration {
 
     @Bean
     public HttpHost httpHost() {
-        final ServiceInstanceEntity serviceInstanceEntity = conductorClient.getInstance(ApplicationType.DOCUMENT_DATABASE)
+        final ServiceInstanceEntity serviceInstanceEntity = conductorClient.getInstance(ApplicationType.DOCUMENT_INDEX)
                 .orElseThrow(() -> new IllegalStateException("Document database (MongoDB) server is not available!"));
 
         if (log.isInfoEnabled()) {
