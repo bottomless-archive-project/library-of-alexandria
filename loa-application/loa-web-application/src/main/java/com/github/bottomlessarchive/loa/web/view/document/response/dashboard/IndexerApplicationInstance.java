@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class DownloaderServiceInstance {
+public class IndexerApplicationInstance {
 
     private final String host;
     private final int port;

@@ -49,15 +49,15 @@
 
 <div class="card mb-2">
   <div class="card-body">
-    <h5 class="card-title">Queues</h5>
+    <h5 class="card-title">Queue Applications</h5>
     <div class="row">
-      <div class="col" *ngFor="let queue of statistics.queues">
+      <div class="col-4" *ngFor="let queue of applications.queues">
         <div class="card">
           <div class="card-body">
-            <h6 class="card-title">{{queue.name.split('_').join(' ') | titlecase}}</h6>
-            <div class="card-body p-0">
-              <p class="m-0">Messages in queue: {{queue.messageCount}}</p>
-            </div>
+            <p class="m-0">Host: {{queue.host}}</p>
+            <p class="m-0">Port: {{queue.port}}</p>
+            <p class="m-0">Messages in location queue: {{queue.documentLocationQueueCount}}</p>
+            <p class="m-0">Messages in archiving queue: {{queue.documentArchivingQueueCount}}</p>
           </div>
         </div>
       </div>
@@ -67,19 +67,78 @@
 
 <div class="card mb-2">
   <div class="card-body">
-    <h5 class="card-title">Vault instances</h5>
+    <h5 class="card-title">Vault Applications</h5>
     <div class="row">
-      <div class="col-4" *ngFor="let vault of statistics.vaultInstances">
-        <div class="card" [ngClass]="{'alert-danger': vault.availableStorageInBytes == -1}">
+      <div class="col-4" *ngFor="let vault of applications.vaults">
+        <div class="card">
           <div class="card-body">
-            <h6 class="card-title">{{vault.name}}
-              <small style="font-weight: bold;" *ngIf="vault.availableStorageInBytes == -1">(Unreachable!)</small>
-            </h6>
-            <div class="card-body p-0">
-              <p class="m-0" *ngIf="vault.availableStorageInBytes > -1">Free
-                space: {{vault.availableStorageInBytes | bytes}}</p>
-              <p class="m-0" *ngIf="vault.availableStorageInBytes == -1">Free space: Unavailable!</p>
-            </div>
+            <p class="m-0">Host: {{vault.host}}</p>
+            <p class="m-0">Port: {{vault.port}}</p>
+            <p class="m-0">Free space: {{vault.freeSpace | bytes}}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card mb-2">
+  <div class="card-body">
+    <h5 class="card-title">Generator Applications</h5>
+    <div class="row">
+      <div class="col-4" *ngFor="let generator of applications.generators">
+        <div class="card">
+          <div class="card-body">
+            <p class="m-0">Host: {{generator.host}}</p>
+            <p class="m-0">Port: {{generator.port}}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card mb-2">
+  <div class="card-body">
+    <h5 class="card-title">Downloader Applications</h5>
+    <div class="row">
+      <div class="col-4" *ngFor="let downloader of applications.downloaders">
+        <div class="card">
+          <div class="card-body">
+            <p class="m-0">Host: {{downloader.host}}</p>
+            <p class="m-0">Port: {{downloader.port}}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card mb-2">
+  <div class="card-body">
+    <h5 class="card-title">Indexer Applications</h5>
+    <div class="row">
+      <div class="col-4" *ngFor="let indexer of applications.indexers">
+        <div class="card">
+          <div class="card-body">
+            <p class="m-0">Host: {{indexer.host}}</p>
+            <p class="m-0">Port: {{indexer.port}}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card mb-2">
+  <div class="card-body">
+    <h5 class="card-title">Administrator Applications</h5>
+    <div class="row">
+      <div class="col-4" *ngFor="let administrator of applications.administrators">
+        <div class="card">
+          <div class="card-body">
+            <p class="m-0">Host: {{administrator.host}}</p>
+            <p class="m-0">Port: {{administrator.port}}</p>
           </div>
         </div>
       </div>

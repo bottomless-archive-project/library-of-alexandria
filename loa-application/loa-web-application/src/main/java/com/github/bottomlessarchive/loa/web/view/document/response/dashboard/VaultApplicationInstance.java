@@ -5,8 +5,10 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class AdministratorServiceInstance {
+public class VaultApplicationInstance {
 
     private final String host;
     private final int port;
+
+    private final long freeSpace;
 }

@@ -3,13 +3,13 @@ package com.github.bottomlessarchive.loa.web.view.document.service;
 import com.github.bottomlessarchive.loa.application.domain.ApplicationType;
 import com.github.bottomlessarchive.loa.conductor.service.client.ConductorClient;
 import com.github.bottomlessarchive.loa.conductor.service.domain.ServiceInstanceEntity;
-import com.github.bottomlessarchive.loa.web.view.document.response.dashboard.AdministratorServiceInstance;
-import com.github.bottomlessarchive.loa.web.view.document.response.dashboard.DashboardServicesResponse;
-import com.github.bottomlessarchive.loa.web.view.document.response.dashboard.DownloaderServiceInstance;
-import com.github.bottomlessarchive.loa.web.view.document.response.dashboard.GeneratorServiceInstance;
-import com.github.bottomlessarchive.loa.web.view.document.response.dashboard.IndexerServiceInstance;
-import com.github.bottomlessarchive.loa.web.view.document.response.dashboard.QueueServiceInstance;
-import com.github.bottomlessarchive.loa.web.view.document.response.dashboard.VaultServiceInstance;
+import com.github.bottomlessarchive.loa.web.view.document.response.dashboard.AdministratorApplicationInstance;
+import com.github.bottomlessarchive.loa.web.view.document.response.dashboard.DashboardApplicationsResponse;
+import com.github.bottomlessarchive.loa.web.view.document.response.dashboard.DownloaderApplicationInstance;
+import com.github.bottomlessarchive.loa.web.view.document.response.dashboard.GeneratorApplicationInstance;
+import com.github.bottomlessarchive.loa.web.view.document.response.dashboard.IndexerApplicationInstance;
+import com.github.bottomlessarchive.loa.web.view.document.response.dashboard.QueueApplicationInstance;
+import com.github.bottomlessarchive.loa.web.view.document.response.dashboard.VaultApplicationInstance;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,10 +21,10 @@ public class ServicesResponseFactory {
 
     private final ConductorClient conductorClient;
 
-    public DashboardServicesResponse newServicesResponse() {
+    public DashboardApplicationsResponse newApplicationsResponse() {
         final List<ServiceInstanceEntity> serviceInstanceEntities = conductorClient.getInstances();
 
-        return DashboardServicesResponse.builder()
+        return DashboardApplicationsResponse.builder()
                 .administrators(buildAdministrators(serviceInstanceEntities))
                 .downloaders(buildDownloaders(serviceInstanceEntities))
                 .generators(buildGenerators(serviceInstanceEntities))
@@ -34,10 +34,10 @@ public class ServicesResponseFactory {
                 .build();
     }
 
-    private List<AdministratorServiceInstance> buildAdministrators(final List<ServiceInstanceEntity> serviceInstanceEntities) {
+    private List<AdministratorApplicationInstance> buildAdministrators(final List<ServiceInstanceEntity> serviceInstanceEntities) {
         return serviceInstanceEntities.stream()
                 .filter(instance -> instance.getApplicationType().equals(ApplicationType.ADMINISTRATOR_APPLICATION))
-                .map(instance -> AdministratorServiceInstance.builder()
+                .map(instance -> AdministratorApplicationInstance.builder()
                         .host(instance.getLocation())
                         .port(instance.getPort())
                         .build()
@@ -45,10 +45,10 @@ public class ServicesResponseFactory {
                 .toList();
     }
 
-    private List<DownloaderServiceInstance> buildDownloaders(final List<ServiceInstanceEntity> serviceInstanceEntities) {
+    private List<DownloaderApplicationInstance> buildDownloaders(final List<ServiceInstanceEntity> serviceInstanceEntities) {
         return serviceInstanceEntities.stream()
                 .filter(instance -> instance.getApplicationType().equals(ApplicationType.DOWNLOADER_APPLICATION))
-                .map(instance -> DownloaderServiceInstance.builder()
+                .map(instance -> DownloaderApplicationInstance.builder()
                         .host(instance.getLocation())
                         .port(instance.getPort())
                         .build()
@@ -56,10 +56,10 @@ public class ServicesResponseFactory {
                 .toList();
     }
 
-    private List<GeneratorServiceInstance> buildGenerators(final List<ServiceInstanceEntity> serviceInstanceEntities) {
+    private List<GeneratorApplicationInstance> buildGenerators(final List<ServiceInstanceEntity> serviceInstanceEntities) {
         return serviceInstanceEntities.stream()
                 .filter(instance -> instance.getApplicationType().equals(ApplicationType.GENERATOR_APPLICATION))
-                .map(instance -> GeneratorServiceInstance.builder()
+                .map(instance -> GeneratorApplicationInstance.builder()
                         .host(instance.getLocation())
                         .port(instance.getPort())
                         .build()
@@ -67,10 +67,10 @@ public class ServicesResponseFactory {
                 .toList();
     }
 
-    private List<IndexerServiceInstance> buildIndexers(final List<ServiceInstanceEntity> serviceInstanceEntities) {
+    private List<IndexerApplicationInstance> buildIndexers(final List<ServiceInstanceEntity> serviceInstanceEntities) {
         return serviceInstanceEntities.stream()
                 .filter(instance -> instance.getApplicationType().equals(ApplicationType.INDEXER_APPLICATION))
-                .map(instance -> IndexerServiceInstance.builder()
+                .map(instance -> IndexerApplicationInstance.builder()
                         .host(instance.getLocation())
                         .port(instance.getPort())
                         .build()
@@ -78,10 +78,10 @@ public class ServicesResponseFactory {
                 .toList();
     }
 
-    private List<QueueServiceInstance> buildQueues(final List<ServiceInstanceEntity> serviceInstanceEntities) {
+    private List<QueueApplicationInstance> buildQueues(final List<ServiceInstanceEntity> serviceInstanceEntities) {
         return serviceInstanceEntities.stream()
                 .filter(instance -> instance.getApplicationType().equals(ApplicationType.QUEUE_APPLICATION))
-                .map(instance -> QueueServiceInstance.builder()
+                .map(instance -> QueueApplicationInstance.builder()
                         .host(instance.getLocation())
                         .port(instance.getPort())
                         .documentLocationQueueCount(
@@ -99,10 +99,10 @@ public class ServicesResponseFactory {
                 .toList();
     }
 
-    private List<VaultServiceInstance> buildVaults(final List<ServiceInstanceEntity> serviceInstanceEntities) {
+    private List<VaultApplicationInstance> buildVaults(final List<ServiceInstanceEntity> serviceInstanceEntities) {
         return serviceInstanceEntities.stream()
                 .filter(instance -> instance.getApplicationType().equals(ApplicationType.VAULT_APPLICATION))
-                .map(instance -> VaultServiceInstance.builder()
+                .map(instance -> VaultApplicationInstance.builder()
                         .host(instance.getLocation())
                         .port(instance.getPort())
                         .freeSpace(

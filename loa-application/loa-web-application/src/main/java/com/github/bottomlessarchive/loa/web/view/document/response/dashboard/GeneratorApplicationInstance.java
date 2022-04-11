@@ -5,11 +5,8 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class QueueServiceInstance {
+public class GeneratorApplicationInstance {
 
     private final String host;
     private final int port;
-
-    private final long documentLocationQueueCount;
-    private final long documentArchivingQueueCount;
 }

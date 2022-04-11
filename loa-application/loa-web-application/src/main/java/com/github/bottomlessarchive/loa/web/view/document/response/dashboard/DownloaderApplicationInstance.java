@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class GeneratorServiceInstance {
+public class DownloaderApplicationInstance {
 
     private final String host;
     private final int port;

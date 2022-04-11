@@ -4,14 +4,16 @@ import {HomeComponent} from './view/home/home.component';
 import {SearchComponent} from './view/search/search.component';
 import {DashboardComponent} from './view/dashboard/dashboard.component';
 import {SearchResolver} from './shared/search/resolver/search.resolver';
-import {StatisticsResolver} from './statistics.resolver';
+import {StatisticsResolver} from './view/statistics/resolver/statistics-resolver';
 import {DebugDocumentComponent} from './view/debug-document/debug-document.component';
+import {ApplicationResolver} from "./view/applications/resolver/application-resolver";
 
 const routes: Routes = [
   {path: '', redirectTo: '/home', pathMatch: 'full'},
   {path: 'home', component: HomeComponent},
   {path: 'search', component: SearchComponent, resolve: {statistics: SearchResolver}},
-  {path: 'dashboard', component: DashboardComponent, resolve: {statistics: StatisticsResolver}},
+  {path: 'dashboard', component: DashboardComponent, resolve: {statistics: StatisticsResolver,
+      applications: ApplicationResolver}},
   {path: 'debug-document', component: DebugDocumentComponent}
 ];
 

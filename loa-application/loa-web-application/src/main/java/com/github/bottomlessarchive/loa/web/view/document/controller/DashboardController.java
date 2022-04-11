@@ -1,7 +1,7 @@
 package com.github.bottomlessarchive.loa.web.view.document.controller;
 
 import com.github.bottomlessarchive.loa.web.view.document.response.dashboard.DashboardDocumentStatisticsResponse;
-import com.github.bottomlessarchive.loa.web.view.document.response.dashboard.DashboardServicesResponse;
+import com.github.bottomlessarchive.loa.web.view.document.response.dashboard.DashboardApplicationsResponse;
 import com.github.bottomlessarchive.loa.web.view.document.service.DocumentStatisticsResponseFactory;
 import com.github.bottomlessarchive.loa.web.view.document.service.ServicesResponseFactory;
 import lombok.RequiredArgsConstructor;
@@ -22,8 +22,8 @@ public class DashboardController {
         return documentStatisticsResponseFactory.newStatisticsResponse();
     }
 
-    @GetMapping("/services")
-    public DashboardServicesResponse services() {
-        return servicesResponseFactory.newServicesResponse();
+    @GetMapping("/applications")
+    public DashboardApplicationsResponse services() {
+        return servicesResponseFactory.newApplicationsResponse();
     }
 }
