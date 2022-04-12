@@ -10,6 +10,7 @@ import com.github.bottomlessarchive.loa.stage.service.domain.StageLocation;
 import com.github.bottomlessarchive.loa.validator.service.DocumentFileValidator;
 import io.micrometer.core.instrument.Counter;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,8 @@ import org.springframework.stereotype.Service;
 import java.net.URL;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Semaphore;
 
 /**
  * This service is responsible for downloading documents.
@@ -32,12 +35,23 @@ public class DocumentLocationProcessor {
     private final DocumentArchiver documentArchiver;
     private final DocumentTypeCalculator documentTypeCalculator;
 
+    @Qualifier("downloaderSemaphore")
+    private final Semaphore downloaderSemaphore;
+    @Qualifier("downloaderExecutorService")
+    private final ExecutorService downloaderExecutorService;
     @Qualifier("processedDocumentCount")
     private final Counter processedDocumentCount;
 
+    @SneakyThrows
     public void processDocumentLocation(final DocumentLocation documentLocation) {
         processedDocumentCount.increment();
 
+        downloaderSemaphore.acquire();
+
+        downloaderExecutorService.execute(() -> doProcessDocumentLocation(documentLocation));
+    }
+
+    private void doProcessDocumentLocation(final DocumentLocation documentLocation) {
         final URL documentLocationURL = documentLocation.getLocation().toUrl().orElseThrow();
         final Optional<DocumentType> documentTypeOptional = documentTypeCalculator.calculate(documentLocationURL);
 
@@ -77,6 +91,8 @@ public class DocumentLocationProcessor {
         if (stageLocation.exists()) {
             stageLocation.cleanup();
         }
+
+        downloaderSemaphore.release();
     }
 
     private void acquireFile(final URL documentLocation, final StageLocation stageLocation) {

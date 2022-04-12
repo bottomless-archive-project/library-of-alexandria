@@ -13,6 +13,7 @@ public record DownloaderConfigurationProperties(
          * 5 = 1.5.1-release -> Updated because the URL encoding logic was changed in the Generator Application.
          */
         int versionNumber,
-        SourceLocation source
+        SourceLocation source,
+        int parallelism
 ) {
 }
