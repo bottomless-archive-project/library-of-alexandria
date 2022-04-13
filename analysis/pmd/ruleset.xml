@@ -14,6 +14,7 @@
 
     <rule ref="category/java/multithreading.xml">
         <!-- Too many false positives. -->
+        <exclude name="DoNotUseThreads"/>
         <exclude name="UseConcurrentHashMap"/>
         <exclude name="AvoidSynchronizedAtMethodLevel"/>
     </rule>
