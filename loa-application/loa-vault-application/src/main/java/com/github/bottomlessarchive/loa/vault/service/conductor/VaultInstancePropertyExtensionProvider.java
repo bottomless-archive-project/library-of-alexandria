@@ -13,7 +13,7 @@ public class VaultInstancePropertyExtensionProvider implements InstancePropertyE
     private final VaultLocationFactory vaultDocumentManager;
 
     @Override
-    public void extendInstanceWithProperty(InstanceExtensionContext instanceExtensionContext) {
+    public void extendInstanceWithProperty(final InstanceExtensionContext instanceExtensionContext) {
         instanceExtensionContext.setProperty("freeSpace", String.valueOf(vaultDocumentManager.getAvailableSpace()));
     }
 }
