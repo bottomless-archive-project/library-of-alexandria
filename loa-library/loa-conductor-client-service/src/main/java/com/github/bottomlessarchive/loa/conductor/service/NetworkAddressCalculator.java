@@ -8,7 +8,6 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.util.Comparator;
 
 @Service
 public class NetworkAddressCalculator {
@@ -16,12 +15,10 @@ public class NetworkAddressCalculator {
     public InetAddress calculateInetAddress() {
         try {
             return NetworkInterface.networkInterfaces()
-                    .min(Comparator.comparingInt(NetworkInterface::getIndex))
-                    .stream()
-                    .flatMap(NetworkInterface::inetAddresses)
-                    .filter(this::isUsableAddress)
-                    .findFirst()
-                    .orElse(InetAddress.getLocalHost());
+                            .flatMap(NetworkInterface::inetAddresses)
+                            .filter(this::isUsableAddress)
+                            .findFirst()
+                            .orElse(InetAddress.getLocalHost());
         } catch (final SocketException | UnknownHostException e) {
             throw new NetworkAddressCalculationException("Unable to calculate network address for registration!", e);
         }
