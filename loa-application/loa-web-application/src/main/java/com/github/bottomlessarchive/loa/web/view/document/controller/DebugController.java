@@ -23,7 +23,7 @@ public class DebugController {
 
     @GetMapping("/document/{documentId}/debug")
     public DebugDocumentResponse getDocumentById(@PathVariable final String documentId) {
-        return documentEntityFactory.getDocumentEntity(UUID.fromString(documentId))
+        return documentEntityFactory.getDocumentEntity(UUID.fromString(documentId.trim()))
                 .map(debugResponseFactory::newDebugDocumentResponse)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Document not found with id " + documentId + "!"));
