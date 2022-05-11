@@ -28,7 +28,7 @@ public class VaultClientService {
 
     private static final MediaType JSON_MEDIA_TYPE = MediaType.parse("application/json; charset=utf-8");
 
-    private final OkHttpClient okHttpClient;
+    private final OkHttpClient vaultOkHttpClient;
     private final ObjectMapper objectMapper;
     private final Map<String, VaultLocation> vaultLocations;
 
@@ -52,7 +52,7 @@ public class VaultClientService {
                 .build();
 
         try {
-            return okHttpClient.newCall(request)
+            return vaultOkHttpClient.newCall(request)
                     .execute()
                     .body()
                     .byteStream();
@@ -79,7 +79,7 @@ public class VaultClientService {
                 .build();
 
         try {
-            okHttpClient.newCall(request)
+            vaultOkHttpClient.newCall(request)
                     .execute()
                     .close();
         } catch (final IOException e) {
@@ -111,7 +111,7 @@ public class VaultClientService {
                 .build();
 
         try {
-            okHttpClient.newCall(request)
+            vaultOkHttpClient.newCall(request)
                     .execute()
                     .close();
         } catch (final IOException e) {
@@ -133,7 +133,7 @@ public class VaultClientService {
                 .build();
 
         try {
-            final String response = okHttpClient.newCall(request)
+            final String response = vaultOkHttpClient.newCall(request)
                     .execute()
                     .body()
                     .string();
@@ -168,7 +168,7 @@ public class VaultClientService {
                 .build();
 
         try {
-            okHttpClient.newCall(request)
+            vaultOkHttpClient.newCall(request)
                     .execute()
                     .close();
         } catch (final IOException e) {
