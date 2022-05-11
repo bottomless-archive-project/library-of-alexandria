@@ -41,6 +41,7 @@ export class SearchComponent implements OnInit {
   loading = false;
   openPdfs: Map<string, boolean> = new Map();
   loadedImages: Map<string, boolean> = new Map();
+  cachedLocations: Map<string, SafeResourceUrl> = new Map<string, SafeResourceUrl>();
 
   constructor(private route: ActivatedRoute, private http: HttpClient, private searchService: SearchService,
               private sanitizer: DomSanitizer) {
@@ -234,8 +235,12 @@ export class SearchComponent implements OnInit {
     }
   }
 
-  getDocumentUrl(documentId: string): SafeResourceUrl {
-    return this.sanitizer.bypassSecurityTrustResourceUrl('./document/' + documentId);
+  getDocumentUrl(documentId: string): SafeResourceUrl | undefined {
+    if (!this.cachedLocations.has(documentId)) {
+      this.cachedLocations.set(documentId, this.sanitizer.bypassSecurityTrustResourceUrl('./document/' + documentId));
+    }
+
+    return this.cachedLocations.get(documentId);
   }
 
   getLanguageName(languageId: string): string {
