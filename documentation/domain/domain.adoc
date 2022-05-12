@@ -20,5 +20,5 @@
 | How many documents fail to download compared to the successfully downloaded ones.
 
 | **Archiving**
-|Moving a document from the staging area to the vault.
+| Saving a document into the vault.
 |===

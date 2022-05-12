@@ -38,5 +38,5 @@ include::../service/conductor/conductor-configuration.adoc[]
 | Removes every document with status `CORRUPT`. The documents will be removed from the vault and the database too.
 
 | recollect-corrupt-documents
-| Tries to recollect  every document with status `CORRUPT`. The document's `sourceLocations` variable stores the ids of the document locations where the document was collected from. This command will try to re-download the document from these source locations. If any of the downloads is successful, then the document's content will be replaced with non-corrupt data (effectively reconstructing the document), if all of the downloads are failed, then the `CORRUPT` status will be kept.
+| Tries to recollect every document with status `CORRUPT`. The document's `sourceLocations` variable stores the ids of the document locations where the document was collected from. This command will try to re-download the document from these source locations. If any of the downloads is successful, then the document's content will be replaced with non-corrupt data (effectively reconstructing the document). If all of the downloads fails, then the `CORRUPT` status will be kept.
 |===

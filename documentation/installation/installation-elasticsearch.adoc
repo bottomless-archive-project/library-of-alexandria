@@ -2,7 +2,7 @@
 
 Elasticsearch is only necessary for indexing! If you only want to collect the PDF documents then it's unnecessary for you!
 
-You can download Elasticsearch 7.13.0 https://www.elastic.co/downloads/past-releases/elasticsearch-7-13-0[here].
+You can download Elasticsearch 8.1.2 https://www.elastic.co/downloads/past-releases/elasticsearch-8-1-2[here].
 
 After the download complete unzip it. You also need to do some slight adjustments to the default configuration.
 
