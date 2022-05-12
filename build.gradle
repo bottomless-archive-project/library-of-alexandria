@@ -13,7 +13,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath('org.springframework.boot:spring-boot-gradle-plugin:2.6.6')
+        classpath('org.springframework.boot:spring-boot-gradle-plugin:2.6.7')
         classpath('com.adarshr:gradle-test-logger-plugin:2.0.0')
         classpath('com.github.ben-manes:gradle-versions-plugin:0.29.0')
         classpath('com.palantir.gradle.docker:gradle-docker:0.25.0')
@@ -25,7 +25,7 @@ configure(subprojects.findAll {it.name != 'loa-frontend'}) {
 
     java {
         toolchain {
-            languageVersion = JavaLanguageVersion.of(17)
+            languageVersion = JavaLanguageVersion.of(18)
         }
     }
 
