@@ -21,5 +21,5 @@ You can do the indexing on any machine that has sufficient memory requirements, 
 === Indexing massive amounts (100 - 500+ million)
 
 * **CPU**: http://www.cpu-world.com/CPUs/Zen/AMD-Ryzen%209%203950X.html[AMD Ryzen 9 3950X] or similar
-* **Memory**: 16 GB memory for each 100 million documents + 32GB+ for the Indexer Application, the exact value depends on what parallelism level is being used
+* **Memory**: 16 GB memory for each 100 million documents and 32GB+ for the Indexer Application, the exact value depends on what parallelism level is being used
 * **Disc space**: 4 TB SSD for each 100 million documents
