@@ -10,6 +10,9 @@ The application looks for documents that has the `DOWNLOADED` status and indexes
 |===
 | Parameter | Description
 
+| **loa.downloader.parallelism**
+| How many documents should be indexed in parallel at any given time. If the value is set to 4, then the application tries to index 4 documents at the same time. *(Default value: 3)*
+
 include::../service/conductor/conductor-configuration.adoc[]
 
 |===

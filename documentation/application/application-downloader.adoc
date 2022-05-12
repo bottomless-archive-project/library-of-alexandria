@@ -22,6 +22,9 @@ include::../service/conductor/conductor-configuration.adoc[]
 | **loa.downloader.source**
 | Two types of document sources are supported by the downloader application. One of this is the `QUEUE` source, where the application get the possible locations of documents (URLs), and download them from there, then sends them for archiving. The other one is `FOLDER`, where the application load document files from a provided folder on the filesystem, and sends them for archiving. *(Default value: QUEUE)*
 
+| **loa.downloader.parallelism**
+| How many connections should be open at any given time to download documents in parallel. If the value is set to 4, then the application tries to download 4 documents at the same time. Your internet speed might allow more parallel downloads, in that case, increase this value. *(Default value: 3)*
+
 | **loa.downloader.source.folder.location**
 | The location on the filesystem where the downloader should load the files from in case of the source set to `FOLDER`.
 
