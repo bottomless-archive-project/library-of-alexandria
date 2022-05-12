@@ -5,7 +5,7 @@ dependencies {
 
     implementation group: 'commons-io', name: 'commons-io', version: '2.11.0'
     implementation group: 'com.github.davidmoten', name: 'io-extras', version: '0.1.4'
-    implementation group: 'software.amazon.awssdk', name: 's3', version: '2.17.164'
+    implementation group: 'software.amazon.awssdk', name: 's3', version: '2.17.189'
 
     implementation project(':loa-library:loa-document-service')
     implementation project(':loa-library:loa-checksum-service')
