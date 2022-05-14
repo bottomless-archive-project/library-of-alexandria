@@ -79,11 +79,13 @@ public class DocumentRepository {
      *
      * @return every element in the database
      */
-    public Iterable<DocumentDatabaseEntity> findByStatus(final String status) {
+    public Iterable<DocumentDatabaseEntity> findByStatus(final String status, final int batchSize) {
         return documentDatabaseEntityMongoCollection.find(eq("status", status))
                 // We don't want to have the cursor closed while processing. It would be a better idea to set
                 // a maximum timeout in milliseconds but that only configurable on the server side.
-                .noCursorTimeout(repositoryMetadataContainer.isNoCursorTimeout());
+                .noCursorTimeout(repositoryMetadataContainer.isNoCursorTimeout())
+                // Batch size can be lowered as well to decrease the chance of a cursor timeout.
+                .batchSize(batchSize);
     }
 
     /**

@@ -4,6 +4,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties("loa.indexer")
 public record IndexerConfigurationProperties(
-        int parallelism
+        int batchSize
+        int parallelism,
 ) {
 }

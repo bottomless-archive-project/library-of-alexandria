@@ -53,8 +53,8 @@ public class DocumentEntityFactory {
      * @param documentStatus the status to query for
      * @return the list of documents with the provided values
      */
-    public Stream<DocumentEntity> getDocumentEntity(final DocumentStatus documentStatus) {
-        return StreamSupport.stream(documentRepository.findByStatus(documentStatus.toString()).spliterator(), false)
+    public Stream<DocumentEntity> getDocumentEntity(final DocumentStatus documentStatus, final int batchSize) {
+        return StreamSupport.stream(documentRepository.findByStatus(documentStatus.toString(), batchSize).spliterator(), false)
                 .map(documentEntityTransformer::transform);
     }
 

@@ -3,6 +3,7 @@ package com.github.bottomlessarchive.loa.indexer.command;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentStatus;
 import com.github.bottomlessarchive.loa.document.service.entity.factory.DocumentEntityFactory;
 import com.github.bottomlessarchive.loa.indexer.DocumentEntityIndexer;
+import com.github.bottomlessarchive.loa.indexer.configuration.IndexerConfigurationProperties;
 import com.github.bottomlessarchive.loa.indexer.service.search.DocumentSearchClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +18,7 @@ public class IndexerCommand implements CommandLineRunner {
     private final DocumentSearchClient documentSearchClient;
     private final DocumentEntityFactory documentEntityFactory;
     private final DocumentEntityIndexer documentEntityIndexer;
+    private final IndexerConfigurationProperties indexerConfigurationProperties;
 
     @Override
     public void run(final String... args) {
@@ -28,7 +30,7 @@ public class IndexerCommand implements CommandLineRunner {
 
         log.info("Start document indexing.");
 
-        documentEntityFactory.getDocumentEntity(DocumentStatus.DOWNLOADED)
+        documentEntityFactory.getDocumentEntity(DocumentStatus.DOWNLOADED, indexerConfigurationProperties.batchSize())
                 .forEach(documentEntityIndexer::processDocumentEntity);
     }
 
