@@ -9,4 +9,5 @@ public class DownloaderApplicationInstance {
 
     private final String host;
     private final int port;
+    private final int parallelism;
 }

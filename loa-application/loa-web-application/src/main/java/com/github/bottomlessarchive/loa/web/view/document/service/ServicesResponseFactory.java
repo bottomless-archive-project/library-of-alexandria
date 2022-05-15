@@ -51,6 +51,11 @@ public class ServicesResponseFactory {
                 .map(instance -> DownloaderApplicationInstance.builder()
                         .host(instance.getLocation())
                         .port(instance.getPort())
+                        .parallelism(
+                                instance.getProperty("parallelism")
+                                        .map(value -> Integer.parseInt(value.getValue()))
+                                        .orElse(-1)
+                        )
                         .build()
                 )
                 .toList();
