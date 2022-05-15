@@ -73,6 +73,16 @@ public class ServicesResponseFactory {
                 .map(instance -> IndexerApplicationInstance.builder()
                         .host(instance.getLocation())
                         .port(instance.getPort())
+                        .parallelism(
+                                instance.getProperty("parallelism")
+                                        .map(value -> Integer.parseInt(value.getValue()))
+                                        .orElse(-1)
+                        )
+                        .batchSize(
+                                instance.getProperty("batchSize")
+                                        .map(value -> Integer.parseInt(value.getValue()))
+                                        .orElse(-1)
+                        )
                         .build()
                 )
                 .toList();

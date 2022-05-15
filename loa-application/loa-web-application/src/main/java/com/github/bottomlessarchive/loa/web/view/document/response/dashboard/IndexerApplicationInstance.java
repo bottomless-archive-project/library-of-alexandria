@@ -9,4 +9,6 @@ public class IndexerApplicationInstance {
 
     private final String host;
     private final int port;
+    private final int parallelism;
+    private final int batchSize;
 }

@@ -8,6 +8,10 @@ public class InstanceExtensionContext {
 
     private final Map<String, String> properties = new HashMap<>();
 
+    public void setProperty(final String propertyName, final int propertyValue) {
+        properties.put(propertyName, String.valueOf(propertyValue));
+    }
+
     public void setProperty(final String propertyName, final String propertyValue) {
         properties.put(propertyName, propertyValue);
     }
