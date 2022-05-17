@@ -4,18 +4,20 @@ import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './view/app/app.component';
 import {HomeComponent} from './view/home/home.component';
 import {SearchComponent} from './view/search/search.component';
-import {DashboardComponent} from './view/dashboard/dashboard.component';
+import {DashboardStatisticsComponent} from './view/dashboard-statistics/dashboard-statistics.component';
 import {DebugDocumentComponent} from './view/debug-document/debug-document.component';
 import {HttpClientModule} from '@angular/common/http';
 import {FormsModule} from '@angular/forms';
 import {BytesPipe} from './bytes.pipe';
+import {DashboardApplicationsComponent} from "./view/dashboard-applications/dashboard-applications.component";
 
 @NgModule({
   declarations: [
     AppComponent,
     HomeComponent,
     SearchComponent,
-    DashboardComponent,
+    DashboardStatisticsComponent,
+    DashboardApplicationsComponent,
     DebugDocumentComponent,
     BytesPipe
   ],
