@@ -17,12 +17,11 @@
 </div>
 
 <div class="row mb-2">
-  <div class="col-9 pe-0">
+  <div class="col-lg-9 pb-2">
     <div class="input-group">
       <input [(ngModel)]="searchText" (ngModelChange)='changed($event)' class="form-control"
              placeholder="Search for something...">
-      <button class="btn btn-loa dropdown-toggle" role="button"
-              data-bs-toggle="dropdown">{{resultSize}}</button>
+      <button class="btn btn-loa dropdown-toggle" role="button" data-bs-toggle="dropdown">{{resultSize}}</button>
       <ul class="dropdown-menu" style="max-height: 200px; overflow: auto;">
         <li class="dropdown-item" (click)="setResultSize(10)">10</li>
         <li class="dropdown-item" (click)="setResultSize(25)">25</li>
@@ -32,7 +31,7 @@
       <span class="input-group-text" id="basic-addon2">results / page</span>
     </div>
   </div>
-  <div class="col-3">
+  <div class="col-lg-3">
     <div class="dropdown language-dropdown">
       <button class="btn btn-loa col-12 dropdown-toggle" role="button" *ngIf="language === undefined"
               data-bs-toggle="dropdown">Language
@@ -52,7 +51,7 @@
 </div>
 
 <div class="row mb-2">
-  <div class="col-9 pe-0 text-center">
+  <div class="col-lg-9 pb-2 text-center">
     <div class="form-group">
       <div class="form-check form-check-inline">
         <input class="form-check-input" type="checkbox" id="pdf" [(ngModel)]="fileTypes.PDF"
@@ -106,7 +105,7 @@
       </div>
     </div>
   </div>
-  <div class="col-3">
+  <div class="col-lg-3">
     <div class="dropdown document-length-dropdown">
       <button class="btn btn-loa col-12 dropdown-toggle" role="button" *ngIf="documentLength === undefined"
               data-bs-toggle="dropdown">Document Length
@@ -218,19 +217,19 @@
             </div>
           </div>
 
-          <div style="text-align: right;" class="mt-3">
+          <div class="mt-3 text-end">
             <span *ngIf="hit.type == 'PDF'">
-              <span style="font-weight: bold;" class="me-3">{{hit.pageCount}} pages</span>
+              <span class="me-3 fw-bold">{{hit.pageCount}} pages</span>
 
-              <button *ngIf="openPdfs.has(hit.id) && openPdfs.get(hit.id)" class="btn btn-loa btn-sm"
-                      (click)="openPdf(hit.id)"
-                      style="min-width: 135px; max-width: 180px; width: 20%; margin-right: 10px;">
+              <button *ngIf="openPdfs.has(hit.id) && openPdfs.get(hit.id)"
+                      class="btn btn-loa btn-sm me-2 d-none d-sm-inline-block"
+                      (click)="openPdf(hit.id)" style="min-width: 135px; max-width: 180px; width: 20%;">
                 Close .pdf
               </button>
 
-              <button *ngIf="!openPdfs.has(hit.id) || !openPdfs.get(hit.id)" class="btn btn-loa btn-sm"
-                      (click)="openPdf(hit.id)"
-                      style="min-width: 135px; max-width: 180px; width: 20%; margin-right: 10px;">
+              <button *ngIf="!openPdfs.has(hit.id) || !openPdfs.get(hit.id)"
+                      class="btn btn-loa btn-sm me-2 d-none d-sm-inline-block"
+                      (click)="openPdf(hit.id)" style="min-width: 135px; max-width: 180px; width: 20%;">
                 Open .pdf
               </button>
             </span>
@@ -243,8 +242,8 @@
 
           <!-- The iframe where the PDF documents should be opened. -->
           <iframe *ngIf="openPdfs.has(hit.id) && openPdfs.get(hit.id) && hit.type == 'PDF'"
-                  [src]="getDocumentUrl(hit.id)"
-                  style="width: 100%; height: 600px; border: 0;" class="mt-3"></iframe>
+                  [src]="getDocumentUrl(hit.id)" style="height: 600px; border: 0;"
+                  class="mt-3 d-none d-sm-block w-100"></iframe>
         </div>
       </div>
     </div>
