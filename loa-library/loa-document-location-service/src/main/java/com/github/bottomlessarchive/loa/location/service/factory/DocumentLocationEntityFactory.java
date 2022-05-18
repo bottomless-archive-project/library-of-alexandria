@@ -20,19 +20,20 @@ public class DocumentLocationEntityFactory {
     public Optional<DocumentLocation> getDocumentLocation(final String id) {
         return documentLocationRepository.getById(hexConverter.decode(id))
                 .map(documentLocationDatabaseEntity -> DocumentLocation.builder()
-                        .id(hexConverter.encode(documentLocationDatabaseEntity.getId()))
-                        .url(documentLocationDatabaseEntity.getUrl())
+                        .id(hexConverter.encode(documentLocationDatabaseEntity.id()))
+                        .url(documentLocationDatabaseEntity.url())
                         .build()
                 );
     }
 
     public boolean isDocumentLocationExistsOrCreate(
             final DocumentLocationCreationContext documentLocationCreationContext) {
-        final DocumentLocationDatabaseEntity documentLocationDatabaseEntity = new DocumentLocationDatabaseEntity();
-        documentLocationDatabaseEntity.setId(hexConverter.decode(documentLocationCreationContext.getId()));
-        documentLocationDatabaseEntity.setSource(documentLocationCreationContext.getSource());
-        documentLocationDatabaseEntity.setUrl(documentLocationCreationContext.getUrl());
-        documentLocationDatabaseEntity.setDownloaderVersion(documentLocationCreationContext.getDownloaderVersion());
+        final DocumentLocationDatabaseEntity documentLocationDatabaseEntity = new DocumentLocationDatabaseEntity(
+                hexConverter.decode(documentLocationCreationContext.getId()),
+                documentLocationCreationContext.getUrl(),
+                documentLocationCreationContext.getSource(),
+                documentLocationCreationContext.getDownloaderVersion()
+        );
 
         return documentLocationRepository.existsOrInsert(documentLocationDatabaseEntity);
     }

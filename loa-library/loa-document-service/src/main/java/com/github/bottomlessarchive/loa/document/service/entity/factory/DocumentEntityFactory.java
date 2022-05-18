@@ -126,24 +126,27 @@ public class DocumentEntityFactory {
      * @return the freshly created document
      */
     public DocumentEntity newDocumentEntity(final DocumentCreationContext documentCreationContext) {
-        final DocumentDatabaseEntity documentDatabaseEntity = new DocumentDatabaseEntity();
+        final Set<byte[]> sourceLocations = documentCreationContext.getSourceLocationId().isPresent()
+                ? Set.of(hexConverter.decode(documentCreationContext.getSourceLocationId().get()))
+                : Collections.emptySet();
 
-        documentDatabaseEntity.setId(documentCreationContext.getId());
-        documentDatabaseEntity.setVault(documentCreationContext.getVault());
-        documentDatabaseEntity.setType(documentCreationContext.getType().toString());
-        documentDatabaseEntity.setStatus(documentCreationContext.getStatus().toString());
-        documentDatabaseEntity.setChecksum(hexConverter.decode(documentCreationContext.getChecksum()));
-        documentDatabaseEntity.setFileSize(documentCreationContext.getFileSize());
-        documentDatabaseEntity.setDownloaderVersion(documentCreationContext.getVersionNumber());
-        documentDatabaseEntity.setCompression(documentCreationContext.getCompression().name());
-        documentDatabaseEntity.setDownloadDate(Instant.now());
-        documentDatabaseEntity.setSource(documentCreationContext.getSource());
+        final DocumentDatabaseEntity documentDatabaseEntity = new DocumentDatabaseEntity(
+                documentCreationContext.getId(),
 
-        if (documentCreationContext.getSourceLocationId().isPresent()) {
-            documentDatabaseEntity.setSourceLocations(Set.of(hexConverter.decode(documentCreationContext.getSourceLocationId().get())));
-        } else {
-            documentDatabaseEntity.setSourceLocations(Collections.emptySet());
-        }
+                documentCreationContext.getVault(),
+                documentCreationContext.getType().toString(),
+                documentCreationContext.getStatus().toString(),
+                documentCreationContext.getCompression().name(),
+
+                documentCreationContext.getSource(),
+                sourceLocations,
+
+                hexConverter.decode(documentCreationContext.getChecksum()),
+                documentCreationContext.getFileSize(),
+
+                documentCreationContext.getVersionNumber(),
+                Instant.now()
+        );
 
         documentRepository.insertDocument(documentDatabaseEntity);
 
