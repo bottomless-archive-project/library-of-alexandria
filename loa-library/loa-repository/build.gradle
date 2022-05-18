@@ -1,5 +1,6 @@
 dependencies {
     api group: 'org.mongodb', name: 'mongodb-driver-sync'
+    api group: 'org.mongodb', name: 'bson-record-codec', version: project['mongodb.version']
 
     implementation group: 'commons-codec', name: 'commons-codec', version: '1.15'
 

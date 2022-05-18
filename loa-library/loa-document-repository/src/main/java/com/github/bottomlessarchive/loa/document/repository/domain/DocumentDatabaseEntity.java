@@ -1,6 +1,6 @@
 package com.github.bottomlessarchive.loa.document.repository.domain;
 
-import org.bson.codecs.pojo.annotations.BsonId;
+import org.bson.codecs.record.annotations.BsonId;
 
 import java.time.Instant;
 import java.util.Collections;
