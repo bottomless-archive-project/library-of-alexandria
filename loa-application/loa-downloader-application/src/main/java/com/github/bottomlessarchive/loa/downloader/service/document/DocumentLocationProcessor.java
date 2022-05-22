@@ -42,13 +42,23 @@ public class DocumentLocationProcessor {
     @Qualifier("processedDocumentCount")
     private final Counter processedDocumentCount;
 
-    @SneakyThrows
     public void processDocumentLocation(final DocumentLocation documentLocation) {
+        processDocumentLocation(documentLocation, null);
+    }
+
+    @SneakyThrows
+    public void processDocumentLocation(final DocumentLocation documentLocation, final Runnable callback) {
         processedDocumentCount.increment();
 
         downloaderSemaphore.acquire();
 
-        downloaderExecutorService.execute(() -> doProcessDocumentLocation(documentLocation));
+        downloaderExecutorService.execute(() -> {
+            doProcessDocumentLocation(documentLocation);
+
+            if (callback != null) {
+                callback.run();
+            }
+        });
     }
 
     private void doProcessDocumentLocation(final DocumentLocation documentLocation) {
