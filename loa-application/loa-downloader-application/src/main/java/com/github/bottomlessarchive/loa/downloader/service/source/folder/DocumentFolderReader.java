@@ -32,19 +32,18 @@ public class DocumentFolderReader implements CommandLineRunner {
         final Path sourceFolder = Path.of(downloaderFolderSourceConfiguration.getLocation());
 
         Files.list(sourceFolder)
-                .forEach(path -> {
-                    documentLocationProcessor.processDocumentLocation(buildDocumentSourceItem(path));
+                .forEach(path -> documentLocationProcessor.processDocumentLocation(buildDocumentSourceItem(path), () -> {
+                            if (downloaderFolderSourceConfiguration.isShouldRemove()) {
+                                try {
+                                    log.debug("Deleting file at: {}.", path);
 
-                    if (downloaderFolderSourceConfiguration.isShouldRemove()) {
-                        try {
-                            log.debug("Deleting file at: {}.", path);
-
-                            Files.deleteIfExists(path);
-                        } catch (final IOException e) {
-                            log.error("Failed to delete source file!", e);
-                        }
-                    }
-                });
+                                    Files.deleteIfExists(path);
+                                } catch (final IOException e) {
+                                    log.error("Failed to delete source file!", e);
+                                }
+                            }
+                        })
+                );
 
         log.info("Finished processing the folder.");
     }
