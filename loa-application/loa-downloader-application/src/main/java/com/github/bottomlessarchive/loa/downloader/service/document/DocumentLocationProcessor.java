@@ -56,8 +56,7 @@ public class DocumentLocationProcessor {
         final Optional<DocumentType> documentTypeOptional = documentTypeCalculator.calculate(documentLocationURL);
 
         if (documentTypeOptional.isEmpty()) {
-            log.error("Invalid document location found: {}! This shouldn't normally happen! Please report it to the developers!",
-                    documentLocation);
+            log.debug("Document on location {} has an unknown document type!", documentLocation);
 
             return;
         }
