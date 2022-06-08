@@ -5,6 +5,7 @@ import com.github.bottomlessarchive.loa.document.repository.domain.DocumentStatu
 import com.github.bottomlessarchive.loa.document.repository.domain.DocumentTypeAggregateEntity;
 import com.github.bottomlessarchive.loa.repository.configuration.RepositoryMetadataContainer;
 import com.github.bottomlessarchive.loa.repository.service.HexConverter;
+import com.mongodb.client.AggregateIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
@@ -100,23 +101,44 @@ public class DocumentRepository {
                 .noCursorTimeout(repositoryMetadataContainer.isNoCursorTimeout());
     }
 
+    /**
+     * Return an approximate count of the documents in the database.
+     *
+     * @return approximate count of the documents
+     */
     public long estimateCount() {
         return documentDatabaseEntityMongoCollection.estimatedDocumentCount();
     }
 
+    /**
+     * Return the document count in the database for each document type.
+     *
+     * @return document count for each document type
+     */
     public Map<String, Integer> countByType() {
         final List<Bson> countByStatusAggregate = Collections.singletonList(group("$type", sum("count", 1L)));
 
-        return StreamSupport.stream(documentDatabaseEntityMongoCollection.aggregate(countByStatusAggregate,
-                        DocumentTypeAggregateEntity.class).spliterator(), false)
+        final AggregateIterable<DocumentTypeAggregateEntity> documentTypeAggregates = documentDatabaseEntityMongoCollection
+                .aggregate(countByStatusAggregate, DocumentTypeAggregateEntity.class)
+                .hintString("type_index");
+
+        return StreamSupport.stream(documentTypeAggregates.spliterator(), false)
                 .collect(Collectors.toMap(DocumentTypeAggregateEntity::getId, DocumentTypeAggregateEntity::getCount));
     }
 
+    /**
+     * Return the document count in the database for each document status.
+     *
+     * @return document count for each document status
+     */
     public Map<String, Integer> countByStatus() {
         final List<Bson> countByStatusAggregate = Collections.singletonList(group("$status", sum("count", 1L)));
 
-        return StreamSupport.stream(documentDatabaseEntityMongoCollection.aggregate(countByStatusAggregate,
-                        DocumentStatusAggregateEntity.class).spliterator(), false)
+        final AggregateIterable<DocumentStatusAggregateEntity> documentStatusAggregates = documentDatabaseEntityMongoCollection
+                .aggregate(countByStatusAggregate, DocumentStatusAggregateEntity.class)
+                .hintString("status_index");
+
+        return StreamSupport.stream(documentStatusAggregates.spliterator(), false)
                 .collect(Collectors.toMap(DocumentStatusAggregateEntity::getId, DocumentStatusAggregateEntity::getCount));
     }
 }
