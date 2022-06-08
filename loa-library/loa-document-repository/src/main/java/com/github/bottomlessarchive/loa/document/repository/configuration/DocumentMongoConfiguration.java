@@ -22,6 +22,12 @@ public class DocumentMongoConfiguration {
         documentDatabaseEntityMongoCollection
                 .createIndex(Indexes.ascending("status"), statusIndexOptions);
 
+        final IndexOptions typeIndexOptions = new IndexOptions()
+                .name("type_index");
+
+        documentDatabaseEntityMongoCollection
+                .createIndex(Indexes.ascending("type"), typeIndexOptions);
+
         final IndexOptions uniqueFileIndexOptions = new IndexOptions()
                 .name("unique_file")
                 .unique(true);
