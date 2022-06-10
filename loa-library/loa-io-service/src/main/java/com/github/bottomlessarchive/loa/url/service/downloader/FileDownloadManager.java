@@ -4,12 +4,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.ResponseBody;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -38,14 +38,13 @@ public class FileDownloadManager {
                 .url(downloadTarget)
                 .build();
 
-        try {
-            //TODO: Re-add the retry logic when the response is HttpStatus.TOO_MANY_REQUESTS
-            final InputStream fileInputStream = downloaderClient.newCall(request)
-                    .execute()
-                    .body()
-                    .byteStream();
+        //TODO: Re-add the retry logic when the response is HttpStatus.TOO_MANY_REQUESTS
+        try (ResponseBody responseBody = downloaderClient.newCall(request).execute().body()) {
+            if (responseBody == null) {
+                return;
+            }
 
-            Files.copy(fileInputStream, resultLocation);
+            Files.copy(responseBody.byteStream(), resultLocation);
         } catch (final IOException e) {
             try {
                 if (Files.exists(resultLocation)) {
