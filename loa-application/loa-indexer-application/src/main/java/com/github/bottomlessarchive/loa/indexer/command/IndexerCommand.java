@@ -30,7 +30,7 @@ public class IndexerCommand implements CommandLineRunner {
 
         log.info("Start document indexing.");
 
-        while(true) {
+        while (true) {
             documentEntityFactory.getDocumentEntity(DocumentStatus.DOWNLOADED, indexerConfigurationProperties.batchSize())
                     .forEach(documentEntityIndexer::processDocumentEntity);
 
