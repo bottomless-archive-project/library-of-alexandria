@@ -22,7 +22,7 @@ public class DocumentCreationContextFactory {
                 .id(documentArchivingContext.getId())
                 .vault(documentArchivingContext.getVault())
                 .type(documentArchivingContext.getType())
-                .status(DocumentStatus.DOWNLOADED)
+                .status(DocumentStatus.CREATED)
                 .source(documentArchivingContext.getSource())
                 .sourceLocationId(documentArchivingContext.getSourceLocationId()
                         .orElse(null))

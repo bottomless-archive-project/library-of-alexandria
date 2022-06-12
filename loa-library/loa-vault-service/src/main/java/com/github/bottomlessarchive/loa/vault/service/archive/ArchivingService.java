@@ -1,6 +1,7 @@
 package com.github.bottomlessarchive.loa.vault.service.archive;
 
 import com.github.bottomlessarchive.loa.checksum.service.ChecksumProvider;
+import com.github.bottomlessarchive.loa.document.service.DocumentManipulator;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentEntity;
 import com.github.bottomlessarchive.loa.document.service.entity.factory.DocumentEntityFactory;
 import com.github.bottomlessarchive.loa.document.service.entity.factory.domain.DocumentCreationContext;
@@ -24,6 +25,7 @@ public class ArchivingService {
     private final DocumentEntityFactory documentEntityFactory;
     private final DocumentCreationContextFactory documentCreationContextFactory;
     private final VaultDocumentStorage vaultDocumentStorage;
+    private final DocumentManipulator documentManipulator;
 
     /**
      * Archives a document to the vault. The document will be saved to the vault's physical storage and inserted into the database as well.
@@ -41,6 +43,8 @@ public class ArchivingService {
                 final DocumentEntity documentEntity = documentEntityFactory.newDocumentEntity(documentCreationContext);
 
                 vaultDocumentStorage.persistDocument(documentEntity, documentArchivingContext.getContent());
+
+                documentManipulator.markDownloaded(documentEntity.getId());
 
                 break;
             } catch (final Exception e) {

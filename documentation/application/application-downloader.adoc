@@ -14,7 +14,7 @@ include::../service/conductor/conductor-configuration.adoc[]
 | The location where the document files are first downloaded. After some validation and occasionally modification (compression etc) it is moved to the vault. *(Default value: temp folder)*
 
 | **loa.downloader.version-number**
-| The version number that should be saved as the downloader version to the database when a new document is inserted. Can be used for debugging, cleanups and so on. *(Default value: 2)*
+| The version number that should be saved as the downloader version to the database when a new document is inserted. Can be used for debugging, cleanups and so on. *(Default value: 6)*
 
 | **loa.downloader.maximum-archive-size**
 | If a document's size in bytes is bigger than the provided value, then the archiving step will be skipped. Too big documents can use up way too much space, compared to how useful they are. This parameter could be used to defend against this problem. *(Default value: 8589934592 bytes aka 8 GB)*

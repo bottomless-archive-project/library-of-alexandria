@@ -3,6 +3,11 @@ package com.github.bottomlessarchive.loa.document.service.domain;
 public enum DocumentStatus {
 
     /**
+     * The document was created in the database but not yet fully moved into the vault.
+     */
+    CREATED,
+
+    /**
      * The document was successfully downloaded and moved to the vault.
      */
     DOWNLOADED,
