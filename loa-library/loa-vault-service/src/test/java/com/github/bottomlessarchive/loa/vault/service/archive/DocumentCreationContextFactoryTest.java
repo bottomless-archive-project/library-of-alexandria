@@ -58,7 +58,7 @@ class DocumentCreationContextFactoryTest {
         assertThat(result.getChecksum(), is("textchecksum"));
         assertThat(result.getVersionNumber(), is(123));
         assertThat(result.getCompression(), is(DocumentCompression.GZIP));
-        assertThat(result.getStatus(), is(DocumentStatus.DOWNLOADED));
+        assertThat(result.getStatus(), is(DocumentStatus.CREATED));
         assertThat(result.getSourceLocationId().isPresent(), is(true));
         assertThat(result.getSourceLocationId().get(), is("locationId"));
     }

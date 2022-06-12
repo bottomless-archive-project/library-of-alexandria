@@ -1,6 +1,7 @@
 package com.github.bottomlessarchive.loa.vault.service.archive;
 
 import com.github.bottomlessarchive.loa.checksum.service.ChecksumProvider;
+import com.github.bottomlessarchive.loa.document.service.DocumentManipulator;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentEntity;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentType;
 import com.github.bottomlessarchive.loa.document.service.entity.factory.DocumentEntityFactory;
@@ -51,6 +52,9 @@ class ArchivingServiceTest {
     private VaultDocumentStorage vaultDocumentStorage;
 
     @Mock
+    private DocumentManipulator documentManipulator;
+
+    @Mock
     private ChecksumProvider checksumProvider;
 
     @Captor
@@ -68,6 +72,7 @@ class ArchivingServiceTest {
                 .thenReturn(documentCreationContext);
 
         final DocumentEntity documentEntity = DocumentEntity.builder()
+                .id(UUID.randomUUID())
                 .build();
         when(documentEntityFactory.newDocumentEntity(documentCreationContext))
                 .thenReturn(documentEntity);
@@ -78,6 +83,7 @@ class ArchivingServiceTest {
         assertThat(documentContent.getValue(), is(CONTENT));
         verify(documentCreationContextFactory).newContext(documentArchivingContext);
         verify(documentEntityFactory).newDocumentEntity(documentCreationContext);
+        verify(documentManipulator).markDownloaded(documentEntity.getId());
     }
 
     @Test
