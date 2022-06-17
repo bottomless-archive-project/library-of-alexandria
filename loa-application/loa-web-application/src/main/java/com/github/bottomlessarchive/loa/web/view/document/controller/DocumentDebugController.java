@@ -16,7 +16,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping
 @RequiredArgsConstructor
-public class DebugController {
+public class DocumentDebugController {
 
     private final DebugResponseFactory debugResponseFactory;
     private final DocumentEntityFactory documentEntityFactory;

@@ -1,15 +1,15 @@
-package com.github.bottomlessarchive.loa.web.view.document.service;
+package com.github.bottomlessarchive.loa.web.view.dashboard.service;
 
 import com.github.bottomlessarchive.loa.application.domain.ApplicationType;
 import com.github.bottomlessarchive.loa.conductor.service.client.ConductorClient;
 import com.github.bottomlessarchive.loa.conductor.service.domain.ServiceInstanceEntity;
-import com.github.bottomlessarchive.loa.web.view.document.response.dashboard.AdministratorApplicationInstance;
-import com.github.bottomlessarchive.loa.web.view.document.response.dashboard.DashboardApplicationsResponse;
-import com.github.bottomlessarchive.loa.web.view.document.response.dashboard.DownloaderApplicationInstance;
-import com.github.bottomlessarchive.loa.web.view.document.response.dashboard.GeneratorApplicationInstance;
-import com.github.bottomlessarchive.loa.web.view.document.response.dashboard.IndexerApplicationInstance;
-import com.github.bottomlessarchive.loa.web.view.document.response.dashboard.QueueApplicationInstance;
-import com.github.bottomlessarchive.loa.web.view.document.response.dashboard.VaultApplicationInstance;
+import com.github.bottomlessarchive.loa.web.view.dashboard.response.AdministratorApplicationInstance;
+import com.github.bottomlessarchive.loa.web.view.dashboard.response.DashboardApplicationsResponse;
+import com.github.bottomlessarchive.loa.web.view.dashboard.response.DownloaderApplicationInstance;
+import com.github.bottomlessarchive.loa.web.view.dashboard.response.GeneratorApplicationInstance;
+import com.github.bottomlessarchive.loa.web.view.dashboard.response.IndexerApplicationInstance;
+import com.github.bottomlessarchive.loa.web.view.dashboard.response.QueueApplicationInstance;
+import com.github.bottomlessarchive.loa.web.view.dashboard.response.VaultApplicationInstance;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +17,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class ServicesResponseFactory {
+public class ApplicationStatisticsResponseFactory {
 
     private final ConductorClient conductorClient;
 

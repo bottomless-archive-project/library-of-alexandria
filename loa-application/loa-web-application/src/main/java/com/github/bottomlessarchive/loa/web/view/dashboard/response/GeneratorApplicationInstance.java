@@ -1,4 +1,4 @@
-package com.github.bottomlessarchive.loa.web.view.document.response.dashboard;
+package com.github.bottomlessarchive.loa.web.view.dashboard.response;
 
 import lombok.Builder;
 import lombok.Getter;
