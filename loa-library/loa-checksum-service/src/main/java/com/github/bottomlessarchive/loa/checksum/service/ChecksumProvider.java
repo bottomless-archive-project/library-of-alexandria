@@ -1,5 +1,7 @@
 package com.github.bottomlessarchive.loa.checksum.service;
 
+import java.io.InputStream;
+
 /**
  * This interface is responsible for providing checksum values for documents in the stage location.
  */
@@ -11,5 +13,5 @@ public interface ChecksumProvider {
      * @param documentContents the contents of the document
      * @return the checksum for the document
      */
-    String checksum(byte[] documentContents);
+    String checksum(InputStream documentContents);
 }

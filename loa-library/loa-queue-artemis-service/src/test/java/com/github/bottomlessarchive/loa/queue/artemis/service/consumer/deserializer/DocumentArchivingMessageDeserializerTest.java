@@ -51,12 +51,6 @@ class DocumentArchivingMessageDeserializerTest {
                 .isEqualTo("sourceLocationId");
         assertThat(result.getContentLength())
                 .isEqualTo(5);
-        verify(activeMQBuffer).readBytes(byteArgumentCaptor.capture());
-        final byte[] content = byteArgumentCaptor.getValue();
-        assertThat(result.getContent())
-                .isEqualTo(content);
-        assertThat(content.length)
-                .isEqualTo(5);
     }
 
     @Test
@@ -83,12 +77,6 @@ class DocumentArchivingMessageDeserializerTest {
         assertThat(result.getSourceLocationId().isPresent())
                 .isFalse();
         assertThat(result.getContentLength())
-                .isEqualTo(5);
-        verify(activeMQBuffer).readBytes(byteArgumentCaptor.capture());
-        final byte[] content = byteArgumentCaptor.getValue();
-        assertThat(result.getContent())
-                .isEqualTo(content);
-        assertThat(content.length)
                 .isEqualTo(5);
     }
 }

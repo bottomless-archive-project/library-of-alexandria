@@ -15,6 +15,7 @@ import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.StorageClass;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -54,7 +55,7 @@ class S3VaultLocationTest {
 
     @Test
     void testUpload() throws IOException {
-        underTest.upload(CONTENT);
+        underTest.upload(new ByteArrayInputStream(CONTENT), CONTENT.length);
 
         verify(s3Client).putObject(putObjectRequestArgumentCaptor.capture(), requestBodyArgumentCaptor.capture());
 

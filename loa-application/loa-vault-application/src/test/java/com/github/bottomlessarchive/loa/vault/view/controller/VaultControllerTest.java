@@ -30,6 +30,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.io.ByteArrayInputStream;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -353,7 +354,7 @@ class VaultControllerTest {
                 .andExpect(status().isOk());
 
         Mockito.verify(vaultDocumentStorage)
-                .persistDocument(documentEntity, newDocumentContent, vaultLocation);
+                .persistDocument(documentEntity, new ByteArrayInputStream(newDocumentContent), vaultLocation, newDocumentContent.length);
         Mockito.verify(documentManipulator)
                 .markDownloaded(UUID.fromString(TEST_DOCUMENT_ID));
     }

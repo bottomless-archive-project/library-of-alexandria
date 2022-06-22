@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.ByteArrayInputStream;
 import java.util.UUID;
 
 @Slf4j
@@ -130,6 +131,7 @@ public class VaultController {
                 .orElseThrow(() -> new InvalidRequestException("Document not found with id " + documentId + "!"));
     }
 
+    //TODO: We need to support an InputStream here for content
     @PutMapping("/document/{documentId}/replace")
     public void replaceCorruptDocument(@PathVariable final String documentId,
             @RequestBody final ReplaceDocumentRequest replaceDocumentRequest) {
@@ -150,8 +152,9 @@ public class VaultController {
                     final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentEntity,
                             documentEntity.getCompression());
 
-                    vaultDocumentStorage.persistDocument(documentEntity, replaceDocumentRequest.getContent(),
-                            vaultLocation);
+                    final byte[] content = replaceDocumentRequest.getContent();
+                    vaultDocumentStorage.persistDocument(documentEntity, new ByteArrayInputStream(content),
+                            vaultLocation, content.length);
 
                     documentManipulator.markDownloaded(documentEntity.getId());
                 }, () -> {

@@ -43,7 +43,6 @@ public class DocumentArchivingMessageSerializer implements MessageSerializer<Doc
             documentArchivingMessage.getSourceLocationId()
                     .ifPresent(bodyBuffer::writeString);
         }
-        bodyBuffer.writeInt(documentArchivingMessage.getContentLength());
-        bodyBuffer.writeBytes(documentArchivingMessage.getContent());
+        bodyBuffer.writeLong(documentArchivingMessage.getContentLength());
     }
 }

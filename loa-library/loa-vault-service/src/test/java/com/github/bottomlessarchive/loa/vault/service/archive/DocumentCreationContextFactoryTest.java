@@ -13,6 +13,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.UUID;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -34,7 +36,7 @@ class DocumentCreationContextFactoryTest {
     @Test
     void testNewContext() {
         final UUID id = UUID.randomUUID();
-        final byte[] content = {0, 1, 2, 3};
+        final InputStream content = new ByteArrayInputStream(new byte[]{0, 1, 2, 3});
         final DocumentArchivingContext documentArchivingContext = DocumentArchivingContext.builder()
                 .id(id)
                 .content(content)
@@ -66,7 +68,7 @@ class DocumentCreationContextFactoryTest {
     @Test
     void testNewContextWhenSourceLocationIdIsNull() {
         final UUID id = UUID.randomUUID();
-        final byte[] content = {0, 1, 2, 3};
+        final InputStream content = new ByteArrayInputStream(new byte[]{0, 1, 2, 3});
         final DocumentArchivingContext documentArchivingContext = DocumentArchivingContext.builder()
                 .id(id)
                 .content(content)

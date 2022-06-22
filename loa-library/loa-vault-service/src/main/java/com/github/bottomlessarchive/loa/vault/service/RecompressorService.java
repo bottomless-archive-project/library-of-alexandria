@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -24,6 +25,7 @@ public class RecompressorService {
     private final VaultLocationFactory vaultLocationFactory;
     private final VaultDocumentStorage vaultDocumentStorage;
 
+    //TODO: This can be optimized. We shouldn't read the whole document into memory!
     public void recompress(final DocumentEntity documentEntity, final DocumentCompression documentCompression) {
         if (log.isInfoEnabled()) {
             log.info("Migrating archived document {} from {} compression to {}.", documentEntity.getId(),
@@ -38,7 +40,8 @@ public class RecompressorService {
 
             final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentEntity, documentCompression);
 
-            vaultDocumentStorage.persistDocument(documentEntity, documentContent, vaultLocation);
+            vaultDocumentStorage.persistDocument(documentEntity, new ByteArrayInputStream(documentContent), vaultLocation,
+                    documentContent.length);
 
             documentManipulator.updateCompression(documentEntity.getId(), documentCompression);
         } catch (final IOException e) {
