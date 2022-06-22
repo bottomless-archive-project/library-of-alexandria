@@ -12,6 +12,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.Optional;
 
 import static org.mockito.Mockito.any;
@@ -23,8 +25,8 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class VaultDocumentStorageTest {
 
-    private static final byte[] CONTENT = {0, 1, 2, 3, 4, -1, -2, -3, -4, -5};
-    private static final byte[] COMPRESSED_CONTENT = {111, 112, 113};
+    private static final InputStream CONTENT = new ByteArrayInputStream(new byte[]{0, 1, 2, 3, 4, -1, -2, -3, -4, -5});
+    private static final InputStream COMPRESSED_CONTENT = new ByteArrayInputStream(new byte[]{111, 112, 113});
 
     @Mock
     private VaultLocationFactory vaultLocationFactory;
@@ -42,9 +44,9 @@ class VaultDocumentStorageTest {
                 .build();
         final VaultLocation vaultLocation = mock(VaultLocation.class);
 
-        underTest.persistDocument(documentEntity, CONTENT, vaultLocation);
+        underTest.persistDocument(documentEntity, CONTENT, vaultLocation, 100L);
 
-        verify(vaultLocation).upload(CONTENT);
+        verify(vaultLocation).upload(CONTENT, 100L);
         verify(compressionServiceProvider, never()).getCompressionService(any());
     }
 
@@ -62,10 +64,10 @@ class VaultDocumentStorageTest {
         when(vaultLocation.getCompression())
                 .thenReturn(Optional.of(DocumentCompression.GZIP));
 
-        underTest.persistDocument(documentEntity, CONTENT, vaultLocation);
+        underTest.persistDocument(documentEntity, CONTENT, vaultLocation, 100L);
 
-        verify(vaultLocation, never()).upload(CONTENT);
-        verify(vaultLocation).upload(COMPRESSED_CONTENT);
+        verify(vaultLocation, never()).upload(CONTENT, 100L);
+        verify(vaultLocation).upload(COMPRESSED_CONTENT, 100L);
         verify(compressionServiceProvider).getCompressionService(DocumentCompression.GZIP);
         verify(compressionService).compress(CONTENT);
     }
@@ -79,8 +81,8 @@ class VaultDocumentStorageTest {
         when(vaultLocationFactory.getLocation(documentEntity))
                 .thenReturn(vaultLocation);
 
-        underTest.persistDocument(documentEntity, CONTENT);
+        underTest.persistDocument(documentEntity, CONTENT, 100L);
 
-        verify(vaultLocation).upload(CONTENT);
+        verify(vaultLocation).upload(CONTENT, 100L);
     }
 }

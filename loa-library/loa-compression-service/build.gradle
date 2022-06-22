@@ -2,4 +2,5 @@ dependencies {
     implementation group: 'commons-io', name: 'commons-io', version: '2.11.0'
     implementation group: 'org.apache.commons', name: 'commons-compress', version: '1.21'
     implementation group: 'org.tukaani', name: 'xz', version: '1.9'
+    implementation group: 'com.github.davidmoten', name: 'io-extras', version: '0.1.4'
 }

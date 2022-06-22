@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import org.apache.commons.io.IOUtils;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -29,9 +28,9 @@ public class FileVaultLocation implements VaultLocation {
      * {@inheritDoc}
      */
     @Override
-    public void upload(final byte[] documentContents) {
+    public void upload(final InputStream documentContents, final long contentLength) {
         try (OutputStream outputStream = Files.newOutputStream(vaultLocation)) {
-            IOUtils.copy(new ByteArrayInputStream(documentContents), outputStream);
+            IOUtils.copy(documentContents, outputStream);
         } catch (final IOException e) {
             throw new StorageAccessException("Unable to create file in vault!", e);
         }

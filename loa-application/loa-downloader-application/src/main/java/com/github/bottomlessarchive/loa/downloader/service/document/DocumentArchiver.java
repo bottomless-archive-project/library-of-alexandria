@@ -5,8 +5,10 @@ import com.github.bottomlessarchive.loa.queue.service.domain.message.DocumentArc
 import com.github.bottomlessarchive.loa.downloader.service.document.domain.DocumentArchivingContext;
 import com.github.bottomlessarchive.loa.downloader.service.document.domain.exception.ArchivingException;
 import com.github.bottomlessarchive.loa.queue.service.domain.Queue;
+import com.github.bottomlessarchive.loa.staging.service.client.StagingClient;
 import io.micrometer.core.instrument.Counter;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -20,19 +22,20 @@ import java.nio.file.Files;
 @RequiredArgsConstructor
 public class DocumentArchiver {
 
+    private final StagingClient stagingClient;
     private final QueueManipulator queueManipulator;
 
     @Qualifier("archivedDocumentCount")
     private final Counter archivedDocumentCount;
 
     public void archiveDocument(final DocumentArchivingContext documentArchivingContext) {
+        //TODO: Can we stream the content to the Staging Application? Would be even better.
         try (InputStream documentContent = Files.newInputStream(documentArchivingContext.getContents())) {
             archivedDocumentCount.increment();
 
-            final byte[] content = documentContent.readAllBytes();
+            stagingClient.sendToStaging(documentArchivingContext.getId(), documentContent);
 
-            final DocumentArchivingMessage documentArchivingMessage = newDocumentArchivingMessage(
-                    documentArchivingContext, content);
+            final DocumentArchivingMessage documentArchivingMessage = newDocumentArchivingMessage(documentArchivingContext);
 
             log.debug("Sending new archiving message: {}!", documentArchivingMessage);
 
@@ -42,15 +45,14 @@ public class DocumentArchiver {
         }
     }
 
-    private DocumentArchivingMessage newDocumentArchivingMessage(final DocumentArchivingContext documentArchivingContext,
-            final byte[] content) {
+    @SneakyThrows
+    private DocumentArchivingMessage newDocumentArchivingMessage(final DocumentArchivingContext documentArchivingContext) {
         return DocumentArchivingMessage.builder()
                 .id(documentArchivingContext.getId().toString())
                 .type(documentArchivingContext.getType().toString())
                 .source(documentArchivingContext.getSource())
                 .sourceLocationId(documentArchivingContext.getSourceLocationId())
-                .contentLength(content.length)
-                .content(content)
+                .contentLength(Files.size(documentArchivingContext.getContents()))
                 .build();
     }
 }

@@ -35,7 +35,7 @@ public class S3VaultLocation implements VaultLocation {
      * {@inheritDoc}
      */
     @Override
-    public void upload(final byte[] documentContents) {
+    public void upload(final InputStream documentContents, final long contentLength) {
         final PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                 .bucket(bucketName)
                 .key(fileName)
@@ -43,7 +43,7 @@ public class S3VaultLocation implements VaultLocation {
                 .storageClass(StorageClass.REDUCED_REDUNDANCY)
                 .build();
 
-        s3Client.putObject(putObjectRequest, RequestBody.fromBytes(documentContents));
+        s3Client.putObject(putObjectRequest, RequestBody.fromInputStream(documentContents, contentLength));
     }
 
     /**

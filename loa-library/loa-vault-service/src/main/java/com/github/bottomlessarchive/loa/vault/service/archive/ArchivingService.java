@@ -35,14 +35,14 @@ public class ArchivingService {
      * @param documentArchivingContext the context of the document to archive
      */
     public void archiveDocument(final DocumentArchivingContext documentArchivingContext) {
-        final DocumentCreationContext documentCreationContext = documentCreationContextFactory.newContext(
-                documentArchivingContext);
+        final DocumentCreationContext documentCreationContext = documentCreationContextFactory.newContext(documentArchivingContext);
 
         while (true) {
             try {
                 final DocumentEntity documentEntity = documentEntityFactory.newDocumentEntity(documentCreationContext);
 
-                vaultDocumentStorage.persistDocument(documentEntity, documentArchivingContext.getContent());
+                vaultDocumentStorage.persistDocument(documentEntity, documentArchivingContext.getContent(),
+                        documentArchivingContext.getContentLength());
 
                 documentManipulator.markDownloaded(documentEntity.getId());
 
@@ -62,6 +62,7 @@ public class ArchivingService {
     private void handleDuplicate(final DocumentArchivingContext documentArchivingContext) {
         log.info("Document with id {} is a duplicate.", documentArchivingContext.getId());
 
+        //TODO: This should be calculated in the Downloader Application. It already has the content of the document in memory.
         final String checksum = checksumProvider.checksum(documentArchivingContext.getContent());
 
         getOriginalDocumentEntity(checksum, documentArchivingContext)
@@ -73,6 +74,7 @@ public class ArchivingService {
 
     private Optional<DocumentEntity> getOriginalDocumentEntity(final String checksum,
             final DocumentArchivingContext documentArchivingContext) {
+        //TODO: Content length should come from the Downloader Application too.
         return documentEntityFactory.getDocumentEntity(checksum, documentArchivingContext.getContentLength(),
                 documentArchivingContext.getType().toString());
     }

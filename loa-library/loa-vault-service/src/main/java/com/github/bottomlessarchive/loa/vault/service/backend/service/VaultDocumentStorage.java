@@ -8,6 +8,8 @@ import com.github.bottomlessarchive.loa.vault.service.location.VaultLocationFact
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.io.InputStream;
+
 /**
  * The document storage is responsible to store and later retrieve the content of a document.
  */
@@ -24,10 +26,10 @@ public class VaultDocumentStorage {
      * @param documentEntity   the document to store the contents for
      * @param documentContents the contents of the document
      */
-    public void persistDocument(final DocumentEntity documentEntity, final byte[] documentContents) {
+    public void persistDocument(final DocumentEntity documentEntity, final InputStream documentContents, final long contentLength) {
         final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentEntity);
 
-        persistDocument(documentEntity, documentContents, vaultLocation);
+        persistDocument(documentEntity, documentContents, vaultLocation, contentLength);
     }
 
     /**
@@ -37,14 +39,12 @@ public class VaultDocumentStorage {
      * @param documentContents the contents of the document
      * @param vaultLocation    the vault location where the document's contents should be stored
      */
-    public void persistDocument(final DocumentEntity documentEntity, final byte[] documentContents,
-            final VaultLocation vaultLocation) {
-        final byte[] contentToSave = vaultLocation.getCompression()
+    public void persistDocument(final DocumentEntity documentEntity, final InputStream documentContents,
+            final VaultLocation vaultLocation, final long contentLength) {
+        try (InputStream contentToSave = vaultLocation.getCompression()
                 .map(compression -> compressionServiceProvider.getCompressionService(compression).compress(documentContents))
-                .orElse(documentContents);
-
-        try {
-            vaultLocation.upload(contentToSave);
+                .orElse(documentContents)) {
+            vaultLocation.upload(contentToSave, contentLength);
         } catch (final Exception e) {
             throw new VaultPersistenceException("Unable to move document with id " + documentEntity.getId()
                     + " to the vault!", e);
