@@ -10,6 +10,7 @@ import com.github.bottomlessarchive.loa.vault.service.backend.service.VaultDocum
 import com.github.bottomlessarchive.loa.vault.service.domain.DocumentArchivingContext;
 import com.mongodb.MongoWriteException;
 import com.mongodb.WriteError;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -26,6 +27,7 @@ import java.util.UUID;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.eq;
@@ -66,6 +68,7 @@ class ArchivingServiceTest {
     private ArchivingService underTest;
 
     @Test
+    @SneakyThrows
     void testWhenPersistingAValidDocument() {
         final DocumentArchivingContext documentArchivingContext = createDocumentArchivingContext();
         final DocumentCreationContext documentCreationContext = DocumentCreationContext.builder()
@@ -81,8 +84,8 @@ class ArchivingServiceTest {
 
         underTest.archiveDocument(documentArchivingContext);
 
-        verify(vaultDocumentStorage).persistDocument(eq(documentEntity), documentContent.capture(), CONTENT.length);
-        assertThat(documentContent.getValue(), is(CONTENT));
+        verify(vaultDocumentStorage).persistDocument(eq(documentEntity), documentContent.capture(), eq((long) CONTENT.length));
+        assertThat(documentContent.getValue().readAllBytes(), is(CONTENT));
         verify(documentCreationContextFactory).newContext(documentArchivingContext);
         verify(documentEntityFactory).newDocumentEntity(documentCreationContext);
         verify(documentManipulator).markDownloaded(documentEntity.getId());
@@ -109,7 +112,7 @@ class ArchivingServiceTest {
                 .thenReturn(writeError);
         //Do a normal exception, then a retry happens and throw the mongo exception to stop the retries
         doThrow(new RuntimeException("Test exception"), mongoWriteException)
-                .when(vaultDocumentStorage).persistDocument(any(), any(), any());
+                .when(vaultDocumentStorage).persistDocument(any(), any(), anyLong());
         final UUID duplicateOfId = UUID.fromString("a10bb054-2d2c-41e8-8d0d-752cc7f0c778");
         final DocumentEntity duplicateOf = DocumentEntity.builder()
                 .id(duplicateOfId)
@@ -123,7 +126,7 @@ class ArchivingServiceTest {
 
         underTest.archiveDocument(documentArchivingContext);
 
-        verify(vaultDocumentStorage, times(2)).persistDocument(any(), any(), any());
+        verify(vaultDocumentStorage, times(2)).persistDocument(any(), any(), anyLong());
         verify(documentEntityFactory).addSourceLocation(duplicateOfId, SOURCE_LOCATION_ID);
     }
 
@@ -152,7 +155,7 @@ class ArchivingServiceTest {
                 .thenReturn(writeError);
         //Do a normal exception, then a retry happens and throw the mongo exception to stop the retries
         doThrow(new RuntimeException("Test exception"), mongoWriteException)
-                .when(vaultDocumentStorage).persistDocument(any(), any(), any());
+                .when(vaultDocumentStorage).persistDocument(any(), any(), anyLong());
         final UUID duplicateOfId = UUID.fromString("a10bb054-2d2c-41e8-8d0d-752cc7f0c778");
         final DocumentEntity duplicateOf = DocumentEntity.builder()
                 .id(duplicateOfId)
@@ -164,7 +167,7 @@ class ArchivingServiceTest {
 
         underTest.archiveDocument(documentArchivingContext);
 
-        verify(vaultDocumentStorage, times(2)).persistDocument(any(), any(), any());
+        verify(vaultDocumentStorage, times(2)).persistDocument(any(), any(), anyLong());
         verify(documentEntityFactory, never()).addSourceLocation(any(), anyString());
     }
 

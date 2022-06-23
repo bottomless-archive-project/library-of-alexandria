@@ -5,21 +5,15 @@ import org.apache.activemq.artemis.api.core.ActiveMQBuffer;
 import org.apache.activemq.artemis.api.core.client.ClientMessage;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class DocumentArchivingMessageDeserializerTest {
-
-    @Captor
-    private ArgumentCaptor<byte[]> byteArgumentCaptor;
 
     @InjectMocks
     private DocumentArchivingMessageDeserializer underTest;
@@ -34,8 +28,8 @@ class DocumentArchivingMessageDeserializerTest {
                 .thenReturn("id", "type", "source", "sourceLocationId");
         when(activeMQBuffer.readBoolean())
                 .thenReturn(true);
-        when(activeMQBuffer.readInt())
-                .thenReturn(5);
+        when(activeMQBuffer.readLong())
+                .thenReturn(5L);
 
         final DocumentArchivingMessage result = underTest.deserialize(clientMessage);
 
@@ -63,8 +57,8 @@ class DocumentArchivingMessageDeserializerTest {
                 .thenReturn("id", "type", "source");
         when(activeMQBuffer.readBoolean())
                 .thenReturn(false);
-        when(activeMQBuffer.readInt())
-                .thenReturn(5);
+        when(activeMQBuffer.readLong())
+                .thenReturn(5L);
 
         final DocumentArchivingMessage result = underTest.deserialize(clientMessage);
 

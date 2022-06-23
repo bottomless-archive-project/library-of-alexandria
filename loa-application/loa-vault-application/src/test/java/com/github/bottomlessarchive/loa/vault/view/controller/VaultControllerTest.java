@@ -18,6 +18,7 @@ import com.github.bottomlessarchive.loa.vault.view.request.domain.ReplaceDocumen
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -30,10 +31,12 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -341,7 +344,7 @@ class VaultControllerTest {
                 .thenReturn(vaultLocation);
 
         final byte[] newDocumentContent = {1, 2, 3, 4};
-
+        final ArgumentCaptor<InputStream> inputStreamArgumentCaptor = ArgumentCaptor.forClass(InputStream.class);
 
         mockMvc.perform(MockMvcRequestBuilders.put("/document/" + TEST_DOCUMENT_ID + "/replace")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -354,7 +357,9 @@ class VaultControllerTest {
                 .andExpect(status().isOk());
 
         Mockito.verify(vaultDocumentStorage)
-                .persistDocument(documentEntity, new ByteArrayInputStream(newDocumentContent), vaultLocation, newDocumentContent.length);
+                .persistDocument(eq(documentEntity), inputStreamArgumentCaptor.capture(), eq(vaultLocation), eq(4L));
+        assertThat(inputStreamArgumentCaptor.getValue().readAllBytes())
+                .isEqualTo(newDocumentContent);
         Mockito.verify(documentManipulator)
                 .markDownloaded(UUID.fromString(TEST_DOCUMENT_ID));
     }
