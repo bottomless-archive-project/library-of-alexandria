@@ -13,6 +13,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.UUID;
 
 @Slf4j
@@ -40,10 +42,16 @@ public class VaultQueueListener implements CommandLineRunner {
 
             log.debug("Got new archiving message: {}!", documentArchivingMessage);
 
-            final DocumentArchivingContext documentArchivingContext = documentArchivingContextTransformer.transform(
-                    documentArchivingMessage, stagingClient.requestFromStaging(UUID.fromString(documentArchivingMessage.getId())));
+            try (InputStream documentContent = stagingClient.grabFromStaging(UUID.fromString(documentArchivingMessage.getId()))) {
+                final DocumentArchivingContext documentArchivingContext = documentArchivingContextTransformer.transform(
+                        documentArchivingMessage, documentContent);
 
-            vaultDocumentManager.archiveDocument(documentArchivingContext);
+                vaultDocumentManager.archiveDocument(documentArchivingContext);
+            } catch (IOException e) {
+                log.error("Failed to download the document's contents!");
+
+                //TODO: Mark it as corrupt?
+            }
         }
     }
 }
