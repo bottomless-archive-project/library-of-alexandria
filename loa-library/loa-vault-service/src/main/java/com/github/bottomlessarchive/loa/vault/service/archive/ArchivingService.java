@@ -1,6 +1,5 @@
 package com.github.bottomlessarchive.loa.vault.service.archive;
 
-import com.github.bottomlessarchive.loa.checksum.service.ChecksumProvider;
 import com.github.bottomlessarchive.loa.document.service.DocumentManipulator;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentEntity;
 import com.github.bottomlessarchive.loa.document.service.entity.factory.DocumentEntityFactory;
@@ -21,7 +20,6 @@ public class ArchivingService {
 
     private static final int DUPLICATE_DOCUMENT_ID_ERROR_CODE = 11000;
 
-    private final ChecksumProvider checksumProvider;
     private final DocumentEntityFactory documentEntityFactory;
     private final DocumentCreationContextFactory documentCreationContextFactory;
     private final VaultDocumentStorage vaultDocumentStorage;
@@ -62,10 +60,7 @@ public class ArchivingService {
     private void handleDuplicate(final DocumentArchivingContext documentArchivingContext) {
         log.info("Document with id {} is a duplicate.", documentArchivingContext.getId());
 
-        //TODO: This should be calculated in the Downloader Application. It already has the content of the document in memory.
-        final String checksum = checksumProvider.checksum(documentArchivingContext.getContent());
-
-        getOriginalDocumentEntity(checksum, documentArchivingContext)
+        getOriginalDocumentEntity(documentArchivingContext.getChecksum(), documentArchivingContext)
                 .ifPresent(originalDocumentEntity -> {
                     logAddingSourceLocation(originalDocumentEntity, documentArchivingContext);
                     addSourceLocation(originalDocumentEntity, documentArchivingContext);

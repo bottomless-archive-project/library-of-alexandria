@@ -27,6 +27,7 @@ public class DocumentArchivingContextTransformer {
                 )
                 .contentLength(documentArchivingMessage.getContentLength())
                 .content(content)
+                .checksum(documentArchivingMessage.getChecksum())
                 .versionNumber(vaultConfigurationProperties.versionNumber())
                 .build();
     }

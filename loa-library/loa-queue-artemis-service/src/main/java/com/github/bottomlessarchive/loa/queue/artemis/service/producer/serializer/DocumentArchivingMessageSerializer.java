@@ -44,5 +44,6 @@ public class DocumentArchivingMessageSerializer implements MessageSerializer<Doc
                     .ifPresent(bodyBuffer::writeString);
         }
         bodyBuffer.writeLong(documentArchivingMessage.getContentLength());
+        bodyBuffer.writeString(documentArchivingMessage.getChecksum());
     }
 }

@@ -18,6 +18,7 @@ public class DocumentArchivingContext {
     private final String source;
     private final String sourceLocationId;
     private final long contentLength;
+    private final String checksum;
     private final InputStream content;
     private final int versionNumber;
 

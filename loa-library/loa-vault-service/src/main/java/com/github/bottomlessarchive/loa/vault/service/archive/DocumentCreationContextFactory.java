@@ -1,6 +1,5 @@
 package com.github.bottomlessarchive.loa.vault.service.archive;
 
-import com.github.bottomlessarchive.loa.checksum.service.ChecksumProvider;
 import com.github.bottomlessarchive.loa.compression.configuration.CompressionConfigurationProperties;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentStatus;
 import com.github.bottomlessarchive.loa.document.service.entity.factory.domain.DocumentCreationContext;
@@ -11,13 +10,9 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class DocumentCreationContextFactory {
-
-    private final ChecksumProvider checksumProvider;
     private final CompressionConfigurationProperties compressionConfigurationProperties;
 
     public DocumentCreationContext newContext(final DocumentArchivingContext documentArchivingContext) {
-        final String checksum = checksumProvider.checksum(documentArchivingContext.getContent());
-
         return DocumentCreationContext.builder()
                 .id(documentArchivingContext.getId())
                 .vault(documentArchivingContext.getVault())
@@ -28,7 +23,7 @@ public class DocumentCreationContextFactory {
                         .orElse(null))
                 .versionNumber(documentArchivingContext.getVersionNumber())
                 .compression(compressionConfigurationProperties.algorithm())
-                .checksum(checksum)
+                .checksum(documentArchivingContext.getChecksum())
                 .fileSize(documentArchivingContext.getContentLength())
                 .build();
     }

@@ -1,5 +1,6 @@
 package com.github.bottomlessarchive.loa.downloader.service.document;
 
+import com.github.bottomlessarchive.loa.checksum.service.ChecksumProvider;
 import com.github.bottomlessarchive.loa.downloader.service.document.domain.DocumentArchivingContext;
 import com.github.bottomlessarchive.loa.queue.service.QueueManipulator;
 import com.github.bottomlessarchive.loa.queue.service.domain.Queue;
@@ -21,6 +22,7 @@ public class DocumentArchiver {
 
     private final StagingClient stagingClient;
     private final QueueManipulator queueManipulator;
+    private final ChecksumProvider checksumProvider;
 
     @Qualifier("archivedDocumentCount")
     private final Counter archivedDocumentCount;
@@ -45,6 +47,7 @@ public class DocumentArchiver {
                 .source(documentArchivingContext.getSource())
                 .sourceLocationId(documentArchivingContext.getSourceLocationId())
                 .contentLength(Files.size(documentArchivingContext.getContents()))
+                .checksum(checksumProvider.checksum(Files.newInputStream(documentArchivingContext.getContents())))
                 .build();
     }
 }
