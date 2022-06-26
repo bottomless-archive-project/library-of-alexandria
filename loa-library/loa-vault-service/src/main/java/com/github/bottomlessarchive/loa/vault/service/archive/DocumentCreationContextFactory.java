@@ -1,6 +1,5 @@
 package com.github.bottomlessarchive.loa.vault.service.archive;
 
-import com.github.bottomlessarchive.loa.compression.configuration.CompressionConfigurationProperties;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentStatus;
 import com.github.bottomlessarchive.loa.document.service.entity.factory.domain.DocumentCreationContext;
 import com.github.bottomlessarchive.loa.vault.service.domain.DocumentArchivingContext;
@@ -10,7 +9,6 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class DocumentCreationContextFactory {
-    private final CompressionConfigurationProperties compressionConfigurationProperties;
 
     public DocumentCreationContext newContext(final DocumentArchivingContext documentArchivingContext) {
         return DocumentCreationContext.builder()
@@ -22,9 +20,9 @@ public class DocumentCreationContextFactory {
                 .sourceLocationId(documentArchivingContext.getSourceLocationId()
                         .orElse(null))
                 .versionNumber(documentArchivingContext.getVersionNumber())
-                .compression(compressionConfigurationProperties.algorithm())
+                .compression(documentArchivingContext.getCompression())
                 .checksum(documentArchivingContext.getChecksum())
-                .fileSize(documentArchivingContext.getContentLength())
+                .fileSize(documentArchivingContext.getOriginalContentLength())
                 .build();
     }
 }

@@ -1,6 +1,5 @@
 package com.github.bottomlessarchive.loa.vault.service.archive;
 
-import com.github.bottomlessarchive.loa.checksum.service.ChecksumProvider;
 import com.github.bottomlessarchive.loa.compression.configuration.CompressionConfigurationProperties;
 import com.github.bottomlessarchive.loa.compression.domain.DocumentCompression;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentStatus;
@@ -25,9 +24,6 @@ import static org.mockito.Mockito.when;
 class DocumentCreationContextFactoryTest {
 
     @Mock
-    private ChecksumProvider checksumProvider;
-
-    @Mock
     private CompressionConfigurationProperties compressionConfigurationProperties;
 
     @InjectMocks
@@ -46,8 +42,6 @@ class DocumentCreationContextFactoryTest {
                 .versionNumber(123)
                 .sourceLocationId("locationId")
                 .build();
-        when(checksumProvider.checksum(content))
-                .thenReturn("textchecksum");
         when(compressionConfigurationProperties.algorithm())
                 .thenReturn(DocumentCompression.GZIP);
 
@@ -78,8 +72,6 @@ class DocumentCreationContextFactoryTest {
                 .versionNumber(123)
                 .sourceLocationId(null)
                 .build();
-        when(checksumProvider.checksum(content))
-                .thenReturn("textchecksum");
         when(compressionConfigurationProperties.algorithm())
                 .thenReturn(DocumentCompression.GZIP);
 

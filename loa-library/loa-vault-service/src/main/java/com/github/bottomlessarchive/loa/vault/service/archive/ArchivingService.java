@@ -69,8 +69,7 @@ public class ArchivingService {
 
     private Optional<DocumentEntity> getOriginalDocumentEntity(final String checksum,
             final DocumentArchivingContext documentArchivingContext) {
-        //TODO: Content length should come from the Downloader Application too.
-        return documentEntityFactory.getDocumentEntity(checksum, documentArchivingContext.getContentLength(),
+        return documentEntityFactory.getDocumentEntity(checksum, documentArchivingContext.getOriginalContentLength(),
                 documentArchivingContext.getType().toString());
     }
 

@@ -3,9 +3,9 @@ package com.github.bottomlessarchive.loa.compression.service;
 import com.github.bottomlessarchive.loa.compression.domain.CompressionException;
 import org.apache.commons.compress.compressors.lzma.LZMACompressorInputStream;
 import org.apache.commons.compress.compressors.lzma.LZMACompressorOutputStream;
-import org.davidmoten.io.extras.IOUtil;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -13,9 +13,15 @@ import java.io.InputStream;
 public class LZMACompressionService implements CompressionService {
 
     @Override
-    public InputStream compress(final InputStream compressedDocumentContent) {
+    public byte[] compress(final byte[] compressedDocumentContent) {
         try {
-            return IOUtil.pipe(compressedDocumentContent, LZMACompressorOutputStream::new);
+            final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            final LZMACompressorOutputStream gzipOutputStream = new LZMACompressorOutputStream(byteArrayOutputStream);
+
+            gzipOutputStream.write(compressedDocumentContent);
+            gzipOutputStream.close();
+
+            return byteArrayOutputStream.toByteArray();
         } catch (final IOException e) {
             throw new CompressionException("Error while compressing document!", e);
         }

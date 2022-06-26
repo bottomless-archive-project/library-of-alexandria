@@ -1,7 +1,6 @@
 package com.github.bottomlessarchive.loa.vault.service.backend.service;
 
 import com.github.bottomlessarchive.loa.vault.service.backend.domain.VaultPersistenceException;
-import com.github.bottomlessarchive.loa.compression.service.provider.CompressionServiceProvider;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentEntity;
 import com.github.bottomlessarchive.loa.vault.service.location.VaultLocation;
 import com.github.bottomlessarchive.loa.vault.service.location.VaultLocationFactory;
@@ -18,7 +17,6 @@ import java.io.InputStream;
 public class VaultDocumentStorage {
 
     private final VaultLocationFactory vaultLocationFactory;
-    private final CompressionServiceProvider compressionServiceProvider;
 
     /**
      * Store the document contents.
@@ -41,13 +39,10 @@ public class VaultDocumentStorage {
      */
     public void persistDocument(final DocumentEntity documentEntity, final InputStream documentContents,
             final VaultLocation vaultLocation, final long contentLength) {
-        try (InputStream contentToSave = vaultLocation.getCompression()
-                .map(compression -> compressionServiceProvider.getCompressionService(compression).compress(documentContents))
-                .orElse(documentContents)) {
-            vaultLocation.upload(contentToSave, contentLength);
+        try {
+            vaultLocation.upload(documentContents, contentLength);
         } catch (final Exception e) {
-            throw new VaultPersistenceException("Unable to move document with id " + documentEntity.getId()
-                    + " to the vault!", e);
+            throw new VaultPersistenceException("Unable to move document with id " + documentEntity.getId() + " to the vault!", e);
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.github.bottomlessarchive.loa.vault.service.transformer;
 
+import com.github.bottomlessarchive.loa.compression.domain.DocumentCompression;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentType;
 import com.github.bottomlessarchive.loa.queue.service.domain.message.DocumentArchivingMessage;
 import com.github.bottomlessarchive.loa.vault.configuration.VaultConfigurationProperties;
@@ -26,9 +27,11 @@ public class DocumentArchivingContextTransformer {
                         .orElse(null)
                 )
                 .contentLength(documentArchivingMessage.getContentLength())
+                .originalContentLength(documentArchivingMessage.getOriginalContentLength())
                 .content(content)
                 .checksum(documentArchivingMessage.getChecksum())
                 .versionNumber(vaultConfigurationProperties.versionNumber())
+                .compression(DocumentCompression.valueOf(documentArchivingMessage.getCompression()))
                 .build();
     }
 }

@@ -15,6 +15,8 @@ public class DocumentArchivingMessage {
     private final String checksum;
     private final String sourceLocationId;
     private final long contentLength;
+    private final long originalContentLength;
+    private final String compression;
 
     public boolean hasSourceLocationId() {
         return sourceLocationId != null;

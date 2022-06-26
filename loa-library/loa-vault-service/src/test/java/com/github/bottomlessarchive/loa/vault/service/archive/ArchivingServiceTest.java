@@ -1,6 +1,5 @@
 package com.github.bottomlessarchive.loa.vault.service.archive;
 
-import com.github.bottomlessarchive.loa.checksum.service.ChecksumProvider;
 import com.github.bottomlessarchive.loa.document.service.DocumentManipulator;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentEntity;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentType;
@@ -57,9 +56,6 @@ class ArchivingServiceTest {
 
     @Mock
     private DocumentManipulator documentManipulator;
-
-    @Mock
-    private ChecksumProvider checksumProvider;
 
     @Captor
     private ArgumentCaptor<InputStream> documentContent;
@@ -118,9 +114,6 @@ class ArchivingServiceTest {
                 .id(duplicateOfId)
                 .build();
 
-        when(checksumProvider.checksum(documentArchivingContext.getContent()))
-                .thenReturn("test-checksum");
-
         when(documentEntityFactory.getDocumentEntity("test-checksum", CONTENT.length, "PDF"))
                 .thenReturn(Optional.of(duplicateOf));
 
@@ -160,8 +153,6 @@ class ArchivingServiceTest {
         final DocumentEntity duplicateOf = DocumentEntity.builder()
                 .id(duplicateOfId)
                 .build();
-        when(checksumProvider.checksum(documentArchivingContext.getContent()))
-                .thenReturn("test-checksum");
         when(documentEntityFactory.getDocumentEntity("test-checksum", CONTENT.length, "PDF"))
                 .thenReturn(Optional.of(duplicateOf));
 

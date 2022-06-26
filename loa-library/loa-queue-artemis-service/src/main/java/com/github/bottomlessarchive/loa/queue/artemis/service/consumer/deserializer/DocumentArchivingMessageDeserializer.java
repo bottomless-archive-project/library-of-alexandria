@@ -23,7 +23,9 @@ public class DocumentArchivingMessageDeserializer implements MessageDeserializer
         final String sourceLocationId = hasSourceLocationId ? contentBuffer.readString() : null;
 
         final long contentLength = contentBuffer.readLong();
+        final long originalContentLength = contentBuffer.readLong();
         final String checksum = contentBuffer.readString();
+        final String compression = contentBuffer.readString();
 
         return DocumentArchivingMessage.builder()
                 .id(id)
@@ -31,7 +33,9 @@ public class DocumentArchivingMessageDeserializer implements MessageDeserializer
                 .source(source)
                 .sourceLocationId(sourceLocationId)
                 .contentLength(contentLength)
+                .originalContentLength(originalContentLength)
                 .checksum(checksum)
+                .compression(compression)
                 .build();
     }
 
