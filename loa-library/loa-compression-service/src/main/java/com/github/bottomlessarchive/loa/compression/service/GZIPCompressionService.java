@@ -16,7 +16,7 @@ public class GZIPCompressionService implements CompressionService {
 
     @Override
     public Path compress(final Path documentLocation) {
-        final Path outputPath = documentLocation.getParent().resolve(documentLocation.getFileName() + ".pdf");
+        final Path outputPath = documentLocation.getParent().resolve(documentLocation.getFileName() + ".gz");
 
         try (InputStream documentContent = Files.newInputStream(documentLocation);
              GzipCompressorOutputStream gzipOutputStream = new GzipCompressorOutputStream(Files.newOutputStream(outputPath))) {
