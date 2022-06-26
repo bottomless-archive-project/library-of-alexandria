@@ -32,7 +32,7 @@ public class StageDocumentController {
     }
 
     @GetMapping("/document/{documentId}")
-    public Mono<Void> serveDocument(@PathVariable final String documentId, ServerHttpResponse response) throws IOException {
+    public Mono<Void> serveDocument(@PathVariable final String documentId, final ServerHttpResponse response) throws IOException {
         ZeroCopyHttpOutputMessage zeroCopyResponse = (ZeroCopyHttpOutputMessage) response;
 
         Path file = Path.of(stagingConfigurationProperties.path()).resolve(documentId);

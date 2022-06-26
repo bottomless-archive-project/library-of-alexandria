@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.nio.file.Files;
+import java.nio.file.Path;
 
 @Slf4j
 @Service
@@ -35,8 +36,8 @@ public class DocumentArchiver {
     public void archiveDocument(final DocumentArchivingContext documentArchivingContext) {
         archivedDocumentCount.increment();
 
-        byte[] content = compressionServiceProvider.getCompressionService(compressionConfigurationProperties.algorithm())
-                .compress(Files.newInputStream(documentArchivingContext.getContents()).readAllBytes()); //TODO: close input stream
+        Path content = compressionServiceProvider.getCompressionService(compressionConfigurationProperties.algorithm())
+                .compress(documentArchivingContext.getContents());
 
         stagingClient.moveToStaging(documentArchivingContext.getId(), content);
 
@@ -48,14 +49,14 @@ public class DocumentArchiver {
     }
 
     @SneakyThrows
-    private DocumentArchivingMessage newDocumentArchivingMessage(final byte[] content,
+    private DocumentArchivingMessage newDocumentArchivingMessage(final Path compressedContent,
             final DocumentArchivingContext documentArchivingContext) {
         return DocumentArchivingMessage.builder()
                 .id(documentArchivingContext.getId().toString())
                 .type(documentArchivingContext.getType().toString())
                 .source(documentArchivingContext.getSource())
                 .sourceLocationId(documentArchivingContext.getSourceLocationId())
-                .contentLength(content.length)
+                .contentLength(Files.size(compressedContent))
                 .originalContentLength(Files.size(documentArchivingContext.getContents()))
                 .checksum(checksumProvider.checksum(Files.newInputStream(documentArchivingContext.getContents())))
                 .compression(compressionConfigurationProperties.algorithm().toString())
