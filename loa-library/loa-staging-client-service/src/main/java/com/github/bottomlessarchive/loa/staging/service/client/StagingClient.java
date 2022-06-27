@@ -10,7 +10,6 @@ import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
-import okhttp3.Response;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
@@ -43,10 +42,9 @@ public class StagingClient {
                 .post(requestBody)
                 .build();
 
-        Response response = okHttpClient.newCall(request)
-                .execute();
-
-        response.close();
+        okHttpClient.newCall(request)
+                .execute()
+                .close();
     }
 
     @SneakyThrows //TODO: StagingException

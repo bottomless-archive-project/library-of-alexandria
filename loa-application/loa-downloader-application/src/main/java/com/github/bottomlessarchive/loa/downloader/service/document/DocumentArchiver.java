@@ -36,7 +36,7 @@ public class DocumentArchiver {
     public void archiveDocument(final DocumentArchivingContext documentArchivingContext) {
         archivedDocumentCount.increment();
 
-        Path content = compressionServiceProvider.getCompressionService(compressionConfigurationProperties.algorithm())
+        final Path content = compressionServiceProvider.getCompressionService(compressionConfigurationProperties.algorithm())
                 .compress(documentArchivingContext.getContents());
 
         stagingClient.moveToStaging(documentArchivingContext.getId(), content);

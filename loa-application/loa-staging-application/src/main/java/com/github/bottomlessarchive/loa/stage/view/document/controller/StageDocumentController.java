@@ -3,6 +3,7 @@ package com.github.bottomlessarchive.loa.stage.view.document.controller;
 import com.github.bottomlessarchive.loa.stage.configuration.StagingConfigurationProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ZeroCopyHttpOutputMessage;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.http.server.reactive.ServerHttpResponse;
@@ -17,6 +18,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 public class StageDocumentController {
@@ -33,17 +35,16 @@ public class StageDocumentController {
 
     @GetMapping("/document/{documentId}")
     public Mono<Void> serveDocument(@PathVariable final String documentId, final ServerHttpResponse response) throws IOException {
-        ZeroCopyHttpOutputMessage zeroCopyResponse = (ZeroCopyHttpOutputMessage) response;
+        final Path file = Path.of(stagingConfigurationProperties.path()).resolve(documentId);
 
-        Path file = Path.of(stagingConfigurationProperties.path()).resolve(documentId);
-
-        return zeroCopyResponse.writeWith(file, 0, Files.size(file))
+        return ((ZeroCopyHttpOutputMessage) response)
+                .writeWith(file, 0, Files.size(file))
                 .then(
                         Mono.fromRunnable(() -> {
                             try {
                                 Files.deleteIfExists(file);
                             } catch (IOException e) {
-                                // Do nothing
+                                log.error("Failed to delete staging file at: {}!", file);
                             }
                         })
                 );

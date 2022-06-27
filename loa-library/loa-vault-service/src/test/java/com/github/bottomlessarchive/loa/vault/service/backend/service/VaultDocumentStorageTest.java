@@ -1,7 +1,6 @@
 package com.github.bottomlessarchive.loa.vault.service.backend.service;
 
 import com.github.bottomlessarchive.loa.compression.domain.DocumentCompression;
-import com.github.bottomlessarchive.loa.compression.service.CompressionService;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentEntity;
 import com.github.bottomlessarchive.loa.vault.service.location.VaultLocation;
 import com.github.bottomlessarchive.loa.vault.service.location.VaultLocationFactory;
@@ -49,7 +48,6 @@ class VaultDocumentStorageTest {
         final DocumentEntity documentEntity = DocumentEntity.builder()
                 .compression(DocumentCompression.GZIP)
                 .build();
-        final CompressionService compressionService = mock(CompressionService.class);
         final VaultLocation vaultLocation = mock(VaultLocation.class);
         when(vaultLocation.getCompression())
                 .thenReturn(Optional.of(DocumentCompression.GZIP));
