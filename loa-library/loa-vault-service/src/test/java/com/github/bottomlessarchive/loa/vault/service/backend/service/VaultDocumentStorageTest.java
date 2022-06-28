@@ -12,10 +12,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.util.Optional;
 
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -23,7 +21,6 @@ import static org.mockito.Mockito.when;
 class VaultDocumentStorageTest {
 
     private static final InputStream CONTENT = new ByteArrayInputStream(new byte[]{0, 1, 2, 3, 4, -1, -2, -3, -4, -5});
-    private static final InputStream COMPRESSED_CONTENT = new ByteArrayInputStream(new byte[]{111, 112, 113});
 
     @Mock
     private VaultLocationFactory vaultLocationFactory;
@@ -32,7 +29,7 @@ class VaultDocumentStorageTest {
     private VaultDocumentStorage underTest;
 
     @Test
-    void testPersistDocumentUncompressed() {
+    void testPersistDocument() {
         final DocumentEntity documentEntity = DocumentEntity.builder()
                 .compression(DocumentCompression.NONE)
                 .build();
@@ -41,21 +38,6 @@ class VaultDocumentStorageTest {
         underTest.persistDocument(documentEntity, CONTENT, vaultLocation, 100L);
 
         verify(vaultLocation).upload(CONTENT, 100L);
-    }
-
-    @Test
-    void testPersistDocumentCompressed() {
-        final DocumentEntity documentEntity = DocumentEntity.builder()
-                .compression(DocumentCompression.GZIP)
-                .build();
-        final VaultLocation vaultLocation = mock(VaultLocation.class);
-        when(vaultLocation.getCompression())
-                .thenReturn(Optional.of(DocumentCompression.GZIP));
-
-        underTest.persistDocument(documentEntity, CONTENT, vaultLocation, 100L);
-
-        verify(vaultLocation, never()).upload(CONTENT, 100L);
-        verify(vaultLocation).upload(COMPRESSED_CONTENT, 100L);
     }
 
     @Test

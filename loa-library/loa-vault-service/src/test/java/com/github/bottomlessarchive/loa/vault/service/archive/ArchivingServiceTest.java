@@ -40,7 +40,6 @@ import static org.mockito.Mockito.when;
 class ArchivingServiceTest {
 
     private static final int DUPLICATE_DOCUMENT_ID_ERROR_CODE = 11000;
-
     private static final byte[] CONTENT = {1, 2, 3, 4, 5};
     private static final UUID DOCUMENT_ID = UUID.fromString("321e4567-e89b-12d3-a456-556642440000");
     private static final String SOURCE_LOCATION_ID = "123e4567-e89b-12d3-a456-556642440000";
@@ -114,7 +113,7 @@ class ArchivingServiceTest {
                 .id(duplicateOfId)
                 .build();
 
-        when(documentEntityFactory.getDocumentEntity("test-checksum", CONTENT.length, "PDF"))
+        when(documentEntityFactory.getDocumentEntity("test-checksum", 8L, "PDF"))
                 .thenReturn(Optional.of(duplicateOf));
 
         underTest.archiveDocument(documentArchivingContext);
@@ -131,6 +130,9 @@ class ArchivingServiceTest {
                 .contentLength(CONTENT.length)
                 .sourceLocationId(null) // The source location is not available
                 .type(DocumentType.PDF)
+                .checksum("test-checksum")
+                .contentLength(6L)
+                .originalContentLength(8L)
                 .build();
         final DocumentCreationContext documentCreationContext = DocumentCreationContext.builder()
                 .build();
@@ -153,7 +155,7 @@ class ArchivingServiceTest {
         final DocumentEntity duplicateOf = DocumentEntity.builder()
                 .id(duplicateOfId)
                 .build();
-        when(documentEntityFactory.getDocumentEntity("test-checksum", CONTENT.length, "PDF"))
+        when(documentEntityFactory.getDocumentEntity("test-checksum", 8L, "PDF"))
                 .thenReturn(Optional.of(duplicateOf));
 
         underTest.archiveDocument(documentArchivingContext);
@@ -167,8 +169,10 @@ class ArchivingServiceTest {
                 .id(DOCUMENT_ID)
                 .content(new ByteArrayInputStream(CONTENT))
                 .contentLength(CONTENT.length)
+                .originalContentLength(8L)
                 .sourceLocationId(SOURCE_LOCATION_ID)
                 .type(DocumentType.PDF)
+                .checksum("test-checksum")
                 .build();
     }
 }
