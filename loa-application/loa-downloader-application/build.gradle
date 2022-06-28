@@ -28,6 +28,7 @@ dependencies {
     implementation project(':loa-library:loa-source-service')
     implementation project(':loa-library:loa-queue-artemis-service')
     implementation project(':loa-library:loa-io-service')
+    implementation project(':loa-library:loa-file-service')
     implementation project(':loa-library:loa-validator-service')
     implementation project(':loa-library:loa-stage-service')
     implementation project(':loa-library:loa-checksum-service')

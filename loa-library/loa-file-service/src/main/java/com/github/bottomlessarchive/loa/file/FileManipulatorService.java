@@ -13,4 +13,8 @@ public class FileManipulatorService {
     public InputStream getInputStream(final String path) throws IOException {
         return Files.newInputStream(Path.of(path));
     }
+
+    public void delete(final Path path) throws IOException {
+        Files.delete(path);
+    }
 }

@@ -2,11 +2,13 @@ package com.github.bottomlessarchive.loa.queue.service.domain.message;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 
 import java.util.Optional;
 
 @Getter
 @Builder
+@ToString
 public class DocumentArchivingMessage {
 
     private final String id;
