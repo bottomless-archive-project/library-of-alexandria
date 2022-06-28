@@ -1,8 +1,6 @@
 package com.github.bottomlessarchive.loa.downloader.service.document;
 
-import com.github.bottomlessarchive.loa.checksum.service.ChecksumProvider;
-import com.github.bottomlessarchive.loa.compression.configuration.CompressionConfigurationProperties;
-import com.github.bottomlessarchive.loa.compression.service.provider.CompressionServiceProvider;
+import com.github.bottomlessarchive.loa.compression.service.file.FileCompressionService;
 import com.github.bottomlessarchive.loa.downloader.service.document.domain.DocumentArchivingContext;
 import com.github.bottomlessarchive.loa.queue.service.QueueManipulator;
 import com.github.bottomlessarchive.loa.queue.service.domain.Queue;
@@ -25,41 +23,28 @@ public class DocumentArchiver {
 
     private final StagingClient stagingClient;
     private final QueueManipulator queueManipulator;
-    private final ChecksumProvider checksumProvider;
-    private final CompressionServiceProvider compressionServiceProvider;
-    private final CompressionConfigurationProperties compressionConfigurationProperties;
+    private final FileCompressionService fileCompressionService;
+    private final DocumentArchivingMessageFactory documentArchivingMessageFactory;
 
     @Qualifier("archivedDocumentCount")
     private final Counter archivedDocumentCount;
 
-    @SneakyThrows //TODO
+    @SneakyThrows
     public void archiveDocument(final DocumentArchivingContext documentArchivingContext) {
         archivedDocumentCount.increment();
 
-        final Path content = compressionServiceProvider.getCompressionService(compressionConfigurationProperties.algorithm())
-                .compress(documentArchivingContext.getContents());
+        final Path compressedContent = fileCompressionService.compressDocument(documentArchivingContext.getContents());
 
-        stagingClient.moveToStaging(documentArchivingContext.getId(), content);
+        stagingClient.moveToStaging(documentArchivingContext.getId(), compressedContent);
 
-        final DocumentArchivingMessage documentArchivingMessage = newDocumentArchivingMessage(content, documentArchivingContext);
+        final DocumentArchivingMessage documentArchivingMessage = documentArchivingMessageFactory.newDocumentArchivingMessage(
+                documentArchivingContext, compressedContent);
 
         log.debug("Sending new archiving message: {}!", documentArchivingMessage);
 
         queueManipulator.sendMessage(Queue.DOCUMENT_ARCHIVING_QUEUE, documentArchivingMessage);
+
+        Files.delete(compressedContent);
     }
 
-    @SneakyThrows
-    private DocumentArchivingMessage newDocumentArchivingMessage(final Path compressedContent,
-            final DocumentArchivingContext documentArchivingContext) {
-        return DocumentArchivingMessage.builder()
-                .id(documentArchivingContext.getId().toString())
-                .type(documentArchivingContext.getType().toString())
-                .source(documentArchivingContext.getSource())
-                .sourceLocationId(documentArchivingContext.getSourceLocationId())
-                .contentLength(Files.size(compressedContent))
-                .originalContentLength(Files.size(documentArchivingContext.getContents()))
-                .checksum(checksumProvider.checksum(Files.newInputStream(documentArchivingContext.getContents())))
-                .compression(compressionConfigurationProperties.algorithm().toString())
-                .build();
-    }
 }

@@ -1,9 +1,10 @@
 package com.github.bottomlessarchive.loa.compression.service.provider;
 
 import com.github.bottomlessarchive.loa.compression.domain.DocumentCompression;
-import com.github.bottomlessarchive.loa.compression.service.CompressionService;
-import com.github.bottomlessarchive.loa.compression.service.GZIPCompressionService;
-import com.github.bottomlessarchive.loa.compression.service.LZMACompressionService;
+import com.github.bottomlessarchive.loa.compression.service.compressor.CompressorService;
+import com.github.bottomlessarchive.loa.compression.service.compressor.GZIPCompressorService;
+import com.github.bottomlessarchive.loa.compression.service.compressor.LZMACompressorService;
+import com.github.bottomlessarchive.loa.compression.service.compressor.provider.CompressorServiceProvider;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -14,27 +15,27 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 @ExtendWith(MockitoExtension.class)
-class CompressionServiceProviderTest {
+class CompressorServiceProviderTest {
 
     @Mock
-    private GZIPCompressionService gzipCompressionService;
+    private GZIPCompressorService gzipCompressionService;
 
     @Mock
-    private LZMACompressionService lzmaCompressionService;
+    private LZMACompressorService lzmaCompressionService;
 
     @InjectMocks
-    private CompressionServiceProvider underTest;
+    private CompressorServiceProvider underTest;
 
     @Test
     void testWhenProviderShouldProvideGzipCompressionService() {
-        final CompressionService result = underTest.getCompressionService(DocumentCompression.GZIP);
+        final CompressorService result = underTest.getCompressionService(DocumentCompression.GZIP);
 
         assertThat(result, is(gzipCompressionService));
     }
 
     @Test
     void testWhenProviderShouldProvideLzmaCompressionService() {
-        final CompressionService result = underTest.getCompressionService(DocumentCompression.LZMA);
+        final CompressorService result = underTest.getCompressionService(DocumentCompression.LZMA);
 
         assertThat(result, is(lzmaCompressionService));
     }

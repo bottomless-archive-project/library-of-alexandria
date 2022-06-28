@@ -1,8 +1,8 @@
-package com.github.bottomlessarchive.loa.compression.service;
+package com.github.bottomlessarchive.loa.compression.service.compressor;
 
 import com.github.bottomlessarchive.loa.compression.domain.CompressionException;
-import org.apache.commons.compress.compressors.lzma.LZMACompressorInputStream;
-import org.apache.commons.compress.compressors.lzma.LZMACompressorOutputStream;
+import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
+import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream;
 import org.apache.commons.compress.utils.IOUtils;
 import org.springframework.stereotype.Service;
 
@@ -12,16 +12,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 @Service
-public class LZMACompressionService implements CompressionService {
+public class GZIPCompressorService implements CompressorService {
 
     @Override
     public Path compress(final Path documentLocation) {
-        final Path outputPath = documentLocation.getParent().resolve(documentLocation.getFileName() + ".lzma");
-
+        final Path outputPath = documentLocation.getParent().resolve(documentLocation.getFileName() + ".gz");
 
         try (InputStream documentContent = Files.newInputStream(documentLocation);
-             LZMACompressorOutputStream lzmaOutputStream = new LZMACompressorOutputStream(Files.newOutputStream(outputPath))) {
-            IOUtils.copy(documentContent, lzmaOutputStream);
+             GzipCompressorOutputStream gzipOutputStream = new GzipCompressorOutputStream(Files.newOutputStream(outputPath))) {
+            IOUtils.copy(documentContent, gzipOutputStream);
         } catch (final IOException e) {
             throw new CompressionException("Error while compressing document!", e);
         }
@@ -32,7 +31,7 @@ public class LZMACompressionService implements CompressionService {
     @Override
     public InputStream decompress(final InputStream compressedDocumentContent) {
         try {
-            return new LZMACompressorInputStream(compressedDocumentContent);
+            return new GzipCompressorInputStream(compressedDocumentContent);
         } catch (final IOException e) {
             throw new CompressionException("Error while decompressing document!", e);
         }

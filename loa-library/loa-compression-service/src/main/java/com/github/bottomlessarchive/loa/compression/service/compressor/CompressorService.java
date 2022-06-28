@@ -1,4 +1,4 @@
-package com.github.bottomlessarchive.loa.compression.service;
+package com.github.bottomlessarchive.loa.compression.service.compressor;
 
 import com.github.bottomlessarchive.loa.compression.domain.CompressionException;
 
@@ -8,7 +8,7 @@ import java.nio.file.Path;
 /**
  * A service that is responsible for compressing binary data.
  */
-public interface CompressionService {
+public interface CompressorService {
 
     /**
      * Compress the data provided on the input stream and write it to the provided output stream.

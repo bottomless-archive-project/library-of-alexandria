@@ -1,4 +1,4 @@
-package com.github.bottomlessarchive.loa.compression.service.provider.domain;
+package com.github.bottomlessarchive.loa.compression.service.compressor.provider.domain;
 
 public class MissingCompressionServiceException extends RuntimeException {
 
