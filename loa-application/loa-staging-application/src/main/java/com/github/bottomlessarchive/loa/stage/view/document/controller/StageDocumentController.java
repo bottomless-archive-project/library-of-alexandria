@@ -18,6 +18,14 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+/**
+ * This class is responsible to serve the web-related functionality of the Staging Application.
+ * <p>
+ * It uses webflux instead of the servlet-based webservers because a zero-copy should be done to serve files optimally and the servlet
+ * stack doesn't support zero-copy yet.
+ *
+ * @see <a href="https://en.wikipedia.org/wiki/Zero-copy">https://en.wikipedia.org/wiki/Zero-copy</a>
+ */
 @Slf4j
 @RestController
 @RequiredArgsConstructor
