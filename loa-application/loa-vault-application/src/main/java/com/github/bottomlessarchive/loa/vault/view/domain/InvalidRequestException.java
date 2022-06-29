@@ -8,4 +8,8 @@ public class InvalidRequestException extends ResponseStatusException {
     public InvalidRequestException(final String message) {
         super(HttpStatus.BAD_REQUEST, message);
     }
+
+    public InvalidRequestException(final String message, final Throwable throwable) {
+        super(HttpStatus.BAD_REQUEST, message, throwable);
+    }
 }

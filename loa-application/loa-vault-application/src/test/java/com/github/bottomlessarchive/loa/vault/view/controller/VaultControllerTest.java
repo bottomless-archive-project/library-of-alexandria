@@ -14,7 +14,6 @@ import com.github.bottomlessarchive.loa.vault.service.backend.service.VaultDocum
 import com.github.bottomlessarchive.loa.vault.service.location.VaultLocation;
 import com.github.bottomlessarchive.loa.vault.service.location.VaultLocationFactory;
 import com.github.bottomlessarchive.loa.vault.view.request.domain.RecompressDocumentRequest;
-import com.github.bottomlessarchive.loa.vault.view.request.domain.ReplaceDocumentRequest;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;

@@ -10,7 +10,6 @@ import com.github.bottomlessarchive.loa.vault.service.backend.service.VaultDocum
 import com.github.bottomlessarchive.loa.vault.service.location.VaultLocation;
 import com.github.bottomlessarchive.loa.vault.service.location.VaultLocationFactory;
 import com.github.bottomlessarchive.loa.vault.view.request.domain.RecompressDocumentRequest;
-import com.github.bottomlessarchive.loa.vault.view.request.domain.ReplaceDocumentRequest;
 import com.github.bottomlessarchive.loa.vault.view.response.domain.DocumentExistsResponse;
 import com.github.bottomlessarchive.loa.vault.view.domain.InvalidRequestException;
 import lombok.RequiredArgsConstructor;
@@ -23,9 +22,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.UUID;
 
 @Slf4j
@@ -134,7 +135,7 @@ public class VaultController {
     //TODO: We need to support an InputStream here for content
     @PutMapping("/document/{documentId}/replace")
     public void replaceCorruptDocument(@PathVariable final String documentId,
-            @RequestBody final ReplaceDocumentRequest replaceDocumentRequest) {
+            @RequestParam("replacementFile") MultipartFile replacementFile) {
         if (!vaultConfigurationProperties.modificationEnabled()) {
             throw new InvalidRequestException("Modification is disabled on this vault instance!");
         }
@@ -152,9 +153,12 @@ public class VaultController {
                     final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentEntity,
                             documentEntity.getCompression());
 
-                    final byte[] content = replaceDocumentRequest.getContent();
-                    vaultDocumentStorage.persistDocument(documentEntity, new ByteArrayInputStream(content),
-                            vaultLocation, content.length);
+                    try {
+                        vaultDocumentStorage.persistDocument(documentEntity, replacementFile.getInputStream(), vaultLocation,
+                                replacementFile.getSize());
+                    } catch (IOException e) {
+                        throw new InvalidRequestException("Failed to save document!", e);
+                    }
 
                     documentManipulator.markDownloaded(documentEntity.getId());
                 }, () -> {
