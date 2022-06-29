@@ -5,6 +5,7 @@ Installing the applications and the prerequisite software is quite straightforwa
 include::installation-java.adoc[leveloffset=+1]
 include::installation-mongodb.adoc[leveloffset=+1]
 include::installation-conductor-application.adoc[leveloffset=+1]
+include::installation-staging-application.adoc[leveloffset=+1]
 include::installation-queue-application.adoc[leveloffset=+1]
 include::installation-vault-application.adoc[leveloffset=+1]
 include::installation-generator-application.adoc[leveloffset=+1]
