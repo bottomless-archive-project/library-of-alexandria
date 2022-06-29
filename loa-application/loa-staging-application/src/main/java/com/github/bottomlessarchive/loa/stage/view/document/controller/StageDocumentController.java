@@ -37,13 +37,13 @@ public class StageDocumentController {
     @PostMapping("/document/{documentId}")
     public Mono<Void> persistDocument(@PathVariable final String documentId,
             @RequestPart("file") final Mono<FilePart> file) {
-        return file.flatMap(p -> p.transferTo(Path.of(stagingConfigurationProperties.path()).resolve(documentId)))
+        return file.flatMap(p -> p.transferTo(Path.of(stagingConfigurationProperties.location()).resolve(documentId)))
                 .then();
     }
 
     @GetMapping("/document/{documentId}")
     public Mono<Void> serveDocument(@PathVariable final String documentId, final ServerHttpResponse response) throws IOException {
-        final Path file = Path.of(stagingConfigurationProperties.path()).resolve(documentId);
+        final Path file = Path.of(stagingConfigurationProperties.location()).resolve(documentId);
 
         return ((ZeroCopyHttpOutputMessage) response)
                 .writeWith(file, 0, Files.size(file))
