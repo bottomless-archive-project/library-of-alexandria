@@ -7,7 +7,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  *
  * @param location the location where the staged documents should be saved to
  */
-@ConfigurationProperties("loa.stage")
+@ConfigurationProperties("loa.staging")
 public record StagingConfigurationProperties(
         String location
 ) {
