@@ -15,6 +15,7 @@ public enum ApplicationType {
     QUEUE_APPLICATION(true),
     VAULT_APPLICATION(true),
     WEB_APPLICATION(true),
+    STAGING_APPLICATION(true),
     DOCUMENT_DATABASE(true),
     DOCUMENT_INDEX(true);
 

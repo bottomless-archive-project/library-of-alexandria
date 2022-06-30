@@ -1,6 +1,5 @@
 package com.github.bottomlessarchive.loa.vault.service.archive;
 
-import com.github.bottomlessarchive.loa.checksum.service.ChecksumProvider;
 import com.github.bottomlessarchive.loa.document.service.DocumentManipulator;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentEntity;
 import com.github.bottomlessarchive.loa.document.service.entity.factory.DocumentEntityFactory;
@@ -21,7 +20,6 @@ public class ArchivingService {
 
     private static final int DUPLICATE_DOCUMENT_ID_ERROR_CODE = 11000;
 
-    private final ChecksumProvider checksumProvider;
     private final DocumentEntityFactory documentEntityFactory;
     private final DocumentCreationContextFactory documentCreationContextFactory;
     private final VaultDocumentStorage vaultDocumentStorage;
@@ -35,14 +33,14 @@ public class ArchivingService {
      * @param documentArchivingContext the context of the document to archive
      */
     public void archiveDocument(final DocumentArchivingContext documentArchivingContext) {
-        final DocumentCreationContext documentCreationContext = documentCreationContextFactory.newContext(
-                documentArchivingContext);
+        final DocumentCreationContext documentCreationContext = documentCreationContextFactory.newContext(documentArchivingContext);
 
         while (true) {
             try {
                 final DocumentEntity documentEntity = documentEntityFactory.newDocumentEntity(documentCreationContext);
 
-                vaultDocumentStorage.persistDocument(documentEntity, documentArchivingContext.getContent());
+                vaultDocumentStorage.persistDocument(documentEntity, documentArchivingContext.getContent(),
+                        documentArchivingContext.getContentLength());
 
                 documentManipulator.markDownloaded(documentEntity.getId());
 
@@ -62,9 +60,7 @@ public class ArchivingService {
     private void handleDuplicate(final DocumentArchivingContext documentArchivingContext) {
         log.info("Document with id {} is a duplicate.", documentArchivingContext.getId());
 
-        final String checksum = checksumProvider.checksum(documentArchivingContext.getContent());
-
-        getOriginalDocumentEntity(checksum, documentArchivingContext)
+        getOriginalDocumentEntity(documentArchivingContext.getChecksum(), documentArchivingContext)
                 .ifPresent(originalDocumentEntity -> {
                     logAddingSourceLocation(originalDocumentEntity, documentArchivingContext);
                     addSourceLocation(originalDocumentEntity, documentArchivingContext);
@@ -73,7 +69,7 @@ public class ArchivingService {
 
     private Optional<DocumentEntity> getOriginalDocumentEntity(final String checksum,
             final DocumentArchivingContext documentArchivingContext) {
-        return documentEntityFactory.getDocumentEntity(checksum, documentArchivingContext.getContentLength(),
+        return documentEntityFactory.getDocumentEntity(checksum, documentArchivingContext.getOriginalContentLength(),
                 documentArchivingContext.getType().toString());
     }
 

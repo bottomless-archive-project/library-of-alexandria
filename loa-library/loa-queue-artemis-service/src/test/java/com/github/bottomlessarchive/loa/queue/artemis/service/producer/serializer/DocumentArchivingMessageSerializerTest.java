@@ -38,7 +38,9 @@ class DocumentArchivingMessageSerializerTest {
                 .source("source")
                 .sourceLocationId("sourceLocationId")
                 .contentLength(5)
-                .content(new byte[]{1, 2, 3})
+                .originalContentLength(8)
+                .checksum("checksum")
+                .compression("compression")
                 .build();
 
         underTest.serialize(documentArchivingMessage);
@@ -50,8 +52,10 @@ class DocumentArchivingMessageSerializerTest {
         inOrder.verify(bodyBuffer).writeString("source");
         inOrder.verify(bodyBuffer).writeBoolean(true);
         inOrder.verify(bodyBuffer).writeString("sourceLocationId");
-        inOrder.verify(bodyBuffer).writeInt(5);
-        inOrder.verify(bodyBuffer).writeBytes(new byte[]{1, 2, 3});
+        inOrder.verify(bodyBuffer).writeLong(5);
+        inOrder.verify(bodyBuffer).writeLong(8);
+        inOrder.verify(bodyBuffer).writeString("checksum");
+        inOrder.verify(bodyBuffer).writeString("compression");
         inOrder.verifyNoMoreInteractions();
     }
 
@@ -69,7 +73,9 @@ class DocumentArchivingMessageSerializerTest {
                 .source("source")
                 .sourceLocationId(null)
                 .contentLength(5)
-                .content(new byte[]{1, 2, 3})
+                .originalContentLength(8)
+                .checksum("checksum")
+                .compression("compression")
                 .build();
 
         underTest.serialize(documentArchivingMessage);
@@ -80,8 +86,10 @@ class DocumentArchivingMessageSerializerTest {
         inOrder.verify(bodyBuffer).writeString("type");
         inOrder.verify(bodyBuffer).writeString("source");
         inOrder.verify(bodyBuffer).writeBoolean(false);
-        inOrder.verify(bodyBuffer).writeInt(5);
-        inOrder.verify(bodyBuffer).writeBytes(new byte[]{1, 2, 3});
+        inOrder.verify(bodyBuffer).writeLong(5);
+        inOrder.verify(bodyBuffer).writeLong(8);
+        inOrder.verify(bodyBuffer).writeString("checksum");
+        inOrder.verify(bodyBuffer).writeString("compression");
         inOrder.verifyNoMoreInteractions();
     }
 }

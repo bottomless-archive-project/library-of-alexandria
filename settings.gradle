@@ -13,6 +13,7 @@ include 'loa-frontend'
 
 include 'loa-application:loa-downloader-application'
 include 'loa-application:loa-web-application'
+include 'loa-application:loa-staging-application'
 include 'loa-application:loa-administrator-application'
 include 'loa-application:loa-indexer-application'
 include 'loa-application:loa-vault-application'
@@ -45,4 +46,5 @@ include 'loa-library:loa-application-domain'
 include 'loa-library:loa-conductor-domain'
 include 'loa-library:loa-conductor-service'
 include 'loa-library:loa-conductor-client-service'
+include 'loa-library:loa-staging-client-service'
 

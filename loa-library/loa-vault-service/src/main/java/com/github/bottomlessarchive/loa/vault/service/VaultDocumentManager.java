@@ -1,6 +1,6 @@
 package com.github.bottomlessarchive.loa.vault.service;
 
-import com.github.bottomlessarchive.loa.compression.service.provider.CompressionServiceProvider;
+import com.github.bottomlessarchive.loa.compression.service.compressor.provider.CompressorServiceProvider;
 import com.github.bottomlessarchive.loa.document.service.DocumentManipulator;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentEntity;
 import com.github.bottomlessarchive.loa.vault.service.archive.ArchivingService;
@@ -26,7 +26,7 @@ public class VaultDocumentManager {
     private final ArchivingService archivingService;
     private final DocumentManipulator documentManipulator;
     private final VaultLocationFactory vaultLocationFactory;
-    private final CompressionServiceProvider compressionServiceProvider;
+    private final CompressorServiceProvider compressorServiceProvider;
 
     /**
      * Archive the document provided in the context.
@@ -52,7 +52,7 @@ public class VaultDocumentManager {
             final InputStream documentContentsInputStream = vaultLocation.download();
 
             if (documentEntity.isCompressed()) {
-                final InputStream decompressedInputStream = compressionServiceProvider.getCompressionService(
+                final InputStream decompressedInputStream = compressorServiceProvider.getCompressionService(
                         documentEntity.getCompression()).decompress(documentContentsInputStream);
 
                 return new InputStreamResource(decompressedInputStream);

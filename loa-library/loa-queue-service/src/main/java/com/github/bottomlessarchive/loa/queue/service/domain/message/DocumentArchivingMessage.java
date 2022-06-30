@@ -8,15 +8,17 @@ import java.util.Optional;
 
 @Getter
 @Builder
-@ToString(exclude = "content")
+@ToString
 public class DocumentArchivingMessage {
 
     private final String id;
     private final String type;
     private final String source;
+    private final String checksum;
     private final String sourceLocationId;
-    private final int contentLength;
-    private final byte[] content;
+    private final long contentLength;
+    private final long originalContentLength;
+    private final String compression;
 
     public boolean hasSourceLocationId() {
         return sourceLocationId != null;

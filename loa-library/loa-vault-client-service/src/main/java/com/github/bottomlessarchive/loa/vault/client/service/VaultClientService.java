@@ -6,12 +6,12 @@ import com.github.bottomlessarchive.loa.document.service.domain.DocumentEntity;
 import com.github.bottomlessarchive.loa.vault.client.service.domain.VaultAccessException;
 import com.github.bottomlessarchive.loa.vault.client.service.domain.VaultLocation;
 import com.github.bottomlessarchive.loa.vault.client.service.request.RecompressDocumentRequest;
-import com.github.bottomlessarchive.loa.vault.client.service.request.ReplaceCorruptDocumentRequest;
 import com.github.bottomlessarchive.loa.vault.client.service.response.DocumentExistsResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -143,13 +143,11 @@ public class VaultClientService {
                 .url("http://" + vaultLocation.getLocation() + ":" + vaultLocation.getPort() + "/document/"
                         + documentEntity.getId() + "/replace")
                 .put(
-                        RequestBody.create(
-                                objectMapper.writeValueAsBytes(
-                                        ReplaceCorruptDocumentRequest.builder()
-                                                .content(content)
-                                                .build()
-                                )
-                        )
+                        new MultipartBody.Builder()
+                                .setType(MultipartBody.FORM)
+                                .addFormDataPart("replacementFile", documentEntity.getId().toString(),
+                                        RequestBody.create(content, MediaType.parse("application/octet-stream")))
+                                .build()
                 )
                 .build();
 

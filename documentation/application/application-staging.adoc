@@ -1,0 +1,14 @@
+= Staging Application
+
+== Workflow
+
+This application is responsible for holding documents before they are being moved to their final place in one of the <<Vault Application>> instances.
+
+.Parameters
+|===
+| Parameter | Description
+
+| **loa.staging.path**
+| Where should the <<Staging Application>> put the files it acquires for staging.
+
+|===

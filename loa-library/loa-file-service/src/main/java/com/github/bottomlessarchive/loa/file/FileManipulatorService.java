@@ -11,6 +11,18 @@ import java.nio.file.Path;
 public class FileManipulatorService {
 
     public InputStream getInputStream(final String path) throws IOException {
-        return Files.newInputStream(Path.of(path));
+        return getInputStream(Path.of(path));
+    }
+
+    public InputStream getInputStream(final Path path) throws IOException {
+        return Files.newInputStream(path);
+    }
+
+    public void delete(final Path path) throws IOException {
+        Files.delete(path);
+    }
+
+    public long size(final Path path) throws IOException {
+        return Files.size(path);
     }
 }

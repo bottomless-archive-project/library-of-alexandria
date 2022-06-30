@@ -17,7 +17,7 @@ public interface VaultLocation {
      *
      * @throws StorageAccessException when unable to create the destination file
      */
-    void upload(byte[] documentContents);
+    void upload(InputStream documentContents, long contentLength);
 
     /**
      * Return the content of the document in the vault.

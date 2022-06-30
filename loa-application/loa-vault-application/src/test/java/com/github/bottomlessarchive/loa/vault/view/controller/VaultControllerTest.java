@@ -14,10 +14,10 @@ import com.github.bottomlessarchive.loa.vault.service.backend.service.VaultDocum
 import com.github.bottomlessarchive.loa.vault.service.location.VaultLocation;
 import com.github.bottomlessarchive.loa.vault.service.location.VaultLocationFactory;
 import com.github.bottomlessarchive.loa.vault.view.request.domain.RecompressDocumentRequest;
-import com.github.bottomlessarchive.loa.vault.view.request.domain.ReplaceDocumentRequest;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -30,9 +30,12 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.io.InputStream;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -281,13 +284,13 @@ class VaultControllerTest {
         Mockito.when(vaultConfigurationProperties.modificationEnabled())
                 .thenReturn(false);
 
-        mockMvc.perform(MockMvcRequestBuilders.put("/document/" + TEST_DOCUMENT_ID + "/replace")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(
-                                ReplaceDocumentRequest.builder()
-                                        .content(new byte[]{})
-                                        .build()
-                        ))
+        mockMvc.perform(
+                        MockMvcRequestBuilders.multipart("/document/" + TEST_DOCUMENT_ID + "/replace")
+                                .file("replacementFile", new byte[]{})
+                                .with(request -> {
+                                    request.setMethod("PUT");
+                                    return request;
+                                })
                 )
                 .andExpect(status().isBadRequest())
                 .andExpect(status().reason("Modification is disabled on this vault instance!"));
@@ -309,13 +312,13 @@ class VaultControllerTest {
                         )
                 );
 
-        mockMvc.perform(MockMvcRequestBuilders.put("/document/" + TEST_DOCUMENT_ID + "/replace")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(
-                                ReplaceDocumentRequest.builder()
-                                        .content(new byte[]{})
-                                        .build()
-                        ))
+        mockMvc.perform(
+                        MockMvcRequestBuilders.multipart("/document/" + TEST_DOCUMENT_ID + "/replace")
+                                .file("replacementFile", new byte[]{})
+                                .with(request -> {
+                                    request.setMethod("PUT");
+                                    return request;
+                                })
                 )
                 .andExpect(status().isBadRequest())
                 .andExpect(status().reason("Document with id 123e4567-e89b-12d3-a456-556642440000 is available on a different vault!"));
@@ -340,20 +343,22 @@ class VaultControllerTest {
                 .thenReturn(vaultLocation);
 
         final byte[] newDocumentContent = {1, 2, 3, 4};
+        final ArgumentCaptor<InputStream> inputStreamArgumentCaptor = ArgumentCaptor.forClass(InputStream.class);
 
-
-        mockMvc.perform(MockMvcRequestBuilders.put("/document/" + TEST_DOCUMENT_ID + "/replace")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(
-                                ReplaceDocumentRequest.builder()
-                                        .content(newDocumentContent)
-                                        .build()
-                        ))
+        mockMvc.perform(
+                        MockMvcRequestBuilders.multipart("/document/" + TEST_DOCUMENT_ID + "/replace")
+                                .file("replacementFile", newDocumentContent)
+                                .with(request -> {
+                                    request.setMethod("PUT");
+                                    return request;
+                                })
                 )
                 .andExpect(status().isOk());
 
         Mockito.verify(vaultDocumentStorage)
-                .persistDocument(documentEntity, newDocumentContent, vaultLocation);
+                .persistDocument(eq(documentEntity), inputStreamArgumentCaptor.capture(), eq(vaultLocation), eq(4L));
+        assertThat(inputStreamArgumentCaptor.getValue().readAllBytes())
+                .isEqualTo(newDocumentContent);
         Mockito.verify(documentManipulator)
                 .markDownloaded(UUID.fromString(TEST_DOCUMENT_ID));
     }
