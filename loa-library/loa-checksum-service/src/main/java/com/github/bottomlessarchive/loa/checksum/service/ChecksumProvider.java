@@ -4,6 +4,8 @@ import java.io.InputStream;
 
 /**
  * This interface is responsible for providing checksum values for documents in the stage location.
+ *
+ * @see <a href="https://en.wikipedia.org/wiki/Checksum">https://en.wikipedia.org/wiki/Checksum</a>
  */
 public interface ChecksumProvider {
 
