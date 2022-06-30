@@ -23,7 +23,7 @@ bootBuildImage {
 }
 
 dependencies {
-    implementation group: 'jakarta.json', name: 'jakarta.json-api', version: '2.0.1'
+    implementation group: 'jakarta.json', name: 'jakarta.json-api', version: '2.1.0'
 
     implementation project(':loa-library:loa-document-service')
     implementation project(':loa-library:loa-vault-client-service')

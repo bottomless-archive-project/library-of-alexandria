@@ -32,12 +32,12 @@ dependencies {
     implementation project(':loa-library:loa-document-location-service')
     implementation project(':loa-library:loa-conductor-client-service')
 
-    implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: '2.0.25'
-    implementation group: 'net.coobird', name: 'thumbnailator', version: '0.4.16'
-    implementation group: 'jakarta.json', name: 'jakarta.json-api', version: '2.0.1'
+    implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: '2.0.26'
+    implementation group: 'net.coobird', name: 'thumbnailator', version: '0.4.17'
+    implementation group: 'jakarta.json', name: 'jakarta.json-api', version: '2.1.0'
 
     implementation 'com.github.jai-imageio:jai-imageio-core:1.4.0'
     implementation 'com.github.jai-imageio:jai-imageio-jpeg2000:1.4.0'
 
-    implementation 'org.apache.pdfbox:jbig2-imageio:3.0.3'
+    implementation 'org.apache.pdfbox:jbig2-imageio:3.0.4'
 }
