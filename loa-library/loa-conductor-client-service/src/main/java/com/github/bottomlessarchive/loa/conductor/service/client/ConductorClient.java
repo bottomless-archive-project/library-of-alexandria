@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.bottomlessarchive.loa.application.domain.ApplicationType;
 import com.github.bottomlessarchive.loa.conductor.service.NetworkAddressCalculator;
 import com.github.bottomlessarchive.loa.conductor.service.client.configuration.ConductorClientConfigurationProperties;
+import com.github.bottomlessarchive.loa.conductor.service.client.domain.ConductorClientException;
 import com.github.bottomlessarchive.loa.conductor.service.client.extension.InstancePropertyExtensionProvider;
 import com.github.bottomlessarchive.loa.conductor.service.client.extension.domain.InstanceExtensionContext;
 import com.github.bottomlessarchive.loa.conductor.service.client.request.ServiceInstancePropertyRequest;
@@ -17,7 +18,6 @@ import com.github.bottomlessarchive.loa.conductor.service.client.response.Servic
 import com.github.bottomlessarchive.loa.conductor.service.domain.ServiceInstanceEntity;
 import com.github.bottomlessarchive.loa.conductor.service.domain.ServiceInstanceEntityProperty;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -29,6 +29,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -50,7 +51,6 @@ public class ConductorClient {
     private final List<InstancePropertyExtensionProvider> instancePropertyExtensionProviderList;
 
     @Cacheable(cacheNames = "single-valid-application-instance")
-    @SneakyThrows //TODO: Use ConductorClientException instead
     public ServiceInstanceEntity getInstanceOrBlock(final ApplicationType applicationType) {
         while (true) {
             log.info("Requesting instance for application: {} in a blocking way.", applicationType);
@@ -58,7 +58,11 @@ public class ConductorClient {
             final Optional<ServiceInstanceEntity> instance = getInstance(applicationType);
 
             if (instance.isEmpty()) {
-                Thread.sleep(62000);
+                try {
+                    Thread.sleep(62000);
+                } catch (InterruptedException e) {
+                    throw new ConductorClientException("Error while querying the Conductor Application!", e);
+                }
             } else {
                 log.info("Got an instance: {} for the blocking call.", instance.get());
 
@@ -82,7 +86,6 @@ public class ConductorClient {
     }
 
     @Cacheable(cacheNames = "single-application-instances")
-    @SneakyThrows //TODO: Use ConductorClientException instead
     public List<ServiceInstanceEntity> getInstances(final ApplicationType applicationType) {
         log.info("Requesting instances for application: {}.", applicationType);
 
@@ -91,18 +94,21 @@ public class ConductorClient {
                 .get()
                 .build();
 
-        final String response = okHttpClient.newCall(request)
-                .execute()
-                .body()
-                .string();
+        try {
+            final String response = okHttpClient.newCall(request)
+                    .execute()
+                    .body()
+                    .string();
 
-        return objectMapper.readValue(response, ServiceResponse.class).getInstances().stream()
-                .map(instance -> transform(applicationType, instance))
-                .toList();
+            return objectMapper.readValue(response, ServiceResponse.class).getInstances().stream()
+                    .map(instance -> transform(applicationType, instance))
+                    .toList();
+        } catch (IOException e) {
+            throw new ConductorClientException("Error while querying the Conductor Application!", e);
+        }
     }
 
     @Cacheable(cacheNames = "all-application-instances")
-    @SneakyThrows //TODO: Use ConductorClientException instead
     public List<ServiceInstanceEntity> getInstances() {
         log.info("Requesting instances for all applications.");
 
@@ -111,20 +117,23 @@ public class ConductorClient {
                 .get()
                 .build();
 
-        final String response = okHttpClient.newCall(request)
-                .execute()
-                .body()
-                .string();
+        try {
+            final String response = okHttpClient.newCall(request)
+                    .execute()
+                    .body()
+                    .string();
 
-        return objectMapper.readValue(response, new TypeReference<List<ServiceResponse>>() {
-                }).stream()
-                .flatMap(serviceResponse -> serviceResponse.getInstances().stream()
-                        .map(instance -> transform(serviceResponse.getApplicationType(), instance))
-                )
-                .toList();
+            return objectMapper.readValue(response, new TypeReference<List<ServiceResponse>>() {
+                    }).stream()
+                    .flatMap(serviceResponse -> serviceResponse.getInstances().stream()
+                            .map(instance -> transform(serviceResponse.getApplicationType(), instance))
+                    )
+                    .toList();
+        } catch (IOException e) {
+            throw new ConductorClientException("Error while querying the Conductor Application!", e);
+        }
     }
 
-    @SneakyThrows //TODO: Use ConductorClientException instead
     public UUID registerInstance(final ApplicationType applicationType) {
         final String hostAddress = networkAddressCalculator.calculateInetAddress().getHostAddress();
 
@@ -149,26 +158,28 @@ public class ConductorClient {
         log.info("Registering service {} with host address: {} and port: {} into the Conductor Application.", applicationType, hostAddress,
                 conductorClientConfigurationProperties.applicationPort());
 
+        try {
+            final Request request = new Request.Builder()
+                    .url(conductorClientConfigurationProperties.getUrl() + "/service/" + convertApplicationTypeToPath(applicationType))
+                    .post(createJsonBody(serviceInstanceRegistrationRequest))
+                    .build();
 
-        final Request request = new Request.Builder()
-                .url(conductorClientConfigurationProperties.getUrl() + "/service/" + convertApplicationTypeToPath(applicationType))
-                .post(createJsonBody(serviceInstanceRegistrationRequest))
-                .build();
+            final String response = okHttpClient.newCall(request)
+                    .execute()
+                    .body()
+                    .string();
 
-        final String response = okHttpClient.newCall(request)
-                .execute()
-                .body()
-                .string();
+            final ServiceInstanceRegistrationResponse serviceInstanceRegistrationResponse = objectMapper.readValue(
+                    response, ServiceInstanceRegistrationResponse.class);
 
-        final ServiceInstanceRegistrationResponse serviceInstanceRegistrationResponse = objectMapper.readValue(
-                response, ServiceInstanceRegistrationResponse.class);
+            log.info("Registration was successful! Instance id: {}.", serviceInstanceRegistrationResponse.getId());
 
-        log.info("Registration was successful! Instance id: {}.", serviceInstanceRegistrationResponse.getId());
-
-        return serviceInstanceRegistrationResponse.getId();
+            return serviceInstanceRegistrationResponse.getId();
+        } catch (IOException e) {
+            throw new ConductorClientException("Error while querying the Conductor Application!", e);
+        }
     }
 
-    @SneakyThrows //TODO: Use ConductorClientException instead
     public void refreshInstance(final UUID instanceId, final ApplicationType applicationType) {
         log.info("Refreshing application instance type: {} with instanceId: {} in the Conductor Application.",
                 applicationType, instanceId);
@@ -193,16 +204,19 @@ public class ConductorClient {
                 )
                 .build();
 
+        try {
+            final Request request = new Request.Builder()
+                    .url(conductorClientConfigurationProperties.getUrl() + "/service/" + convertApplicationTypeToPath(applicationType)
+                            + "/" + instanceId)
+                    .put(createJsonBody(serviceInstanceRefreshRequest))
+                    .build();
 
-        final Request request = new Request.Builder()
-                .url(conductorClientConfigurationProperties.getUrl() + "/service/" + convertApplicationTypeToPath(applicationType)
-                        + "/" + instanceId)
-                .put(createJsonBody(serviceInstanceRefreshRequest))
-                .build();
-
-        okHttpClient.newCall(request)
-                .execute()
-                .close();
+            okHttpClient.newCall(request)
+                    .execute()
+                    .close();
+        } catch (IOException e) {
+            throw new ConductorClientException("Error while querying the Conductor Application!", e);
+        }
     }
 
     @CacheEvict(value = {
