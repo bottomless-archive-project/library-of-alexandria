@@ -135,7 +135,7 @@ public class VaultController {
     //TODO: We need to support an InputStream here for content
     @PutMapping("/document/{documentId}/replace")
     public void replaceCorruptDocument(@PathVariable final String documentId,
-            @RequestParam("replacementFile") MultipartFile replacementFile) {
+            @RequestParam("replacementFile") final MultipartFile replacementFile) {
         if (!vaultConfigurationProperties.modificationEnabled()) {
             throw new InvalidRequestException("Modification is disabled on this vault instance!");
         }

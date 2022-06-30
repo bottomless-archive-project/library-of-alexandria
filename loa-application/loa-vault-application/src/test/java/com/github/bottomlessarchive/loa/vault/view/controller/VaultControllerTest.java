@@ -284,13 +284,13 @@ class VaultControllerTest {
         Mockito.when(vaultConfigurationProperties.modificationEnabled())
                 .thenReturn(false);
 
-        mockMvc.perform(MockMvcRequestBuilders.put("/document/" + TEST_DOCUMENT_ID + "/replace")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(
-                                ReplaceDocumentRequest.builder()
-                                        .content(new byte[]{})
-                                        .build()
-                        ))
+        mockMvc.perform(
+                        MockMvcRequestBuilders.multipart("/document/" + TEST_DOCUMENT_ID + "/replace")
+                                .file("replacementFile", new byte[]{})
+                                .with(request -> {
+                                    request.setMethod("PUT");
+                                    return request;
+                                })
                 )
                 .andExpect(status().isBadRequest())
                 .andExpect(status().reason("Modification is disabled on this vault instance!"));
@@ -312,13 +312,13 @@ class VaultControllerTest {
                         )
                 );
 
-        mockMvc.perform(MockMvcRequestBuilders.put("/document/" + TEST_DOCUMENT_ID + "/replace")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(
-                                ReplaceDocumentRequest.builder()
-                                        .content(new byte[]{})
-                                        .build()
-                        ))
+        mockMvc.perform(
+                        MockMvcRequestBuilders.multipart("/document/" + TEST_DOCUMENT_ID + "/replace")
+                                .file("replacementFile", new byte[]{})
+                                .with(request -> {
+                                    request.setMethod("PUT");
+                                    return request;
+                                })
                 )
                 .andExpect(status().isBadRequest())
                 .andExpect(status().reason("Document with id 123e4567-e89b-12d3-a456-556642440000 is available on a different vault!"));
@@ -345,13 +345,13 @@ class VaultControllerTest {
         final byte[] newDocumentContent = {1, 2, 3, 4};
         final ArgumentCaptor<InputStream> inputStreamArgumentCaptor = ArgumentCaptor.forClass(InputStream.class);
 
-        mockMvc.perform(MockMvcRequestBuilders.put("/document/" + TEST_DOCUMENT_ID + "/replace")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(
-                                ReplaceDocumentRequest.builder()
-                                        .content(newDocumentContent)
-                                        .build()
-                        ))
+        mockMvc.perform(
+                        MockMvcRequestBuilders.multipart("/document/" + TEST_DOCUMENT_ID + "/replace")
+                                .file("replacementFile", newDocumentContent)
+                                .with(request -> {
+                                    request.setMethod("PUT");
+                                    return request;
+                                })
                 )
                 .andExpect(status().isOk());
 
