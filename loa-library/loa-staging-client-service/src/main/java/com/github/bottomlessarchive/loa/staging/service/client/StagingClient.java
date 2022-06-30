@@ -3,8 +3,8 @@ package com.github.bottomlessarchive.loa.staging.service.client;
 import com.github.bottomlessarchive.loa.application.domain.ApplicationType;
 import com.github.bottomlessarchive.loa.conductor.service.client.ConductorClient;
 import com.github.bottomlessarchive.loa.conductor.service.domain.ServiceInstanceEntity;
+import com.github.bottomlessarchive.loa.staging.service.client.domain.StagingException;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
@@ -13,6 +13,7 @@ import okhttp3.RequestBody;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.UUID;
@@ -27,7 +28,6 @@ public class StagingClient {
     private final OkHttpClient okHttpClient;
     private final ConductorClient conductorClient;
 
-    @SneakyThrows //TODO: StagingException
     public void moveToStaging(final UUID documentId, final Path content) {
         final ServiceInstanceEntity serviceInstanceEntity = conductorClient.getInstanceOrBlock(ApplicationType.STAGING_APPLICATION);
 
@@ -42,12 +42,15 @@ public class StagingClient {
                 .post(requestBody)
                 .build();
 
-        okHttpClient.newCall(request)
-                .execute()
-                .close();
+        try {
+            okHttpClient.newCall(request)
+                    .execute()
+                    .close();
+        } catch (IOException e) {
+            throw new StagingException("Failed to call the Staging Application!", e);
+        }
     }
 
-    @SneakyThrows //TODO: StagingException
     public InputStream grabFromStaging(final UUID documentId) {
         final ServiceInstanceEntity serviceInstanceEntity = conductorClient.getInstanceOrBlock(ApplicationType.STAGING_APPLICATION);
 
@@ -56,9 +59,13 @@ public class StagingClient {
                 .get()
                 .build();
 
-        return okHttpClient.newCall(request)
-                .execute()
-                .body()
-                .byteStream();
+        try {
+            return okHttpClient.newCall(request)
+                    .execute()
+                    .body()
+                    .byteStream();
+        } catch (IOException e) {
+            throw new StagingException("Failed to call the Staging Application!", e);
+        }
     }
 }
