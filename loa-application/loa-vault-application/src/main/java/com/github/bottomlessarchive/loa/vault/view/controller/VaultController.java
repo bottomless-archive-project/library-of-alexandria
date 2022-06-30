@@ -132,7 +132,6 @@ public class VaultController {
                 .orElseThrow(() -> new InvalidRequestException("Document not found with id " + documentId + "!"));
     }
 
-    //TODO: We need to support an InputStream here for content
     @PutMapping("/document/{documentId}/replace")
     public void replaceCorruptDocument(@PathVariable final String documentId,
             @RequestParam("replacementFile") final MultipartFile replacementFile) {
