@@ -16,7 +16,6 @@ export class SearchComponent implements OnInit {
 
   statistics: any;
   searchText = '';
-  modelChanged: Subject<string> = new Subject<string>();
   documentLengths: string[][];
   documentLength: any = undefined;
   languages: string[][];
@@ -45,14 +44,6 @@ export class SearchComponent implements OnInit {
 
   constructor(private route: ActivatedRoute, private http: HttpClient, private searchService: SearchService,
               private sanitizer: DomSanitizer) {
-    this.modelChanged.pipe(debounceTime(300), distinctUntilChanged())
-      .subscribe(searchText => {
-        this.searchText = searchText;
-        this.page = 0;
-
-        this.refreshHits();
-      });
-
     this.languages = [
       ['af', 'afrikaans'],
       ['sq', 'albanian'],
@@ -142,8 +133,10 @@ export class SearchComponent implements OnInit {
     this.statistics = this.route.snapshot.data.statistics;
   }
 
-  changed(text: string): void {
-    this.modelChanged.next(text);
+  search(): void {
+    this.page = 0;
+
+    this.refreshHits();
   }
 
   setType(type: string): void {
