@@ -4,7 +4,15 @@ This application's goal is to provide an abstraction layer between the applicati
 
 == Workflow
 
-The Queue Application is a simple glue between the <<Vault Application>>, <<Downloader Application>>, and <<Generator Application>>. It exists to make these applications tightly coupled and scalable.
+The Queue Application is a simple glue between the <<Vault Application>>, <<Downloader Application>>, and <<Generator Application>>. It exists to make these applications tightly coupled and scalable. It works as a https://en.wikipedia.org/wiki/Message_queue[message queue] provider between these processes. It has two queues.
+
+The *loa-document-location* contains the URLs that should be visited for document downloading. It is connecting the <<Generator Application>> and the <<Downloader Application>>.
+
+The *loa-document-archiving* contains the metadata for the downloaded documents thats are in the staging area. It connects the <<Downloader Application>> and the <<Vault Application>>.
+
+Both of these queues are persistent, so if the Queue Application is stopped, the messages are not going to be lost.
+
+The queues contain only basic text (like urls) and metadata (like content length, file type, etc). All of this data is sent in a binary format, so it is fairly compact. Because of this, the whole application doesn't require a lot of storage space. A big deployment might need around 100 GB, while a small-is deployment can fit on around 10 GB. The data access pattern consist of a lot of small IO operations. Because of this, an SSD is recommended for storing the application's data.
 
 .Parameters
 |===
