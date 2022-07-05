@@ -3,8 +3,66 @@
     background: darkseagreen;
   }
 </style>
+
+<div class="modal fade" id="queueModal" tabindex="-1" aria-labelledby="queueModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="queueModalLabel">Queue Application</h5>
+        <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>
+          The <b>Queue Application</b> is a simple glue between the <b>Vault Application</b>, <b>Downloader
+          Application</b>, and <b>Generator Application</b>. It exists to make these applications tightly coupled and
+          scalable. It works as a <a href="https://en.wikipedia.org/wiki/Message_queue">message queue</a> provider
+          between these processes. It has two queues.
+        </p>
+
+        <p>
+          The <b>loa-document-location</b> contains the URLs that should be visited for document downloading. It is
+          connecting the <b>Generator Application</b> and the <b>Downloader Application</b>.
+        </p>
+
+        <p>
+          The <b>loa-document-archiving</b> contains the metadata for the downloaded documents thats are in the staging
+          area. It connects the <b>Downloader Application</b> and the <b>Vault Application</b>.
+        </p>
+
+        <p>
+          Both of these queues are persistent, so if the Queue Application is stopped, the messages are not going
+          to be lost.
+        </p>
+
+        <p>
+          The queues contain only basic text (like urls) and metadata (like content length, file type, etc). All
+          of this data is sent in a binary format, so it is fairly compact. Because of this, the whole application
+          doesn't require a lot of storage space. A big deployment might need around 100 GB, while a small-is
+          deployment can fit on around 10 GB. The data access pattern consist of a lot of small IO operations.
+          Because of this, an SSD is recommended for storing the application's data.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-warning" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="card mb-2">
   <div class="card-body">
+    <span class="bi bi-question-circle" style="float: right; line-height: 0; cursor: pointer;"
+          data-bs-toggle="modal" data-bs-target="#queueModal">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-question-circle"
+           viewBox="0 0 16 16">
+        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"></path>
+        <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0
+        1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0
+        .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056
+        0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286zm1.557 5.763c0 .533.425.927 1.01.927.609 0
+        1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"></path>
+      </svg>
+    </span>
     <h5 class="card-title">Queue Applications</h5>
     <div class="row">
       <div class="col-4" *ngFor="let queue of applications.queues">
