@@ -3,7 +3,7 @@ package com.github.bottomlessarchive.loa.vault.service;
 import com.github.bottomlessarchive.loa.compression.service.compressor.provider.CompressorServiceProvider;
 import com.github.bottomlessarchive.loa.document.service.DocumentManipulator;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentEntity;
-import com.github.bottomlessarchive.loa.vault.service.archive.ArchivingService;
+import com.github.bottomlessarchive.loa.vault.service.backend.service.VaultDocumentStorage;
 import com.github.bottomlessarchive.loa.vault.service.domain.DocumentArchivingContext;
 import com.github.bottomlessarchive.loa.vault.service.location.VaultLocation;
 import com.github.bottomlessarchive.loa.vault.service.location.VaultLocationFactory;
@@ -23,18 +23,21 @@ import java.io.InputStream;
 @RequiredArgsConstructor
 public class VaultDocumentManager {
 
-    private final ArchivingService archivingService;
     private final DocumentManipulator documentManipulator;
     private final VaultLocationFactory vaultLocationFactory;
     private final CompressorServiceProvider compressorServiceProvider;
+    private final VaultDocumentStorage vaultDocumentStorage;
 
     /**
-     * Archive the document provided in the context.
+     * Archives a document to the vault. The document will be saved to the vault's physical storage.
+     *
+     * @param documentArchivingContext the context of the document to archive
      */
-    public void archiveDocument(final DocumentArchivingContext documentArchivingContext) {
+    public void archiveDocument(final DocumentEntity documentEntity, final DocumentArchivingContext documentArchivingContext,
+            final InputStream documentContent) {
         log.info("Archiving document with id: {}.", documentArchivingContext.getId());
 
-        archivingService.archiveDocument(documentArchivingContext);
+        vaultDocumentStorage.persistDocument(documentEntity, documentContent, documentArchivingContext.getContentLength());
     }
 
     /**

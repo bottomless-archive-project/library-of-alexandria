@@ -8,7 +8,6 @@ import com.github.bottomlessarchive.loa.vault.service.domain.DocumentArchivingCo
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.io.InputStream;
 import java.util.UUID;
 
 @Service
@@ -17,7 +16,7 @@ public class DocumentArchivingContextTransformer {
 
     private final VaultConfigurationProperties vaultConfigurationProperties;
 
-    public DocumentArchivingContext transform(final DocumentArchivingMessage documentArchivingMessage, final InputStream content) {
+    public DocumentArchivingContext transform(final DocumentArchivingMessage documentArchivingMessage) {
         return DocumentArchivingContext.builder()
                 .id(UUID.fromString(documentArchivingMessage.getId()))
                 .vault(vaultConfigurationProperties.name())
@@ -28,7 +27,6 @@ public class DocumentArchivingContextTransformer {
                 )
                 .contentLength(documentArchivingMessage.getContentLength())
                 .originalContentLength(documentArchivingMessage.getOriginalContentLength())
-                .content(content)
                 .checksum(documentArchivingMessage.getChecksum())
                 .versionNumber(vaultConfigurationProperties.versionNumber())
                 .compression(DocumentCompression.valueOf(documentArchivingMessage.getCompression()))

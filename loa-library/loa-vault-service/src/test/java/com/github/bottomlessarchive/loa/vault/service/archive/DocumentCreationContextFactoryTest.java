@@ -10,8 +10,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.util.UUID;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -26,10 +24,8 @@ class DocumentCreationContextFactoryTest {
     @Test
     void testNewContext() {
         final UUID id = UUID.randomUUID();
-        final InputStream content = new ByteArrayInputStream(new byte[]{0, 1, 2, 3});
         final DocumentArchivingContext documentArchivingContext = DocumentArchivingContext.builder()
                 .id(id)
-                .content(content)
                 .contentLength(4)
                 .originalContentLength(6L)
                 .source("unknown")
@@ -57,10 +53,8 @@ class DocumentCreationContextFactoryTest {
     @Test
     void testNewContextWhenSourceLocationIdIsNull() {
         final UUID id = UUID.randomUUID();
-        final InputStream content = new ByteArrayInputStream(new byte[]{0, 1, 2, 3});
         final DocumentArchivingContext documentArchivingContext = DocumentArchivingContext.builder()
                 .id(id)
-                .content(content)
                 .contentLength(4)
                 .source("unknown")
                 .type(DocumentType.PDF)

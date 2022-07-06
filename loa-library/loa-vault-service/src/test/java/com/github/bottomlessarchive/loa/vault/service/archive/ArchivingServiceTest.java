@@ -5,15 +5,14 @@ import com.github.bottomlessarchive.loa.document.service.domain.DocumentEntity;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentType;
 import com.github.bottomlessarchive.loa.document.service.entity.factory.DocumentEntityFactory;
 import com.github.bottomlessarchive.loa.document.service.entity.factory.domain.DocumentCreationContext;
-import com.github.bottomlessarchive.loa.vault.service.backend.service.VaultDocumentStorage;
+import com.github.bottomlessarchive.loa.staging.service.client.StagingClient;
+import com.github.bottomlessarchive.loa.vault.service.VaultDocumentManager;
 import com.github.bottomlessarchive.loa.vault.service.domain.DocumentArchivingContext;
 import com.mongodb.MongoWriteException;
 import com.mongodb.WriteError;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -23,10 +22,7 @@ import java.io.InputStream;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.eq;
@@ -44,20 +40,21 @@ class ArchivingServiceTest {
     private static final UUID DOCUMENT_ID = UUID.fromString("321e4567-e89b-12d3-a456-556642440000");
     private static final String SOURCE_LOCATION_ID = "123e4567-e89b-12d3-a456-556642440000";
 
-    @Mock
-    private DocumentEntityFactory documentEntityFactory;
 
     @Mock
     private DocumentCreationContextFactory documentCreationContextFactory;
 
     @Mock
-    private VaultDocumentStorage vaultDocumentStorage;
+    private VaultDocumentManager vaultDocumentManager;
 
     @Mock
     private DocumentManipulator documentManipulator;
 
-    @Captor
-    private ArgumentCaptor<InputStream> documentContent;
+    @Mock
+    private DocumentEntityFactory documentEntityFactory;
+
+    @Mock
+    private StagingClient stagingClient;
 
     @InjectMocks
     private ArchivingService underTest;
@@ -70,6 +67,9 @@ class ArchivingServiceTest {
                 .build();
         when(documentCreationContextFactory.newContext(documentArchivingContext))
                 .thenReturn(documentCreationContext);
+        final InputStream content = new ByteArrayInputStream(CONTENT);
+        when(stagingClient.grabFromStaging(DOCUMENT_ID))
+                .thenReturn(content);
 
         final DocumentEntity documentEntity = DocumentEntity.builder()
                 .id(UUID.randomUUID())
@@ -79,8 +79,7 @@ class ArchivingServiceTest {
 
         underTest.archiveDocument(documentArchivingContext);
 
-        verify(vaultDocumentStorage).persistDocument(eq(documentEntity), documentContent.capture(), eq((long) CONTENT.length));
-        assertThat(documentContent.getValue().readAllBytes(), is(CONTENT));
+        verify(vaultDocumentManager).archiveDocument(eq(documentEntity), eq(documentArchivingContext), eq(content));
         verify(documentCreationContextFactory).newContext(documentArchivingContext);
         verify(documentEntityFactory).newDocumentEntity(documentCreationContext);
         verify(documentManipulator).markDownloaded(documentEntity.getId());
@@ -107,7 +106,7 @@ class ArchivingServiceTest {
                 .thenReturn(writeError);
         //Do a normal exception, then a retry happens and throw the mongo exception to stop the retries
         doThrow(new RuntimeException("Test exception"), mongoWriteException)
-                .when(vaultDocumentStorage).persistDocument(any(), any(), anyLong());
+                .when(vaultDocumentManager).archiveDocument(any(), any(), any());
         final UUID duplicateOfId = UUID.fromString("a10bb054-2d2c-41e8-8d0d-752cc7f0c778");
         final DocumentEntity duplicateOf = DocumentEntity.builder()
                 .id(duplicateOfId)
@@ -118,7 +117,7 @@ class ArchivingServiceTest {
 
         underTest.archiveDocument(documentArchivingContext);
 
-        verify(vaultDocumentStorage, times(2)).persistDocument(any(), any(), anyLong());
+        verify(vaultDocumentManager, times(2)).archiveDocument(any(), any(), any());
         verify(documentEntityFactory).addSourceLocation(duplicateOfId, SOURCE_LOCATION_ID);
     }
 
@@ -126,7 +125,6 @@ class ArchivingServiceTest {
     void testDontSaveSourceLocationWhenItIsNotAvailableAndTheDocumentIsADuplicate() {
         final DocumentArchivingContext documentArchivingContext = DocumentArchivingContext.builder()
                 .id(DOCUMENT_ID)
-                .content(new ByteArrayInputStream(CONTENT))
                 .contentLength(CONTENT.length)
                 .sourceLocationId(null) // The source location is not available
                 .type(DocumentType.PDF)
@@ -134,6 +132,8 @@ class ArchivingServiceTest {
                 .contentLength(6L)
                 .originalContentLength(8L)
                 .build();
+        when(stagingClient.grabFromStaging(DOCUMENT_ID))
+                .thenReturn(new ByteArrayInputStream(CONTENT));
         final DocumentCreationContext documentCreationContext = DocumentCreationContext.builder()
                 .build();
         when(documentCreationContextFactory.newContext(documentArchivingContext))
@@ -150,7 +150,7 @@ class ArchivingServiceTest {
                 .thenReturn(writeError);
         //Do a normal exception, then a retry happens and throw the mongo exception to stop the retries
         doThrow(new RuntimeException("Test exception"), mongoWriteException)
-                .when(vaultDocumentStorage).persistDocument(any(), any(), anyLong());
+                .when(vaultDocumentManager).archiveDocument(any(), any(), any());
         final UUID duplicateOfId = UUID.fromString("a10bb054-2d2c-41e8-8d0d-752cc7f0c778");
         final DocumentEntity duplicateOf = DocumentEntity.builder()
                 .id(duplicateOfId)
@@ -160,14 +160,13 @@ class ArchivingServiceTest {
 
         underTest.archiveDocument(documentArchivingContext);
 
-        verify(vaultDocumentStorage, times(2)).persistDocument(any(), any(), anyLong());
+        verify(vaultDocumentManager, times(2)).archiveDocument(any(), any(), any());
         verify(documentEntityFactory, never()).addSourceLocation(any(), anyString());
     }
 
     private DocumentArchivingContext createDocumentArchivingContext() {
         return DocumentArchivingContext.builder()
                 .id(DOCUMENT_ID)
-                .content(new ByteArrayInputStream(CONTENT))
                 .contentLength(CONTENT.length)
                 .originalContentLength(8L)
                 .sourceLocationId(SOURCE_LOCATION_ID)

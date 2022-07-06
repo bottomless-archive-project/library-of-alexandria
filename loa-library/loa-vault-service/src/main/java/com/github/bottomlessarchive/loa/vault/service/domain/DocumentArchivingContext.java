@@ -5,7 +5,6 @@ import com.github.bottomlessarchive.loa.document.service.domain.DocumentType;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.io.InputStream;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -21,7 +20,6 @@ public class DocumentArchivingContext {
     private final long contentLength;
     private final long originalContentLength;
     private final String checksum;
-    private final InputStream content;
     private final int versionNumber;
     private final DocumentCompression compression;
 

@@ -4,13 +4,16 @@ import com.github.bottomlessarchive.loa.document.service.DocumentManipulator;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentEntity;
 import com.github.bottomlessarchive.loa.document.service.entity.factory.DocumentEntityFactory;
 import com.github.bottomlessarchive.loa.document.service.entity.factory.domain.DocumentCreationContext;
-import com.github.bottomlessarchive.loa.vault.service.backend.service.VaultDocumentStorage;
+import com.github.bottomlessarchive.loa.staging.service.client.StagingClient;
+import com.github.bottomlessarchive.loa.vault.service.VaultDocumentManager;
 import com.github.bottomlessarchive.loa.vault.service.domain.DocumentArchivingContext;
 import com.mongodb.MongoWriteException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Optional;
 
 @Slf4j
@@ -20,38 +23,41 @@ public class ArchivingService {
 
     private static final int DUPLICATE_DOCUMENT_ID_ERROR_CODE = 11000;
 
+    private final StagingClient stagingClient;
+    private final DocumentManipulator documentManipulator;
+    private final VaultDocumentManager vaultDocumentManager;
     private final DocumentEntityFactory documentEntityFactory;
     private final DocumentCreationContextFactory documentCreationContextFactory;
-    private final VaultDocumentStorage vaultDocumentStorage;
-    private final DocumentManipulator documentManipulator;
 
-    /**
-     * Archives a document to the vault. The document will be saved to the vault's physical storage and inserted into the database as well.
-     * If the document is a duplicate (evaluated by its checksum) then the original document's (the one that the newly inserted document is
-     * the duplicate of) source locations will be updated with the source location of the document that is being inserted.
-     *
-     * @param documentArchivingContext the context of the document to archive
-     */
     public void archiveDocument(final DocumentArchivingContext documentArchivingContext) {
-        final DocumentCreationContext documentCreationContext = documentCreationContextFactory.newContext(documentArchivingContext);
+        final DocumentCreationContext documentCreationContext = documentCreationContextFactory.newContext(
+                documentArchivingContext);
 
+        // Retry until we eventually succeed to save the document
         while (true) {
             try {
                 final DocumentEntity documentEntity = documentEntityFactory.newDocumentEntity(documentCreationContext);
 
-                vaultDocumentStorage.persistDocument(documentEntity, documentArchivingContext.getContent(),
-                        documentArchivingContext.getContentLength());
+                try (InputStream documentContent = stagingClient.grabFromStaging(documentArchivingContext.getId())) {
+                    vaultDocumentManager.archiveDocument(documentEntity, documentArchivingContext, documentContent);
 
-                documentManipulator.markDownloaded(documentEntity.getId());
+                    documentManipulator.markDownloaded(documentEntity.getId());
 
-                break;
+                    // The document was successfully saved
+                    return;
+                } catch (IOException e) {
+                    log.error("Failed to download the document's contents!", e);
+                }
             } catch (final Exception e) {
                 if (isDuplicateIndexError(e)) {
                     handleDuplicate(documentArchivingContext);
+                    //TODO: Delete it from stage
 
-                    break;
+                    // It is a duplicate
+                    return;
                 }
 
+                // We were unable to save it! Needs to retry!
                 log.error("Failed to save document!", e);
             }
         }
