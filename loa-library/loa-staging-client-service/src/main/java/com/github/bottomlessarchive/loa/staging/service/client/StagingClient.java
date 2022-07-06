@@ -68,4 +68,22 @@ public class StagingClient {
             throw new StagingException("Failed to call the Staging Application!", e);
         }
     }
+
+    public void deleteFromStaging(final UUID documentId) {
+        final ServiceInstanceEntity serviceInstanceEntity = conductorClient.getInstanceOrBlock(ApplicationType.STAGING_APPLICATION);
+
+        final Request request = new Request.Builder()
+                .url(serviceInstanceEntity.getAsHttpLocation() + "/document/" + documentId)
+                .delete()
+                .build();
+
+
+        try {
+            okHttpClient.newCall(request)
+                    .execute()
+                    .close();
+        } catch (IOException e) {
+            throw new StagingException("Failed to call the Staging Application!", e);
+        }
+    }
 }

@@ -51,7 +51,8 @@ public class ArchivingService {
             } catch (final Exception e) {
                 if (isDuplicateIndexError(e)) {
                     handleDuplicate(documentArchivingContext);
-                    //TODO: Delete it from stage
+
+                    stagingClient.deleteFromStaging(documentArchivingContext.getId());
 
                     // It is a duplicate
                     return;

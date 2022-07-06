@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ZeroCopyHttpOutputMessage;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.http.server.reactive.ServerHttpResponse;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -41,8 +42,9 @@ public class StageDocumentController {
                 .then();
     }
 
+    @SneakyThrows
     @GetMapping("/document/{documentId}")
-    public Mono<Void> serveDocument(@PathVariable final String documentId, final ServerHttpResponse response) throws IOException {
+    public Mono<Void> serveDocument(@PathVariable final String documentId, final ServerHttpResponse response) {
         final Path file = Path.of(stagingConfigurationProperties.location()).resolve(documentId);
 
         return ((ZeroCopyHttpOutputMessage) response)
@@ -56,5 +58,18 @@ public class StageDocumentController {
                             }
                         })
                 );
+    }
+
+    @DeleteMapping("/document/{documentId}")
+    public Mono<Void> deleteDocument(@PathVariable final String documentId) {
+        final Path file = Path.of(stagingConfigurationProperties.location()).resolve(documentId);
+
+        return Mono.fromRunnable(() -> {
+            try {
+                Files.deleteIfExists(file);
+            } catch (IOException e) {
+                log.error("Failed to delete staging file at: {}!", file);
+            }
+        });
     }
 }

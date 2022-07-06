@@ -119,6 +119,7 @@ class ArchivingServiceTest {
 
         verify(vaultDocumentManager, times(2)).archiveDocument(any(), any(), any());
         verify(documentEntityFactory).addSourceLocation(duplicateOfId, SOURCE_LOCATION_ID);
+        verify(stagingClient).deleteFromStaging(DOCUMENT_ID);
     }
 
     @Test
