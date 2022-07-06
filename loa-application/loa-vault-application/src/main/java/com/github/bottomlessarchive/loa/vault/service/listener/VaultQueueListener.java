@@ -31,17 +31,20 @@ public class VaultQueueListener implements CommandLineRunner {
     @Override
     public void run(final String... args) {
         queueManipulator.silentlyInitializeQueue(Queue.DOCUMENT_ARCHIVING_QUEUE);
+
         if (log.isInfoEnabled()) {
             log.info("Initialized queue processing! There are {} messages available in the archiving queue!",
                     queueManipulator.getMessageCount(Queue.DOCUMENT_ARCHIVING_QUEUE));
         }
 
+        //TODO: Make this parallel!
         while (true) {
             final DocumentArchivingMessage documentArchivingMessage = queueManipulator.readMessage(
                     Queue.DOCUMENT_ARCHIVING_QUEUE, DocumentArchivingMessage.class);
 
             log.debug("Got new archiving message: {}!", documentArchivingMessage);
 
+            //TODO: Verify if duplicate, if it is then remove it from stage
             try (InputStream documentContent = stagingClient.grabFromStaging(UUID.fromString(documentArchivingMessage.getId()))) {
                 final DocumentArchivingContext documentArchivingContext = documentArchivingContextTransformer.transform(
                         documentArchivingMessage, documentContent);
