@@ -1,12 +1,14 @@
 = Generator Application
 
-This application's goal is to fill the <<Queue Application>> with downloadable document locations (links).
+This application's goal is to fill the <<Queue Application>> with downloadable document locations (links/urls).
 
 == Workflow
 
 The Generator Application connects to the <<Queue Application>> and send URLs to be checked and downloaded by the <<Downloader Application>>.
 
-These URLs could come from various sources, the most common is a local file.
+These URLs can come from a file that is either encrypted (with GZIP) or plain text. The file is read line by line. Each line should represent a document location.
+
+The URLs are validated by the <<Generator Application>>. So if an url doesn't end with one of the supported file types (ie.: .pdf, .doc, .docx, etc) then it is not going to be added to the document location queue. Also, other illegal or invalid urls will be filtered out too.
 
 NOTE: If you do not have a lot of URLs ready at hand, take a look into the https://github.com/bottomless-archive-project/url-collector[url-collector] project or into the https://github.com/bottomless-archive-project/document-location-database[document-location-database]. These projects are also curated by the _Bottomless Archive Project_ and are created for the specific purpose to give easy access for LoA users to a lot of possible document locations.
 
