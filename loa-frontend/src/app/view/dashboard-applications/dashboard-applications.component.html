@@ -89,7 +89,26 @@
         <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        ...
+        <p>
+          The Vault Application connects to the <b>Queue Application</b>, asks for the metadata of new documents that
+          should be archived (these were inserted by the <b>Downloader Application</b> to the queue previously).
+        </p>
+
+        <p>
+          When a metadata entry is acquired, the application will look up if the document is a duplicate. If it is, then
+          it updates the document's entry in the database to contain the new source for the document, then asks the
+          <b>Staging Application</b> to remove the document's content from the staging area. If it is not a duplicate,
+          then it saves the new document entity to the database, then downloads the document's content from the
+          <b>Staging Application</b> into a vault location that is available either on local disk or in an AWS S3
+          compatible storage.
+        </p>
+
+        <p>
+          The <b>Vault Application</b> is scalable so more than one instance can run at the same time. This is necessary
+          to support more than one storage machines. Each instance of the application has an unique name. When a
+          document is stored, then the vault's name that is holding the document's content is also saved to the
+          document's metadata in the database. This way it is easy to track which vault instance has which document.
+        </p>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-warning" data-bs-dismiss="modal">Close</button>
