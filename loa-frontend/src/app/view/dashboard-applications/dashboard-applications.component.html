@@ -146,8 +146,65 @@
   </div>
 </div>
 
+<div class="modal fade" id="generatorApplicationModal" tabindex="-1" aria-labelledby="generatorApplicationModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="generatorApplicationModalLabel">Generator Application</h5>
+        <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>
+          The Generator Application connects to the <b>Queue Application</b> and send URLs to be checked and downloaded
+          by the <b>Downloader Application</b>.
+        </p>
+
+        <p>
+          These URLs can come from a file that is either encrypted (with GZIP) or plain text. The file is read line by
+          line. Each line should represent a document location.
+        </p>
+
+        <p>
+          The URLs are validated by the <b>Generator Application</b>. So if an url doesn't end with one of the supported
+          file types (ie.: .pdf, .doc, .docx, etc) then it is not going to be added to the document location queue.
+          Also, other illegal or invalid urls will be filtered out too.
+        </p>
+
+        <div class="callout m-0">
+          <h5>A good source for document locations</h5>
+
+          <p class="mb-0">
+            If you do not have a lot of URLs ready at hand, take a look into the
+            <a href="https://github.com/bottomless-archive-project/url-collector">url-collector</a> project or into the
+            <a href="https://github.com/bottomless-archive-project/document-location-database">
+              document-location-database</a>. These projects are also curated by the <b>Bottomless Archive Project</b>
+            and are created for the specific purpose to give easy access for Library of Alexandria users to a lot of
+            possible document locations.
+          </p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-warning" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="card mb-2">
   <div class="card-body">
+    <span class="bi bi-question-circle" style="float: right; line-height: 0; cursor: pointer;"
+          data-bs-toggle="modal" data-bs-target="#generatorApplicationModal">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-question-circle"
+           viewBox="0 0 16 16">
+        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"></path>
+        <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0
+        1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0
+        .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056
+        0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286zm1.557 5.763c0 .533.425.927 1.01.927.609 0
+        1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"></path>
+      </svg>
+    </span>
     <h5 class="card-title">Generator Applications</h5>
     <div class="row">
       <div class="col-4" *ngFor="let generator of applications.generators">
