@@ -6,13 +6,9 @@ Responsible for storing documents and making them available via web endpoints.
 
 The Vault Application connects to the <<Queue Application>>, asks for the metadata of new documents that should be archived (these were inserted by the <<Downloader Application>> to the queue previously).
 
-When a metadata entry is acquired, the application will look up if the document is a duplicate
+When a metadata entry is acquired, the application will look up if the document is a duplicate. If it is, then it updates the document's entry in the database to contain the new source for the document, then asks the <<Staging Application>> to remove the document's content from the staging area. If it is not a duplicate, then it saves the new document entity to the database, then downloads the document's content from the <<Staging Application>> into a vault location that is available either on local disk or in an AWS S3 compatible storage.
 
-
-Once a new document is acquired then it will be moved into a staging area.
-A checksum will be generated from the staging copy and checked for duplicates using the data available in the MongoDB database.
-
-If the application is not a duplicate then the staging file's contents will be moved to the archive, and a new entry will be created for the document in the database.
+The Vault Application is scalable so more than one instance can run at the same time. This is necessary to support more than one storage machines. Each instance of the application has an unique name. When a document is stored, then the vault's name that is holding the document's content is also saved to the document's metadata in the database. This way it is easy to track which vault instance has which document.
 
 .Parameters
 |===
