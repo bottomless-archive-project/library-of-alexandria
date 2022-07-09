@@ -1,6 +1,6 @@
 package com.github.bottomlessarchive.loa.generator.command;
 
-import com.github.bottomlessarchive.loa.location.service.DocumentLocationValidator;
+import com.github.bottomlessarchive.loa.location.service.validation.DocumentLocationValidator;
 import com.github.bottomlessarchive.loa.location.domain.DocumentLocation;
 import com.github.bottomlessarchive.loa.queue.service.QueueManipulator;
 import com.github.bottomlessarchive.loa.queue.service.domain.Queue;

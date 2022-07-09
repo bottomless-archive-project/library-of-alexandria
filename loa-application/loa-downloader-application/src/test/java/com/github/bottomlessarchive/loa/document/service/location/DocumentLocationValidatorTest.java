@@ -1,7 +1,7 @@
 package com.github.bottomlessarchive.loa.document.service.location;
 
 import com.github.bottomlessarchive.loa.location.domain.link.StringLink;
-import com.github.bottomlessarchive.loa.location.service.DocumentLocationValidator;
+import com.github.bottomlessarchive.loa.location.service.validation.DocumentLocationValidator;
 import com.github.bottomlessarchive.loa.location.domain.DocumentLocation;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;

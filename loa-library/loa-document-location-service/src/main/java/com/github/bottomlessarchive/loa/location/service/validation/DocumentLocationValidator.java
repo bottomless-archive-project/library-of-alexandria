@@ -1,16 +1,18 @@
-package com.github.bottomlessarchive.loa.location.service;
+package com.github.bottomlessarchive.loa.location.service.validation;
 
-import com.github.bottomlessarchive.loa.document.service.domain.DocumentType;
 import com.github.bottomlessarchive.loa.location.domain.DocumentLocation;
+import com.github.bottomlessarchive.loa.location.service.validation.extension.FileExtensionValidator;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.Arrays;
 
 /**
  * This service validates that a provided location contains a document.
  */
 @Service
+@RequiredArgsConstructor
 public class DocumentLocationValidator {
+
+    private final FileExtensionValidator fileExtensionValidator;
 
     /**
      * Returns true if the location could contain a valid document the application could archive.
@@ -26,7 +28,6 @@ public class DocumentLocationValidator {
         //Using getPath() to be able to crawl urls like: /example/examplefile.pdf?queryparam=value
         final String documentLocationPath = documentLocation.getLocation().toUrl().orElseThrow().getPath();
 
-        return Arrays.stream(DocumentType.values())
-                .anyMatch(documentType -> documentLocationPath.endsWith("." + documentType.getFileExtension()));
+        return fileExtensionValidator.isValidPathWithExtension(documentLocationPath);
     }
 }
