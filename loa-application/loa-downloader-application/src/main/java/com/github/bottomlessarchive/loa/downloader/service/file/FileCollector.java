@@ -1,9 +1,10 @@
 package com.github.bottomlessarchive.loa.downloader.service.file;
 
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentType;
+import com.github.bottomlessarchive.loa.downloader.service.file.domain.FileCollectionException;
+import com.github.bottomlessarchive.loa.file.FileManipulatorService;
 import com.github.bottomlessarchive.loa.url.service.downloader.FileDownloadManager;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedOutputStream;
@@ -25,28 +26,27 @@ import java.util.zip.ZipFile;
 public class FileCollector {
 
     private final FileDownloadManager fileDownloadManager;
+    private final FileManipulatorService fileManipulatorService;
 
     public void acquireFile(final URL fileLocation, final Path resultLocation, final DocumentType documentType) {
-        final String protocol = fileLocation.getProtocol();
+        try {
+            final String protocol = fileLocation.getProtocol();
 
-        if ("http".equals(protocol) || "https".equals(protocol)) {
-            fileDownloadManager.downloadFile(fileLocation, resultLocation);
-        } else if ("file".equals(protocol)) {
-            copyFile(fileLocation, resultLocation);
-        }
+            if ("http".equals(protocol) || "https".equals(protocol)) {
+                fileDownloadManager.downloadFile(fileLocation, resultLocation);
+            } else if ("file".equals(protocol)) {
+                fileManipulatorService.copy(Path.of(fileLocation.toURI()), resultLocation);
+            }
 
-        if (DocumentType.FB2.equals(documentType) && isZipArchive(resultLocation)) {
-            postProcessFB2File(resultLocation);
+            if (DocumentType.FB2.equals(documentType) && isZipArchive(resultLocation)) {
+                postProcessFB2File(resultLocation);
+            }
+        } catch (Exception e) {
+            throw new FileCollectionException("Failed to collect file at location: " + fileLocation + "!", e);
         }
     }
 
-    @SneakyThrows //TODO: Add real exception handling
-    private void copyFile(final URL fileLocation, final Path resultLocation) {
-        Files.copy(Path.of(fileLocation.toURI()), resultLocation);
-    }
-
-    @SneakyThrows //TODO: Add real exception handling
-    private void postProcessFB2File(final Path resultLocation) {
+    private void postProcessFB2File(final Path resultLocation) throws IOException {
         final Path unzipLocation = resultLocation.getParent().resolve(resultLocation.getFileName() + ".tmp");
 
         try (ZipFile zipFile = new ZipFile(resultLocation.toFile())) {

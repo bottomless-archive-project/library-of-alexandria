@@ -25,4 +25,8 @@ public class FileManipulatorService {
     public long size(final Path path) throws IOException {
         return Files.size(path);
     }
+
+    public void copy(final Path copyFrom, final Path copyTo) throws IOException {
+        Files.copy(copyFrom, copyTo);
+    }
 }
