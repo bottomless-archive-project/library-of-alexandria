@@ -7,7 +7,6 @@ import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedOutputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
@@ -74,7 +73,7 @@ public class FileCollector {
     }
 
     private void extractFile(final InputStream zipIn, final Path filePath) throws IOException {
-        try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(filePath.toFile()))) {
+        try (BufferedOutputStream bos = new BufferedOutputStream(Files.newOutputStream(filePath))) {
             final byte[] bytesIn = new byte[8192];
 
             int read;
