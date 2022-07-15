@@ -17,8 +17,14 @@ public class DocumentTypeCalculator {
      * @return the calculated type
      */
     public Optional<DocumentType> calculate(final URL documentLocation) {
+        final String path = documentLocation.getPath();
+
+        if (path.endsWith(".fb2.zip")) {
+            return Optional.of(DocumentType.FB2);
+        }
+
         return Arrays.stream(DocumentType.values())
-                .filter(type -> documentLocation.getPath().endsWith("." + type.getFileExtension()))
+                .filter(type -> path.endsWith("." + type.getFileExtension()))
                 .findFirst();
     }
 }
