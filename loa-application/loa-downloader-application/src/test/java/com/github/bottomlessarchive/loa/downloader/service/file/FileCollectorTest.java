@@ -62,7 +62,7 @@ class FileCollectorTest {
 
     @Test
     void testWhenFileLocationIsVisited() throws IOException, URISyntaxException {
-        final URL testLocation = new URL("file:\\C:\\Test\\test.pdf");
+        final URL testLocation = new URL("file:" + System.getProperty("java.io.tmpdir") + "\\test.pdf");
 
         underTest.acquireFile(testLocation, TEST_PATH, DocumentType.PDF);
 
