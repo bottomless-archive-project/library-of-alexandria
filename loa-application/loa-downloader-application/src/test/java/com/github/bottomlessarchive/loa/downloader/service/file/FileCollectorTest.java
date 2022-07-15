@@ -2,12 +2,14 @@ package com.github.bottomlessarchive.loa.downloader.service.file;
 
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentType;
 import com.github.bottomlessarchive.loa.file.FileManipulatorService;
+import com.github.bottomlessarchive.loa.file.zip.ZipFileManipulatorService;
 import com.github.bottomlessarchive.loa.url.service.downloader.FileDownloadManager;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.IOException;
@@ -15,8 +17,11 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class FileCollectorTest {
@@ -28,6 +33,9 @@ class FileCollectorTest {
 
     @Mock
     private FileManipulatorService fileManipulatorService;
+
+    @Mock
+    private ZipFileManipulatorService zipFileManipulatorService;
 
     @InjectMocks
     private FileCollector underTest;
@@ -59,19 +67,25 @@ class FileCollectorTest {
         underTest.acquireFile(testLocation, TEST_PATH, DocumentType.PDF);
 
         verify(fileManipulatorService)
-                .copy(Path.of(testLocation.toURI()), TEST_PATH);
+                .copy(testLocation.toURI(), TEST_PATH);
     }
 
     @Test
-    @Disabled
-    void testWhenFB2ArchiveIsAcquired() throws MalformedURLException {
+    void testWhenFB2ArchiveIsAcquired() throws IOException {
         final URL testLocation = new URL("http://localhost/test.fb2.zip");
+
+        when(zipFileManipulatorService.isZipArchive(any()))
+                .thenReturn(true);
 
         underTest.acquireFile(testLocation, TEST_PATH, DocumentType.FB2);
 
         verify(fileDownloadManager)
                 .downloadFile(testLocation, TEST_PATH);
 
-        //TODO: Figure out something to test this scenario regardless of the complexity around the filesystem operations
+        final InOrder order = Mockito.inOrder(zipFileManipulatorService, fileManipulatorService);
+        order.verify(zipFileManipulatorService)
+                .unzipSingleFile(TEST_PATH, Path.of("/test.pdf.tmp"));
+        order.verify(fileManipulatorService)
+                .move(Path.of("/test.pdf.tmp"), TEST_PATH, StandardCopyOption.REPLACE_EXISTING);
     }
 }
