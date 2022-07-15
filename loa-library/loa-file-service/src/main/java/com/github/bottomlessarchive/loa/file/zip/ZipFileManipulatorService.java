@@ -25,10 +25,10 @@ public class ZipFileManipulatorService {
         }
     }
 
-    public void unzipSingleFile(final Path sourcePath, final Path destinationPath) throws IOException {
+    public void unzipSingleFileArchive(final Path sourcePath, final Path destinationPath) throws IOException {
         try (ZipFile zipFile = new ZipFile(sourcePath.toFile())) {
             // FB2 should have only one file in the archive
-            if (zipFile.size() > 1) {
+            if (zipFile.size() == 1) {
                 final ZipEntry fb2FileInArchive = zipFile.entries().nextElement();
 
                 extractFile(zipFile.getInputStream(fb2FileInArchive), destinationPath);

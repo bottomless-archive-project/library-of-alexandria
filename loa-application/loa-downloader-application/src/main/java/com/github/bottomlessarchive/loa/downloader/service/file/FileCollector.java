@@ -45,7 +45,7 @@ public class FileCollector {
     private void postProcessFB2File(final Path resultLocation) throws IOException {
         final Path unzipLocation = resultLocation.getParent().resolve(resultLocation.getFileName() + ".tmp");
 
-        zipFileManipulatorService.unzipSingleFile(resultLocation, unzipLocation);
+        zipFileManipulatorService.unzipSingleFileArchive(resultLocation, unzipLocation);
 
         fileManipulatorService.move(unzipLocation, resultLocation, StandardCopyOption.REPLACE_EXISTING);
     }

@@ -84,7 +84,7 @@ class FileCollectorTest {
 
         final InOrder order = Mockito.inOrder(zipFileManipulatorService, fileManipulatorService);
         order.verify(zipFileManipulatorService)
-                .unzipSingleFile(TEST_PATH, Path.of("/test.pdf.tmp"));
+                .unzipSingleFileArchive(TEST_PATH, Path.of("/test.pdf.tmp"));
         order.verify(fileManipulatorService)
                 .move(Path.of("/test.pdf.tmp"), TEST_PATH, StandardCopyOption.REPLACE_EXISTING);
     }
