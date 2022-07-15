@@ -105,6 +105,11 @@
                (change)="setType('MOBI')">
         <label class="form-check-label" for="mobi">.mobi</label>
       </div>
+      <div class="form-check form-check-inline">
+        <input class="form-check-input" type="checkbox" id="fb2" [(ngModel)]="fileTypes.FB2"
+               (change)="setType('FB2')">
+        <label class="form-check-label" for="mobi">.fb2</label>
+      </div>
     </div>
   </div>
   <div class="col-lg-3">
