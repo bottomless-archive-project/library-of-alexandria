@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Locale;
 import java.util.Optional;
 
 @Service
@@ -17,7 +18,7 @@ public class DocumentTypeCalculator {
      * @return the calculated type
      */
     public Optional<DocumentType> calculate(final URL documentLocation) {
-        final String path = documentLocation.getPath();
+        final String path = documentLocation.getPath().toLowerCase(Locale.ENGLISH);
 
         if (path.endsWith(".fb2.zip")) {
             return Optional.of(DocumentType.FB2);
