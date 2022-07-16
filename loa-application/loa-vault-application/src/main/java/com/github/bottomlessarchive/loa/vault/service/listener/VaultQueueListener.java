@@ -8,9 +8,13 @@ import com.github.bottomlessarchive.loa.vault.service.domain.DocumentArchivingCo
 import com.github.bottomlessarchive.loa.vault.service.transformer.DocumentArchivingContextTransformer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Semaphore;
 
 @Slf4j
 @Service
@@ -22,8 +26,13 @@ public class VaultQueueListener implements CommandLineRunner {
     private final QueueManipulator queueManipulator;
     private final DocumentArchivingContextTransformer documentArchivingContextTransformer;
 
+    @Qualifier("vaultSemaphore")
+    private final Semaphore vaultSemaphore;
+    @Qualifier("vaultExecutorService")
+    private final ExecutorService vaultExecutorService;
+
     @Override
-    public void run(final String... args) {
+    public void run(final String... args) throws InterruptedException {
         queueManipulator.silentlyInitializeQueue(Queue.DOCUMENT_ARCHIVING_QUEUE);
 
         if (log.isInfoEnabled()) {
@@ -31,17 +40,22 @@ public class VaultQueueListener implements CommandLineRunner {
                     queueManipulator.getMessageCount(Queue.DOCUMENT_ARCHIVING_QUEUE));
         }
 
-        //TODO: Make this parallel!
         while (true) {
             final DocumentArchivingMessage documentArchivingMessage = queueManipulator.readMessage(
                     Queue.DOCUMENT_ARCHIVING_QUEUE, DocumentArchivingMessage.class);
 
             log.debug("Got new archiving message: {}!", documentArchivingMessage);
 
-            final DocumentArchivingContext documentArchivingContext = documentArchivingContextTransformer.transform(
-                    documentArchivingMessage);
+            vaultSemaphore.acquire();
 
-            archivingService.archiveDocument(documentArchivingContext);
+            vaultExecutorService.execute(() -> {
+                final DocumentArchivingContext documentArchivingContext = documentArchivingContextTransformer.transform(
+                        documentArchivingMessage);
+
+                archivingService.archiveDocument(documentArchivingContext);
+
+                vaultSemaphore.release();
+            });
         }
     }
 }

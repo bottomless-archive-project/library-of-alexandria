@@ -31,6 +31,9 @@ include::../service/conductor/conductor-configuration.adoc[]
 | **loa.vault.name**
 | The unique name of the vault. This name will be saved when archiving new documents and will be used to identify the vault that holds a given document. Do not change this after creating the vault because the documents previously archived by this vault are not going to be accessible.
 
+| **loa.vault.parallelism**
+| The number of documents that should be saved in parallel at the same time. If the value is set to 4, then the application tries to archive 4 documents at the same time. *(Default value: 20)*
+
 | **loa.vault.modification-enabled**
 | If this vault should be able to modify documents (eg. remove) after they are archived. If your vault is available publicly on the internet then set this to false! *(Default value: true)*
 
