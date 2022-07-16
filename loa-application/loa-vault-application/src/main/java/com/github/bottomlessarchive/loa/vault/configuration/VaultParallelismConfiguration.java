@@ -23,7 +23,7 @@ public class VaultParallelismConfiguration {
 
     @Bean
     public ExecutorService vaultExecutorService() {
-        log.info("Initializing the downloader with parallelism level of {}.",
+        log.info("Initializing the vault processor with parallelism level of {}.",
                 vaultConfigurationProperties.parallelism());
 
         return Executors.newFixedThreadPool(vaultConfigurationProperties.parallelism());
