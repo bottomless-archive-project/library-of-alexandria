@@ -1,87 +1,84 @@
 package com.github.bottomlessarchive.loa.document.service.location;
 
 import com.github.bottomlessarchive.loa.location.domain.link.StringLink;
-import com.github.bottomlessarchive.loa.location.service.DocumentLocationValidator;
+import com.github.bottomlessarchive.loa.location.service.validation.DocumentLocationValidator;
 import com.github.bottomlessarchive.loa.location.domain.DocumentLocation;
+import com.github.bottomlessarchive.loa.location.service.validation.extension.FileExtensionValidator;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 class DocumentLocationValidatorTest {
 
     private static final String EMPTY_LINK = "";
 
-    private final DocumentLocationValidator underTest = new DocumentLocationValidator();
+    @Mock
+    private FileExtensionValidator fileExtensionValidator;
 
-    @ParameterizedTest
-    @CsvSource(
-            value = {
-                    "http://www.example.com/test.pdf",
-                    "http://www.example.com/test.doc",
-                    "http://www.example.com/test.docx",
-                    "http://www.example.com/test.ppt",
-                    "http://www.example.com/test.pptx",
-                    "http://www.example.com/test.xls",
-                    "http://www.example.com/test.xlsx",
-                    "http://www.example.com/test.rtf",
-                    "http://www.example.com/test.mobi",
-                    "http://www.example.com/test.epub",
-                    "http://www.example.com/test.epub?queryparam=value"
-            }
-    )
-    void testValidDocumentLocationWithValidDocuments(final String documentLocation) {
+    @InjectMocks
+    private DocumentLocationValidator underTest;
+
+    @Test
+    void testValidDocumentLocation() {
+        when(fileExtensionValidator.isValidPathWithExtension("/test.epub"))
+                .thenReturn(true);
+
         final boolean result = underTest.validDocumentLocation(
                 DocumentLocation.builder()
-                        .location(StringLink.builder()
-                                .link(documentLocation)
-                                .build()
+                        .location(
+                                StringLink.builder()
+                                        .link("http://www.example.com/test.epub?queryparam=value")
+                                        .build()
                         )
                         .build()
         );
 
-        assertTrue(result);
+        assertThat(result)
+                .isTrue();
+        verify(fileExtensionValidator).isValidPathWithExtension("/test.epub");
     }
 
-    @ParameterizedTest
-    @CsvSource(
-            value = {
-                    "http://www.example.com/test.exe",
-                    "http://www.example.com/test.md",
-                    "http://www.example.com/test"
-            }
-    )
-    void testValidDocumentLocationWithInvalidDocuments(final String documentLocation) {
+    @Test
+    void testInvalidDocumentLocationWithNoDomainExtension() {
         final boolean result = underTest.validDocumentLocation(
                 DocumentLocation.builder()
-                        .location(StringLink.builder()
-                                .link(documentLocation)
-                                .build()
+                        .location(
+                                StringLink.builder()
+                                        .link("helloWorld")
+                                        .build()
                         )
                         .build()
         );
 
-        assertFalse(result);
+        assertThat(result)
+                .isFalse();
     }
 
+    @Test
+    void testInvalidDocumentLocationBadDomainLocation() {
+        when(fileExtensionValidator.isValidPathWithExtension(any()))
+                .thenReturn(false);
 
-    @ParameterizedTest
-    @CsvSource(
-            value = {
-                    "helloWorld",
-                    "http://askdoctorkcom-back-strengthening-exercises-37d5.pdf/"
-            }
-    )
-    void testInvalidDocumentLocation(final String documentLocation) {
         final boolean result = underTest.validDocumentLocation(
                 DocumentLocation.builder()
-                        .location(StringLink.builder().link(documentLocation).build())
+                        .location(
+                                StringLink.builder()
+                                        .link("http://askdoctorkcom-back-strengthening-exercises-37d5.pdf/")
+                                        .build()
+                        )
                         .build()
         );
 
-        assertFalse(result);
+        assertThat(result)
+                .isFalse();
     }
 
     // Empty string makes JUnit throw an invalid CSV error, so we need to test it in its own method
@@ -96,6 +93,7 @@ class DocumentLocationValidatorTest {
                         .build()
         );
 
-        assertFalse(result);
+        assertThat(result)
+                .isFalse();
     }
 }

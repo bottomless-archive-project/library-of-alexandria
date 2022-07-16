@@ -1,7 +1,5 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
-import {Subject} from 'rxjs';
-import {debounceTime, distinctUntilChanged} from 'rxjs/operators';
 import {HttpClient} from '@angular/common/http';
 import {SearchService} from '../../shared/search/service/search.service';
 import {DomSanitizer, SafeResourceUrl} from '@angular/platform-browser';
@@ -31,7 +29,8 @@ export class SearchComponent implements OnInit {
     ['XLSX', false],
     ['RTF', false],
     ['EPUB', false],
-    ['MOBI', false]
+    ['MOBI', false],
+    ['FB2', false]
   ]);
   hits: SearchHit[] = [];
   hitCount = 0;
