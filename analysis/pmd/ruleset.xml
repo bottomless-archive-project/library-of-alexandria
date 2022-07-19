@@ -134,9 +134,9 @@
     <rule ref="category/java/errorprone.xml/CloseResource">
         <properties>
             <property name="violationSuppressXPath"
-                      value="//ClassOrInterfaceDeclaration['com.github.bottomlessarchive.loa.queue.artemis.service.consumer.pool.QueueConsumerFactory']"/>
+                      value="//ClassOrInterfaceDeclaration['com.github.bottomlessarchive.loa.queue.artemis.service.consumer.pool.QueueConsumerProvider']"/>
             <property name="violationSuppressXPath"
-                      value="//ClassOrInterfaceDeclaration['com.github.bottomlessarchive.loa.queue.artemis.service.producer.pool.QueueProducerFactory']"/>
+                      value="//ClassOrInterfaceDeclaration['com.github.bottomlessarchive.loa.queue.artemis.service.producer.pool.QueueProducerProvider']"/>
             <property name="violationSuppressXPath" value="//ClassOrInterfaceDeclaration['.*Test']"/>
         </properties>
     </rule>
