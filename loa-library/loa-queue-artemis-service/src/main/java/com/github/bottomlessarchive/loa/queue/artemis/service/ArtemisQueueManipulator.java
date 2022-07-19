@@ -118,9 +118,11 @@ public class ArtemisQueueManipulator implements QueueManipulator {
         final ClientMessage clientMessage = messageSerializer.serialize(message);
 
         try {
-            queueProducerProvider.getProducer(queue)
-                    .getClientProducer()
-                    .send(clientMessage);
+            synchronized (this) {
+                queueProducerProvider.getProducer(queue)
+                        .getClientProducer()
+                        .send(clientMessage);
+            }
         } catch (final ActiveMQException e) {
             throw new QueueException("Unable to send message to the " + queue.getName() + " queue!", e);
         }

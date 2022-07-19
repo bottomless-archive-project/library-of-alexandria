@@ -14,6 +14,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.stereotype.Service;
 
 import java.io.Closeable;
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.Map;
 
@@ -25,7 +26,7 @@ public class QueueProducerProvider implements Closeable {
 
     private final ClientSessionFactory clientSessionFactory;
 
-    private final Map<Queue, QueueProducer> clientProducers = new EnumMap<>(Queue.class);
+    private final Map<Queue, QueueProducer> clientProducers = Collections.synchronizedMap(new EnumMap<>(Queue.class));
 
     /**
      * Provides a {@link QueueProducer} for a given {@link Queue}. A new Artemis socket might be opened in the
