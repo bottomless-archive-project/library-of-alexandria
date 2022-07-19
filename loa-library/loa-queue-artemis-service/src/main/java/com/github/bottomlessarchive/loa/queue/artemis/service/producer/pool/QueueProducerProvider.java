@@ -13,22 +13,32 @@ import org.apache.activemq.artemis.api.core.client.ClientSessionFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Service;
 
+import java.io.Closeable;
+import java.util.EnumMap;
+import java.util.Map;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
 @ConditionalOnMissingBean(QueueServerConfiguration.class)
-public class QueueProducerFactory {
+public class QueueProducerProvider implements Closeable {
 
     private final ClientSessionFactory clientSessionFactory;
 
+    private final Map<Queue, QueueProducer> clientProducers = new EnumMap<>(Queue.class);
+
     /**
-     * Creates a new {@link QueueProducer} for a given {@link Queue}. A new Artemis socket is being opened in the
+     * Provides a {@link QueueProducer} for a given {@link Queue}. A new Artemis socket might be opened in the
      * background for this.
      *
-     * @param queue the queue to create the producer for
-     * @return the freshly created producer
+     * @param queue the queue to return the producer for
+     * @return the producer
      */
-    public QueueProducer createProducer(final Queue queue) {
+    public QueueProducer getProducer(final Queue queue) {
+        return clientProducers.computeIfAbsent(queue, this::createProducer);
+    }
+
+    private QueueProducer createProducer(final Queue queue) {
         log.info("Creating new producer for queue: {}!", queue);
 
         try {
@@ -44,5 +54,17 @@ public class QueueProducerFactory {
 
             throw new QueueException("Unable to create client producer for queue: " + queue + "!", e);
         }
+    }
+
+    @Override
+    public void close() {
+        clientProducers.values()
+                .forEach(queueProducer -> {
+                    try {
+                        queueProducer.close();
+                    } catch (final ActiveMQException e) {
+                        log.error("Failed to close connection to the queue!", e);
+                    }
+                });
     }
 }

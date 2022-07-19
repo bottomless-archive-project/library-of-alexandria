@@ -1,7 +1,7 @@
 package com.github.bottomlessarchive.loa.queue.artemis.service.consumer.pool;
 
-import com.github.bottomlessarchive.loa.queue.artemis.service.consumer.pool.domain.QueueConsumer;
 import com.github.bottomlessarchive.loa.queue.artemis.configuration.QueueServerConfiguration;
+import com.github.bottomlessarchive.loa.queue.artemis.service.consumer.pool.domain.QueueConsumer;
 import com.github.bottomlessarchive.loa.queue.service.domain.Queue;
 import com.github.bottomlessarchive.loa.queue.service.domain.QueueException;
 import lombok.RequiredArgsConstructor;
@@ -13,22 +13,32 @@ import org.apache.activemq.artemis.api.core.client.ClientSessionFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Service;
 
+import java.io.Closeable;
+import java.util.EnumMap;
+import java.util.Map;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
 @ConditionalOnMissingBean(QueueServerConfiguration.class)
-public class QueueConsumerFactory {
+public class QueueConsumerProvider implements Closeable {
 
     private final ClientSessionFactory clientSessionFactory;
 
+    private final Map<Queue, QueueConsumer> clientConsumers = new EnumMap<>(Queue.class);
+
     /**
-     * Creates a new {@link ClientConsumer} for a given {@link Queue}. A new Artemis socket is being opened in the
+     * Provides a {@link ClientConsumer} for a given {@link Queue}. A new Artemis socket might be opened in the
      * background for this.
      *
-     * @param queue the queue to create the consumer for
-     * @return the freshly created consumer
+     * @param queue the queue to return the consumer for
+     * @return the consumer
      */
-    public QueueConsumer createConsumer(final Queue queue) {
+    public QueueConsumer getConsumer(final Queue queue) {
+        return clientConsumers.computeIfAbsent(queue, this::createConsumer);
+    }
+
+    private QueueConsumer createConsumer(final Queue queue) {
         log.info("Creating new consumer for queue: {}!", queue);
 
         try {
@@ -47,5 +57,11 @@ public class QueueConsumerFactory {
 
             throw new QueueException("Unable to create client consumer for queue: " + queue + "!", e);
         }
+    }
+
+    @Override
+    public void close() {
+        clientConsumers.values()
+                .forEach(QueueConsumer::close);
     }
 }
