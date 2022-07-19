@@ -12,7 +12,6 @@ import com.github.bottomlessarchive.loa.queue.service.domain.QueueException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.artemis.api.core.ActiveMQException;
-import org.apache.activemq.artemis.api.core.ActiveMQLargeMessageInterruptedException;
 import org.apache.activemq.artemis.api.core.QueueConfiguration;
 import org.apache.activemq.artemis.api.core.RoutingType;
 import org.apache.activemq.artemis.api.core.SimpleString;
@@ -149,14 +148,6 @@ public class ArtemisQueueManipulator implements QueueManipulator {
                     .deserialize(clientMessage);
         } catch (final ActiveMQException e) {
             throw new QueueException("Unable to read message from the " + queue.getName() + " queue!", e);
-        } catch (final RuntimeException e) {
-            // Artemis sometimes throws a RuntimeException that wraps a named exception, even after a named exception happened
-            // inside the artemis client. See: https://issues.apache.org/jira/browse/ARTEMIS-3588
-            if (e.getCause() instanceof ActiveMQLargeMessageInterruptedException) {
-                throw new QueueException("Unrecoverable error happened when reading a large message.", e);
-            } else {
-                throw e;
-            }
         }
     }
 }
