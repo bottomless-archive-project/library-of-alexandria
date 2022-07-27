@@ -34,7 +34,7 @@ dependencies {
 
     implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: '2.0.26'
     implementation group: 'net.coobird', name: 'thumbnailator', version: '0.4.17'
-    implementation group: 'jakarta.json', name: 'jakarta.json-api', version: '2.1.0'
+    implementation group: 'jakarta.json', name: 'jakarta.json-api', version: '2.1.1'
 
     implementation 'com.github.jai-imageio:jai-imageio-core:1.4.0'
     implementation 'com.github.jai-imageio:jai-imageio-jpeg2000:1.4.0'
