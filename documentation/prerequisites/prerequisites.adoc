@@ -4,8 +4,8 @@ Special emphasis was placed on to keep the prerequisites of the project to the m
 
 List of the required software to start archiving:
 
-- https://www.oracle.com/technetwork/java/javase/downloads/index.html[Java 17]
-- https://www.mongodb.com/download-center/community[MongoDB 5.0]
+- https://www.oracle.com/technetwork/java/javase/downloads/index.html[Java 18]
+- https://www.mongodb.com/download-center/community[MongoDB 6.0]
 
 List of the required software to be able to search the archived documents:
 
