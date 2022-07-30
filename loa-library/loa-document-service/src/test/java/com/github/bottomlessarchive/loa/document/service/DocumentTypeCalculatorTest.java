@@ -17,18 +17,18 @@ class DocumentTypeCalculatorTest {
 
     @ParameterizedTest
     @CsvSource({
-            "http://lcoalhost/123.pdf,PDF",
-            "http://lcoalhost/123.doc,DOC",
-            "http://lcoalhost/123.docx,DOCX",
-            "http://lcoalhost/123.ppt,PPT",
-            "http://lcoalhost/123.pptx,PPTX",
-            "http://lcoalhost/123.xls,XLS",
-            "http://lcoalhost/123.xlsx,XLSX",
-            "http://lcoalhost/123.rtf,RTF",
-            "http://lcoalhost/123.mobi,MOBI",
-            "http://lcoalhost/123.epub,EPUB",
-            "http://lcoalhost/123.fb2,FB2",
-            "http://lcoalhost/123.txt,TXT"
+            "http://localhost/123.pdf,PDF",
+            "http://localhost/123.doc,DOC",
+            "http://localhost/123.docx,DOCX",
+            "http://localhost/123.ppt,PPT",
+            "http://localhost/123.pptx,PPTX",
+            "http://localhost/123.xls,XLS",
+            "http://localhost/123.xlsx,XLSX",
+            "http://localhost/123.rtf,RTF",
+            "http://localhost/123.mobi,MOBI",
+            "http://localhost/123.epub,EPUB",
+            "http://localhost/123.fb2,FB2",
+            "http://localhost/123.txt,TXT"
     })
     void testCalculateForVariousTypes(final String url, final String expectedDocumentType) throws MalformedURLException {
         final Optional<DocumentType> result = underTest.calculate(new URL(url));
@@ -40,7 +40,7 @@ class DocumentTypeCalculatorTest {
 
     @Test
     void testCalculateForUppercaseUrl() throws MalformedURLException {
-        final Optional<DocumentType> result = underTest.calculate(new URL("http://lcoalhost/123.PDF"));
+        final Optional<DocumentType> result = underTest.calculate(new URL("http://localhost/123.PDF"));
 
         assertThat(result)
                 .isPresent()
@@ -49,7 +49,7 @@ class DocumentTypeCalculatorTest {
 
     @Test
     void testCalculateForZippedFB2() throws MalformedURLException {
-        final Optional<DocumentType> result = underTest.calculate(new URL("http://lcoalhost/123.fb2.zip"));
+        final Optional<DocumentType> result = underTest.calculate(new URL("http://localhost/123.fb2.zip"));
 
         assertThat(result)
                 .isPresent()
@@ -58,7 +58,7 @@ class DocumentTypeCalculatorTest {
 
     @Test
     void testCalculateForUppercaseZippedFB2Url() throws MalformedURLException {
-        final Optional<DocumentType> result = underTest.calculate(new URL("http://lcoalhost/123.FB2.zip"));
+        final Optional<DocumentType> result = underTest.calculate(new URL("http://localhost/123.FB2.zip"));
 
         assertThat(result)
                 .isPresent()
@@ -67,9 +67,9 @@ class DocumentTypeCalculatorTest {
 
     @ParameterizedTest
     @CsvSource({
-            "http://lcoalhost/",
-            "http://lcoalhost/123",
-            "http://lcoalhost/123.exe"
+            "http://localhost/",
+            "http://localhost/123",
+            "http://localhost/123.exe"
     })
     void testCalculateForVariousTypes(final String url) throws MalformedURLException {
         final Optional<DocumentType> result = underTest.calculate(new URL(url));
