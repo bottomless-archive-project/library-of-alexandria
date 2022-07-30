@@ -27,7 +27,8 @@ class DocumentTypeCalculatorTest {
             "http://lcoalhost/123.rtf,RTF",
             "http://lcoalhost/123.mobi,MOBI",
             "http://lcoalhost/123.epub,EPUB",
-            "http://lcoalhost/123.fb2,FB2"
+            "http://lcoalhost/123.fb2,FB2",
+            "http://lcoalhost/123.txt,TXT"
     })
     void testCalculateForVariousTypes(final String url, final String expectedDocumentType) throws MalformedURLException {
         final Optional<DocumentType> result = underTest.calculate(new URL(url));
