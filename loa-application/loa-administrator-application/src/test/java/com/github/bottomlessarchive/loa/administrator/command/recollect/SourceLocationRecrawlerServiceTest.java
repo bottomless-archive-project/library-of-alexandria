@@ -2,6 +2,7 @@ package com.github.bottomlessarchive.loa.administrator.command.recollect;
 
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentEntity;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentType;
+import com.github.bottomlessarchive.loa.location.service.factory.domain.DocumentLocation;
 import com.github.bottomlessarchive.loa.stage.service.StageLocationFactory;
 import com.github.bottomlessarchive.loa.stage.service.domain.StageLocation;
 import com.github.bottomlessarchive.loa.url.service.downloader.FileDownloadManager;
@@ -44,7 +45,10 @@ class SourceLocationRecrawlerServiceTest {
 
     @Test
     void testRecrawlSourceLocationWhenSourceIsDownloadabe() throws MalformedURLException {
-        final URL sourceLocation = new URL("http://example.com/");
+        final DocumentLocation documentLocation = DocumentLocation.builder()
+                .id("test-id")
+                .url("http://example.com/")
+                .build();
         final DocumentEntity documentEntity = DocumentEntity.builder()
                 .type(DocumentType.PDF)
                 .build();
@@ -64,10 +68,10 @@ class SourceLocationRecrawlerServiceTest {
         when(stageLocation.openStream())
                 .thenReturn(new ByteArrayInputStream(content));
 
-        underTest.recrawlSourceLocation(sourceLocation, documentEntity);
+        underTest.recrawlSourceLocation(documentLocation, documentEntity);
 
         verify(stageLocation).cleanup();
-        verify(fileDownloadManager).downloadFile(sourceLocation, mockPath);
+        verify(fileDownloadManager).downloadFile(eq("test-id"), eq(new URL("http://example.com/")), eq(mockPath));
         verify(vaultClientService).replaceCorruptDocument(documentEntity, content);
     }
 }

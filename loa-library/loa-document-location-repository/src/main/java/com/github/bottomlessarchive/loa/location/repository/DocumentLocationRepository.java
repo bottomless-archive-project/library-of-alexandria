@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import java.util.Optional;
 
 import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Updates.set;
 
 @Component
 @RequiredArgsConstructor
@@ -34,5 +35,10 @@ public class DocumentLocationRepository {
 
             throw e;
         }
+    }
+
+    public void updateDownloadResultCode(final String documentLocationId, final int downloadResultCode) {
+        documentLocationDatabaseEntityMongoCollection.updateOne(eq("_id", documentLocationId),
+                set("downloadResultCode", downloadResultCode));
     }
 }
