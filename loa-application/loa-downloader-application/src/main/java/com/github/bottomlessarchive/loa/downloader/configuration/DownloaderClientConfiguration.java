@@ -20,27 +20,27 @@ public class DownloaderClientConfiguration {
     @Bean
     public OkHttpClient downloaderClient(
             @Qualifier("trustAllSSLContext") final SSLContext trustAllSSLContext,
-            @Qualifier("trustAllTrustManager") final TrustManager[] trustAllTrustManager) {
+            @Qualifier("trustAllTrustManagers") final TrustManager[] trustAllTrustManagers) {
         return new OkHttpClient.Builder()
                 // We don't care about hostname verification when download files. See #441 for more info.
-                .sslSocketFactory(trustAllSSLContext.getSocketFactory(), (X509TrustManager) trustAllTrustManager[0])
+                .sslSocketFactory(trustAllSSLContext.getSocketFactory(), (X509TrustManager) trustAllTrustManagers[0])
                 .hostnameVerifier((hostname, session) -> true)
                 .build();
     }
 
     @Bean
     @SneakyThrows
-    protected SSLContext trustAllSSLContext(@Qualifier("trustAllTrustManager") final TrustManager[] trustAllTrustManager) {
+    protected SSLContext trustAllSSLContext(@Qualifier("trustAllTrustManagers") final TrustManager[] trustAllTrustManagers) {
         final SSLContext sslContext = SSLContext.getInstance("SSL");
 
         // Disabling SSL trust management & checking. See #441 for more info.
-        sslContext.init(null, trustAllTrustManager, new java.security.SecureRandom());
+        sslContext.init(null, trustAllTrustManagers, new java.security.SecureRandom());
 
         return sslContext;
     }
 
     @Bean
-    protected TrustManager[] trustAllTrustManager(final TrustAllTrustManager trustAllTrustManager) {
+    protected TrustManager[] trustAllTrustManagers(final TrustAllTrustManager trustAllTrustManager) {
         return new TrustManager[]{trustAllTrustManager};
     }
 }
