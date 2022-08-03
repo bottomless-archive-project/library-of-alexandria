@@ -9,7 +9,7 @@
 
     <rule ref="category/java/performance.xml">
         <!-- Too many false positives. -->
-        <exclude name="AvoidInstantiatingObjectsInLoops" />
+        <exclude name="AvoidInstantiatingObjectsInLoops"/>
     </rule>
 
     <rule ref="category/java/multithreading.xml">
@@ -111,6 +111,13 @@
         <!-- Too many false positives. -->
         <exclude name="GuardLogStatement"/>
         <exclude name="AvoidUsingHardCodedIP"/>
+    </rule>
+
+    <!-- Makes no sense in configuration classes. -->
+    <rule ref="category/java/bestpractices.xml/UseVarargs">
+        <properties>
+            <property name="violationSuppressXPath" value="//ClassOrInterfaceDeclaration['.*Configuration']"/>
+        </properties>
     </rule>
 
     <rule ref="category/java/errorprone.xml">
