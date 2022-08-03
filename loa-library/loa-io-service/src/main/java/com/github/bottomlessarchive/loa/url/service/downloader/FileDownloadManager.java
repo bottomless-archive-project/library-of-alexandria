@@ -11,7 +11,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -54,8 +56,13 @@ public class FileDownloadManager {
                 Files.copy(responseBody.byteStream(), resultLocation);
             }
         } catch (final IOException e) {
-            //TODO: Figure out how could we handle the IO exception
-            log.error("Error while downloading document form {}.", downloadTarget, e);
+            if (e instanceof UnknownHostException) {
+                downloadResultReporter.updateResultToOriginNotFound(documentLocationId);
+            } else if (e instanceof SocketTimeoutException) {
+                downloadResultReporter.updateResultToTimeout(documentLocationId);
+            } else {
+                log.error("Error while downloading document form {}.", downloadTarget, e);
+            }
 
             try {
                 if (Files.exists(resultLocation)) {

@@ -19,6 +19,14 @@ public class DownloadResultReporter {
         documentLocationManipulator.updateDownloadResultCode(documentLocationId, DocumentLocationResultType.EMPTY_BODY);
     }
 
+    public void updateResultToOriginNotFound(final String documentLocationId) {
+        documentLocationManipulator.updateDownloadResultCode(documentLocationId, DocumentLocationResultType.ORIGIN_NOT_FOUND);
+    }
+
+    public void updateResultToTimeout(final String documentLocationId) {
+        documentLocationManipulator.updateDownloadResultCode(documentLocationId, DocumentLocationResultType.TIMEOUT);
+    }
+
     public void updateResultBasedOnResponseCode(final String documentLocationId, final URL downloadTarget, final int responseCode) {
         switch (responseCode) {
             case 200 -> documentLocationManipulator.updateDownloadResultCode(documentLocationId,

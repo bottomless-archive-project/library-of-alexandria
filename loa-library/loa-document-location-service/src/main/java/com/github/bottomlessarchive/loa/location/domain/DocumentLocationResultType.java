@@ -13,9 +13,20 @@ public enum DocumentLocationResultType {
     UNKNOWN,
 
     /**
-     * The document location is no-longer exists.
+     * The origin location was found (i.e. the server or the folder) but the document is no-longer exists on the location.
      */
     NOT_FOUND,
+
+    /**
+     * The origin location was not found (i.e. the server or the folder). The cause can be that the domain expired, there is no server
+     * behind the domain or the server is not running, or the disk where the document should be present is detached.
+     */
+    ORIGIN_NOT_FOUND,
+
+    /**
+     * The request timed out while downloading the document.
+     */
+    TIMEOUT,
 
     /**
      * The document location requires authentication or authorization. For this reason we were unable to download it.
