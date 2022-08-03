@@ -1,6 +1,5 @@
 package com.github.bottomlessarchive.loa.url.service.downloader;
 
-import com.github.bottomlessarchive.loa.location.service.DocumentLocationManipulator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
@@ -27,7 +26,7 @@ public class FileDownloadManager {
 
     @Qualifier("downloaderClient")
     private final OkHttpClient downloaderClient;
-    private final DocumentLocationManipulator documentLocationManipulator;
+    private final DownloadResultReporter downloadResultReporter;
 
     /**
      * Download a file from the provided url to the provided file location.
@@ -43,18 +42,21 @@ public class FileDownloadManager {
 
         //TODO: Re-add the retry logic when the response is HttpStatus.TOO_MANY_REQUESTS
         try (Response response = downloaderClient.newCall(request).execute()) {
-            //TODO: We shouldn't directly save the response code but smthing else!
-            documentLocationManipulator.updateDownloadStatus(documentLocationId, response.code());
-
             try (ResponseBody responseBody = response.body()) {
                 if (responseBody == null) {
+                    downloadResultReporter.updateResultToEmptyBody(documentLocationId);
+
                     return;
+                } else {
+                    downloadResultReporter.updateResultBasedOnResponseCode(documentLocationId, downloadTarget, response.code());
                 }
 
                 Files.copy(responseBody.byteStream(), resultLocation);
             }
         } catch (final IOException e) {
             //TODO: Figure out how could we handle the IO exception
+            log.error("Error while downloading document form {}.", downloadTarget, e);
+
             try {
                 if (Files.exists(resultLocation)) {
                     Files.delete(resultLocation);

@@ -13,5 +13,5 @@ public class DocumentLocationDatabaseEntity {
     private String url;
     private String source;
     private int downloaderVersion;
-    private int downloadResultCode;
+    private String downloadResultCode;
 }

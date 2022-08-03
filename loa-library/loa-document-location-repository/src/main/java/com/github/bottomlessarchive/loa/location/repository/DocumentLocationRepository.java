@@ -37,7 +37,7 @@ public class DocumentLocationRepository {
         }
     }
 
-    public void updateDownloadResultCode(final String documentLocationId, final int downloadResultCode) {
+    public void updateDownloadResultCode(final byte[] documentLocationId, final String downloadResultCode) {
         documentLocationDatabaseEntityMongoCollection.updateOne(eq("_id", documentLocationId),
                 set("downloadResultCode", downloadResultCode));
     }
