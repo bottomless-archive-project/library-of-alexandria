@@ -27,6 +27,10 @@ public class DownloadResultReporter {
         documentLocationManipulator.updateDownloadResultCode(documentLocationId, DocumentLocationResultType.TIMEOUT);
     }
 
+    public void updateResultToConnectionError(final String documentLocationId) {
+        documentLocationManipulator.updateDownloadResultCode(documentLocationId, DocumentLocationResultType.CONNECTION_ERROR);
+    }
+
     public void updateResultBasedOnResponseCode(final String documentLocationId, final URL downloadTarget, final int responseCode) {
         switch (responseCode) {
             case 200 -> documentLocationManipulator.updateDownloadResultCode(documentLocationId,
@@ -35,6 +39,8 @@ public class DownloadResultReporter {
                     DocumentLocationResultType.NOT_FOUND);
             case 403 -> documentLocationManipulator.updateDownloadResultCode(documentLocationId,
                     DocumentLocationResultType.FORBIDDEN);
+            case 400 -> documentLocationManipulator.updateDownloadResultCode(documentLocationId,
+                    DocumentLocationResultType.SERVER_ERROR);
             default -> {
                 log.info("Unknown response code: {} on location: {}.", responseCode, downloadTarget);
 

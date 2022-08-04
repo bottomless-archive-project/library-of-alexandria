@@ -29,9 +29,19 @@ public enum DocumentLocationResultType {
     TIMEOUT,
 
     /**
+     * There were an error with the connection while downloading the document.
+     */
+    CONNECTION_ERROR,
+
+    /**
      * The document location requires authentication or authorization. For this reason we were unable to download it.
      */
     FORBIDDEN,
+
+    /**
+     * There was an error on the server side. Can happen with fairly random things (i.e.: 400 errors).
+     */
+    SERVER_ERROR,
 
     /**
      * Got a valid response from the document location, but it was empty.

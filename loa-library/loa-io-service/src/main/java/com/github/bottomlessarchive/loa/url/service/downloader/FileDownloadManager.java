@@ -11,6 +11,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.net.NoRouteToHostException;
+import java.net.ProtocolException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.UnknownHostException;
@@ -56,10 +58,12 @@ public class FileDownloadManager {
                 Files.copy(responseBody.byteStream(), resultLocation);
             }
         } catch (final IOException e) {
-            if (e instanceof UnknownHostException) {
+            if (e instanceof UnknownHostException || e instanceof NoRouteToHostException) {
                 downloadResultReporter.updateResultToOriginNotFound(documentLocationId);
             } else if (e instanceof SocketTimeoutException) {
                 downloadResultReporter.updateResultToTimeout(documentLocationId);
+            } else if (e instanceof ProtocolException && e.getMessage().contains("unexpected end of stream")) {
+                downloadResultReporter.updateResultToConnectionError(documentLocationId);
             } else {
                 log.error("Error while downloading document form {}.", downloadTarget, e);
             }
