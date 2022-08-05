@@ -53,7 +53,7 @@ public class DocumentFolderReader implements CommandLineRunner {
 
     @SneakyThrows
     private DocumentLocation buildDocumentSourceItem(final Path file) {
-        log.info("Starting to parse document at location: {}.", file);
+        log.debug("Starting to parse document at location: {}.", file);
 
         return DocumentLocation.builder()
                 .location(
