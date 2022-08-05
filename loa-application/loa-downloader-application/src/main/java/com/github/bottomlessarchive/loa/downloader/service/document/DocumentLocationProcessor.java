@@ -55,6 +55,8 @@ public class DocumentLocationProcessor {
         downloaderExecutorService.execute(() -> {
             doProcessDocumentLocation(documentLocation);
 
+            downloaderSemaphore.release();
+
             if (callback != null) {
                 callback.run();
             }
@@ -100,8 +102,6 @@ public class DocumentLocationProcessor {
         if (stageLocation.exists()) {
             stageLocation.cleanup();
         }
-
-        downloaderSemaphore.release();
     }
 
     private void acquireFile(final URL documentLocation, final StageLocation stageLocation, final DocumentType documentType) {
