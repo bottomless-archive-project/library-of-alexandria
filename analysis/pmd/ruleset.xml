@@ -120,6 +120,14 @@
         </properties>
     </rule>
 
+    <!-- This only happens because the used version of PMD doesn't fully support Java 18. -->
+    <rule ref="category/java/bestpractices.xml/SwitchStmtsShouldHaveDefault">
+        <properties>
+            <property name="violationSuppressXPath"
+                      value="//ClassOrInterfaceDeclaration['com.github.bottomlessarchive.loa.url.service.downloader.DownloadResultReporter']"/>
+        </properties>
+    </rule>
+
     <rule ref="category/java/errorprone.xml">
         <!-- This would ask us to create a serialVersionUid on every Exception. -->
         <exclude name="MissingSerialVersionUID"/>
@@ -140,11 +148,15 @@
     <!-- These classes were checked on a case by case basis. -->
     <rule ref="category/java/errorprone.xml/CloseResource">
         <properties>
-            <property name="violationSuppressXPath"
-                      value="//ClassOrInterfaceDeclaration['com.github.bottomlessarchive.loa.queue.artemis.service.consumer.pool.QueueConsumerProvider']"/>
-            <property name="violationSuppressXPath"
-                      value="//ClassOrInterfaceDeclaration['com.github.bottomlessarchive.loa.queue.artemis.service.producer.pool.QueueProducerProvider']"/>
             <property name="violationSuppressXPath" value="//ClassOrInterfaceDeclaration['.*Test']"/>
+        </properties>
+    </rule>
+
+    <!-- The used solution is a lot less error-prone and a lot easier to understand that the one suggested by PMD. -->
+    <rule ref="category/java/errorprone.xml/AvoidInstanceofChecksInCatchClause">
+        <properties>
+            <property name="violationSuppressXPath"
+                      value="//ClassOrInterfaceDeclaration['com.github.bottomlessarchive.loa.url.service.downloader.FileDownloadManager']"/>
         </properties>
     </rule>
 </ruleset>
