@@ -36,6 +36,12 @@
         </properties>
     </rule>
 
+    <rule ref="category/java/design.xml/AvoidThrowingRawExceptionTypes">
+        <properties>
+            <property name="violationSuppressXPath" value="//ClassOrInterfaceDeclaration['.*Test']"/>
+        </properties>
+    </rule>
+
     <rule ref="category/java/design.xml/AvoidCatchingGenericException">
         <properties>
             <property name="violationSuppressXPath"
