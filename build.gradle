@@ -2,8 +2,8 @@ import org.springframework.boot.gradle.plugin.SpringBootPlugin
 
 buildscript {
     ext {
-        set('artemis.version', '2.23.1')
-        set('mongodb.version', '4.7.0')
+        set('artemis.version', '2.24.0')
+        set('mongodb.version', '4.7.1')
         set('okhttp.version', '4.10.0')
     }
     repositories {
