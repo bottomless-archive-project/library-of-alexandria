@@ -55,6 +55,8 @@ public class DocumentLocationProcessor {
         downloaderExecutorService.execute(() -> {
             doProcessDocumentLocation(documentLocation);
 
+            downloaderSemaphore.release();
+
             if (callback != null) {
                 callback.run();
             }
@@ -80,7 +82,7 @@ public class DocumentLocationProcessor {
         final StageLocation stageLocation = stageLocationFactory.getLocation(documentId.toString(), documentType);
 
         try {
-            acquireFile(documentLocationURL, stageLocation, documentType);
+            fileCollector.acquireFile(documentLocation.getId(), documentLocationURL, stageLocation.getPath(), documentType);
 
             if (documentFileValidator.isValidDocument(documentId.toString(), documentType)) {
                 final DocumentArchivingContext documentArchivingContext = DocumentArchivingContext.builder()
@@ -100,11 +102,5 @@ public class DocumentLocationProcessor {
         if (stageLocation.exists()) {
             stageLocation.cleanup();
         }
-
-        downloaderSemaphore.release();
-    }
-
-    private void acquireFile(final URL documentLocation, final StageLocation stageLocation, final DocumentType documentType) {
-        fileCollector.acquireFile(documentLocation, stageLocation.getPath(), documentType);
     }
 }
