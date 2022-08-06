@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -31,25 +32,29 @@ public class DocumentFolderReader implements CommandLineRunner {
     public void run(final String... args) {
         final Path sourceFolder = Path.of(downloaderFolderSourceConfiguration.getLocation());
 
-        Files.list(sourceFolder)
-                .forEach(path -> documentLocationProcessor.processDocumentLocation(buildDocumentSourceItem(path), () -> {
-                            if (downloaderFolderSourceConfiguration.isShouldRemove()) {
-                                try {
-                                    log.debug("Deleting file at: {}.", path);
+        try (Stream<Path> files = Files.list(sourceFolder)) {
+            files.forEach(path -> documentLocationProcessor.processDocumentLocation(buildDocumentSourceItem(path), () -> {
+                                if (downloaderFolderSourceConfiguration.isShouldRemove()) {
+                                    try {
+                                        log.debug("Deleting file at: {}.", path);
 
-                                    Files.deleteIfExists(path);
-                                } catch (final IOException e) {
-                                    log.error("Failed to delete source file!", e);
+                                        Files.deleteIfExists(path);
+                                    } catch (final IOException e) {
+                                        log.error("Failed to delete source file!", e);
+                                    }
                                 }
                             }
-                        })
-                );
+                    )
+            );
+        }
 
         log.info("Finished processing the folder.");
     }
 
     @SneakyThrows
     private DocumentLocation buildDocumentSourceItem(final Path file) {
+        log.debug("Starting to parse document at location: {}.", file);
+
         return DocumentLocation.builder()
                 .location(
                         UrlLink.builder()

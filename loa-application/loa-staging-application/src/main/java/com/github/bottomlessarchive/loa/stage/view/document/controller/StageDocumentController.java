@@ -38,8 +38,9 @@ public class StageDocumentController {
     @PostMapping("/document/{documentId}")
     public Mono<Void> persistDocument(@PathVariable final String documentId,
             @RequestPart("file") final Mono<FilePart> file) {
-        return file.flatMap(p -> p.transferTo(Path.of(stagingConfigurationProperties.location()).resolve(documentId)))
-                .then();
+        return file.flatMap(p -> p.transferTo(Path.of(stagingConfigurationProperties.location()).resolve(documentId))
+                .then(p.delete())
+        );
     }
 
     @SneakyThrows
