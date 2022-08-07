@@ -1,0 +1,23 @@
+<div class="card mb-2">
+  <div class="card-body">
+    <div class="row">
+      <div class="col-3"></div>
+      <div class="col-6">
+        <div class="alert alert-danger" *ngIf="invalidCredentials">
+          Invalid credentials!
+        </div>
+        <div class="mb-3">
+          <label for="username" class="form-label">Username</label>
+          <input type="text" class="form-control" id="username" [(ngModel)]="username">
+        </div>
+        <div class="mb-3">
+          <label for="password" class="form-label">Password</label>
+          <input type="password" class="form-control" id="password" [(ngModel)]="password">
+        </div>
+        <div class="text-center">
+          <button class="btn btn-loa btn-sm w-50" (click)="login()">Login</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

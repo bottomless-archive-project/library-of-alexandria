@@ -25,7 +25,7 @@ public class UserController {
 
     @PostMapping("/login")
     public LoginResponse login(@RequestBody final LoginRequest loginRequest, final HttpSession httpSession) {
-        return userEntityFactory.getUserEntity(loginRequest.getUser(), loginRequest.getPassword())
+        return userEntityFactory.getUserEntity(loginRequest.getUsername(), loginRequest.getPassword())
                 .map(userEntity -> {
                     httpSession.setAttribute("USER_ID", userEntity.getId().toString());
 

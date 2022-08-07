@@ -8,10 +8,12 @@ import {StatisticsResolver} from './shared/statistics/resolver/statistics-resolv
 import {DebugDocumentComponent} from './view/debug-document/debug-document.component';
 import {ApplicationResolver} from "./shared/application/resolver/application-resolver";
 import {DashboardApplicationsComponent} from "./view/dashboard-applications/dashboard-applications.component";
+import {LoginComponent} from "./view/login/login.component";
 
 const routes: Routes = [
   {path: '', redirectTo: '/home', pathMatch: 'full'},
   {path: 'home', component: HomeComponent},
+  {path: 'login', component: LoginComponent},
   {path: 'search', component: SearchComponent, resolve: {statistics: SearchResolver}},
   {path: 'dashboard/statistics', component: DashboardStatisticsComponent, resolve: {statistics: StatisticsResolver}},
   {path: 'dashboard/applications', component: DashboardApplicationsComponent, resolve: {applications: ApplicationResolver}},

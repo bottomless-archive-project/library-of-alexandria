@@ -9,6 +9,6 @@ import lombok.extern.jackson.Jacksonized;
 @Jacksonized
 public class LoginRequest {
 
-    private final String user;
+    private final String username;
     private final String password;
 }
