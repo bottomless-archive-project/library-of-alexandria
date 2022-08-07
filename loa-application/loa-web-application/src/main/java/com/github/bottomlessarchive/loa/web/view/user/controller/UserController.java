@@ -1,8 +1,8 @@
 package com.github.bottomlessarchive.loa.web.view.user.controller;
 
 import com.github.bottomlessarchive.loa.user.service.UserEntityFactory;
-import com.github.bottomlessarchive.loa.web.view.user.request.LoginRequest;
 import com.github.bottomlessarchive.loa.web.view.user.response.InfoResponse;
+import com.github.bottomlessarchive.loa.web.view.user.request.LoginRequest;
 import com.github.bottomlessarchive.loa.web.view.user.response.LoginResponse;
 import com.github.bottomlessarchive.loa.web.view.user.response.domain.LoginResult;
 import lombok.RequiredArgsConstructor;
