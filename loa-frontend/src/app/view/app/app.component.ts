@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
 import {
   Event,
   NavigationCancel,
@@ -7,6 +7,7 @@ import {
   NavigationStart,
   Router
 } from '@angular/router';
+import {SiteInfoService} from "../../shared/info/service/site-info.service";
 
 @Component({
   selector: 'app-root',
@@ -16,8 +17,15 @@ import {
 export class AppComponent {
   title = 'loa-frontend';
   loading = false;
+  usersEnabled = false;
 
-  constructor(private router: Router) {
+  constructor(private router: Router, private siteInfoService: SiteInfoService) {
+    siteInfoService.querySiteInfo().subscribe(siteInfo => {
+      this.usersEnabled = siteInfo.usersEnabled;
+
+      console.log("Users enabled: " + this.usersEnabled);
+    })
+
     this.router.events.subscribe((event: Event) => {
       console.log('New route change event!', event);
 

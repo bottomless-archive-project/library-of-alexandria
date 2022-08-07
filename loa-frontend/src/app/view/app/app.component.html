@@ -6,6 +6,20 @@
     <h2 class="display-4 mt-4" style="font-size: 4.1rem;">
       <a class="title-text" routerLink="/home">Library of Alexandria</a>
     </h2>
+    <div class="card mb-2" *ngIf="usersEnabled">
+      <div class="card-body p-2 text-center">
+        <div class="row">
+          <div class="col">
+            <span class="lh-lg" style="font-weight: 500;">Not logged in!</span>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <button class="btn btn-sm btn-loa w-100 mt-2">Login</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
   <div class="col d-none d-md-block">
     <img class="img-fluid right-sphinx" src="../../../assets/sphinx.svg" alt="Sphinx logo">
