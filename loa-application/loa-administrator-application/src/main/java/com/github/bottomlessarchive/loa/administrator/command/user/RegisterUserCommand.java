@@ -18,7 +18,7 @@ public class RegisterUserCommand implements CommandLineRunner {
     private final RegisterUserConfigurationProperties registerUserConfigurationProperties;
 
     @Override
-    public void run(String... args) {
+    public void run(final String... args) {
         if (!registerUserConfigurationProperties.isNameValid()) {
             throw new IllegalArgumentException("The provided username is invalid! It should be at least 3 characters long!"
                     + " Please set the loa.command.register-user.name property to a valid value.");
