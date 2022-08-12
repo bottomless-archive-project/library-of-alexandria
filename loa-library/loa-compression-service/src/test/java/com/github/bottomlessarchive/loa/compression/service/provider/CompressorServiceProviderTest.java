@@ -1,6 +1,7 @@
 package com.github.bottomlessarchive.loa.compression.service.provider;
 
 import com.github.bottomlessarchive.loa.compression.domain.DocumentCompression;
+import com.github.bottomlessarchive.loa.compression.service.compressor.BrotliCompressorService;
 import com.github.bottomlessarchive.loa.compression.service.compressor.CompressorService;
 import com.github.bottomlessarchive.loa.compression.service.compressor.GZIPCompressorService;
 import com.github.bottomlessarchive.loa.compression.service.compressor.LZMACompressorService;
@@ -23,6 +24,9 @@ class CompressorServiceProviderTest {
     @Mock
     private LZMACompressorService lzmaCompressionService;
 
+    @Mock
+    private BrotliCompressorService brotliCompressorService;
+
     @InjectMocks
     private CompressorServiceProvider underTest;
 
@@ -38,5 +42,12 @@ class CompressorServiceProviderTest {
         final CompressorService result = underTest.getCompressionService(DocumentCompression.LZMA);
 
         assertThat(result, is(lzmaCompressionService));
+    }
+
+    @Test
+    void testWhenProviderShouldProvideBrotliCompressionService() {
+        final CompressorService result = underTest.getCompressionService(DocumentCompression.BROTLI);
+
+        assertThat(result, is(brotliCompressorService));
     }
 }
