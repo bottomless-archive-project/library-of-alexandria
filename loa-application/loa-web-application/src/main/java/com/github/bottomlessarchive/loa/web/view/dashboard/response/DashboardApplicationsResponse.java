@@ -15,4 +15,5 @@ public class DashboardApplicationsResponse {
     private final List<IndexerApplicationInstance> indexers;
     private final List<QueueApplicationInstance> queues;
     private final List<VaultApplicationInstance> vaults;
+    private final List<StagingApplicationInstance> stagings;
 }
