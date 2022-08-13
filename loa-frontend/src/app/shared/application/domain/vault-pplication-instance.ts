@@ -1,8 +1,7 @@
-export class VaultApplicationInstance {
+export class StagingApplicationInstance {
 
   host: string;
   port: number;
 
-  name: string;
   freeSpace: number;
 }

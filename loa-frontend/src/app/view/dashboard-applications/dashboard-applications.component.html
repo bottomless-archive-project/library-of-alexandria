@@ -138,7 +138,25 @@
           <div class="card-body">
             <p class="m-0">Host: {{vault.host}}</p>
             <p class="m-0">Port: {{vault.port}}</p>
+            <p class="m-0">Name: {{vault.name}}</p>
             <p class="m-0">Free space: {{vault.freeSpace | bytes}}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card mb-2">
+  <div class="card-body">
+    <h5 class="card-title">Staging Applications</h5>
+    <div class="row">
+      <div class="col-4" *ngFor="let staging of applications.stagings">
+        <div class="card application-card">
+          <div class="card-body">
+            <p class="m-0">Host: {{staging.host}}</p>
+            <p class="m-0">Port: {{staging.port}}</p>
+            <p class="m-0">Free space: {{staging.freeSpace | bytes}}</p>
           </div>
         </div>
       </div>

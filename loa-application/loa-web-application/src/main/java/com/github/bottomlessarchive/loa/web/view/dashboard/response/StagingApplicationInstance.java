@@ -5,11 +5,10 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class VaultApplicationInstance {
+public class StagingApplicationInstance {
 
     private final String host;
     private final int port;
 
-    private final String name;
     private final long freeSpace;
 }
