@@ -7,5 +7,7 @@ dependencies {
     implementation group: 'org.apache.tika', name: 'tika-parser-microsoft-module', version: '2.4.1'
     implementation group: 'org.apache.tika', name: 'tika-parser-miscoffice-module', version: '2.4.1'
 
+    implementation group: 'com.fasterxml.woodstox', name: 'woodstox-core', version: '6.3.1'
+
     api project(':loa-library:loa-document-service')
 }
