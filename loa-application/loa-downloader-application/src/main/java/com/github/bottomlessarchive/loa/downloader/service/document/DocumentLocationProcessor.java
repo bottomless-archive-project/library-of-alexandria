@@ -12,6 +12,7 @@ import io.micrometer.core.instrument.Counter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
@@ -53,6 +54,8 @@ public class DocumentLocationProcessor {
         downloaderSemaphore.acquire();
 
         downloaderExecutorService.execute(() -> {
+            MDC.put("documentLocationId", documentLocation.getId());
+
             doProcessDocumentLocation(documentLocation);
 
             downloaderSemaphore.release();
@@ -60,6 +63,8 @@ public class DocumentLocationProcessor {
             if (callback != null) {
                 callback.run();
             }
+
+            MDC.clear();
         });
     }
 
@@ -96,7 +101,7 @@ public class DocumentLocationProcessor {
                 documentArchiver.archiveDocument(documentArchivingContext);
             }
         } catch (final Exception e) {
-            log.debug("Error downloading a document: {}!", e.getMessage());
+            log.info("Error downloading a document: {}!", e.getMessage());
         }
 
         if (stageLocation.exists()) {

@@ -10,6 +10,7 @@ import com.github.bottomlessarchive.loa.downloader.service.document.DocumentLoca
 import com.github.bottomlessarchive.loa.queue.service.domain.message.DocumentLocationMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
@@ -48,6 +49,12 @@ public class DownloadQueueListener implements CommandLineRunner {
 
             final URL documentLocationURL = new URL(documentLocationMessage.getDocumentLocation());
 
+            final String documentLocationId = documentLocationIdFactory.newDocumentLocationId(documentLocationURL);
+
+            MDC.put("documentLocationId", documentLocationId);
+
+            log.info("Starting to process document location: {}.", documentLocationMessage.getDocumentLocation());
+
             final DocumentLocation documentLocation = DocumentLocation.builder()
                     .id(documentLocationIdFactory.newDocumentLocationId(documentLocationURL))
                     .location(
@@ -60,7 +67,11 @@ public class DownloadQueueListener implements CommandLineRunner {
 
             if (documentLocationEvaluator.shouldProcessDocumentLocation(documentLocation)) {
                 documentLocationProcessor.processDocumentLocation(documentLocation);
+            } else {
+                log.info("Document location is a duplicate.");
             }
+
+            MDC.clear();
         }
     }
 }

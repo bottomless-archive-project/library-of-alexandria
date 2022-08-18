@@ -50,7 +50,7 @@ public class DocumentArchiver {
         final DocumentArchivingMessage documentArchivingMessage = documentArchivingMessageFactory.newDocumentArchivingMessage(
                 documentArchivingContext, compressedContent);
 
-        log.debug("Sending new archiving message: {}!", documentArchivingMessage);
+        log.info("Sending new archiving message for location!");
 
         queueManipulator.sendMessage(Queue.DOCUMENT_ARCHIVING_QUEUE, documentArchivingMessage);
 
