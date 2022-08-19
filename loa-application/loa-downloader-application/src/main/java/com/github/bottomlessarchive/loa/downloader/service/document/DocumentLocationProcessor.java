@@ -99,6 +99,8 @@ public class DocumentLocationProcessor {
                         .build();
 
                 documentArchiver.archiveDocument(documentArchivingContext);
+            } else {
+                log.info("Invalid document!");
             }
         } catch (final Exception e) {
             log.info("Error downloading a document: {}!", e.getMessage());
