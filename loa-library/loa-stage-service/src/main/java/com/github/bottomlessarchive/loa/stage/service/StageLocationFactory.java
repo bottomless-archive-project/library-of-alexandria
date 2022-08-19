@@ -33,6 +33,10 @@ public class StageLocationFactory {
                 .build();
     }
 
+    public boolean hasSpace(final long requiredSpaceInBytes) {
+        return Path.of(stageConfigurationProperties.location()).toFile().getFreeSpace() > requiredSpaceInBytes;
+    }
+
     private String buildFileName(final String documentId, final DocumentType documentType) {
         return documentId + '.' + documentType.getFileExtension();
     }
