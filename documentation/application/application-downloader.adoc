@@ -16,9 +16,6 @@ include::../service/conductor/conductor-configuration.adoc[]
 | **loa.downloader.version-number**
 | The version number that should be saved as the downloader version to the database when a new document is inserted. Can be used for debugging, cleanups and so on. *(Default value: 6)*
 
-| **loa.downloader.maximum-archive-size**
-| If a document's size in bytes is bigger than the provided value, then the archiving step will be skipped. Too big documents can use up way too much space, compared to how useful they are. This parameter could be used to defend against this problem. *(Default value: 8589934592 bytes aka 8 GB)*
-
 | **loa.downloader.source**
 | Two types of document sources are supported by the downloader application. One of this is the `QUEUE` source, where the application get the possible locations of documents (URLs), and download them from there, then sends them for archiving. The other one is `FOLDER`, where the application load document files from a provided folder on the filesystem, and sends them for archiving. *(Default value: QUEUE)*
 
@@ -30,6 +27,9 @@ include::../service/conductor/conductor-configuration.adoc[]
 
 | **loa.downloader.source.folder.should-remove**
 | When the source is set to `FOLDER`, should the application remove the files after processing from the folder. Useful when there are a lot of entries in the directory and can't be processed with one go. *(Default value: false)*
+
+| **loa.validation.maximum-archive-size**
+| If a document's size in bytes is bigger than the provided value, then the archiving step will be skipped. Too big documents can use up way too much space, compared to how useful they are. This parameter could be used to defend against this problem. Also, if the disk space on the stage location is lower than this value, the processing will stop to guard against filling the disk fully and breaking the processing algorithm. *(Default value: 8589934592 bytes aka 8 GB)*
 
 | **loa.source.name**
 | The name of the source location. This name will be saved to the database for every crawled document. It could be helpful for statistics collection or in identifying bugs and errors with specific sources. Only used when the `loa.downloader.source` is set to `FOLDER`. When `QUEUE` is specified, then the value that is saved to the database will be sent by the <<Generator Application>>. *(Default value: unknown)*

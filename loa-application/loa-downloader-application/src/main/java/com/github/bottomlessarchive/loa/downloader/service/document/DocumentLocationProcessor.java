@@ -3,15 +3,18 @@ package com.github.bottomlessarchive.loa.downloader.service.document;
 import com.github.bottomlessarchive.loa.document.service.DocumentTypeCalculator;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentType;
 import com.github.bottomlessarchive.loa.downloader.service.document.domain.DocumentArchivingContext;
+import com.github.bottomlessarchive.loa.downloader.service.document.domain.exception.NotEnoughSpaceException;
 import com.github.bottomlessarchive.loa.downloader.service.file.FileCollector;
 import com.github.bottomlessarchive.loa.location.domain.DocumentLocation;
 import com.github.bottomlessarchive.loa.stage.service.StageLocationFactory;
 import com.github.bottomlessarchive.loa.stage.service.domain.StageLocation;
+import com.github.bottomlessarchive.loa.validator.configuration.FileValidationConfigurationProperties;
 import com.github.bottomlessarchive.loa.validator.service.DocumentFileValidator;
 import io.micrometer.core.instrument.Counter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
@@ -34,6 +37,7 @@ public class DocumentLocationProcessor {
     private final FileCollector fileCollector;
     private final DocumentArchiver documentArchiver;
     private final DocumentTypeCalculator documentTypeCalculator;
+    private final FileValidationConfigurationProperties fileValidationConfigurationProperties;
 
     @Qualifier("downloaderSemaphore")
     private final Semaphore downloaderSemaphore;
@@ -48,11 +52,19 @@ public class DocumentLocationProcessor {
 
     @SneakyThrows
     public void processDocumentLocation(final DocumentLocation documentLocation, final Runnable callback) {
+        if (!stageLocationFactory.hasSpace(fileValidationConfigurationProperties.maximumArchiveSize())) {
+            log.error("Not enough local staging space is available!");
+
+            throw new NotEnoughSpaceException("Not enough local staging space is available!");
+        }
+
         processedDocumentCount.increment();
 
         downloaderSemaphore.acquire();
 
         downloaderExecutorService.execute(() -> {
+            MDC.put("documentLocationId", documentLocation.getId());
+
             doProcessDocumentLocation(documentLocation);
 
             downloaderSemaphore.release();
@@ -60,6 +72,8 @@ public class DocumentLocationProcessor {
             if (callback != null) {
                 callback.run();
             }
+
+            MDC.clear();
         });
     }
 
@@ -94,9 +108,11 @@ public class DocumentLocationProcessor {
                         .build();
 
                 documentArchiver.archiveDocument(documentArchivingContext);
+            } else {
+                log.info("Invalid document!");
             }
         } catch (final Exception e) {
-            log.debug("Error downloading a document: {}!", e.getMessage());
+            log.info("Error downloading a document: {}!", e.getMessage());
         }
 
         if (stageLocation.exists()) {

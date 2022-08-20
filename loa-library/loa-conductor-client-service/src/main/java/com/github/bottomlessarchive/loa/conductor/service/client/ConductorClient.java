@@ -50,7 +50,7 @@ public class ConductorClient {
     private final ConductorClientConfigurationProperties conductorClientConfigurationProperties;
     private final List<InstancePropertyExtensionProvider> instancePropertyExtensionProviderList;
 
-    @Cacheable(cacheNames = "single-valid-application-instance")
+    @Cacheable(cacheNames = "single-valid-application-instance", sync = true)
     public ServiceInstanceEntity getInstanceOrBlock(final ApplicationType applicationType) {
         while (true) {
             log.info("Requesting instance for application: {} in a blocking way.", applicationType);
@@ -77,7 +77,7 @@ public class ConductorClient {
      * @param applicationType the application to get the instance for
      * @return the service instance
      */
-    @Cacheable(cacheNames = "single-application-instance")
+    @Cacheable(cacheNames = "single-application-instance", sync = true)
     public Optional<ServiceInstanceEntity> getInstance(final ApplicationType applicationType) {
         log.info("Requesting instance for application: {}.", applicationType);
 
@@ -85,7 +85,7 @@ public class ConductorClient {
                 .findFirst();
     }
 
-    @Cacheable(cacheNames = "single-application-instances")
+    @Cacheable(cacheNames = "single-application-instances", sync = true)
     public List<ServiceInstanceEntity> getInstances(final ApplicationType applicationType) {
         log.info("Requesting instances for application: {}.", applicationType);
 
@@ -108,7 +108,7 @@ public class ConductorClient {
         }
     }
 
-    @Cacheable(cacheNames = "all-application-instances")
+    @Cacheable(cacheNames = "all-application-instances", sync = true)
     public List<ServiceInstanceEntity> getInstances() {
         log.info("Requesting instances for all applications.");
 
