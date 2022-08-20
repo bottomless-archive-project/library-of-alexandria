@@ -1,6 +1,7 @@
 package com.github.bottomlessarchive.loa.compression.service.compressor.provider;
 
 import com.github.bottomlessarchive.loa.compression.domain.DocumentCompression;
+import com.github.bottomlessarchive.loa.compression.service.compressor.BrotliCompressorService;
 import com.github.bottomlessarchive.loa.compression.service.compressor.CompressorService;
 import com.github.bottomlessarchive.loa.compression.service.compressor.GZIPCompressorService;
 import com.github.bottomlessarchive.loa.compression.service.compressor.LZMACompressorService;
@@ -18,10 +19,11 @@ public class CompressorServiceProvider {
     private final Map<DocumentCompression, CompressorService> compressionServices;
 
     public CompressorServiceProvider(final GZIPCompressorService gzipCompressionService,
-            final LZMACompressorService lzmaCompressionService) {
+            final LZMACompressorService lzmaCompressionService, final BrotliCompressorService brotliCompressorService) {
         compressionServices = Map.of(
                 DocumentCompression.GZIP, gzipCompressionService,
-                DocumentCompression.LZMA, lzmaCompressionService
+                DocumentCompression.LZMA, lzmaCompressionService,
+                DocumentCompression.BROTLI, brotliCompressorService
         );
     }
 

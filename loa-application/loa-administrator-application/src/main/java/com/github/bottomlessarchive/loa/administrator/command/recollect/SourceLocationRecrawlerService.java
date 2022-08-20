@@ -1,6 +1,7 @@
 package com.github.bottomlessarchive.loa.administrator.command.recollect;
 
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentEntity;
+import com.github.bottomlessarchive.loa.location.service.factory.domain.DocumentLocation;
 import com.github.bottomlessarchive.loa.stage.service.StageLocationFactory;
 import com.github.bottomlessarchive.loa.stage.service.domain.StageLocation;
 import com.github.bottomlessarchive.loa.url.service.downloader.FileDownloadManager;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.UUID;
 
@@ -27,7 +29,7 @@ public class SourceLocationRecrawlerService {
     private final VaultClientService vaultClientService;
     private final FileDownloadManager fileDownloadManager;
 
-    public void recrawlSourceLocation(final URL sourceLocation, final DocumentEntity documentEntity) {
+    public void recrawlSourceLocation(final DocumentLocation documentLocation, final DocumentEntity documentEntity) {
         final String documentRecrawlId = UUID.randomUUID().toString();
 
         if (log.isInfoEnabled()) {
@@ -36,7 +38,7 @@ public class SourceLocationRecrawlerService {
 
         final StageLocation stageLocation = stageLocationFactory.getLocation(documentRecrawlId, documentEntity.getType());
 
-        fileDownloadManager.downloadFile(sourceLocation, stageLocation.getPath());
+        fileDownloadManager.downloadFile(documentLocation.getId(), convertToURL(documentLocation), stageLocation.getPath());
 
         final boolean isValidDocument = documentFileValidator.isValidDocument(documentRecrawlId, documentEntity.getType());
 
@@ -49,5 +51,13 @@ public class SourceLocationRecrawlerService {
         }
 
         stageLocation.cleanup();
+    }
+
+    private URL convertToURL(final DocumentLocation sourceLocation) {
+        try {
+            return new URL(sourceLocation.getUrl());
+        } catch (MalformedURLException e) {
+            throw new IllegalStateException("Illegal URL: " + sourceLocation + "!", e);
+        }
     }
 }

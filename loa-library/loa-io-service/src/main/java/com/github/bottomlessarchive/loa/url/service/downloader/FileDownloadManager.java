@@ -4,13 +4,18 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.Response;
 import okhttp3.ResponseBody;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.net.NoRouteToHostException;
+import java.net.ProtocolException;
+import java.net.SocketTimeoutException;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -25,6 +30,7 @@ public class FileDownloadManager {
 
     @Qualifier("downloaderClient")
     private final OkHttpClient downloaderClient;
+    private final DownloadResultReporter downloadResultReporter;
 
     /**
      * Download a file from the provided url to the provided file location.
@@ -32,20 +38,36 @@ public class FileDownloadManager {
      * @param downloadTarget the url to download the file from
      * @param resultLocation the location to download the file to
      */
-    public void downloadFile(final URL downloadTarget, final Path resultLocation) {
+    public void downloadFile(final String documentLocationId, final URL downloadTarget, final Path resultLocation) {
         final Request request = new Request.Builder()
                 .get()
                 .url(downloadTarget)
                 .build();
 
         //TODO: Re-add the retry logic when the response is HttpStatus.TOO_MANY_REQUESTS
-        try (ResponseBody responseBody = downloaderClient.newCall(request).execute().body()) {
-            if (responseBody == null) {
-                return;
+        try (Response response = downloaderClient.newCall(request).execute()) {
+            try (ResponseBody responseBody = response.body()) {
+                if (responseBody == null) {
+                    downloadResultReporter.updateResultToEmptyBody(documentLocationId);
+
+                    return;
+                } else {
+                    downloadResultReporter.updateResultBasedOnResponseCode(documentLocationId, downloadTarget, response.code());
+                }
+
+                Files.copy(responseBody.byteStream(), resultLocation);
+            }
+        } catch (final IOException e) {
+            if (e instanceof UnknownHostException || e instanceof NoRouteToHostException) {
+                downloadResultReporter.updateResultToOriginNotFound(documentLocationId);
+            } else if (e instanceof SocketTimeoutException) {
+                downloadResultReporter.updateResultToTimeout(documentLocationId);
+            } else if (e instanceof ProtocolException && e.getMessage().contains("unexpected end of stream")) {
+                downloadResultReporter.updateResultToConnectionError(documentLocationId);
+            } else {
+                log.error("Error while downloading document form {}.", downloadTarget, e);
             }
 
-            Files.copy(responseBody.byteStream(), resultLocation);
-        } catch (final IOException e) {
             try {
                 if (Files.exists(resultLocation)) {
                     Files.delete(resultLocation);

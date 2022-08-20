@@ -10,5 +10,6 @@ public class VaultApplicationInstance {
     private final String host;
     private final int port;
 
+    private final String name;
     private final long freeSpace;
 }

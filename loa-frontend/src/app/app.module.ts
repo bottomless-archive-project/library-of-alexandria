@@ -10,6 +10,7 @@ import {HttpClientModule} from '@angular/common/http';
 import {FormsModule} from '@angular/forms';
 import {BytesPipe} from './bytes.pipe';
 import {DashboardApplicationsComponent} from "./view/dashboard-applications/dashboard-applications.component";
+import { LoginComponent } from './view/login/login.component';
 
 @NgModule({
   declarations: [
@@ -19,7 +20,8 @@ import {DashboardApplicationsComponent} from "./view/dashboard-applications/dash
     DashboardStatisticsComponent,
     DashboardApplicationsComponent,
     DebugDocumentComponent,
-    BytesPipe
+    BytesPipe,
+    LoginComponent
   ],
   imports: [
     BrowserModule,

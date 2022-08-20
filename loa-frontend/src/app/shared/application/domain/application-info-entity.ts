@@ -4,6 +4,7 @@ import {GeneratorApplicationInstance} from "./generator-application-instance";
 import {IndexerApplicationInstance} from "./indexer-application-instance";
 import {QueueApplicationInstance} from "./queue-application-instance";
 import {VaultApplicationInstance} from "./vault-application-instance";
+import {StagingApplicationInstance} from "./vault-pplication-instance";
 
 export class ApplicationInfoEntity {
 
@@ -13,4 +14,5 @@ export class ApplicationInfoEntity {
   indexers: IndexerApplicationInstance[];
   queues: QueueApplicationInstance[];
   vaults: VaultApplicationInstance[];
+  stagings: StagingApplicationInstance[];
 }
