@@ -4,7 +4,7 @@ dependencies {
     implementation group: 'org.mongodb', name: 'mongodb-driver-reactivestreams'
 
     implementation group: 'commons-io', name: 'commons-io', version: '2.11.0'
-    implementation group: 'software.amazon.awssdk', name: 's3', version: '2.17.247'
+    implementation group: 'software.amazon.awssdk', name: 's3', version: '2.17.257'
 
     implementation project(':loa-library:loa-document-service')
     implementation project(':loa-library:loa-staging-client-service')
