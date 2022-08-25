@@ -5,5 +5,5 @@ dependencies {
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-json'
 
     implementation group: 'jakarta.json', name: 'jakarta.json-api', version: '2.1.1'
-    implementation group: 'co.elastic.clients', name: 'elasticsearch-java', version: '8.3.3'
+    implementation group: 'co.elastic.clients', name: 'elasticsearch-java', version: '8.4.0'
 }
