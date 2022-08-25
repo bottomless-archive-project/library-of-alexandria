@@ -2,6 +2,7 @@ package com.github.bottomlessarchive.loa.administrator.command.user;
 
 import com.github.bottomlessarchive.loa.administrator.command.user.configuration.RegisterUserConfigurationProperties;
 import com.github.bottomlessarchive.loa.user.service.UserEntityFactory;
+import com.github.bottomlessarchive.loa.user.service.domain.UserEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
@@ -29,7 +30,11 @@ public class RegisterUserCommand implements CommandLineRunner {
                     + " Please set the loa.command.register-user.password property to a valid value.");
         }
 
-        userEntityFactory.newUserEntity(registerUserConfigurationProperties.name(),
+        log.info("Creating new user with name: {}.", registerUserConfigurationProperties.name());
+
+        final UserEntity userEntity = userEntityFactory.newUserEntity(registerUserConfigurationProperties.name(),
                 registerUserConfigurationProperties.password());
+
+        log.info("The new user was created with id: {}!", userEntity.getId());
     }
 }

@@ -1,7 +1,9 @@
 package com.github.bottomlessarchive.loa.user.service;
 
 import com.github.bottomlessarchive.loa.user.repository.UserRepository;
+import com.github.bottomlessarchive.loa.user.repository.domain.UserAlreadyExistsInDatabaseException;
 import com.github.bottomlessarchive.loa.user.repository.domain.UserDatabaseEntity;
+import com.github.bottomlessarchive.loa.user.service.domain.UserAlreadyExistsException;
 import com.github.bottomlessarchive.loa.user.service.domain.UserEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -33,8 +35,12 @@ public class UserEntityFactory {
         userDatabaseEntity.setName(name);
         userDatabaseEntity.setPassword(password);
 
-        userRepository.insertUser(userDatabaseEntity);
+        try {
+            userRepository.insertUser(userDatabaseEntity);
 
-        return userEntityTransformer.transform(userDatabaseEntity);
+            return userEntityTransformer.transform(userDatabaseEntity);
+        } catch (final UserAlreadyExistsInDatabaseException e) {
+            throw new UserAlreadyExistsException("User " + name + " already exists!");
+        }
     }
 }

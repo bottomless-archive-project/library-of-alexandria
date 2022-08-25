@@ -1,6 +1,9 @@
 package com.github.bottomlessarchive.loa.user.repository;
 
+import com.github.bottomlessarchive.loa.repository.document.Error;
+import com.github.bottomlessarchive.loa.user.repository.domain.UserAlreadyExistsInDatabaseException;
 import com.github.bottomlessarchive.loa.user.repository.domain.UserDatabaseEntity;
+import com.mongodb.MongoWriteException;
 import com.mongodb.client.MongoCollection;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -18,7 +21,16 @@ public class UserRepository {
     private final MongoCollection<UserDatabaseEntity> userDatabaseEntityMongoCollection;
 
     public void insertUser(final UserDatabaseEntity userDatabaseEntity) {
-        userDatabaseEntityMongoCollection.insertOne(userDatabaseEntity);
+        try {
+            userDatabaseEntityMongoCollection.insertOne(userDatabaseEntity);
+        } catch (final MongoWriteException e) {
+            if (Error.DUPLICATE.hasErrorCode(e.getCode())) {
+                throw new UserAlreadyExistsInDatabaseException("User " + userDatabaseEntity.getName()
+                        + " already exists in the database!");
+            }
+
+            throw e;
+        }
     }
 
     public Optional<UserDatabaseEntity> getUser(final UUID userId) {
