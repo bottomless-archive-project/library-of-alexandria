@@ -9,6 +9,7 @@ import {
 } from '@angular/router';
 import {SiteInfoService} from "../../shared/info/service/site-info.service";
 import {UserService} from "../../shared/user/service/user-service";
+import {UserInfo} from "../../shared/user/service/domain/user-info";
 
 @Component({
   selector: 'app-root',
@@ -19,8 +20,7 @@ export class AppComponent {
   title: string = 'loa-frontend';
   loading: boolean = false;
   usersEnabled: boolean = false;
-  name: string;
-  isLoggedIn: boolean;
+  userInfo: UserInfo;
 
   constructor(private router: Router, private siteInfoService: SiteInfoService, private userService: UserService) {
     siteInfoService.querySiteInfo().subscribe(siteInfo => {
@@ -29,8 +29,12 @@ export class AppComponent {
       if (this.usersEnabled) {
         userService.updateUserInfo();
 
-        this.name = userService.name;
-        this.isLoggedIn = userService.isLoggedIn;
+        userService.userInfo
+          .subscribe(val => {
+            console.log("Got new value: " + val)
+
+            this.userInfo = val
+          });
       }
 
       console.log("Users enabled: " + this.usersEnabled);

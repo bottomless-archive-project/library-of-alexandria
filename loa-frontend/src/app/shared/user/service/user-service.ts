@@ -1,6 +1,6 @@
 import {Injectable} from "@angular/core";
 import {HttpClient} from "@angular/common/http";
-import {Observable} from "rxjs";
+import {Observable, ReplaySubject} from "rxjs";
 import {UserInfo} from "./domain/user-info";
 import {LoginResponse} from "./domain/login-response";
 
@@ -9,8 +9,7 @@ import {LoginResponse} from "./domain/login-response";
 })
 export class UserService {
 
-  public name: string;
-  public isLoggedIn: boolean
+  public userInfo: ReplaySubject<UserInfo> = new ReplaySubject<UserInfo>();
 
   constructor(private http: HttpClient) {
   }
@@ -20,8 +19,7 @@ export class UserService {
 
     this.http.get<UserInfo>('/user/info')
       .subscribe(result => {
-        this.name = result.name;
-        this.isLoggedIn = result.isLoggedIn;
+        this.userInfo.next(result);
       });
   }
 

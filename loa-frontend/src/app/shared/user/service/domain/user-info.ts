@@ -2,7 +2,7 @@ export class UserInfo {
 
   constructor(
     public name: string,
-    public isLoggedIn: boolean
+    public loggedIn: boolean
   ) {
   }
 }
