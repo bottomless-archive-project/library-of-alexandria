@@ -1,5 +1,6 @@
 import {Component} from '@angular/core';
 import {UserService} from "../../shared/user/service/user-service";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-login',
@@ -13,7 +14,7 @@ export class LoginComponent {
 
   invalidCredentials: boolean = false;
 
-  constructor(private userService: UserService) {
+  constructor(private userService: UserService, private router: Router) {
   }
 
   login(): void {
@@ -21,6 +22,7 @@ export class LoginComponent {
       .subscribe(loginResponse => {
         if (loginResponse.result === 'SUCCESSFUL') {
           this.userService.updateUserInfo();
+          this.router.navigateByUrl('/home');
         } else {
           this.invalidCredentials = true;
         }

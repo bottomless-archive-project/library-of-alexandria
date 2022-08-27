@@ -49,14 +49,15 @@ public class UserController {
     public InfoResponse info(final HttpSession httpSession) {
         return Optional.ofNullable((String) httpSession.getAttribute("USER_ID"))
                 .flatMap(sessionAttribute -> userEntityFactory.getUserEntity(UUID.fromString(sessionAttribute)))
-                .map(userEntity -> InfoResponse.builder()
-                        .isLoggedIn(true)
-                        .name(userEntity.getName())
-                        .build()
+                .map(userEntity ->
+                        InfoResponse.builder()
+                                .isLoggedIn(true)
+                                .name(userEntity.getName())
+                                .build()
                 )
                 .orElse(
                         InfoResponse.builder()
-                                .isLoggedIn(true)
+                                .isLoggedIn(false)
                                 .build()
                 );
     }
