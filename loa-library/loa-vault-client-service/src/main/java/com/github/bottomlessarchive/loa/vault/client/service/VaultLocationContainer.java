@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -15,7 +16,7 @@ public class VaultLocationContainer {
 
     private final VaultLocationFetcher vaultLocationFetcher;
 
-    private Map<String, VaultLocation> vaultLocations;
+    private Map<String, VaultLocation> vaultLocations = Collections.emptyMap();
 
     @Scheduled(fixedRate = 1, timeUnit = TimeUnit.MINUTES)
     public void updateVaultLocations() {
