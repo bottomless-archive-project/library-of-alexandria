@@ -26,7 +26,7 @@ public class UserRepository {
         } catch (final MongoWriteException e) {
             if (Error.DUPLICATE.hasErrorCode(e.getCode())) {
                 throw new UserAlreadyExistsInDatabaseException("User " + userDatabaseEntity.getName()
-                        + " already exists in the database!");
+                        + " already exists in the database!", e);
             }
 
             throw e;

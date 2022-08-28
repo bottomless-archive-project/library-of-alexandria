@@ -17,28 +17,29 @@ import {UserInfo} from "../../shared/user/service/domain/user-info";
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  title: string = 'loa-frontend';
+
   loading: boolean = false;
   usersEnabled: boolean = false;
   userInfo: UserInfo;
 
   constructor(private router: Router, private siteInfoService: SiteInfoService, private userService: UserService) {
-    siteInfoService.querySiteInfo().subscribe(siteInfo => {
-      this.usersEnabled = siteInfo.usersEnabled;
+    siteInfoService.querySiteInfo()
+      .subscribe(siteInfo => {
+        this.usersEnabled = siteInfo.usersEnabled;
 
-      if (this.usersEnabled) {
-        userService.updateUserInfo();
+        if (this.usersEnabled) {
+          userService.updateUserInfo();
 
-        userService.userInfo
-          .subscribe(val => {
-            console.log("Got new value: " + val)
+          userService.userInfo
+            .subscribe(userInfo => {
+              console.log("Got new user info.", userInfo)
 
-            this.userInfo = val
-          });
-      }
+              this.userInfo = userInfo
+            });
+        }
 
-      console.log("Users enabled: " + this.usersEnabled);
-    });
+        console.log("Users enabled: " + this.usersEnabled);
+      });
 
     this.router.events.subscribe((event: Event) => {
       console.log('New route change event!', event);

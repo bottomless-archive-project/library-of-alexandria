@@ -40,7 +40,7 @@ public class UserEntityFactory {
 
             return userEntityTransformer.transform(userDatabaseEntity);
         } catch (final UserAlreadyExistsInDatabaseException e) {
-            throw new UserAlreadyExistsException("User " + name + " already exists!");
+            throw new UserAlreadyExistsException("User " + name + " already exists!", e);
         }
     }
 }
