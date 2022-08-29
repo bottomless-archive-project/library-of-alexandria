@@ -19,7 +19,8 @@
 <div class="row gx-3 mb-2">
   <div class="col-lg-7 pb-2">
     <div class="input-group">
-      <input [(ngModel)]="searchText" class="form-control" placeholder="Search for something...">
+      <input [(ngModel)]="searchText" class="form-control" placeholder="Search for something..."
+             (keyup.enter)="search()">
       <button class="btn btn-loa dropdown-toggle" role="button" data-bs-toggle="dropdown">{{resultSize}}</button>
       <ul class="dropdown-menu" style="max-height: 200px; overflow: auto;">
         <li class="dropdown-item" (click)="setResultSize(10)">10</li>
