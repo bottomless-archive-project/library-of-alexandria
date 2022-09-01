@@ -21,7 +21,7 @@ import java.util.UUID;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@ConditionalOnProperty("recollect-corrupt-documents")
+@ConditionalOnProperty(name = "loa.command", havingValue = "recollect-corrupt-documents")
 public class SourceLocationRecrawlerService {
 
     private final StageLocationFactory stageLocationFactory;

@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-@ConditionalOnProperty("silent-compressor")
+@ConditionalOnProperty(name = "loa.command", havingValue = "silent-compressor")
 public class SilentCompressorCommand implements CommandLineRunner {
 
     private final DocumentEntityFactory documentEntityFactory;

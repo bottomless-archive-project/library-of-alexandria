@@ -11,8 +11,8 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-@ConditionalOnProperty("register-user")
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "loa.command", havingValue = "register-user")
 public class RegisterUserCommand implements CommandLineRunner {
 
     private final UserEntityFactory userEntityFactory;

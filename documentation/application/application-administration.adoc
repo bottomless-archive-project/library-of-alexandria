@@ -6,6 +6,9 @@ This application's goal is to provide basic database administrator tasks (query 
 |===
 | Parameter | Description
 
+| **loa.command.name**
+| The name of the command to run. (See the commands table bellow.)
+
 include::../service/conductor/conductor-configuration.adoc[]
 
 | **loa.indexer.database.host**
@@ -24,19 +27,22 @@ include::../service/conductor/conductor-configuration.adoc[]
 | The port open for the MongoDB database server. *(Default value: 10)*
 |===
 
-.Tasks
+.Commands
 |===
 | Name | Description
 
 | reindex
-| This task will reset every document's status to `DOWNLOADED`.
+| This task will reset every document's status to `DOWNLOADED`. It is useful if a full reindex is needed via the Indexer Application.
 
 | silent-compressor
-| This command will go through every document in the database and ask the <<Vault Application>> to recompress them when the compression is not the same as provided.
+| This command will go through every document in the database and ask the <<Vault Application>> to recompress them when the provided compression algorithm is not the same as provided.
 
 | cleanup
-| Removes every document with status `CORRUPT`. The documents will be removed from the vault and the database too.
+| Removes every document with status `CORRUPT`. The documents will be removed from the <<Vault Application>> and the database too.
 
 | recollect-corrupt-documents
 | Tries to recollect every document with status `CORRUPT`. The document's `sourceLocations` variable stores the ids of the document locations where the document was collected from. This command will try to re-download the document from these source locations. If any of the downloads is successful, then the document's content will be replaced with non-corrupt data (effectively reconstructing the document). If all of the downloads fails, then the `CORRUPT` status will be kept.
+
+| register-user
+| Registers a user into the application suite. The `loa.command.register-user.name` and the `loa.command.register-user.password` parameters should be provided.
 |===

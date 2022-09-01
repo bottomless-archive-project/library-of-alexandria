@@ -13,7 +13,7 @@ import java.util.List;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@ConditionalOnProperty("recollect-corrupt-documents")
+@ConditionalOnProperty(name = "loa.command", havingValue = "recollect-corrupt-documents")
 public class DocumentRecollectorService {
 
     private final DocumentLocationEntityFactory documentLocationEntityFactory;

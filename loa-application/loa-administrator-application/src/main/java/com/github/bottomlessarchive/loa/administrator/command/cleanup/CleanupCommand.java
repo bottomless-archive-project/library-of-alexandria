@@ -11,8 +11,8 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-@ConditionalOnProperty("cleanup")
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "loa.command", havingValue = "cleanup")
 public class CleanupCommand implements CommandLineRunner {
 
     private final DocumentEntityFactory documentEntityFactory;
