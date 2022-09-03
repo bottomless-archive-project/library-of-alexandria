@@ -20,11 +20,6 @@ include::../service/conductor/conductor-configuration.adoc[]
 | **loa.stage.location**
 | Required only for the `recollect-corrupt-documents` command. The location where the document files are first downloaded. After some validation and occasionally modification (compression etc) it is moved to the vault. *(Default value: temp folder)*
 
-| **loa.queue.producer-pool-size**
-| The number of consumer connections to the <<Queue Application>>.*(Default value: 10)*
-
-| **loa.queue.consumer-pool-size**
-| The port open for the MongoDB database server. *(Default value: 10)*
 |===
 
 .Commands

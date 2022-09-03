@@ -34,12 +34,6 @@ include::../service/conductor/conductor-configuration.adoc[]
 | **loa.source.name**
 | The name of the source location. This name will be saved to the database for every crawled document. It could be helpful for statistics collection or in identifying bugs and errors with specific sources. Only used when the `loa.downloader.source` is set to `FOLDER`. When `QUEUE` is specified, then the value that is saved to the database will be sent by the <<Generator Application>>. *(Default value: unknown)*
 
-| **loa.queue.producer-pool-size**
-| The number of consumer connections to the <<Queue Application>>.*(Default value: 10)*
-
-| **loa.queue.consumer-pool-size**
-| The number of producer connections to the <<Queue Application>>.*(Default value: 10)*
-
 | **loa.compression.algorithm**
 | This property describes what compression algorithm should be used while saving documents to the vault. The available values are `lzma`, `gzip`, `none`. https://en.wikipedia.org/wiki/Lempel%E2%80%93Ziv%E2%80%93Markov_chain_algorithm[LZMA] has the best compression ratios while being quite CPU resource-intensive, https://en.wikipedia.org/wiki/Gzip[GZIP] is better than no compression, but a little worse than LZMA while having minimal CPU footprint while `none` is saving the documents without compression. *(Default value: gzip)*
 
