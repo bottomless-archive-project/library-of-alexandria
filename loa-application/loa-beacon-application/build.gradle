@@ -27,6 +27,7 @@ dependencies {
 
     implementation project(':loa-library:loa-io-service')
     implementation project(':loa-library:loa-stage-service')
+    implementation project(':loa-library:loa-checksum-service')
     implementation project(':loa-library:loa-validator-service')
     implementation project(':loa-library:loa-document-type-service')
 }
