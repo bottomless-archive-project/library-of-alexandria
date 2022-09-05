@@ -1,4 +1,4 @@
-package com.github.bottomlessarchive.loa.downloader.service.file.domain;
+package com.github.bottomlessarchive.loa.url.service.collector.domain;
 
 import lombok.experimental.StandardException;
 

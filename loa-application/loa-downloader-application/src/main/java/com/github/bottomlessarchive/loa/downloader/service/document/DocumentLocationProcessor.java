@@ -2,7 +2,7 @@ package com.github.bottomlessarchive.loa.downloader.service.document;
 
 import com.github.bottomlessarchive.loa.downloader.service.document.domain.DocumentArchivingContext;
 import com.github.bottomlessarchive.loa.downloader.service.document.domain.exception.NotEnoughSpaceException;
-import com.github.bottomlessarchive.loa.downloader.service.file.FileCollector;
+import com.github.bottomlessarchive.loa.url.service.collector.FileCollector;
 import com.github.bottomlessarchive.loa.location.domain.DocumentLocation;
 import com.github.bottomlessarchive.loa.stage.service.StageLocationFactory;
 import com.github.bottomlessarchive.loa.stage.service.domain.StageLocation;

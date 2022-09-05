@@ -3,6 +3,7 @@ package com.github.bottomlessarchive.loa.downloader.service.file;
 import com.github.bottomlessarchive.loa.file.FileManipulatorService;
 import com.github.bottomlessarchive.loa.file.zip.ZipFileManipulatorService;
 import com.github.bottomlessarchive.loa.type.domain.DocumentType;
+import com.github.bottomlessarchive.loa.url.service.collector.FileCollector;
 import com.github.bottomlessarchive.loa.url.service.downloader.FileDownloadManager;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

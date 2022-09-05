@@ -1,9 +1,9 @@
-package com.github.bottomlessarchive.loa.downloader.service.file;
+package com.github.bottomlessarchive.loa.url.service.collector;
 
-import com.github.bottomlessarchive.loa.downloader.service.file.domain.FileCollectionException;
 import com.github.bottomlessarchive.loa.file.FileManipulatorService;
 import com.github.bottomlessarchive.loa.file.zip.ZipFileManipulatorService;
 import com.github.bottomlessarchive.loa.type.domain.DocumentType;
+import com.github.bottomlessarchive.loa.url.service.collector.domain.FileCollectionException;
 import com.github.bottomlessarchive.loa.url.service.downloader.FileDownloadManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
