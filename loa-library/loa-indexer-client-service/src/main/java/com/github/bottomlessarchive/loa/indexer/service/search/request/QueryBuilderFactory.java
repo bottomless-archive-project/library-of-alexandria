@@ -5,9 +5,9 @@ import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
 import co.elastic.clients.json.JsonData;
-import com.github.bottomlessarchive.loa.document.service.domain.DocumentType;
 import com.github.bottomlessarchive.loa.indexer.service.search.domain.SearchContext;
 import com.github.bottomlessarchive.loa.indexer.service.search.domain.SearchField;
+import com.github.bottomlessarchive.loa.type.domain.DocumentType;
 import org.springframework.stereotype.Service;
 
 /**

@@ -24,6 +24,7 @@ public class BeaconController {
                 .map(location -> DocumentLocation.builder()
                         .id(location.getId())
                         .location(location.getLocation())
+                        .type(location.getType())
                         .build()
                 )
                 .toList();

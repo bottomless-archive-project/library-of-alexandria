@@ -1,13 +1,13 @@
 package com.github.bottomlessarchive.loa.downloader.service.document;
 
-import com.github.bottomlessarchive.loa.document.service.DocumentTypeCalculator;
-import com.github.bottomlessarchive.loa.document.service.domain.DocumentType;
 import com.github.bottomlessarchive.loa.downloader.service.document.domain.DocumentArchivingContext;
 import com.github.bottomlessarchive.loa.downloader.service.document.domain.exception.NotEnoughSpaceException;
 import com.github.bottomlessarchive.loa.downloader.service.file.FileCollector;
 import com.github.bottomlessarchive.loa.location.domain.DocumentLocation;
 import com.github.bottomlessarchive.loa.stage.service.StageLocationFactory;
 import com.github.bottomlessarchive.loa.stage.service.domain.StageLocation;
+import com.github.bottomlessarchive.loa.type.DocumentTypeCalculator;
+import com.github.bottomlessarchive.loa.type.domain.DocumentType;
 import com.github.bottomlessarchive.loa.validator.configuration.FileValidationConfigurationProperties;
 import com.github.bottomlessarchive.loa.validator.service.DocumentFileValidator;
 import io.micrometer.core.instrument.Counter;

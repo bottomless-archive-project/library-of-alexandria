@@ -5,7 +5,7 @@ import com.github.bottomlessarchive.loa.repository.service.HexConverter;
 import com.github.bottomlessarchive.loa.document.repository.domain.DocumentDatabaseEntity;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentEntity;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentStatus;
-import com.github.bottomlessarchive.loa.document.service.domain.DocumentType;
+import com.github.bottomlessarchive.loa.type.domain.DocumentType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

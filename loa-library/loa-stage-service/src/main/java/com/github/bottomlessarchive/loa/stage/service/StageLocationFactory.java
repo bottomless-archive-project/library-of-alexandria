@@ -1,8 +1,8 @@
 package com.github.bottomlessarchive.loa.stage.service;
 
 import com.github.bottomlessarchive.loa.stage.configuration.StageConfigurationProperties;
-import com.github.bottomlessarchive.loa.document.service.domain.DocumentType;
 import com.github.bottomlessarchive.loa.stage.service.domain.StageLocation;
+import com.github.bottomlessarchive.loa.type.domain.DocumentType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

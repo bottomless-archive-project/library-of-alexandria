@@ -1,10 +1,10 @@
 package com.github.bottomlessarchive.loa.validator.service;
 
-import com.github.bottomlessarchive.loa.document.service.domain.DocumentType;
 import com.github.bottomlessarchive.loa.parser.domain.ParsingResult;
 import com.github.bottomlessarchive.loa.parser.service.DocumentDataParser;
 import com.github.bottomlessarchive.loa.stage.service.StageLocationFactory;
 import com.github.bottomlessarchive.loa.stage.service.domain.StageLocation;
+import com.github.bottomlessarchive.loa.type.domain.DocumentType;
 import com.github.bottomlessarchive.loa.validator.configuration.FileValidationConfigurationProperties;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

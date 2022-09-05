@@ -1,7 +1,7 @@
 package com.github.bottomlessarchive.loa.parser.configuration;
 
-import com.github.bottomlessarchive.loa.document.service.domain.DocumentType;
 import com.github.bottomlessarchive.loa.parser.service.parser.ExceptionParser;
+import com.github.bottomlessarchive.loa.type.domain.DocumentType;
 import com.github.pemistahl.lingua.api.LanguageDetector;
 import com.github.pemistahl.lingua.api.LanguageDetectorBuilder;
 import org.apache.tika.mime.MediaType;

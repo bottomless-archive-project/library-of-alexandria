@@ -2,10 +2,10 @@ package com.github.bottomlessarchive.loa.vault.service.archive;
 
 import com.github.bottomlessarchive.loa.document.service.DocumentManipulator;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentEntity;
-import com.github.bottomlessarchive.loa.document.service.domain.DocumentType;
 import com.github.bottomlessarchive.loa.document.service.entity.factory.DocumentEntityFactory;
 import com.github.bottomlessarchive.loa.document.service.entity.factory.domain.DocumentCreationContext;
 import com.github.bottomlessarchive.loa.staging.service.client.StagingClient;
+import com.github.bottomlessarchive.loa.type.domain.DocumentType;
 import com.github.bottomlessarchive.loa.vault.service.VaultDocumentManager;
 import com.github.bottomlessarchive.loa.vault.service.domain.DocumentArchivingContext;
 import com.mongodb.MongoWriteException;

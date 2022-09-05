@@ -2,8 +2,8 @@ package com.github.bottomlessarchive.loa.vault.service.archive;
 
 import com.github.bottomlessarchive.loa.compression.domain.DocumentCompression;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentStatus;
-import com.github.bottomlessarchive.loa.document.service.domain.DocumentType;
 import com.github.bottomlessarchive.loa.document.service.entity.factory.domain.DocumentCreationContext;
+import com.github.bottomlessarchive.loa.type.domain.DocumentType;
 import com.github.bottomlessarchive.loa.vault.service.domain.DocumentArchivingContext;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

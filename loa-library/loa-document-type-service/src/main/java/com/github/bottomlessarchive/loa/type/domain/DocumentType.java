@@ -1,4 +1,4 @@
-package com.github.bottomlessarchive.loa.document.service.domain;
+package com.github.bottomlessarchive.loa.type.domain;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

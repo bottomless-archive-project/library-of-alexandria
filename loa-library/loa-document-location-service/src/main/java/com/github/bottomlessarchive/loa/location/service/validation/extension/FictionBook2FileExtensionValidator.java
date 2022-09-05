@@ -1,6 +1,6 @@
 package com.github.bottomlessarchive.loa.location.service.validation.extension;
 
-import com.github.bottomlessarchive.loa.document.service.domain.DocumentType;
+import com.github.bottomlessarchive.loa.type.domain.DocumentType;
 
 public class FictionBook2FileExtensionValidator implements FileExtensionValidator {
 
