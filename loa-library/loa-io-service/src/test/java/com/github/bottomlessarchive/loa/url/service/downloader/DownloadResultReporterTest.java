@@ -67,7 +67,7 @@ class DownloadResultReporterTest {
 
     @Test
     void testUpdateResultBasedOnResponseCodeWhenResponseCode200() {
-        underTest.updateResultBasedOnResponseCode(DOCUMENT_LOCATION_ID, TEST_URL, 200);
+        underTest.calculateResultBasedOnResponseCode(DOCUMENT_LOCATION_ID, TEST_URL, 200);
 
         verify(documentLocationManipulator)
                 .updateDownloadResultCode(DOCUMENT_LOCATION_ID, DocumentLocationResultType.OK);
@@ -75,7 +75,7 @@ class DownloadResultReporterTest {
 
     @Test
     void testUpdateResultBasedOnResponseCodeWhenResponseCode404() {
-        underTest.updateResultBasedOnResponseCode(DOCUMENT_LOCATION_ID, TEST_URL, 404);
+        underTest.calculateResultBasedOnResponseCode(DOCUMENT_LOCATION_ID, TEST_URL, 404);
 
         verify(documentLocationManipulator)
                 .updateDownloadResultCode(DOCUMENT_LOCATION_ID, DocumentLocationResultType.NOT_FOUND);
@@ -83,7 +83,7 @@ class DownloadResultReporterTest {
 
     @Test
     void testUpdateResultBasedOnResponseCodeWhenResponseCode403() {
-        underTest.updateResultBasedOnResponseCode(DOCUMENT_LOCATION_ID, TEST_URL, 403);
+        underTest.calculateResultBasedOnResponseCode(DOCUMENT_LOCATION_ID, TEST_URL, 403);
 
         verify(documentLocationManipulator)
                 .updateDownloadResultCode(DOCUMENT_LOCATION_ID, DocumentLocationResultType.FORBIDDEN);
@@ -91,7 +91,7 @@ class DownloadResultReporterTest {
 
     @Test
     void testUpdateResultBasedOnResponseCodeWhenResponseCode400() {
-        underTest.updateResultBasedOnResponseCode(DOCUMENT_LOCATION_ID, TEST_URL, 400);
+        underTest.calculateResultBasedOnResponseCode(DOCUMENT_LOCATION_ID, TEST_URL, 400);
 
         verify(documentLocationManipulator)
                 .updateDownloadResultCode(DOCUMENT_LOCATION_ID, DocumentLocationResultType.SERVER_ERROR);
@@ -99,7 +99,7 @@ class DownloadResultReporterTest {
 
     @Test
     void testUpdateResultBasedOnResponseCodeWhenResponseCodeIsUnknown() {
-        underTest.updateResultBasedOnResponseCode(DOCUMENT_LOCATION_ID, TEST_URL, -1);
+        underTest.calculateResultBasedOnResponseCode(DOCUMENT_LOCATION_ID, TEST_URL, -1);
 
         verify(documentLocationManipulator)
                 .updateDownloadResultCode(DOCUMENT_LOCATION_ID, DocumentLocationResultType.UNKNOWN);

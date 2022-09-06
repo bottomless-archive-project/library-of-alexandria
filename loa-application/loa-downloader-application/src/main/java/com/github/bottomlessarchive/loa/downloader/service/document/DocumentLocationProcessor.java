@@ -2,6 +2,8 @@ package com.github.bottomlessarchive.loa.downloader.service.document;
 
 import com.github.bottomlessarchive.loa.downloader.service.document.domain.DocumentArchivingContext;
 import com.github.bottomlessarchive.loa.downloader.service.document.domain.exception.NotEnoughSpaceException;
+import com.github.bottomlessarchive.loa.location.domain.DocumentLocationResultType;
+import com.github.bottomlessarchive.loa.location.service.DocumentLocationManipulator;
 import com.github.bottomlessarchive.loa.url.service.collector.FileCollector;
 import com.github.bottomlessarchive.loa.location.domain.DocumentLocation;
 import com.github.bottomlessarchive.loa.stage.service.StageLocationFactory;
@@ -38,6 +40,7 @@ public class DocumentLocationProcessor {
     private final DocumentArchiver documentArchiver;
     private final DocumentTypeCalculator documentTypeCalculator;
     private final FileValidationConfigurationProperties fileValidationConfigurationProperties;
+    private final DocumentLocationManipulator documentLocationManipulator;
 
     @Qualifier("downloaderSemaphore")
     private final Semaphore downloaderSemaphore;
@@ -96,7 +99,10 @@ public class DocumentLocationProcessor {
         final StageLocation stageLocation = stageLocationFactory.getLocation(documentId.toString(), documentType);
 
         try {
-            fileCollector.acquireFile(documentLocation.getId(), documentLocationURL, stageLocation.getPath(), documentType);
+            final DocumentLocationResultType documentLocationResultType = fileCollector.acquireFile(documentLocationURL,
+                    stageLocation.getPath(), documentType);
+
+            documentLocationManipulator.updateDownloadResultCode(documentLocation.getId(), documentLocationResultType);
 
             if (documentFileValidator.isValidDocument(documentId.toString(), documentType)) {
                 final DocumentArchivingContext documentArchivingContext = DocumentArchivingContext.builder()

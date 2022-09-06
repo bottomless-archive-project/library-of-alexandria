@@ -33,7 +33,8 @@ public class DocumentLocationVisitor {
         try {
             final URL documentLocationURL = new URL(documentLocation.getLocation());
 
-            fileCollector.acquireFile(documentLocation.getId(), documentLocationURL, stageLocation.getPath(), documentLocation.getType());
+            final DocumentLocationResultType documentLocationResultType = fileCollector.acquireFile(documentLocationURL,
+                    stageLocation.getPath(), documentLocation.getType());
 
             if (documentFileValidator.isValidDocument(documentLocation.getId(), documentLocation.getType())) {
                 final long size = stageLocation.size();
@@ -43,7 +44,7 @@ public class DocumentLocationVisitor {
 
                     return DocumentLocationResult.builder()
                             .id(documentLocation.getId())
-                            .resultType(DocumentLocationResultType.OK)
+                            .resultType(documentLocationResultType)
                             .size(size)
                             .checksum(checksum)
                             .build();

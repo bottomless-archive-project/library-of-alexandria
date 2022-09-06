@@ -71,7 +71,7 @@ class SourceLocationRecrawlerServiceTest {
         underTest.recrawlSourceLocation(documentLocation, documentEntity);
 
         verify(stageLocation).cleanup();
-        verify(fileDownloadManager).downloadFile(eq("test-id"), eq(new URL("http://example.com/")), eq(mockPath));
+        verify(fileDownloadManager).downloadFile(eq(new URL("http://example.com/")), eq(mockPath));
         verify(vaultClientService).replaceCorruptDocument(documentEntity, content);
     }
 }

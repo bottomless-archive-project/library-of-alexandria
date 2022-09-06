@@ -2,6 +2,7 @@ package com.github.bottomlessarchive.loa.url.service.collector;
 
 import com.github.bottomlessarchive.loa.file.FileManipulatorService;
 import com.github.bottomlessarchive.loa.file.zip.ZipFileManipulatorService;
+import com.github.bottomlessarchive.loa.location.domain.DocumentLocationResultType;
 import com.github.bottomlessarchive.loa.type.domain.DocumentType;
 import com.github.bottomlessarchive.loa.url.service.collector.domain.FileCollectionException;
 import com.github.bottomlessarchive.loa.url.service.downloader.FileDownloadManager;
@@ -24,13 +25,14 @@ public class FileCollector {
     private final FileManipulatorService fileManipulatorService;
     private final ZipFileManipulatorService zipFileManipulatorService;
 
-    public void acquireFile(final String documentLocationId, final URL fileLocation, final Path resultLocation,
-            final DocumentType documentType) {
+    public DocumentLocationResultType acquireFile(final URL fileLocation, final Path resultLocation, final DocumentType documentType) {
         try {
             final String protocol = fileLocation.getProtocol();
 
+            DocumentLocationResultType documentLocationResultType = DocumentLocationResultType.UNKNOWN;
+
             if ("http".equals(protocol) || "https".equals(protocol)) {
-                fileDownloadManager.downloadFile(documentLocationId, fileLocation, resultLocation);
+                documentLocationResultType = fileDownloadManager.downloadFile(fileLocation, resultLocation);
             } else if ("file".equals(protocol)) {
                 fileManipulatorService.copy(fileLocation.toURI(), resultLocation);
             }
@@ -38,6 +40,8 @@ public class FileCollector {
             if (DocumentType.FB2.equals(documentType) && zipFileManipulatorService.isZipArchive(resultLocation)) {
                 postProcessFB2File(resultLocation);
             }
+
+            return documentLocationResultType;
         } catch (Exception e) {
             throw new FileCollectionException("Failed to collect file at location: " + fileLocation + "!", e);
         }

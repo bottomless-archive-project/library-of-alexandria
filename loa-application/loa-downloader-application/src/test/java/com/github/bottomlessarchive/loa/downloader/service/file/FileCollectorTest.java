@@ -19,7 +19,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -44,32 +43,29 @@ class FileCollectorTest {
 
     @Test
     void testWhenHttpLocationIsVisited() throws MalformedURLException {
-        final String testDocumentId = UUID.randomUUID().toString();
         final URL testLocation = new URL("http://localhost/test.pdf");
 
-        underTest.acquireFile(testDocumentId, testLocation, TEST_PATH, DocumentType.PDF);
+        underTest.acquireFile(testLocation, TEST_PATH, DocumentType.PDF);
 
         verify(fileDownloadManager)
-                .downloadFile(testDocumentId, testLocation, TEST_PATH);
+                .downloadFile(testLocation, TEST_PATH);
     }
 
     @Test
     void testWhenHttpsLocationIsVisited() throws MalformedURLException {
-        final String testDocumentId = UUID.randomUUID().toString();
         final URL testLocation = new URL("http://localhost/test.pdf");
 
-        underTest.acquireFile(testDocumentId, testLocation, TEST_PATH, DocumentType.PDF);
+        underTest.acquireFile(testLocation, TEST_PATH, DocumentType.PDF);
 
         verify(fileDownloadManager)
-                .downloadFile(testDocumentId, testLocation, TEST_PATH);
+                .downloadFile(testLocation, TEST_PATH);
     }
 
     @Test
     void testWhenFileLocationIsVisited() throws IOException, URISyntaxException {
-        final String testDocumentId = UUID.randomUUID().toString();
         final URL testLocation = new URL("file:" + System.getProperty("java.io.tmpdir") + "//test.pdf");
 
-        underTest.acquireFile(testDocumentId, testLocation, TEST_PATH, DocumentType.PDF);
+        underTest.acquireFile(testLocation, TEST_PATH, DocumentType.PDF);
 
         verify(fileManipulatorService)
                 .copy(testLocation.toURI(), TEST_PATH);
@@ -77,16 +73,15 @@ class FileCollectorTest {
 
     @Test
     void testWhenFB2ArchiveIsAcquired() throws IOException {
-        final String testDocumentId = UUID.randomUUID().toString();
         final URL testLocation = new URL("http://localhost/test.fb2.zip");
 
         when(zipFileManipulatorService.isZipArchive(any()))
                 .thenReturn(true);
 
-        underTest.acquireFile(testDocumentId, testLocation, TEST_PATH, DocumentType.FB2);
+        underTest.acquireFile(testLocation, TEST_PATH, DocumentType.FB2);
 
         verify(fileDownloadManager)
-                .downloadFile(testDocumentId, testLocation, TEST_PATH);
+                .downloadFile(testLocation, TEST_PATH);
 
         final InOrder order = Mockito.inOrder(zipFileManipulatorService, fileManipulatorService);
         order.verify(zipFileManipulatorService)
