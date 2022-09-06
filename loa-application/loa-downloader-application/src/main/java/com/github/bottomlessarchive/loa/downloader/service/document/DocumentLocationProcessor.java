@@ -6,86 +6,35 @@ import com.github.bottomlessarchive.loa.document.service.domain.DocumentEntity;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentType;
 import com.github.bottomlessarchive.loa.document.service.entity.factory.DocumentEntityFactory;
 import com.github.bottomlessarchive.loa.downloader.service.document.domain.DocumentArchivingContext;
-import com.github.bottomlessarchive.loa.downloader.service.document.domain.exception.NotEnoughSpaceException;
 import com.github.bottomlessarchive.loa.downloader.service.file.FileCollector;
 import com.github.bottomlessarchive.loa.file.FileManipulatorService;
 import com.github.bottomlessarchive.loa.location.domain.DocumentLocation;
 import com.github.bottomlessarchive.loa.stage.service.StageLocationFactory;
 import com.github.bottomlessarchive.loa.stage.service.domain.StageLocation;
-import com.github.bottomlessarchive.loa.validator.configuration.FileValidationConfigurationProperties;
 import com.github.bottomlessarchive.loa.validator.service.DocumentFileValidator;
-import io.micrometer.core.instrument.Counter;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.MDC;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.net.URL;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Semaphore;
 
-/**
- * This service is responsible for downloading documents.
- */
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class DocumentLocationProcessor {
 
-    private final StageLocationFactory stageLocationFactory;
     private final DocumentFileValidator documentFileValidator;
     private final FileCollector fileCollector;
     private final DocumentArchiver documentArchiver;
-
     private final ChecksumProvider checksumProvider;
     private final DocumentTypeCalculator documentTypeCalculator;
     private final DocumentEntityFactory documentEntityFactory;
     private final FileManipulatorService fileManipulatorService;
-    private final FileValidationConfigurationProperties fileValidationConfigurationProperties;
+    private final StageLocationFactory stageLocationFactory;
 
-    @Qualifier("downloaderSemaphore")
-    private final Semaphore downloaderSemaphore;
-    @Qualifier("downloaderExecutorService")
-    private final ExecutorService downloaderExecutorService;
-    @Qualifier("processedDocumentCount")
-    private final Counter processedDocumentCount;
-
-    public void processDocumentLocation(final DocumentLocation documentLocation) {
-        processDocumentLocation(documentLocation, null);
-    }
-
-    @SneakyThrows
-    public void processDocumentLocation(final DocumentLocation documentLocation, final Runnable callback) {
-        if (!stageLocationFactory.hasSpace(fileValidationConfigurationProperties.maximumArchiveSize())) {
-            log.error("Not enough local staging space is available!");
-
-            throw new NotEnoughSpaceException("Not enough local staging space is available!");
-        }
-
-        processedDocumentCount.increment();
-
-        downloaderSemaphore.acquire();
-
-        downloaderExecutorService.execute(() -> {
-            MDC.put("documentLocationId", documentLocation.getId());
-
-            doProcessDocumentLocation(documentLocation);
-
-            downloaderSemaphore.release();
-
-            if (callback != null) {
-                callback.run();
-            }
-
-            MDC.clear();
-        });
-    }
-
-    private void doProcessDocumentLocation(final DocumentLocation documentLocation) {
+    public void doProcessDocumentLocation(final DocumentLocation documentLocation) {
         final URL documentLocationURL = documentLocation.getLocation().toUrl().orElseThrow();
         final Optional<DocumentType> documentTypeOptional = documentTypeCalculator.calculate(documentLocationURL);
 
