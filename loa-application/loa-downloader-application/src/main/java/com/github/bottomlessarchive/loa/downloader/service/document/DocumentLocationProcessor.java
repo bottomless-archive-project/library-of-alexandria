@@ -99,8 +99,8 @@ public class DocumentLocationProcessor {
         final StageLocation stageLocation = stageLocationFactory.getLocation(documentId.toString(), documentType);
 
         try {
-            final DocumentLocationResultType documentLocationResultType = fileCollector.acquireFile(documentLocationURL,
-                    stageLocation.getPath(), documentType);
+            final DocumentLocationResultType documentLocationResultType = DocumentLocationResultType.valueOf(
+                    fileCollector.acquireFile(documentLocationURL, stageLocation.getPath(), documentType).name());
 
             documentLocationManipulator.updateDownloadResultCode(documentLocation.getId(), documentLocationResultType);
 

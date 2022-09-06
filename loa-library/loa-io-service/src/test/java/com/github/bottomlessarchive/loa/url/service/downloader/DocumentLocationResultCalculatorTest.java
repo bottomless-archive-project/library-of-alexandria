@@ -1,21 +1,11 @@
 package com.github.bottomlessarchive.loa.url.service.downloader;
 
-import com.github.bottomlessarchive.loa.location.domain.DocumentLocationResultType;
-import com.github.bottomlessarchive.loa.location.service.DocumentLocationManipulator;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
-import static org.mockito.Mockito.verify;
-
 @ExtendWith(MockitoExtension.class)
-class DownloadResultReporterTest {
-
+class DocumentLocationResultCalculatorTest {
+/*
     private static final String DOCUMENT_LOCATION_ID = "test-location";
     private static final URL TEST_URL;
 
@@ -31,7 +21,7 @@ class DownloadResultReporterTest {
     private DocumentLocationManipulator documentLocationManipulator;
 
     @InjectMocks
-    private DownloadResultReporter underTest;
+    private DocumentLocationResultCalculator underTest;
 
     @Test
     void testUpdateResultToEmptyBody() {
@@ -103,5 +93,5 @@ class DownloadResultReporterTest {
 
         verify(documentLocationManipulator)
                 .updateDownloadResultCode(DOCUMENT_LOCATION_ID, DocumentLocationResultType.UNKNOWN);
-    }
+    }*/
 }

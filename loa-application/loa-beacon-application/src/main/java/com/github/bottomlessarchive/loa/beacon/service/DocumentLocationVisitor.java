@@ -4,11 +4,11 @@ import com.github.bottomlessarchive.loa.beacon.configuration.BeaconConfiguration
 import com.github.bottomlessarchive.loa.beacon.service.domain.DocumentLocation;
 import com.github.bottomlessarchive.loa.beacon.service.domain.DocumentLocationResult;
 import com.github.bottomlessarchive.loa.checksum.service.ChecksumProvider;
-import com.github.bottomlessarchive.loa.location.domain.DocumentLocationResultType;
 import com.github.bottomlessarchive.loa.stage.service.StageLocationFactory;
 import com.github.bottomlessarchive.loa.stage.service.domain.StageLocation;
 import com.github.bottomlessarchive.loa.type.domain.DocumentType;
 import com.github.bottomlessarchive.loa.url.service.collector.FileCollector;
+import com.github.bottomlessarchive.loa.url.service.downloader.domain.DownloadResult;
 import com.github.bottomlessarchive.loa.validator.service.DocumentFileValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -33,7 +33,7 @@ public class DocumentLocationVisitor {
         try {
             final URL documentLocationURL = new URL(documentLocation.getLocation());
 
-            final DocumentLocationResultType documentLocationResultType = fileCollector.acquireFile(documentLocationURL,
+            final DownloadResult documentLocationResultType = fileCollector.acquireFile(documentLocationURL,
                     stageLocation.getPath(), documentLocation.getType());
 
             if (documentFileValidator.isValidDocument(documentLocation.getId(), documentLocation.getType())) {

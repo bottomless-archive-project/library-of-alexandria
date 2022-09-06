@@ -2,10 +2,10 @@ package com.github.bottomlessarchive.loa.url.service.collector;
 
 import com.github.bottomlessarchive.loa.file.FileManipulatorService;
 import com.github.bottomlessarchive.loa.file.zip.ZipFileManipulatorService;
-import com.github.bottomlessarchive.loa.location.domain.DocumentLocationResultType;
 import com.github.bottomlessarchive.loa.type.domain.DocumentType;
 import com.github.bottomlessarchive.loa.url.service.collector.domain.FileCollectionException;
 import com.github.bottomlessarchive.loa.url.service.downloader.FileDownloadManager;
+import com.github.bottomlessarchive.loa.url.service.downloader.domain.DownloadResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -25,11 +25,11 @@ public class FileCollector {
     private final FileManipulatorService fileManipulatorService;
     private final ZipFileManipulatorService zipFileManipulatorService;
 
-    public DocumentLocationResultType acquireFile(final URL fileLocation, final Path resultLocation, final DocumentType documentType) {
+    public DownloadResult acquireFile(final URL fileLocation, final Path resultLocation, final DocumentType documentType) {
         try {
             final String protocol = fileLocation.getProtocol();
 
-            DocumentLocationResultType documentLocationResultType = DocumentLocationResultType.UNKNOWN;
+            DownloadResult documentLocationResultType = DownloadResult.UNKNOWN;
 
             if ("http".equals(protocol) || "https".equals(protocol)) {
                 documentLocationResultType = fileDownloadManager.downloadFile(fileLocation, resultLocation);

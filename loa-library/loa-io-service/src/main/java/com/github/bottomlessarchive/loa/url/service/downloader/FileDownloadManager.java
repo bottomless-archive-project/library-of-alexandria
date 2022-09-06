@@ -1,6 +1,6 @@
 package com.github.bottomlessarchive.loa.url.service.downloader;
 
-import com.github.bottomlessarchive.loa.location.domain.DocumentLocationResultType;
+import com.github.bottomlessarchive.loa.url.service.downloader.domain.DownloadResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
@@ -31,7 +31,7 @@ public class FileDownloadManager {
 
     @Qualifier("downloaderClient")
     private final OkHttpClient downloaderClient;
-    private final DownloadResultReporter downloadResultReporter;
+    private final DocumentLocationResultCalculator documentLocationResultCalculator;
 
     /**
      * Download a file from the provided url to the provided file location.
@@ -39,36 +39,29 @@ public class FileDownloadManager {
      * @param downloadTarget the url to download the file from
      * @param resultLocation the location to download the file to
      */
-    public DocumentLocationResultType downloadFile(final URL downloadTarget, final Path resultLocation) {
+    public DownloadResult downloadFile(final URL downloadTarget, final Path resultLocation) {
         final Request request = new Request.Builder()
                 .get()
                 .url(downloadTarget)
                 .build();
 
-        DocumentLocationResultType documentLocationResultType = DocumentLocationResultType.UNKNOWN;
+        DownloadResult documentLocationResultType;
 
         //TODO: Re-add the retry logic when the response is HttpStatus.TOO_MANY_REQUESTS
         try (Response response = downloaderClient.newCall(request).execute()) {
             try (ResponseBody responseBody = response.body()) {
-                documentLocationResultType = downloadResultReporter.calculateResultBasedOnResponseCode(downloadTarget, response.code());
+                documentLocationResultType = documentLocationResultCalculator.calculateResultBasedOnResponseCode(
+                        downloadTarget, response.code());
 
                 if (responseBody == null) {
-                    return documentLocationResultType == DocumentLocationResultType.OK
-                            ? DocumentLocationResultType.EMPTY_BODY : documentLocationResultType;
+                    return documentLocationResultType == DownloadResult.OK
+                            ? DownloadResult.EMPTY_BODY : documentLocationResultType;
                 }
 
                 Files.copy(responseBody.byteStream(), resultLocation);
             }
         } catch (final IOException e) {
-            if (e instanceof UnknownHostException || e instanceof NoRouteToHostException) {
-                documentLocationResultType = DocumentLocationResultType.ORIGIN_NOT_FOUND;
-            } else if (e instanceof SocketTimeoutException) {
-                documentLocationResultType = DocumentLocationResultType.TIMEOUT;
-            } else if (e instanceof ProtocolException && e.getMessage().contains("unexpected end of stream")) {
-                documentLocationResultType = DocumentLocationResultType.CONNECTION_ERROR;
-            } else {
-                log.error("Error while downloading document form {}.", downloadTarget, e);
-            }
+            documentLocationResultType = transformExceptionToDownloadResult(downloadTarget, e);
 
             try {
                 if (Files.exists(resultLocation)) {
@@ -80,5 +73,19 @@ public class FileDownloadManager {
         }
 
         return documentLocationResultType;
+    }
+
+    private DownloadResult transformExceptionToDownloadResult(final URL downloadTarget, final Exception e) {
+        if (e instanceof UnknownHostException || e instanceof NoRouteToHostException) {
+            return DownloadResult.ORIGIN_NOT_FOUND;
+        } else if (e instanceof SocketTimeoutException) {
+            return DownloadResult.TIMEOUT;
+        } else if (e instanceof ProtocolException && e.getMessage().contains("unexpected end of stream")) {
+            return DownloadResult.CONNECTION_ERROR;
+        } else {
+            log.error("Unknown error while downloading document form {}.", downloadTarget, e);
+
+            return DownloadResult.UNKNOWN;
+        }
     }
 }

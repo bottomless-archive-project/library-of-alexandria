@@ -130,7 +130,7 @@
     <rule ref="category/java/bestpractices.xml/SwitchStmtsShouldHaveDefault">
         <properties>
             <property name="violationSuppressXPath"
-                      value="//ClassOrInterfaceDeclaration['com.github.bottomlessarchive.loa.url.service.downloader.DownloadResultReporter']"/>
+                      value="//ClassOrInterfaceDeclaration['com.github.bottomlessarchive.loa.url.service.downloader.DocumentLocationResultCalculator']"/>
         </properties>
     </rule>
 

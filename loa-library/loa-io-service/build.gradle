@@ -5,5 +5,4 @@ dependencies {
 
     api project(':loa-library:loa-file-service')
     api project(':loa-library:loa-document-type-service')
-    api project(':loa-library:loa-document-location-service')
 }
