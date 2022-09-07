@@ -3,17 +3,14 @@ package com.github.bottomlessarchive.loa.downloader.service.document;
 import com.github.bottomlessarchive.loa.downloader.service.document.domain.exception.NotEnoughSpaceException;
 import com.github.bottomlessarchive.loa.location.domain.DocumentLocation;
 import com.github.bottomlessarchive.loa.stage.service.StageLocationFactory;
+import com.github.bottomlessarchive.loa.threading.util.BlockingExecutor;
 import com.github.bottomlessarchive.loa.validator.configuration.FileValidationConfigurationProperties;
 import io.micrometer.core.instrument.Counter;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Semaphore;
 
 /**
  * This service is responsible for downloading documents.
@@ -27,10 +24,8 @@ public class DocumentLocationProcessorWrapper {
     private final FileValidationConfigurationProperties fileValidationConfigurationProperties;
     private final DocumentLocationProcessor documentLocationProcessor;
 
-    @Qualifier("downloaderSemaphore")
-    private final Semaphore downloaderSemaphore;
     @Qualifier("downloaderExecutorService")
-    private final ExecutorService downloaderExecutorService;
+    private final BlockingExecutor blockingExecutor;
     @Qualifier("processedDocumentCount")
     private final Counter processedDocumentCount;
 
@@ -43,9 +38,8 @@ public class DocumentLocationProcessorWrapper {
 
         increaseProcessedDocumentCount();
 
-        acquireProcessingPermit();
-
-        downloaderExecutorService.execute(() -> {
+        blockingExecutor.execute(() -> {
+            //TODO: Wrapper that set up the mdc and clears it like MDCWrapperTask
             MDC.put("documentLocationId", documentLocation.getId());
 
             documentLocationProcessor.doProcessDocumentLocation(documentLocation);
@@ -55,8 +49,6 @@ public class DocumentLocationProcessorWrapper {
             }
 
             MDC.clear();
-
-            releaseProcessingPermit();
         });
     }
 
@@ -70,14 +62,5 @@ public class DocumentLocationProcessorWrapper {
 
     private void increaseProcessedDocumentCount() {
         processedDocumentCount.increment();
-    }
-
-    @SneakyThrows
-    private void acquireProcessingPermit() {
-        downloaderSemaphore.acquire();
-    }
-
-    private void releaseProcessingPermit() {
-        downloaderSemaphore.release();
     }
 }
