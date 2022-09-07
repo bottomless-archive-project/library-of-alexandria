@@ -11,6 +11,6 @@ public class DocumentLocationProcessorTask implements Runnable {
 
     @Override
     public void run() {
-        documentLocationProcessor.doProcessDocumentLocation(documentLocation);
+        documentLocationProcessor.processDocumentLocation(documentLocation);
     }
 }
