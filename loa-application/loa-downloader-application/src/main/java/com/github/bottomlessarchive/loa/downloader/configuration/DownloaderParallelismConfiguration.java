@@ -1,6 +1,6 @@
 package com.github.bottomlessarchive.loa.downloader.configuration;
 
-import com.github.bottomlessarchive.loa.threading.util.BlockingExecutor;
+import com.github.bottomlessarchive.loa.threading.executor.BlockingExecutor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;

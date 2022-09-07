@@ -1,4 +1,4 @@
-package com.github.bottomlessarchive.loa.threading.util;
+package com.github.bottomlessarchive.loa.threading.executor;
 
 import lombok.SneakyThrows;
 
