@@ -1,128 +1,37 @@
 package com.github.bottomlessarchive.loa.downloader.service.document;
 
-import com.github.bottomlessarchive.loa.downloader.service.document.domain.DocumentArchivingContext;
-import com.github.bottomlessarchive.loa.downloader.service.document.domain.exception.NotEnoughSpaceException;
-import com.github.bottomlessarchive.loa.location.domain.DocumentLocationResultType;
-import com.github.bottomlessarchive.loa.location.service.DocumentLocationManipulator;
-import com.github.bottomlessarchive.loa.url.service.collector.FileCollector;
 import com.github.bottomlessarchive.loa.location.domain.DocumentLocation;
-import com.github.bottomlessarchive.loa.stage.service.StageLocationFactory;
-import com.github.bottomlessarchive.loa.stage.service.domain.StageLocation;
 import com.github.bottomlessarchive.loa.type.DocumentTypeCalculator;
 import com.github.bottomlessarchive.loa.type.domain.DocumentType;
-import com.github.bottomlessarchive.loa.validator.configuration.FileValidationConfigurationProperties;
-import com.github.bottomlessarchive.loa.validator.service.DocumentFileValidator;
-import io.micrometer.core.instrument.Counter;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.MDC;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.springframework.stereotype.Service;
 
 import java.net.URL;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Semaphore;
 
-/**
- * This service is responsible for downloading documents.
- */
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class DocumentLocationProcessor {
 
-    private final StageLocationFactory stageLocationFactory;
-    private final DocumentFileValidator documentFileValidator;
-    private final FileCollector fileCollector;
-    private final DocumentArchiver documentArchiver;
     private final DocumentTypeCalculator documentTypeCalculator;
-    private final FileValidationConfigurationProperties fileValidationConfigurationProperties;
-    private final DocumentLocationManipulator documentLocationManipulator;
-
-    @Qualifier("downloaderSemaphore")
-    private final Semaphore downloaderSemaphore;
-    @Qualifier("downloaderExecutorService")
-    private final ExecutorService downloaderExecutorService;
-    @Qualifier("processedDocumentCount")
-    private final Counter processedDocumentCount;
+    private final DocumentLocationProcessingExecutor documentLocationProcessingExecutor;
 
     public void processDocumentLocation(final DocumentLocation documentLocation) {
-        processDocumentLocation(documentLocation, null);
+        documentLocation.getLocation().toUrl()
+                .flatMap(location -> documentTypeCalculator.calculate(location)
+                        .map(value -> ImmutablePair.of(location, value))
+                )
+                .ifPresentOrElse(pair -> doProcessing(documentLocation, pair), () -> logInvalidType(documentLocation));
     }
 
-    @SneakyThrows
-    public void processDocumentLocation(final DocumentLocation documentLocation, final Runnable callback) {
-        if (!stageLocationFactory.hasSpace(fileValidationConfigurationProperties.maximumArchiveSize())) {
-            log.error("Not enough local staging space is available!");
-
-            throw new NotEnoughSpaceException("Not enough local staging space is available!");
-        }
-
-        processedDocumentCount.increment();
-
-        downloaderSemaphore.acquire();
-
-        downloaderExecutorService.execute(() -> {
-            MDC.put("documentLocationId", documentLocation.getId());
-
-            doProcessDocumentLocation(documentLocation);
-
-            downloaderSemaphore.release();
-
-            if (callback != null) {
-                callback.run();
-            }
-
-            MDC.clear();
-        });
+    private void doProcessing(final DocumentLocation documentLocation, final ImmutablePair<URL, DocumentType> pair) {
+        documentLocationProcessingExecutor.executeProcessing(documentLocation.getId(), documentLocation.getSourceName(),
+                pair.getLeft(), pair.getRight());
     }
 
-    private void doProcessDocumentLocation(final DocumentLocation documentLocation) {
-        final URL documentLocationURL = documentLocation.getLocation().toUrl().orElseThrow();
-        final Optional<DocumentType> documentTypeOptional = documentTypeCalculator.calculate(documentLocationURL);
-
-        if (documentTypeOptional.isEmpty()) {
-            log.debug("Document on location {} has an unknown document type!", documentLocation);
-
-            return;
-        }
-
-        final DocumentType documentType = documentTypeOptional.get();
-
-        log.debug("Starting to download document {}.", documentLocationURL);
-
-        final UUID documentId = UUID.randomUUID();
-
-        final StageLocation stageLocation = stageLocationFactory.getLocation(documentId.toString(), documentType);
-
-        try {
-            final DocumentLocationResultType documentLocationResultType = DocumentLocationResultType.valueOf(
-                    fileCollector.acquireFile(documentLocationURL, stageLocation.getPath(), documentType).name());
-
-            documentLocationManipulator.updateDownloadResultCode(documentLocation.getId(), documentLocationResultType);
-
-            if (documentFileValidator.isValidDocument(documentId.toString(), documentType)) {
-                final DocumentArchivingContext documentArchivingContext = DocumentArchivingContext.builder()
-                        .id(documentId)
-                        .type(documentType)
-                        .source(documentLocation.getSourceName())
-                        .sourceLocationId(documentLocation.getId())
-                        .contents(stageLocation.getPath())
-                        .build();
-
-                documentArchiver.archiveDocument(documentArchivingContext);
-            } else {
-                log.info("Invalid document!");
-            }
-        } catch (final Exception e) {
-            log.info("Error downloading a document: {}!", e.getMessage());
-        }
-
-        if (stageLocation.exists()) {
-            stageLocation.cleanup();
-        }
+    private void logInvalidType(final DocumentLocation documentLocation) {
+        log.debug("Document on location {} has an unknown document type!", documentLocation);
     }
 }
