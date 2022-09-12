@@ -1,6 +1,7 @@
 package com.github.bottomlessarchive.loa.beacon.service;
 
 import com.github.bottomlessarchive.loa.beacon.service.domain.DocumentLocation;
+import com.github.bottomlessarchive.loa.beacon.service.domain.DocumentLocationResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -12,7 +13,7 @@ public class DocumentLocationProcessor {
 
     private final DocumentLocationVisitor documentLocationVisitor;
 
-    public List<Object> processLocations(final List<DocumentLocation> documentLocations) {
+    public List<DocumentLocationResult> processLocations(final List<DocumentLocation> documentLocations) {
         return documentLocations.stream()
                 .map(documentLocationVisitor::visitDocumentLocation)
                 .toList();

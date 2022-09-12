@@ -8,6 +8,7 @@ import com.github.bottomlessarchive.loa.stage.service.StageLocationFactory;
 import com.github.bottomlessarchive.loa.stage.service.domain.StageLocation;
 import com.github.bottomlessarchive.loa.type.domain.DocumentType;
 import com.github.bottomlessarchive.loa.url.service.collector.FileCollector;
+import com.github.bottomlessarchive.loa.url.service.downloader.DocumentLocationResultCalculator;
 import com.github.bottomlessarchive.loa.url.service.downloader.domain.DownloadResult;
 import com.github.bottomlessarchive.loa.validator.service.DocumentFileValidator;
 import lombok.RequiredArgsConstructor;
@@ -26,8 +27,9 @@ public class DocumentLocationVisitor {
     private final DocumentFileValidator documentFileValidator;
     private final StageLocationFactory stageLocationFactory;
     private final BeaconConfigurationProperties beaconConfigurationProperties;
+    private final DocumentLocationResultCalculator documentLocationResultCalculator;
 
-    public Object visitDocumentLocation(final DocumentLocation documentLocation) {
+    public DocumentLocationResult visitDocumentLocation(final DocumentLocation documentLocation) {
         final StageLocation stageLocation = stageLocationFactory.getLocation(documentLocation.getId(), documentLocation.getType());
 
         try {
@@ -52,10 +54,18 @@ public class DocumentLocationVisitor {
                     stageLocation.moveTo(buildStoragePath(documentLocation.getId(), documentLocation.getType()));
                 }
             } else {
-                return null; // TODO: return the failure reason (illegal document)
+                return DocumentLocationResult.builder()
+                        .id(documentLocation.getId())
+                        .size(-1)
+                        .resultType(DownloadResult.INVALID)
+                        .build();
             }
         } catch (Exception e) {
-            return null; // TODO: return the failure reason (IO exception etc)
+            return DocumentLocationResult.builder()
+                    .id(documentLocation.getId())
+                    .size(-1)
+                    .resultType(documentLocationResultCalculator.transformExceptionToDownloadResult(e))
+                    .build();
         } finally {
             if (stageLocation.exists()) {
                 stageLocation.cleanup();

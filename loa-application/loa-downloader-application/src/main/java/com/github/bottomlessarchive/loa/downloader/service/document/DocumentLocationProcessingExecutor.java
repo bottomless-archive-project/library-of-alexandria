@@ -73,6 +73,10 @@ public class DocumentLocationProcessingExecutor {
                 documentArchiver.archiveDocument(documentArchivingContext);
             } else {
                 log.info("Invalid document!");
+
+                if (documentLocationResultType.equals(DocumentLocationResultType.UNKNOWN)) {
+                    documentLocationManipulator.updateDownloadResultCode(documentLocationId, DocumentLocationResultType.INVALID);
+                }
             }
         } catch (final Exception e) {
             log.info("Error downloading a document: {}!", e.getMessage());

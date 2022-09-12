@@ -46,5 +46,7 @@ public enum DocumentLocationResultType {
     /**
      * Got a valid response from the document location, but it was empty.
      */
-    EMPTY_BODY
+    EMPTY_BODY,
+
+    INVALID
 }
