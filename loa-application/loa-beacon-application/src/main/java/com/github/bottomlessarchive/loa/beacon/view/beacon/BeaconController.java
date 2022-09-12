@@ -22,7 +22,8 @@ public class BeaconController {
     private final DocumentLocationProcessor documentLocationProcessor;
 
     @PostMapping("/visit-document-locations")
-    public VisitDocumentLocationsResponse visitDocumentLocations(@RequestBody final VisitDocumentLocationsRequest visitDocumentLocationsRequest) {
+    public VisitDocumentLocationsResponse visitDocumentLocations(
+            @RequestBody final VisitDocumentLocationsRequest visitDocumentLocationsRequest) {
         final List<DocumentLocation> documentLocations = visitDocumentLocationsRequest.getLocations().stream()
                 .map(location -> DocumentLocation.builder()
                         .id(location.getId())

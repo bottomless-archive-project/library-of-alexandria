@@ -68,7 +68,16 @@ public class BeaconClient {
             final VisitDocumentLocationsResponse visitDocumentLocationsResponse = objectMapper.readValue(
                     response, VisitDocumentLocationsResponse.class);
 
-            //TODO: Map the response to a domain class
+            return visitDocumentLocationsResponse.getResults().stream()
+                    .map(location ->
+                            BeaconDocumentLocationResult.builder()
+                                    .id(location.getId())
+                                    .size(location.getSize())
+                                    .checksum(location.getChecksum())
+                                    .resultType(location.getResultType())
+                                    .build()
+                    )
+                    .toList();
         } catch (IOException e) {
             throw new BeaconClientException("Failed to send document locations for downloading!", e);
         }
