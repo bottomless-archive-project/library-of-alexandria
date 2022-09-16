@@ -49,10 +49,6 @@ public class DownloadQueueListener implements CommandLineRunner {
 
             final URL documentLocationURL = new URL(documentLocationMessage.getDocumentLocation());
 
-            final String documentLocationId = documentLocationIdFactory.newDocumentLocationId(documentLocationURL);
-
-            MDC.put("documentLocationId", documentLocationId);
-
             final DocumentLocation documentLocation = DocumentLocation.builder()
                     .id(documentLocationIdFactory.newDocumentLocationId(documentLocationURL))
                     .location(
@@ -70,8 +66,6 @@ public class DownloadQueueListener implements CommandLineRunner {
             } else {
                 log.info("Document location is a duplicate.");
             }
-
-            MDC.clear();
         }
     }
 }

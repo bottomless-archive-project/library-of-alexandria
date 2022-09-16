@@ -34,6 +34,7 @@ dependencies {
     implementation project(':loa-library:loa-checksum-service')
     implementation project(':loa-library:loa-logging-service')
     implementation project(':loa-library:loa-threading-service')
+    implementation project(':loa-library:loa-beacon-client-service')
     implementation project(':loa-library:loa-staging-client-service')
     implementation project(':loa-library:loa-conductor-client-service')
 
