@@ -13,4 +13,5 @@ public class BeaconDocumentLocation {
     private final String id;
     private final URL location;
     private final DocumentType type;
+    private final String sourceName;
 }

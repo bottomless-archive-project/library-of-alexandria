@@ -31,12 +31,13 @@ public class DocumentLocationProcessingExecutor {
     private final DocumentEntityFactory documentEntityFactory;
     private final FileManipulatorService fileManipulatorService;
     private final StageLocationFactory stageLocationFactory;
+    private final DocumentIdFactory documentIdFactory;
     private final DocumentLocationManipulator documentLocationManipulator;
 
     public void executeProcessing(final DocumentLocation documentLocation) {
         log.debug("Starting to download document {}.", documentLocation.getLocation());
 
-        final UUID documentId = UUID.randomUUID();
+        final UUID documentId = documentIdFactory.newDocumentId();
 
         final StageLocation stageLocation = stageLocationFactory.getLocation(documentId.toString(), documentLocation.getType());
 

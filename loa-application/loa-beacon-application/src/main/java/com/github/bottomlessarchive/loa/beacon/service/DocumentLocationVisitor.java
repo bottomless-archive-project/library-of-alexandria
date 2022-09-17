@@ -49,6 +49,8 @@ public class DocumentLocationVisitor {
                             .resultType(documentLocationResultType)
                             .size(size)
                             .checksum(checksum)
+                            .sourceName(documentLocation.getSourceName())
+                            .type(documentLocation.getType())
                             .build();
                 } finally {
                     stageLocation.moveTo(buildStoragePath(documentLocation.getId(), documentLocation.getType()));

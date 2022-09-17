@@ -29,6 +29,7 @@ public class BeaconController {
                         .id(location.getId())
                         .location(location.getLocation())
                         .type(location.getType())
+                        .sourceName(location.getSourceName())
                         .build()
                 )
                 .toList();
@@ -44,6 +45,8 @@ public class BeaconController {
                                                 .size(documentLocationResult.size())
                                                 .checksum(documentLocationResult.checksum())
                                                 .resultType(documentLocationResult.resultType())
+                                                .sourceName(documentLocationResult.sourceName())
+                                                .type(documentLocationResult.type())
                                                 .build()
                                 )
                                 .toList()
