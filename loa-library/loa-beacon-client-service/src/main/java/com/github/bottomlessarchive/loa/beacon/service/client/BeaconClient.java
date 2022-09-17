@@ -50,7 +50,7 @@ public class BeaconClient {
                                                                     DocumentLocationPartialRequest.builder()
                                                                             .id(location.getId())
                                                                             .type(location.getType())
-                                                                            .location(location.getLocation())
+                                                                            .location(location.getLocation().toString())
                                                                             .build()
                                                             )
                                                             .toList()

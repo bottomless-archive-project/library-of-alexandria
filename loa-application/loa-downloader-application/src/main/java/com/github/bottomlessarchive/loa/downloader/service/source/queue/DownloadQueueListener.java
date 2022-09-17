@@ -2,7 +2,6 @@ package com.github.bottomlessarchive.loa.downloader.service.source.queue;
 
 import com.github.bottomlessarchive.loa.downloader.service.document.DocumentLocationEvaluator;
 import com.github.bottomlessarchive.loa.location.domain.DocumentLocation;
-import com.github.bottomlessarchive.loa.location.domain.link.UrlLink;
 import com.github.bottomlessarchive.loa.location.service.id.factory.DocumentLocationIdFactory;
 import com.github.bottomlessarchive.loa.queue.service.QueueManipulator;
 import com.github.bottomlessarchive.loa.queue.service.domain.Queue;
@@ -10,7 +9,6 @@ import com.github.bottomlessarchive.loa.downloader.service.document.DocumentLoca
 import com.github.bottomlessarchive.loa.queue.service.domain.message.DocumentLocationMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.MDC;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
@@ -51,11 +49,7 @@ public class DownloadQueueListener implements CommandLineRunner {
 
             final DocumentLocation documentLocation = DocumentLocation.builder()
                     .id(documentLocationIdFactory.newDocumentLocationId(documentLocationURL))
-                    .location(
-                            UrlLink.builder()
-                                    .url(documentLocationURL)
-                                    .build()
-                    )
+                    .location(documentLocationURL)
                     .sourceName(documentLocationMessage.getSourceName())
                     .build();
 

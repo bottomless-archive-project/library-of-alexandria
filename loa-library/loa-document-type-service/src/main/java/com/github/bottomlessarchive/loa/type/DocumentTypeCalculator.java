@@ -18,6 +18,7 @@ public class DocumentTypeCalculator {
      * @return the calculated type
      */
     public Optional<DocumentType> calculate(final URL documentLocation) {
+        //Using getPath() to be able to crawl urls like: /example/examplefile.pdf?queryparam=value
         final String path = documentLocation.getPath().toLowerCase(Locale.ENGLISH);
 
         if (path.endsWith(".fb2.zip")) {

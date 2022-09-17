@@ -1,11 +1,13 @@
 package com.github.bottomlessarchive.loa.source.file.service.location;
 
+import com.github.bottomlessarchive.loa.location.service.id.factory.DocumentLocationIdFactory;
 import com.github.bottomlessarchive.loa.source.configuration.DocumentSourceConfiguration;
 import com.github.bottomlessarchive.loa.source.source.DocumentLocationSource;
-import com.github.bottomlessarchive.loa.location.domain.link.StringLink;
 import com.github.bottomlessarchive.loa.location.domain.DocumentLocation;
 import com.github.bottomlessarchive.loa.source.file.configuration.FileDocumentSourceConfigurationProperties;
 import com.github.bottomlessarchive.loa.source.file.service.FileSourceFactory;
+import com.github.bottomlessarchive.loa.type.DocumentTypeCalculator;
+import com.github.bottomlessarchive.loa.url.service.encoder.UrlEncoder;
 import io.micrometer.core.instrument.Counter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +15,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 @Slf4j
@@ -23,7 +28,10 @@ public class FileDocumentLocationSource implements DocumentLocationSource {
 
     private final DocumentSourceConfiguration documentSourceConfiguration;
     private final FileDocumentSourceConfigurationProperties fileDocumentSourceConfigurationProperties;
+    private final DocumentTypeCalculator documentTypeCalculator;
     private final FileSourceFactory fileSourceFactory;
+    private final DocumentLocationIdFactory documentLocationIdFactory;
+    private final UrlEncoder urlEncoder;
 
     @Qualifier("processedDocumentLocationCount")
     private final Counter processedDocumentLocationCount;
@@ -42,17 +50,27 @@ public class FileDocumentLocationSource implements DocumentLocationSource {
         return fileSourceFactory.newSourceReader()
                 .lines()
                 .skip(fileDocumentSourceConfigurationProperties.skipLines())
-                .map(link -> {
-                    processedDocumentLocationCount.increment();
+                .peek(url -> processedDocumentLocationCount.increment())
+                .flatMap(link -> parseToUrl(link).stream())
+                .flatMap(url -> urlEncoder.encode(url).stream())
+                .flatMap(url -> documentTypeCalculator.calculate(url)
+                        .map(type ->
+                                DocumentLocation.builder()
+                                        .id(documentLocationIdFactory.newDocumentLocationId(url))
+                                        .location(url)
+                                        .sourceName(documentSourceConfiguration.getName())
+                                        .type(type)
+                                        .build()
+                        )
+                        .stream()
+                );
+    }
 
-                    return DocumentLocation.builder()
-                            .location(
-                                    StringLink.builder()
-                                            .link(link)
-                                            .build()
-                            )
-                            .sourceName(documentSourceConfiguration.getName())
-                            .build();
-                });
+    private Optional<URL> parseToUrl(final String link) {
+        try {
+            return Optional.of(new URL(link));
+        } catch (MalformedURLException e) {
+            return Optional.empty();
+        }
     }
 }

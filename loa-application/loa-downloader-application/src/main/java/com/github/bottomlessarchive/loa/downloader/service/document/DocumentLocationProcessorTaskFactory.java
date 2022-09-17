@@ -15,7 +15,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class DocumentLocationProcessorTaskFactory {
 
-    private final DocumentLocationProcessor documentLocationProcessor;
+    private final DocumentLocationProcessingExecutor documentLocationProcessingExecutor;
     @Qualifier("processedDocumentCount")
     private final Counter processedDocumentCount;
 
@@ -28,7 +28,8 @@ public class DocumentLocationProcessorTaskFactory {
                                 .task(
                                         MDCWrapperTask.builder()
                                                 .mdcParameters(Map.of("documentLocationId", documentLocation.getId()))
-                                                .task(new DocumentLocationProcessorTask(documentLocation, documentLocationProcessor))
+                                                .task(new DocumentLocationProcessorTask(
+                                                        documentLocation, documentLocationProcessingExecutor))
                                                 .build()
                                 )
                                 .build()
