@@ -77,7 +77,7 @@ public class ReplyBeaconDownloader implements CommandLineRunner {
                     documentLocationMessages.stream()
                             .map(location -> BeaconDocumentLocation.builder()
                                     .id(location.getId())
-                                    .type(DocumentType.FB2) //TODO: add type!!!
+                                    .type(location.getType())
                                     .location(location.getLocation())
                                     //TODO: Source name?
                                     .build()

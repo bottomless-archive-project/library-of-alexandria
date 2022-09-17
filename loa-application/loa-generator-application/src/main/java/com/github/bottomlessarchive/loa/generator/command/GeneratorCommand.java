@@ -36,10 +36,10 @@ public class GeneratorCommand implements CommandLineRunner {
 
     private DocumentLocationMessage transform(final DocumentLocation documentLocation) {
         return DocumentLocationMessage.builder()
-                //TODO: Send id too
+                .id(documentLocation.getId())
+                .type(documentLocation.getLocation().toString())
                 .sourceName(documentLocation.getSourceName())
                 .documentLocation(documentLocation.getLocation().toString())
-                //TODO: Send type too
                 .build();
     }
 

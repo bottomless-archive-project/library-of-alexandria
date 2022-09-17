@@ -35,6 +35,8 @@ public class DocumentLocationMessageSerializer implements MessageSerializer<Docu
             final ClientMessage clientMessage) {
         final ActiveMQBuffer bodyBuffer = clientMessage.getBodyBuffer();
 
+        bodyBuffer.writeString(documentLocationMessage.getId());
+        bodyBuffer.writeString(documentLocationMessage.getType());
         bodyBuffer.writeString(documentLocationMessage.getSourceName());
         bodyBuffer.writeString(documentLocationMessage.getDocumentLocation());
     }
