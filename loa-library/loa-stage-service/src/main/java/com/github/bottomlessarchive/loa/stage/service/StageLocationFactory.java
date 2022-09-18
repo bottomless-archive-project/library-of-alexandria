@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.nio.file.Path;
+import java.util.UUID;
 
 /**
  * A factory that creates {@link java.io.File} instances in the staging area. These files could be used to save the
@@ -25,7 +26,7 @@ public class StageLocationFactory {
      * @param documentType the type of the document that we need to create the location for
      * @return the location created in the staging area
      */
-    public StageLocation getLocation(final String documentId, final DocumentType documentType) {
+    public StageLocation getLocation(final UUID documentId, final DocumentType documentType) {
         final Path path = Path.of(stageConfigurationProperties.location(), buildFileName(documentId, documentType));
 
         return StageLocation.builder()
@@ -37,7 +38,7 @@ public class StageLocationFactory {
         return Path.of(stageConfigurationProperties.location()).toFile().getFreeSpace() > requiredSpaceInBytes;
     }
 
-    private String buildFileName(final String documentId, final DocumentType documentType) {
-        return documentId + '.' + documentType.getFileExtension();
+    private String buildFileName(final UUID documentId, final DocumentType documentType) {
+        return documentId + "." + documentType.getFileExtension();
     }
 }

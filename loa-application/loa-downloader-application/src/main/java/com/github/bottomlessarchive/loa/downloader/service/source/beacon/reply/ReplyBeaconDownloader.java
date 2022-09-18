@@ -4,8 +4,10 @@ import com.github.bottomlessarchive.loa.beacon.service.client.BeaconClient;
 import com.github.bottomlessarchive.loa.beacon.service.client.domain.BeaconDocumentLocation;
 import com.github.bottomlessarchive.loa.beacon.service.client.domain.BeaconDocumentLocationResult;
 import com.github.bottomlessarchive.loa.compression.configuration.CompressionConfigurationProperties;
+import com.github.bottomlessarchive.loa.downloader.service.document.DocumentArchiver;
 import com.github.bottomlessarchive.loa.downloader.service.document.DocumentIdFactory;
 import com.github.bottomlessarchive.loa.downloader.service.document.DocumentLocationEvaluator;
+import com.github.bottomlessarchive.loa.downloader.service.document.domain.DocumentArchivingContext;
 import com.github.bottomlessarchive.loa.location.domain.DocumentLocation;
 import com.github.bottomlessarchive.loa.location.domain.DocumentLocationResultType;
 import com.github.bottomlessarchive.loa.location.service.DocumentLocationManipulator;
@@ -13,8 +15,9 @@ import com.github.bottomlessarchive.loa.queue.service.QueueManipulator;
 import com.github.bottomlessarchive.loa.queue.service.domain.Queue;
 import com.github.bottomlessarchive.loa.queue.service.domain.message.DocumentArchivingMessage;
 import com.github.bottomlessarchive.loa.queue.service.domain.message.DocumentLocationMessage;
+import com.github.bottomlessarchive.loa.stage.service.StageLocationFactory;
+import com.github.bottomlessarchive.loa.stage.service.domain.StageLocation;
 import com.github.bottomlessarchive.loa.type.domain.DocumentType;
-import com.github.bottomlessarchive.loa.url.service.downloader.FileDownloadManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
@@ -36,7 +39,9 @@ public class ReplyBeaconDownloader implements CommandLineRunner {
 
     private final BeaconClient beaconClient;
     private final QueueManipulator queueManipulator;
+    private final DocumentArchiver documentArchiver;
     private final DocumentIdFactory documentIdFactory;
+    private final StageLocationFactory stageLocationFactory;
     private final DocumentLocationEvaluator documentLocationEvaluator;
     private final DocumentLocationManipulator documentLocationManipulator;
     private final CompressionConfigurationProperties compressionConfigurationProperties;
@@ -90,7 +95,7 @@ public class ReplyBeaconDownloader implements CommandLineRunner {
                             .collect(Collectors.toList())
             );
 
-            result.forEach(beaconDocumentLocationResult -> {
+            for (BeaconDocumentLocationResult beaconDocumentLocationResult : result) {
                 // Updating the location result is mandatory
                 final DocumentLocationResultType documentLocationResultType = DocumentLocationResultType.valueOf(
                         beaconDocumentLocationResult.getResultType());
@@ -101,22 +106,32 @@ public class ReplyBeaconDownloader implements CommandLineRunner {
 
                 if (DocumentLocationResultType.OK.equals(documentLocationResultType)) {
                     final UUID documentId = documentIdFactory.newDocumentId();
-                    //TODO: download the document
 
-                    beaconClient.downloadDocumentFromBeacon("beacon-1", beaconDocumentLocationResult.getId(), ); //TODO: beacon name!
+                    final StageLocation stageLocation = stageLocationFactory.getLocation(documentId,
+                            beaconDocumentLocationResult.getType());
 
-                    DocumentArchivingMessage documentArchivingMessage = DocumentArchivingMessage.builder()
-                            .id(documentId.toString())
-                            .type(beaconDocumentLocationResult.getType().toString())
-                            .source(beaconDocumentLocationResult.getSourceName())
-                            .sourceLocationId(beaconDocumentLocationResult.getId())
-                            .contentLength(fileManipulatorService.size(compressedContent))
-                            .originalContentLength(beaconDocumentLocationResult.getSize())
-                            .checksum(checksumProvider.checksum(fileManipulatorService.getInputStream(documentArchivingContext.getContents())))
-                            .compression(compressionConfigurationProperties.algorithm().toString())
-                            .build();
+                    try {
+                        beaconClient.downloadDocumentFromBeacon("beacon-1", documentId, stageLocation.getPath()); //TODO: beacon name!
+
+                        final DocumentArchivingContext documentArchivingContext = DocumentArchivingContext.builder()
+                                .id(documentId)
+                                .type(beaconDocumentLocationResult.getType())
+                                .source(beaconDocumentLocationResult.getSourceName())
+                                .sourceLocationId(beaconDocumentLocationResult.getId())
+                                .contents(stageLocation.getPath())
+                                .build();
+
+                        documentArchiver.archiveDocument(documentArchivingContext);
+                    } catch (final Exception e) {
+                        //TODO: Handle this normally! Ie retry until we can get the document etc!
+                        log.info("Error downloading a document: {}!", e.getMessage());
+                    } finally {
+                        if (stageLocation.exists()) {
+                            stageLocation.cleanup();
+                        }
+                    }
                 }
-            });
+            }
         }
     }
 }
