@@ -61,7 +61,7 @@ class SourceLocationRecrawlerServiceTest {
         when(stageLocation.getPath())
                 .thenReturn(mockPath);
 
-        when(documentFileValidator.isValidDocument(any(), eq(DocumentType.PDF)))
+        when(documentFileValidator.isValidDocument(any(), eq(stageLocation), eq(DocumentType.PDF)))
                 .thenReturn(true);
 
         final byte[] content = {1, 2, 3};

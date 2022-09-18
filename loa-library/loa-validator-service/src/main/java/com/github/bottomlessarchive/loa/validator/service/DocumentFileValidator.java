@@ -1,7 +1,6 @@
 package com.github.bottomlessarchive.loa.validator.service;
 
 import com.github.bottomlessarchive.loa.parser.service.DocumentDataParser;
-import com.github.bottomlessarchive.loa.stage.service.StageLocationFactory;
 import com.github.bottomlessarchive.loa.stage.service.domain.StageLocation;
 import com.github.bottomlessarchive.loa.type.domain.DocumentType;
 import com.github.bottomlessarchive.loa.validator.configuration.FileValidationConfigurationProperties;
@@ -24,7 +23,6 @@ public class DocumentFileValidator {
     private static final int MINIMUM_FILE_LENGTH = 1024;
 
     private final DocumentDataParser documentDataParser;
-    private final StageLocationFactory stageLocationFactory;
     private final FileValidationConfigurationProperties fileValidationConfigurationProperties;
 
     /**
@@ -33,9 +31,8 @@ public class DocumentFileValidator {
      * @param documentId   the id of the document to validate
      * @param documentType the type of the document to validate
      */
-    public boolean isValidDocument(final String documentId, final DocumentType documentType) {
-        final StageLocation stageLocation = stageLocationFactory.getLocation(documentId, documentType);
-
+    public boolean isValidDocument(final UUID documentId, final StageLocation stageLocation, final DocumentType documentType) {
+        //TODO: StageLocation should extend and interface called FileLocation. This module shouldn't know about stage at all!
         return stageLocation.exists() && isValidFileSize(stageLocation.size()) && isParsable(documentId, documentType, stageLocation);
     }
 
@@ -44,10 +41,10 @@ public class DocumentFileValidator {
                 && stageFileSize < fileValidationConfigurationProperties.maximumArchiveSize();
     }
 
-    private boolean isParsable(final String documentId, final DocumentType documentType,
+    private boolean isParsable(final UUID documentId, final DocumentType documentType,
             final StageLocation stageLocation) {
         try (InputStream inputStream = stageLocation.openStream()) {
-            documentDataParser.parseDocumentMetadata(UUID.fromString(documentId), documentType, inputStream);
+            documentDataParser.parseDocumentMetadata(documentId, documentType, inputStream);
 
             return true;
         } catch (final Exception e) {

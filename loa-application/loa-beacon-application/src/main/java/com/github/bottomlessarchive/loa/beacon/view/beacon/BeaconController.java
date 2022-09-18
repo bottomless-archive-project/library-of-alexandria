@@ -42,6 +42,7 @@ public class BeaconController {
                                 .map(documentLocationResult ->
                                         DocumentLocationResultPartialResponse.builder()
                                                 .id(documentLocationResult.id())
+                                                .documentId(documentLocationResult.documentId().toString())
                                                 .size(documentLocationResult.size())
                                                 .checksum(documentLocationResult.checksum())
                                                 .resultType(documentLocationResult.resultType())

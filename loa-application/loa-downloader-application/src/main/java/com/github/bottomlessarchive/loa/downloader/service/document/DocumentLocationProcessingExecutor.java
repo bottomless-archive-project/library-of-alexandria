@@ -60,7 +60,7 @@ public class DocumentLocationProcessingExecutor {
                 return;
             }
 
-            if (documentFileValidator.isValidDocument(documentId.toString(), documentLocation.getType())) {
+            if (documentFileValidator.isValidDocument(documentId, stageLocation, documentLocation.getType())) {
                 final DocumentArchivingContext documentArchivingContext = DocumentArchivingContext.builder()
                         .id(documentId)
                         .type(documentLocation.getType())

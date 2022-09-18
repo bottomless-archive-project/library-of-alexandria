@@ -10,6 +10,7 @@ import lombok.Getter;
 public class DocumentLocationResultPartialResponse {
 
     private final String id;
+    private final String documentId;
     private final String checksum;
     private final long size;
     private final DownloadResult resultType;

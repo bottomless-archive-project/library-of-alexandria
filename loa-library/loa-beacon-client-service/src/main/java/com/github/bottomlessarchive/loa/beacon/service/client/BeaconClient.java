@@ -80,6 +80,8 @@ public class BeaconClient {
                     .map(location ->
                             BeaconDocumentLocationResult.builder()
                                     .id(location.getId())
+                                    .documentId(location.getDocumentId() == null
+                                            ? null : UUID.fromString(location.getDocumentId()))
                                     .size(location.getSize())
                                     .checksum(location.getChecksum())
                                     .resultType(location.getResultType())

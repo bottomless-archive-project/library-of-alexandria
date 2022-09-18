@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Path;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -30,7 +31,9 @@ public class DocumentLocationVisitor {
     private final DocumentLocationResultCalculator documentLocationResultCalculator;
 
     public DocumentLocationResult visitDocumentLocation(final DocumentLocation documentLocation) {
-        final StageLocation stageLocation = stageLocationFactory.getLocation(documentLocation.getId(), documentLocation.getType());
+        final UUID documentId = UUID.randomUUID();
+
+        final StageLocation stageLocation = stageLocationFactory.getLocation(documentId, documentLocation.getType());
 
         try {
             final URL documentLocationURL = new URL(documentLocation.getLocation());
@@ -38,7 +41,7 @@ public class DocumentLocationVisitor {
             final DownloadResult documentLocationResultType = fileCollector.acquireFile(documentLocationURL,
                     stageLocation.getPath(), documentLocation.getType());
 
-            if (documentFileValidator.isValidDocument(documentLocation.getId(), documentLocation.getType())) {
+            if (documentFileValidator.isValidDocument(documentId, stageLocation, documentLocation.getType())) {
                 final long size = stageLocation.size();
 
                 try (InputStream inputStream = stageLocation.openStream()) {
@@ -46,6 +49,7 @@ public class DocumentLocationVisitor {
 
                     return DocumentLocationResult.builder()
                             .id(documentLocation.getId())
+                            .documentId(documentId)
                             .resultType(documentLocationResultType)
                             .size(size)
                             .checksum(checksum)
@@ -53,7 +57,7 @@ public class DocumentLocationVisitor {
                             .type(documentLocation.getType())
                             .build();
                 } finally {
-                    stageLocation.moveTo(buildStoragePath(documentLocation.getId(), documentLocation.getType()));
+                    stageLocation.moveTo(buildStoragePath(documentId, documentLocation.getType()));
                 }
             } else {
                 return DocumentLocationResult.builder()
@@ -75,7 +79,7 @@ public class DocumentLocationVisitor {
         }
     }
 
-    private Path buildStoragePath(final String documentId, final DocumentType documentType) {
+    private Path buildStoragePath(final UUID documentId, final DocumentType documentType) {
         return Path.of(beaconConfigurationProperties.storagePath()).resolve(documentId + "." + documentType.getFileExtension());
     }
 }

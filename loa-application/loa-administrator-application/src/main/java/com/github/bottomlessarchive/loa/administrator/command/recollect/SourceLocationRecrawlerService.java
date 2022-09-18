@@ -30,7 +30,7 @@ public class SourceLocationRecrawlerService {
     private final FileDownloadManager fileDownloadManager;
 
     public void recrawlSourceLocation(final DocumentLocation documentLocation, final DocumentEntity documentEntity) {
-        final String documentRecrawlId = UUID.randomUUID().toString();
+        final UUID documentRecrawlId = UUID.randomUUID();
 
         if (log.isInfoEnabled()) {
             log.info("Downloading the recrawl target for document: {} with new staging id: {}.", documentEntity.getId(), documentRecrawlId);
@@ -40,7 +40,7 @@ public class SourceLocationRecrawlerService {
 
         fileDownloadManager.downloadFile(convertToURL(documentLocation), stageLocation.getPath());
 
-        final boolean isValidDocument = documentFileValidator.isValidDocument(documentRecrawlId, documentEntity.getType());
+        final boolean isValidDocument = documentFileValidator.isValidDocument(documentRecrawlId, stageLocation, documentEntity.getType());
 
         if (isValidDocument) {
             try (InputStream content = stageLocation.openStream()) {
