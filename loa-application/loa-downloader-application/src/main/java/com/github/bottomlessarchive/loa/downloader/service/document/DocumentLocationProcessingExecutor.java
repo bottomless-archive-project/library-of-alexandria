@@ -39,7 +39,7 @@ public class DocumentLocationProcessingExecutor {
 
         final UUID documentId = documentIdFactory.newDocumentId();
 
-        final StageLocation stageLocation = stageLocationFactory.getLocation(documentId, documentLocation.getType());
+        final StageLocation stageLocation = stageLocationFactory.getLocation(documentId);
 
         try {
             final DocumentLocationResultType documentLocationResultType = DocumentLocationResultType.valueOf(

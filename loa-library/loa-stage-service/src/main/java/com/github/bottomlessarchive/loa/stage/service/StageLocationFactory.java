@@ -2,7 +2,6 @@ package com.github.bottomlessarchive.loa.stage.service;
 
 import com.github.bottomlessarchive.loa.stage.configuration.StageConfigurationProperties;
 import com.github.bottomlessarchive.loa.stage.service.domain.StageLocation;
-import com.github.bottomlessarchive.loa.type.domain.DocumentType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,11 +22,10 @@ public class StageLocationFactory {
      * Return a path in the staging area that's uniquely generated for the provided document id.
      *
      * @param documentId   the document's id that we need to create the location for
-     * @param documentType the type of the document that we need to create the location for
      * @return the location created in the staging area
      */
-    public StageLocation getLocation(final UUID documentId, final DocumentType documentType) {
-        final Path path = Path.of(stageConfigurationProperties.location(), buildFileName(documentId, documentType));
+    public StageLocation getLocation(final UUID documentId) {
+        final Path path = Path.of(stageConfigurationProperties.location(), buildFileName(documentId));
 
         return StageLocation.builder()
                 .path(path)
@@ -38,7 +36,7 @@ public class StageLocationFactory {
         return Path.of(stageConfigurationProperties.location()).toFile().getFreeSpace() > requiredSpaceInBytes;
     }
 
-    private String buildFileName(final UUID documentId, final DocumentType documentType) {
-        return documentId + "." + documentType.getFileExtension();
+    private String buildFileName(final UUID documentId) {
+        return documentId.toString();
     }
 }

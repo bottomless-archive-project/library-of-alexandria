@@ -2,7 +2,6 @@ package com.github.bottomlessarchive.loa.stage.service;
 
 import com.github.bottomlessarchive.loa.stage.configuration.StageConfigurationProperties;
 import com.github.bottomlessarchive.loa.stage.service.domain.StageLocation;
-import com.github.bottomlessarchive.loa.type.domain.DocumentType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -33,7 +32,7 @@ class StageLocationFactoryTest {
         when(stageConfigurationProperties.location())
                 .thenReturn("testlocation");
 
-        final StageLocation result = underTest.getLocation(TEST_DOCUMENT_ID, DocumentType.PDF);
+        final StageLocation result = underTest.getLocation(TEST_DOCUMENT_ID);
 
         assertThat(result.getPath().toString(), is(TEST_LOCATION + FileSystems.getDefault().getSeparator()
                 + TEST_DOCUMENT_ID + ".pdf"));

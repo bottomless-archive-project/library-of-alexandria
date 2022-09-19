@@ -36,7 +36,7 @@ public class SourceLocationRecrawlerService {
             log.info("Downloading the recrawl target for document: {} with new staging id: {}.", documentEntity.getId(), documentRecrawlId);
         }
 
-        final StageLocation stageLocation = stageLocationFactory.getLocation(documentRecrawlId, documentEntity.getType());
+        final StageLocation stageLocation = stageLocationFactory.getLocation(documentRecrawlId);
 
         fileDownloadManager.downloadFile(convertToURL(documentLocation), stageLocation.getPath());
 

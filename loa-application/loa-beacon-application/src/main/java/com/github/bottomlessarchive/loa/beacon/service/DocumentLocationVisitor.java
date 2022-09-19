@@ -33,7 +33,7 @@ public class DocumentLocationVisitor {
     public DocumentLocationResult visitDocumentLocation(final DocumentLocation documentLocation) {
         final UUID documentId = UUID.randomUUID();
 
-        final StageLocation stageLocation = stageLocationFactory.getLocation(documentId, documentLocation.getType());
+        final StageLocation stageLocation = stageLocationFactory.getLocation(documentId);
 
         try {
             final URL documentLocationURL = new URL(documentLocation.getLocation());

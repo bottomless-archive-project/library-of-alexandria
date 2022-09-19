@@ -93,7 +93,7 @@ public class ReplyBeaconDownloader implements CommandLineRunner {
                             .collect(Collectors.toList())
             );
 
-            for (BeaconDocumentLocationResult beaconDocumentLocationResult : result) {
+            for (final BeaconDocumentLocationResult beaconDocumentLocationResult : result) {
                 // Updating the location result is mandatory
                 final DocumentLocationResultType documentLocationResultType = DocumentLocationResultType.valueOf(
                         beaconDocumentLocationResult.getResultType());
@@ -106,8 +106,7 @@ public class ReplyBeaconDownloader implements CommandLineRunner {
                     final UUID documentId = beaconDocumentLocationResult.getDocumentId()
                             .orElseThrow();
 
-                    final StageLocation stageLocation = stageLocationFactory.getLocation(documentId,
-                            beaconDocumentLocationResult.getType());
+                    final StageLocation stageLocation = stageLocationFactory.getLocation(documentId);
 
                     try {
                         beaconClient.downloadDocumentFromBeacon(beaconDownloaderConfigurationProperties.activeBeacon(),

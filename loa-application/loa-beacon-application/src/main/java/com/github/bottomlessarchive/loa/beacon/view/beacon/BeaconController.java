@@ -59,6 +59,6 @@ public class BeaconController {
 
     @PostMapping("/document/{documentId}")
     public byte[] returnDownloadedDocument(@PathVariable final UUID documentId) {
-        return null; //TODO
+        return new byte[]{}; //TODO
     }
 }
