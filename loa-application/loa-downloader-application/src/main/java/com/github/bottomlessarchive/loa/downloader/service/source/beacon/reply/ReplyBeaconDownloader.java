@@ -3,17 +3,15 @@ package com.github.bottomlessarchive.loa.downloader.service.source.beacon.reply;
 import com.github.bottomlessarchive.loa.beacon.service.client.BeaconClient;
 import com.github.bottomlessarchive.loa.beacon.service.client.domain.BeaconDocumentLocation;
 import com.github.bottomlessarchive.loa.beacon.service.client.domain.BeaconDocumentLocationResult;
-import com.github.bottomlessarchive.loa.compression.configuration.CompressionConfigurationProperties;
 import com.github.bottomlessarchive.loa.downloader.service.document.DocumentArchiver;
-import com.github.bottomlessarchive.loa.downloader.service.document.DocumentIdFactory;
 import com.github.bottomlessarchive.loa.downloader.service.document.DocumentLocationEvaluator;
 import com.github.bottomlessarchive.loa.downloader.service.document.domain.DocumentArchivingContext;
+import com.github.bottomlessarchive.loa.downloader.service.source.beacon.configuration.BeaconDownloaderConfigurationProperties;
 import com.github.bottomlessarchive.loa.location.domain.DocumentLocation;
 import com.github.bottomlessarchive.loa.location.domain.DocumentLocationResultType;
 import com.github.bottomlessarchive.loa.location.service.DocumentLocationManipulator;
 import com.github.bottomlessarchive.loa.queue.service.QueueManipulator;
 import com.github.bottomlessarchive.loa.queue.service.domain.Queue;
-import com.github.bottomlessarchive.loa.queue.service.domain.message.DocumentArchivingMessage;
 import com.github.bottomlessarchive.loa.queue.service.domain.message.DocumentLocationMessage;
 import com.github.bottomlessarchive.loa.stage.service.StageLocationFactory;
 import com.github.bottomlessarchive.loa.stage.service.domain.StageLocation;
@@ -40,11 +38,10 @@ public class ReplyBeaconDownloader implements CommandLineRunner {
     private final BeaconClient beaconClient;
     private final QueueManipulator queueManipulator;
     private final DocumentArchiver documentArchiver;
-    private final DocumentIdFactory documentIdFactory;
     private final StageLocationFactory stageLocationFactory;
     private final DocumentLocationEvaluator documentLocationEvaluator;
     private final DocumentLocationManipulator documentLocationManipulator;
-    private final CompressionConfigurationProperties compressionConfigurationProperties;
+    private final BeaconDownloaderConfigurationProperties beaconDownloaderConfigurationProperties;
 
     @Override
     public void run(final String... args) throws MalformedURLException {
@@ -83,7 +80,8 @@ public class ReplyBeaconDownloader implements CommandLineRunner {
                 }
             }
 
-            final List<BeaconDocumentLocationResult> result = beaconClient.visitDocumentLocations("beacon-1", //TODO: Beacon name!
+            final List<BeaconDocumentLocationResult> result = beaconClient.visitDocumentLocations(
+                    beaconDownloaderConfigurationProperties.activeBeacon(),
                     documentLocationMessages.stream()
                             .map(location -> BeaconDocumentLocation.builder()
                                     .id(location.getId())
@@ -112,7 +110,8 @@ public class ReplyBeaconDownloader implements CommandLineRunner {
                             beaconDocumentLocationResult.getType());
 
                     try {
-                        beaconClient.downloadDocumentFromBeacon("beacon-1", documentId, stageLocation.getPath()); //TODO: beacon name!
+                        beaconClient.downloadDocumentFromBeacon(beaconDownloaderConfigurationProperties.activeBeacon(),
+                                documentId, stageLocation.getPath());
 
                         final DocumentArchivingContext documentArchivingContext = DocumentArchivingContext.builder()
                                 .id(documentId)
