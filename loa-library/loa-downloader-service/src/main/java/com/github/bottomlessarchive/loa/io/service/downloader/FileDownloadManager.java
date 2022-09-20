@@ -1,5 +1,6 @@
-package com.github.bottomlessarchive.loa.url.service.downloader;
+package com.github.bottomlessarchive.loa.io.service.downloader;
 
+import com.github.bottomlessarchive.loa.url.service.downloader.DocumentLocationResultCalculator;
 import com.github.bottomlessarchive.loa.url.service.downloader.domain.DownloadResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

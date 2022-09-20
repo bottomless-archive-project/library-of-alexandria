@@ -1,10 +1,10 @@
-package com.github.bottomlessarchive.loa.url.service.collector;
+package com.github.bottomlessarchive.loa.io.service.collector;
 
 import com.github.bottomlessarchive.loa.file.FileManipulatorService;
 import com.github.bottomlessarchive.loa.file.zip.ZipFileManipulatorService;
+import com.github.bottomlessarchive.loa.io.service.collector.domain.DocumentCollectionException;
+import com.github.bottomlessarchive.loa.io.service.downloader.FileDownloadManager;
 import com.github.bottomlessarchive.loa.type.domain.DocumentType;
-import com.github.bottomlessarchive.loa.url.service.collector.domain.FileCollectionException;
-import com.github.bottomlessarchive.loa.url.service.downloader.FileDownloadManager;
 import com.github.bottomlessarchive.loa.url.service.downloader.domain.DownloadResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,13 +19,13 @@ import java.nio.file.StandardCopyOption;
  */
 @Service
 @RequiredArgsConstructor
-public class FileCollector {
+public class DocumentCollector {
 
     private final FileDownloadManager fileDownloadManager;
     private final FileManipulatorService fileManipulatorService;
     private final ZipFileManipulatorService zipFileManipulatorService;
 
-    public DownloadResult acquireFile(final URL fileLocation, final Path resultLocation, final DocumentType documentType) {
+    public DownloadResult acquireDocument(final URL fileLocation, final Path resultLocation, final DocumentType documentType) {
         try {
             final String protocol = fileLocation.getProtocol();
 
@@ -43,7 +43,7 @@ public class FileCollector {
 
             return documentLocationResultType;
         } catch (Exception e) {
-            throw new FileCollectionException("Failed to collect file at location: " + fileLocation + "!", e);
+            throw new DocumentCollectionException("Failed to collect file at location: " + fileLocation + "!", e);
         }
     }
 

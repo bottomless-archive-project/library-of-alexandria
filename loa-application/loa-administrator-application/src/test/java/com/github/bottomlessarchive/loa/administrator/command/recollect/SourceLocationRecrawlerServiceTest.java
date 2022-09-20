@@ -1,11 +1,11 @@
 package com.github.bottomlessarchive.loa.administrator.command.recollect;
 
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentEntity;
+import com.github.bottomlessarchive.loa.io.service.downloader.FileDownloadManager;
 import com.github.bottomlessarchive.loa.location.service.factory.domain.DocumentLocation;
 import com.github.bottomlessarchive.loa.stage.service.StageLocationFactory;
 import com.github.bottomlessarchive.loa.stage.service.domain.StageLocation;
 import com.github.bottomlessarchive.loa.type.domain.DocumentType;
-import com.github.bottomlessarchive.loa.url.service.downloader.FileDownloadManager;
 import com.github.bottomlessarchive.loa.validator.service.DocumentFileValidator;
 import com.github.bottomlessarchive.loa.vault.client.service.VaultClientService;
 import org.junit.jupiter.api.Test;

@@ -1,6 +1,4 @@
 dependencies {
-    implementation group: 'com.squareup.okhttp3', name: 'okhttp'
-
     implementation group: 'io.mola.galimatias', name: 'galimatias', version: '0.2.1'
 
     api project(':loa-library:loa-file-service')

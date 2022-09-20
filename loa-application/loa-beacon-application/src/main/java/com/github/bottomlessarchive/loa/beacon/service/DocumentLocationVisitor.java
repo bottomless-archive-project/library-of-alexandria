@@ -4,10 +4,10 @@ import com.github.bottomlessarchive.loa.beacon.configuration.BeaconConfiguration
 import com.github.bottomlessarchive.loa.beacon.service.domain.DocumentLocation;
 import com.github.bottomlessarchive.loa.beacon.service.domain.DocumentLocationResult;
 import com.github.bottomlessarchive.loa.checksum.service.ChecksumProvider;
+import com.github.bottomlessarchive.loa.io.service.collector.DocumentCollector;
 import com.github.bottomlessarchive.loa.stage.service.StageLocationFactory;
 import com.github.bottomlessarchive.loa.stage.service.domain.StageLocation;
 import com.github.bottomlessarchive.loa.type.domain.DocumentType;
-import com.github.bottomlessarchive.loa.url.service.collector.FileCollector;
 import com.github.bottomlessarchive.loa.url.service.downloader.DocumentLocationResultCalculator;
 import com.github.bottomlessarchive.loa.url.service.downloader.domain.DownloadResult;
 import com.github.bottomlessarchive.loa.validator.service.DocumentFileValidator;
@@ -23,7 +23,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class DocumentLocationVisitor {
 
-    private final FileCollector fileCollector;
+    private final DocumentCollector documentCollector;
     private final ChecksumProvider checksumProvider;
     private final DocumentFileValidator documentFileValidator;
     private final StageLocationFactory stageLocationFactory;
@@ -38,7 +38,7 @@ public class DocumentLocationVisitor {
         try {
             final URL documentLocationURL = new URL(documentLocation.getLocation());
 
-            final DownloadResult documentLocationResultType = fileCollector.acquireFile(documentLocationURL,
+            final DownloadResult documentLocationResultType = documentCollector.acquireDocument(documentLocationURL,
                     stageLocation.getPath(), documentLocation.getType());
 
             if (documentFileValidator.isValidDocument(documentId, stageLocation, documentLocation.getType())) {

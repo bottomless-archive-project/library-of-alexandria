@@ -1,9 +1,9 @@
-package com.github.bottomlessarchive.loa.downloader.configuration;
+package com.github.bottomlessarchive.loa.io.service.configuration;
 
+import com.github.bottomlessarchive.loa.io.service.configuration.ssl.TrustAllTrustManager;
 import lombok.RequiredArgsConstructor;
 import okhttp3.ConnectionPool;
 import okhttp3.Dispatcher;
-import com.github.bottomlessarchive.loa.downloader.configuration.ssl.TrustAllTrustManager;
 import lombok.SneakyThrows;
 import okhttp3.OkHttpClient;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -23,7 +23,7 @@ import javax.net.ssl.X509TrustManager;
 @RequiredArgsConstructor
 public class DownloaderClientConfiguration {
 
-    private final DownloaderConfigurationProperties downloaderConfigurationProperties;
+    private final HttpClientConfigurationProperties httpClientConfigurationProperties;
 
     @Bean
     public OkHttpClient downloaderClient(
@@ -44,7 +44,7 @@ public class DownloaderClientConfiguration {
     protected Dispatcher dispatcher() {
         final Dispatcher dispatcher = new Dispatcher();
 
-        dispatcher.setMaxRequests(downloaderConfigurationProperties.parallelism());
+        dispatcher.setMaxRequests(httpClientConfigurationProperties.parallelism());
         dispatcher.setMaxRequestsPerHost(10);
 
         return dispatcher;
@@ -52,7 +52,7 @@ public class DownloaderClientConfiguration {
 
     @Bean
     protected ConnectionPool connectionPool() {
-        return new ConnectionPool(downloaderConfigurationProperties.parallelism(), 5, TimeUnit.MINUTES);
+        return new ConnectionPool(httpClientConfigurationProperties.parallelism(), 5, TimeUnit.MINUTES);
     }
 
     @Bean

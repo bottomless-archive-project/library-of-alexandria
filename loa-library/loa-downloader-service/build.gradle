@@ -1,0 +1,5 @@
+dependencies {
+    implementation group: 'com.squareup.okhttp3', name: 'okhttp'
+
+    implementation project(':loa-library:loa-io-service')
+}

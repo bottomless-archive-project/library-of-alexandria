@@ -5,12 +5,12 @@ import com.github.bottomlessarchive.loa.document.service.domain.DocumentEntity;
 import com.github.bottomlessarchive.loa.document.service.entity.factory.DocumentEntityFactory;
 import com.github.bottomlessarchive.loa.downloader.service.document.domain.DocumentArchivingContext;
 import com.github.bottomlessarchive.loa.file.FileManipulatorService;
+import com.github.bottomlessarchive.loa.io.service.collector.DocumentCollector;
 import com.github.bottomlessarchive.loa.location.domain.DocumentLocation;
 import com.github.bottomlessarchive.loa.location.domain.DocumentLocationResultType;
 import com.github.bottomlessarchive.loa.location.service.DocumentLocationManipulator;
 import com.github.bottomlessarchive.loa.stage.service.StageLocationFactory;
 import com.github.bottomlessarchive.loa.stage.service.domain.StageLocation;
-import com.github.bottomlessarchive.loa.url.service.collector.FileCollector;
 import com.github.bottomlessarchive.loa.validator.service.DocumentFileValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +25,7 @@ import java.util.UUID;
 public class DocumentLocationProcessingExecutor {
 
     private final DocumentFileValidator documentFileValidator;
-    private final FileCollector fileCollector;
+    private final DocumentCollector documentCollector;
     private final DocumentArchiver documentArchiver;
     private final ChecksumProvider checksumProvider;
     private final DocumentEntityFactory documentEntityFactory;
@@ -43,7 +43,8 @@ public class DocumentLocationProcessingExecutor {
 
         try {
             final DocumentLocationResultType documentLocationResultType = DocumentLocationResultType.valueOf(
-                    fileCollector.acquireFile(documentLocation.getLocation(), stageLocation.getPath(), documentLocation.getType()).name());
+                    documentCollector.acquireDocument(documentLocation.getLocation(), stageLocation.getPath(),
+                            documentLocation.getType()).name());
 
             documentLocationManipulator.updateDownloadResultCode(documentLocation.getId(), documentLocationResultType);
 

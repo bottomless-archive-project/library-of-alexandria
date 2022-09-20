@@ -1,10 +1,9 @@
-package com.github.bottomlessarchive.loa.downloader.service.file;
+package com.github.bottomlessarchive.loa.io.service.collector;
 
 import com.github.bottomlessarchive.loa.file.FileManipulatorService;
 import com.github.bottomlessarchive.loa.file.zip.ZipFileManipulatorService;
+import com.github.bottomlessarchive.loa.io.service.downloader.FileDownloadManager;
 import com.github.bottomlessarchive.loa.type.domain.DocumentType;
-import com.github.bottomlessarchive.loa.url.service.collector.FileCollector;
-import com.github.bottomlessarchive.loa.url.service.downloader.FileDownloadManager;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InOrder;
@@ -25,7 +24,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class FileCollectorTest {
+class DocumentCollectorTest {
 
     private static final Path TEST_PATH = Path.of("/test.pdf");
 
@@ -39,13 +38,13 @@ class FileCollectorTest {
     private ZipFileManipulatorService zipFileManipulatorService;
 
     @InjectMocks
-    private FileCollector underTest;
+    private DocumentCollector underTest;
 
     @Test
     void testWhenHttpLocationIsVisited() throws MalformedURLException {
         final URL testLocation = new URL("http://localhost/test.pdf");
 
-        underTest.acquireFile(testLocation, TEST_PATH, DocumentType.PDF);
+        underTest.acquireDocument(testLocation, TEST_PATH, DocumentType.PDF);
 
         verify(fileDownloadManager)
                 .downloadFile(testLocation, TEST_PATH);
@@ -55,7 +54,7 @@ class FileCollectorTest {
     void testWhenHttpsLocationIsVisited() throws MalformedURLException {
         final URL testLocation = new URL("http://localhost/test.pdf");
 
-        underTest.acquireFile(testLocation, TEST_PATH, DocumentType.PDF);
+        underTest.acquireDocument(testLocation, TEST_PATH, DocumentType.PDF);
 
         verify(fileDownloadManager)
                 .downloadFile(testLocation, TEST_PATH);
@@ -65,7 +64,7 @@ class FileCollectorTest {
     void testWhenFileLocationIsVisited() throws IOException, URISyntaxException {
         final URL testLocation = new URL("file:" + System.getProperty("java.io.tmpdir") + "//test.pdf");
 
-        underTest.acquireFile(testLocation, TEST_PATH, DocumentType.PDF);
+        underTest.acquireDocument(testLocation, TEST_PATH, DocumentType.PDF);
 
         verify(fileManipulatorService)
                 .copy(testLocation.toURI(), TEST_PATH);
@@ -78,7 +77,7 @@ class FileCollectorTest {
         when(zipFileManipulatorService.isZipArchive(any()))
                 .thenReturn(true);
 
-        underTest.acquireFile(testLocation, TEST_PATH, DocumentType.FB2);
+        underTest.acquireDocument(testLocation, TEST_PATH, DocumentType.FB2);
 
         verify(fileDownloadManager)
                 .downloadFile(testLocation, TEST_PATH);

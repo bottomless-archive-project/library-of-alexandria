@@ -1,4 +1,4 @@
-package com.github.bottomlessarchive.loa.downloader.configuration.ssl;
+package com.github.bottomlessarchive.loa.io.service.configuration.ssl;
 
 import org.springframework.stereotype.Component;
 

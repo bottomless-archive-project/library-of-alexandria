@@ -29,6 +29,7 @@ dependencies {
     implementation project(':loa-library:loa-user-service')
     implementation project(':loa-library:loa-stage-service')
     implementation project(':loa-library:loa-validator-service')
+    implementation project(':loa-library:loa-downloader-service')
     implementation project(':loa-library:loa-vault-client-service')
     implementation project(':loa-library:loa-document-parser-service')
     implementation project(':loa-library:loa-document-location-service')

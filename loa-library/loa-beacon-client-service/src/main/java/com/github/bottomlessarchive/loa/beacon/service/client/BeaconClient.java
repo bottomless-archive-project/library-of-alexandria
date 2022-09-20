@@ -8,7 +8,7 @@ import com.github.bottomlessarchive.loa.beacon.service.client.domain.BeaconDocum
 import com.github.bottomlessarchive.loa.beacon.service.client.request.DocumentLocationPartialRequest;
 import com.github.bottomlessarchive.loa.beacon.service.client.request.VisitDocumentLocationsRequest;
 import com.github.bottomlessarchive.loa.beacon.service.client.response.VisitDocumentLocationsResponse;
-import com.github.bottomlessarchive.loa.url.service.downloader.FileDownloadManager;
+import com.github.bottomlessarchive.loa.io.service.downloader.FileDownloadManager;
 import com.github.bottomlessarchive.loa.url.service.downloader.domain.DownloadResult;
 import lombok.RequiredArgsConstructor;
 import okhttp3.MediaType;
