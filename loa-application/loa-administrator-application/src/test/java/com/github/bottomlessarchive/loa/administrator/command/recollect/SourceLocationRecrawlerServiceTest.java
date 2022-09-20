@@ -50,6 +50,7 @@ class SourceLocationRecrawlerServiceTest {
                 .url("http://example.com/")
                 .build();
         final DocumentEntity documentEntity = DocumentEntity.builder()
+                .type(DocumentType.PDF)
                 .build();
 
         final StageLocation stageLocation = mock(StageLocation.class);

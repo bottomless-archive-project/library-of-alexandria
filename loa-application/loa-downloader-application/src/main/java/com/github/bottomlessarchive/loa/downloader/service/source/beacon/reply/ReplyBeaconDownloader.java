@@ -27,7 +27,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -58,79 +57,97 @@ public class ReplyBeaconDownloader implements CommandLineRunner {
         }
 
         while (true) {
-            final List<DocumentLocation> documentLocationMessages = new ArrayList<>(1000);
+            final List<DocumentLocation> documentLocationMessages = collectDocumentsToProcess();
 
-            while (documentLocationMessages.size() != 1000) {
-                final DocumentLocationMessage documentLocationMessage =
-                        queueManipulator.readMessage(Queue.DOCUMENT_LOCATION_QUEUE, DocumentLocationMessage.class);
+            final List<BeaconDocumentLocationResult> beaconDocumentLocationResults =
+                    processDocumentLocationsByBeacon(documentLocationMessages);
 
-                final DocumentLocation documentLocation = DocumentLocation.builder()
-                        .id(documentLocationMessage.getId())
-                        .location(new URL(documentLocationMessage.getDocumentLocation()))
-                        .type(DocumentType.valueOf(documentLocationMessage.getType()))
-                        .sourceName(documentLocationMessage.getSourceName())
+            beaconDocumentLocationResults.forEach(this::processBeaconDocumentLocationResult);
+        }
+    }
+
+    //TODO: move to a factory
+    private BeaconDocumentLocation newBeaconDocumentLocation(final DocumentLocation location) {
+        return BeaconDocumentLocation.builder()
+                .id(location.getId())
+                .type(location.getType())
+                .location(location.getLocation())
+                .sourceName(location.getSourceName())
+                .build();
+    }
+
+    private void processBeaconDocumentLocationResult(final BeaconDocumentLocationResult beaconDocumentLocationResult) {
+        // Updating the location result is mandatory
+        final DocumentLocationResultType documentLocationResultType = DocumentLocationResultType.valueOf(
+                beaconDocumentLocationResult.getResultType());
+
+        documentLocationManipulator.updateDownloadResultCode(beaconDocumentLocationResult.getId(), documentLocationResultType);
+
+        //TODO: Filter duplicates based on the returned data (so we don't need to download the doc if it is a duplicate)
+
+        if (DocumentLocationResultType.OK.equals(documentLocationResultType)) {
+            final UUID documentId = beaconDocumentLocationResult.getDocumentId()
+                    .orElseThrow();
+
+            final StageLocation stageLocation = stageLocationFactory.getLocation(documentId);
+
+            try {
+                beaconClient.downloadDocumentFromBeacon(beaconDownloaderConfigurationProperties.activeBeacon(),
+                        documentId, stageLocation.getPath());
+
+                final DocumentArchivingContext documentArchivingContext = DocumentArchivingContext.builder()
+                        .id(documentId)
+                        .type(beaconDocumentLocationResult.getType())
+                        .source(beaconDocumentLocationResult.getSourceName())
+                        .sourceLocationId(beaconDocumentLocationResult.getId())
+                        .contents(stageLocation.getPath())
                         .build();
 
-                log.info("Processing location.");
-
-                if (documentLocationEvaluator.shouldProcessDocumentLocation(documentLocation)) {
-                    documentLocationMessages.add(documentLocation);
-                } else {
-                    log.info("Document location is a duplicate.");
-                }
-            }
-
-            final List<BeaconDocumentLocationResult> result = beaconClient.visitDocumentLocations(
-                    beaconDownloaderConfigurationProperties.activeBeacon(),
-                    documentLocationMessages.stream()
-                            .map(location -> BeaconDocumentLocation.builder()
-                                    .id(location.getId())
-                                    .type(location.getType())
-                                    .location(location.getLocation())
-                                    .sourceName(location.getSourceName())
-                                    .build()
-                            )
-                            .collect(Collectors.toList())
-            );
-
-            for (final BeaconDocumentLocationResult beaconDocumentLocationResult : result) {
-                // Updating the location result is mandatory
-                final DocumentLocationResultType documentLocationResultType = DocumentLocationResultType.valueOf(
-                        beaconDocumentLocationResult.getResultType());
-
-                documentLocationManipulator.updateDownloadResultCode(beaconDocumentLocationResult.getId(), documentLocationResultType);
-
-                //TODO: Filter duplicates based on the returned data (so we don't need to download the doc if it is a duplicate)
-
-                if (DocumentLocationResultType.OK.equals(documentLocationResultType)) {
-                    final UUID documentId = beaconDocumentLocationResult.getDocumentId()
-                            .orElseThrow();
-
-                    final StageLocation stageLocation = stageLocationFactory.getLocation(documentId);
-
-                    try {
-                        beaconClient.downloadDocumentFromBeacon(beaconDownloaderConfigurationProperties.activeBeacon(),
-                                documentId, stageLocation.getPath());
-
-                        final DocumentArchivingContext documentArchivingContext = DocumentArchivingContext.builder()
-                                .id(documentId)
-                                .type(beaconDocumentLocationResult.getType())
-                                .source(beaconDocumentLocationResult.getSourceName())
-                                .sourceLocationId(beaconDocumentLocationResult.getId())
-                                .contents(stageLocation.getPath())
-                                .build();
-
-                        documentArchiver.archiveDocument(documentArchivingContext);
-                    } catch (final Exception e) {
-                        //TODO: Handle this normally! Ie retry until we can get the document etc!
-                        log.info("Error downloading a document: {}!", e.getMessage());
-                    } finally {
-                        if (stageLocation.exists()) {
-                            stageLocation.cleanup();
-                        }
-                    }
+                documentArchiver.archiveDocument(documentArchivingContext);
+            } catch (final Exception e) {
+                //TODO: Handle this normally! Ie retry until we can get the document etc!
+                log.info("Error downloading a document: {}!", e.getMessage());
+            } finally {
+                if (stageLocation.exists()) {
+                    stageLocation.cleanup();
                 }
             }
         }
+    }
+
+    private List<BeaconDocumentLocationResult> processDocumentLocationsByBeacon(final List<DocumentLocation> documentLocationMessages) {
+        return beaconClient.visitDocumentLocations(
+                beaconDownloaderConfigurationProperties.activeBeacon(),
+                documentLocationMessages.stream()
+                        .map(this::newBeaconDocumentLocation)
+                        .toList()
+        );
+    }
+
+    private List<DocumentLocation> collectDocumentsToProcess() throws MalformedURLException {
+        //TODO: 1000 should come from a config
+        final List<DocumentLocation> documentLocationMessages = new ArrayList<>(1000);
+
+        while (documentLocationMessages.size() != 1000) {
+            final DocumentLocationMessage documentLocationMessage =
+                    queueManipulator.readMessage(Queue.DOCUMENT_LOCATION_QUEUE, DocumentLocationMessage.class);
+
+            final DocumentLocation documentLocation = DocumentLocation.builder()
+                    .id(documentLocationMessage.getId())
+                    .location(new URL(documentLocationMessage.getDocumentLocation()))
+                    .type(DocumentType.valueOf(documentLocationMessage.getType()))
+                    .sourceName(documentLocationMessage.getSourceName())
+                    .build();
+
+            log.info("Processing location.");
+
+            if (documentLocationEvaluator.shouldProcessDocumentLocation(documentLocation)) {
+                documentLocationMessages.add(documentLocation);
+            } else {
+                log.info("Document location is a duplicate.");
+            }
+        }
+
+        return documentLocationMessages;
     }
 }
