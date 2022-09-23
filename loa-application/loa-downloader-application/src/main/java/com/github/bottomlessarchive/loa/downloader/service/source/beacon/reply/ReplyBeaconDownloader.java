@@ -59,8 +59,14 @@ public class ReplyBeaconDownloader implements CommandLineRunner {
         while (true) {
             final List<DocumentLocation> documentLocationMessages = collectDocumentsToProcess();
 
+            log.info("Sending {} locations for processing to the beacon with name: {}.", documentLocationMessages.size(),
+                    beaconDownloaderConfigurationProperties.activeBeacon());
+
             final List<BeaconDocumentLocationResult> beaconDocumentLocationResults =
                     processDocumentLocationsByBeacon(documentLocationMessages);
+
+            log.info("Got back {} location reasults from beacon with name: {}.", beaconDocumentLocationResults.size(),
+                    beaconDownloaderConfigurationProperties.activeBeacon());
 
             beaconDocumentLocationResults.forEach(this::processBeaconDocumentLocationResult);
         }
@@ -92,6 +98,8 @@ public class ReplyBeaconDownloader implements CommandLineRunner {
             final StageLocation stageLocation = stageLocationFactory.getLocation(documentId);
 
             try {
+                log.info("Downloading document from beacon: {}.", beaconDownloaderConfigurationProperties.activeBeacon());
+
                 beaconClient.downloadDocumentFromBeacon(beaconDownloaderConfigurationProperties.activeBeacon(),
                         documentId, stageLocation.getPath());
 

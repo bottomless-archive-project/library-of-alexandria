@@ -7,6 +7,7 @@ import com.github.bottomlessarchive.loa.beacon.view.beacon.request.VisitDocument
 import com.github.bottomlessarchive.loa.beacon.view.beacon.response.DocumentLocationResultPartialResponse;
 import com.github.bottomlessarchive.loa.beacon.view.beacon.response.VisitDocumentLocationsResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @RestController
 @RequestMapping("/beacon")
 @RequiredArgsConstructor
@@ -26,6 +28,8 @@ public class BeaconController {
     @PostMapping("/visit-document-locations")
     public VisitDocumentLocationsResponse visitDocumentLocations(
             @RequestBody final VisitDocumentLocationsRequest visitDocumentLocationsRequest) {
+        log.info("Got {} document locations to visit.", visitDocumentLocationsRequest.getLocations().size());
+
         final List<DocumentLocation> documentLocations = visitDocumentLocationsRequest.getLocations().stream()
                 .map(location -> DocumentLocation.builder()
                         .id(location.getId())
@@ -38,13 +42,16 @@ public class BeaconController {
 
         final List<DocumentLocationResult> results = documentLocationProcessor.processLocations(documentLocations);
 
+        log.info("Returning {} results for a crawl request.", results.size());
+
         return VisitDocumentLocationsResponse.builder()
                 .results(
                         results.stream()
                                 .map(documentLocationResult ->
                                         DocumentLocationResultPartialResponse.builder()
                                                 .id(documentLocationResult.id())
-                                                .documentId(documentLocationResult.documentId().toString())
+                                                .documentId(documentLocationResult.documentId() != null
+                                                        ? documentLocationResult.documentId().toString() : null)
                                                 .size(documentLocationResult.size())
                                                 .checksum(documentLocationResult.checksum())
                                                 .resultType(documentLocationResult.resultType())
