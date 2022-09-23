@@ -25,7 +25,7 @@ configure(subprojects.findAll {it.name != 'loa-frontend'}) {
 
     java {
         toolchain {
-            languageVersion = JavaLanguageVersion.of(18)
+            languageVersion = JavaLanguageVersion.of(19)
         }
     }
 
