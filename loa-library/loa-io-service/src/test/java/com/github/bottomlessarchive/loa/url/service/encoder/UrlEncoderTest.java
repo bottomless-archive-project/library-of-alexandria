@@ -27,9 +27,10 @@ class UrlEncoderTest {
             }
     )
     void testEncodeWhenUsingValidUrls(final String urlToEncode, final String expected) throws MalformedURLException {
-        final Optional<URL> result = underTest.encode(new URL(urlToEncode));
+        final Optional<URL> result = underTest.encode(urlToEncode);
 
-        assertThat(result).contains(new URL(expected));
+        assertThat(result)
+                .contains(new URL(expected));
     }
 
     @ParameterizedTest
@@ -38,9 +39,10 @@ class UrlEncoderTest {
                     "http://промкаталог.рф/PublicDocuments/05-0211-00.pdf"
             }
     )
-    void testEncodeWhenUsingInvalidUrls(final String urlToEncode) throws MalformedURLException {
-        final Optional<URL> result = underTest.encode(new URL(urlToEncode));
+    void testEncodeWhenUsingInvalidUrls(final String urlToEncode) {
+        final Optional<URL> result = underTest.encode(urlToEncode);
 
-        assertThat(result).isEmpty();
+        assertThat(result)
+                .isEmpty();
     }
 }

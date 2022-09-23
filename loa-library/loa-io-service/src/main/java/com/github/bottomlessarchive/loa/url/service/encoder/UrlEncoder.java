@@ -21,11 +21,13 @@ public class UrlEncoder {
      * <a href="https://en.wikipedia.org/wiki/Internationalized_Resource_Identifier">resource identifier</a> and return
      * the new identifier as a URL.
      *
-     * @param url the url to encode
+     * @param link the url to encode
      * @return the encoded url
      */
-    public Optional<URL> encode(final URL url) {
+    public Optional<URL> encode(final String link) {
         try {
+            final URL url = new URL(link);
+
             // We need to further validate the URL because the java.net.URL's validation is inadequate.
             validateUrl(url);
 

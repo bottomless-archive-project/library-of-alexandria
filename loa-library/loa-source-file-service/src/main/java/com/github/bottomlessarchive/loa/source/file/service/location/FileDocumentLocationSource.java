@@ -15,9 +15,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 @Slf4j
@@ -51,7 +48,6 @@ public class FileDocumentLocationSource implements DocumentLocationSource {
                 .lines()
                 .skip(fileDocumentSourceConfigurationProperties.skipLines())
                 .peek(url -> processedDocumentLocationCount.increment())
-                .flatMap(link -> parseToUrl(link).stream())
                 .flatMap(url -> urlEncoder.encode(url).stream())
                 .flatMap(url -> documentTypeCalculator.calculate(url)
                         .map(type ->
@@ -64,13 +60,5 @@ public class FileDocumentLocationSource implements DocumentLocationSource {
                         )
                         .stream()
                 );
-    }
-
-    private Optional<URL> parseToUrl(final String link) {
-        try {
-            return Optional.of(new URL(link));
-        } catch (MalformedURLException e) {
-            return Optional.empty();
-        }
     }
 }
