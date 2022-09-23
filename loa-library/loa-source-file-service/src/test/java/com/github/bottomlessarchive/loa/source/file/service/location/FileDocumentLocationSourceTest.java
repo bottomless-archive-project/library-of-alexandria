@@ -1,13 +1,10 @@
 package com.github.bottomlessarchive.loa.source.file.service.location;
 
 import com.github.bottomlessarchive.loa.location.domain.DocumentLocation;
-import com.github.bottomlessarchive.loa.location.service.id.factory.DocumentLocationIdFactory;
+import com.github.bottomlessarchive.loa.location.service.factory.DocumentLocationFactory;
 import com.github.bottomlessarchive.loa.source.configuration.DocumentSourceConfiguration;
 import com.github.bottomlessarchive.loa.source.file.configuration.FileDocumentSourceConfigurationProperties;
 import com.github.bottomlessarchive.loa.source.file.service.FileSourceFactory;
-import com.github.bottomlessarchive.loa.type.DocumentTypeCalculator;
-import com.github.bottomlessarchive.loa.type.domain.DocumentType;
-import com.github.bottomlessarchive.loa.url.service.encoder.UrlEncoder;
 import io.micrometer.core.instrument.Counter;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,14 +14,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.BufferedReader;
 import java.io.CharArrayReader;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -40,19 +34,13 @@ class FileDocumentLocationSourceTest {
     private FileSourceFactory fileSourceFactory;
 
     @Mock
+    private DocumentLocationFactory documentLocationFactory;
+
+    @Mock
     private Counter processedDocumentLocationCount;
 
     @Mock
     private DocumentSourceConfiguration documentSourceConfiguration;
-
-    @Mock
-    private UrlEncoder urlEncoder;
-
-    @Mock
-    private DocumentTypeCalculator documentTypeCalculator;
-
-    @Mock
-    private DocumentLocationIdFactory documentLocationIdFactory;
 
     @InjectMocks
     private FileDocumentLocationSource underTest;
@@ -69,10 +57,8 @@ class FileDocumentLocationSourceTest {
     void testWhenSkipLinesAreSet() {
         when(fileDocumentSourceConfigurationProperties.skipLines())
                 .thenReturn(3L);
-        when(urlEncoder.encode(any()))
-                .thenAnswer(invocation -> Optional.of(invocation.getArguments()[0]));
-        when(documentTypeCalculator.calculate(any()))
-                .thenReturn(Optional.of(DocumentType.DOC));
+        when(documentSourceConfiguration.getName())
+                .thenReturn("test-source");
         when(fileSourceFactory.newSourceReader())
                 .thenReturn(
                         new BufferedReader(
@@ -88,16 +74,25 @@ class FileDocumentLocationSourceTest {
                                 )
                         )
                 );
+        final DocumentLocation fourthDocumentLocation = DocumentLocation.builder()
+                .build();
+        final DocumentLocation fifthDocumentLocation = DocumentLocation.builder()
+                .build();
+        when(documentLocationFactory.newDocumentLocation("http://www.example.com/4", "test-source"))
+                .thenReturn(Optional.of(fourthDocumentLocation));
+        when(documentLocationFactory.newDocumentLocation("http://www.example.com/5", "test-source"))
+                .thenReturn(Optional.of(fifthDocumentLocation));
 
         final List<DocumentLocation> result = underTest.streamLocations().toList();
 
-        assertThat(result.size())
-                .isEqualTo(2);
-        verify(processedDocumentLocationCount, times(2)).increment();
+        assertThat(result)
+                .containsExactly(fourthDocumentLocation, fifthDocumentLocation);
+        verify(processedDocumentLocationCount, times(2))
+                .increment();
     }
 
     @Test
-    void testWhenSkipLinesAreNotSet() throws MalformedURLException {
+    void testWhenSkipLinesAreNotSet() {
         final BufferedReader reader = mock(BufferedReader.class);
         when(fileSourceFactory.newSourceReader())
                 .thenReturn(reader);
@@ -116,58 +111,24 @@ class FileDocumentLocationSourceTest {
                 );
         when(documentSourceConfiguration.getName())
                 .thenReturn("test-source");
-        when(urlEncoder.encode(any()))
-                .thenAnswer(invocation -> Optional.of(invocation.getArguments()[0]));
-        when(documentTypeCalculator.calculate(any()))
-                .thenReturn(Optional.of(DocumentType.DOC));
-        when(documentLocationIdFactory.newDocumentLocationId(new URL("http://www.example.com/1")))
-                .thenReturn("123");
-        when(documentLocationIdFactory.newDocumentLocationId(new URL("http://www.example.com/2")))
-                .thenReturn("456");
-        when(documentLocationIdFactory.newDocumentLocationId(new URL("http://www.example.com/3")))
-                .thenReturn("789");
+        final DocumentLocation firstDocumentLocation = DocumentLocation.builder()
+                .build();
+        final DocumentLocation secondDocumentLocation = DocumentLocation.builder()
+                .build();
+        final DocumentLocation thirdDocumentLocation = DocumentLocation.builder()
+                .build();
+        when(documentLocationFactory.newDocumentLocation("http://www.example.com/1", "test-source"))
+                .thenReturn(Optional.of(firstDocumentLocation));
+        when(documentLocationFactory.newDocumentLocation("http://www.example.com/2", "test-source"))
+                .thenReturn(Optional.of(secondDocumentLocation));
+        when(documentLocationFactory.newDocumentLocation("http://www.example.com/3", "test-source"))
+                .thenReturn(Optional.of(thirdDocumentLocation));
 
         final List<DocumentLocation> result = underTest.streamLocations().toList();
 
         assertThat(result)
-                .element(0)
-                .satisfies(element -> {
-                    assertThat(element.getId())
-                            .isEqualTo("123");
-                    assertThat(element.getLocation())
-                            .isEqualTo(new URL("http://www.example.com/1"));
-                    assertThat(element.getSourceName())
-                            .isEqualTo("test-source");
-                    assertThat(element.getType())
-                            .isEqualTo(DocumentType.DOC);
-                });
-
-        assertThat(result)
-                .element(1)
-                .satisfies(element -> {
-                    assertThat(element.getId())
-                            .isEqualTo("456");
-                    assertThat(element.getLocation())
-                            .isEqualTo(new URL("http://www.example.com/2"));
-                    assertThat(element.getSourceName())
-                            .isEqualTo("test-source");
-                    assertThat(element.getType())
-                            .isEqualTo(DocumentType.DOC);
-                });
-
-        assertThat(result)
-                .element(2)
-                .satisfies(element -> {
-                    assertThat(element.getId())
-                            .isEqualTo("789");
-                    assertThat(element.getLocation())
-                            .isEqualTo(new URL("http://www.example.com/3"));
-                    assertThat(element.getSourceName())
-                            .isEqualTo("test-source");
-                    assertThat(element.getType())
-                            .isEqualTo(DocumentType.DOC);
-                });
-
-        verify(processedDocumentLocationCount, times(3)).increment();
+                .containsExactly(firstDocumentLocation, secondDocumentLocation, thirdDocumentLocation);
+        verify(processedDocumentLocationCount, times(3))
+                .increment();
     }
 }
