@@ -150,6 +150,7 @@ export class SearchComponent implements OnInit {
       ?.classList.remove('show');
 
     this.language = language;
+    this.page = 0;
 
     this.refreshHits();
   }
@@ -166,6 +167,7 @@ export class SearchComponent implements OnInit {
       ?.classList.remove('show');
 
     this.documentLength = documentLength;
+    this.page = 0;
 
     this.refreshHits();
   }
