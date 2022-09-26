@@ -43,6 +43,10 @@ public class ApplicationStatisticsResponseFactory {
                 .map(instance -> AdministratorApplicationInstance.builder()
                         .host(instance.getLocation())
                         .port(instance.getPort())
+                        .command(instance.getProperty("command")
+                                .map(ServiceInstanceEntityProperty::getValue)
+                                .orElse("unknown")
+                        )
                         .build()
                 )
                 .toList();

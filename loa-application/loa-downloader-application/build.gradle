@@ -33,8 +33,11 @@ dependencies {
     implementation project(':loa-library:loa-stage-service')
     implementation project(':loa-library:loa-checksum-service')
     implementation project(':loa-library:loa-logging-service')
+    implementation project(':loa-library:loa-threading-service')
     implementation project(':loa-library:loa-staging-client-service')
     implementation project(':loa-library:loa-conductor-client-service')
 
     implementation group: 'com.squareup.okhttp3', name: 'okhttp'
+
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
 }

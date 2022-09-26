@@ -1,0 +1,3 @@
+dependencies {
+    implementation group: 'io.micrometer', name: 'micrometer-core'
+}

@@ -15,8 +15,8 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
-@ConditionalOnProperty("reindex")
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "loa.command", havingValue = "reindex")
 public class ReindexCommand implements CommandLineRunner {
 
     private final DocumentEntityFactory documentEntityFactory;

@@ -90,7 +90,7 @@ public class ServiceRegistryController {
     @GetMapping
     public List<ServiceResponse> queryServices() {
         return Stream.of(ApplicationType.values())
-                .filter(ApplicationType::isReportStatusAndLocation)
+                .filter(applicationType -> !ApplicationType.CONDUCTOR_APPLICATION.equals(applicationType))
                 .map(applicationType -> {
                     final List<ServiceInstanceResponse> serviceInstanceResponses =
                             serviceInstanceContainer.queryServiceInstances(applicationType).stream()

@@ -100,6 +100,8 @@ public class ArchivingService {
                 documentEntityFactory.addSourceLocation(originalDocumentEntity.getId(), sourceLocationId));
     }
 
+    //TODO: Move this down the stack, use com.github.bottomlessarchive.loa.repository.document.Error.DUPLICATE
+    // The service level code shouldn't know about MongoDB.
     private boolean isDuplicateIndexError(final Object throwable) {
         return throwable instanceof MongoWriteException mongoWriteException
                 && mongoWriteException.getError().getCode() == DUPLICATE_DOCUMENT_ID_ERROR_CODE;
