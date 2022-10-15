@@ -20,7 +20,7 @@ public class DocumentLocationProcessor {
 
     public List<DocumentLocationResult> processLocations(final List<DocumentLocation> documentLocations) {
         try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
-            List<Future<DocumentLocationResult>> results = documentLocations.stream()
+            final List<Future<DocumentLocationResult>> results = documentLocations.stream()
                     .map(documentLocation -> scope.fork(() -> visitDocumentLocation(documentLocation)))
                     .toList();
 
