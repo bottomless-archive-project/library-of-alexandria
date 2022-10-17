@@ -1,5 +1,6 @@
 package com.github.bottomlessarchive.loa.location.service.factory;
 
+import com.github.bottomlessarchive.loa.location.domain.DocumentLocationResultType;
 import com.github.bottomlessarchive.loa.location.repository.DocumentLocationRepository;
 import com.github.bottomlessarchive.loa.location.repository.domain.DocumentLocationDatabaseEntity;
 import com.github.bottomlessarchive.loa.location.service.factory.domain.DocumentLocation;
@@ -22,6 +23,9 @@ public class DocumentLocationEntityFactory {
                 .map(documentLocationDatabaseEntity -> DocumentLocation.builder()
                         .id(hexConverter.encode(documentLocationDatabaseEntity.getId()))
                         .url(documentLocationDatabaseEntity.getUrl())
+                        .source(documentLocationDatabaseEntity.getSource())
+                        .downloaderVersion(documentLocationDatabaseEntity.getDownloaderVersion())
+                        .downloadResultCode(DocumentLocationResultType.valueOf(documentLocationDatabaseEntity.getDownloadResultCode()))
                         .build()
                 );
     }
