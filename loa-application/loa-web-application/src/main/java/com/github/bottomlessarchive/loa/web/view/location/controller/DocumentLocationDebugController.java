@@ -1,7 +1,6 @@
 package com.github.bottomlessarchive.loa.web.view.location.controller;
 
 import com.github.bottomlessarchive.loa.location.service.factory.DocumentLocationEntityFactory;
-import com.github.bottomlessarchive.loa.location.service.factory.domain.DocumentLocation;
 import com.github.bottomlessarchive.loa.web.view.location.response.DocumentLocationDebugResponse;
 import com.github.bottomlessarchive.loa.web.view.location.service.DocumentLocationDebugResponseFactory;
 import lombok.RequiredArgsConstructor;
