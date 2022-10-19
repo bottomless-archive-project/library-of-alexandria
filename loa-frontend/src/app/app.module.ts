@@ -9,8 +9,9 @@ import {DebugDocumentComponent} from './view/debug-document/debug-document.compo
 import {HttpClientModule} from '@angular/common/http';
 import {FormsModule} from '@angular/forms';
 import {BytesPipe} from './bytes.pipe';
-import {DashboardApplicationsComponent} from "./view/dashboard-applications/dashboard-applications.component";
+import {DashboardApplicationsComponent} from './view/dashboard-applications/dashboard-applications.component';
 import { LoginComponent } from './view/login/login.component';
+import {DebugLocationComponent} from './view/debug-location/debug-location.component';
 
 @NgModule({
   declarations: [
@@ -20,6 +21,7 @@ import { LoginComponent } from './view/login/login.component';
     DashboardStatisticsComponent,
     DashboardApplicationsComponent,
     DebugDocumentComponent,
+    DebugLocationComponent,
     BytesPipe,
     LoginComponent
   ],

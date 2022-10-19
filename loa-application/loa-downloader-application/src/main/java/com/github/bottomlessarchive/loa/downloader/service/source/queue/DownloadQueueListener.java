@@ -54,7 +54,7 @@ public class DownloadQueueListener implements CommandLineRunner {
             MDC.put("documentLocationId", documentLocationId);
 
             final DocumentLocation documentLocation = DocumentLocation.builder()
-                    .id(documentLocationIdFactory.newDocumentLocationId(documentLocationURL))
+                    .id(documentLocationId)
                     .location(
                             UrlLink.builder()
                                     .url(documentLocationURL)

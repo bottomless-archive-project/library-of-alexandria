@@ -1,0 +1,42 @@
+<div class="card mb-2">
+  <div class="card-body">
+    <div class="row">
+      <div class="col-9 pe-0">
+        <input placeholder="Location Id" class="form-control" [(ngModel)]="locationId">
+      </div>
+      <div class="col-3">
+        <button class="btn btn-loa col-12" (click)="queryLocation()">Search</button>
+      </div>
+    </div>
+
+    <div class="spin-wrapper" *ngIf="loading">
+      <div class="spinner">
+      </div>
+    </div>
+
+    <div class="text-center mt-3" *ngIf="notFound">
+      <b>Document location with the provided Id cannot be found in the database!</b>
+    </div>
+
+    <div class="row mt-3" *ngIf="location">
+      <div class="col-6">
+        <dl class="mb-0">
+          <dt>Id:</dt>
+          <dd>{{location.id}}</dd>
+          <dt>Source:</dt>
+          <dd>{{location.source}}</dd>
+          <dt>Url:</dt>
+          <dd>{{location.url}}</dd>
+        </dl>
+      </div>
+      <div class="col-6">
+        <dl class="mb-0">
+          <dt>Downloader version:</dt>
+          <dd>{{location.downloaderVersion}}</dd>
+          <dt>Downloading result:</dt>
+          <dd>{{location.downloadResultCode}}</dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+</div>

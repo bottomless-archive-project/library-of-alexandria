@@ -33,7 +33,7 @@ public class DocumentLocationProcessingExecutor {
 
     public void executeProcessing(final String documentLocationId, final String documentLocationSource, final URL documentLocationURL,
             final DocumentType documentType) {
-        log.debug("Starting to download document {}.", documentLocationURL);
+        log.info("Starting to download document {}.", documentLocationURL);
 
         final UUID documentId = UUID.randomUUID();
 
