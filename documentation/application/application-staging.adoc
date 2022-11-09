@@ -8,7 +8,7 @@ This application is responsible for holding documents before they are being move
 |===
 | Parameter | Description
 
-| **loa.staging.path**
+| **loa.staging.location**
 | Where should the <<Staging Application>> put the files it acquires for staging.
 
 |===
