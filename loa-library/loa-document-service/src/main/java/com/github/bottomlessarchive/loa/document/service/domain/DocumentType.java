@@ -17,7 +17,8 @@ public enum DocumentType {
     RTF("rtf", "application/rtf"),
     MOBI("mobi", "application/x-mobipocket-ebook"),
     EPUB("epub", "application/epub+zip"),
-    FB2("fb2", "text/fb2+xml");
+    FB2("fb2", "text/fb2+xml"),
+    TXT("txt", "text/plain");
 
     private final String fileExtension;
     private final String mimeType;

@@ -9,4 +9,5 @@ public class AdministratorApplicationInstance {
 
     private final String host;
     private final int port;
+    private final String command;
 }

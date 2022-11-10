@@ -22,17 +22,14 @@ include::../service/conductor/conductor-configuration.adoc[]
 | The name of the source location. This name will be saved to the database for every crawled document. It could be helpful for statistics collection or in identifying bugs and errors with specific sources. *(Default value: unknown)*
 
 | **loa.source.type**
-| Describes the type of the source. The only one supported at the moment is `file`. If the value is file then the location data will be loaded from a local file. *(Default value: file)*
+| Describes the type of the source. The only one supported at the moment is `file`. If the value is file then the location data will be loaded from a local file. A location is represented as one line inside the file. *(Default value: file)*
 
 | **loa.source.file.location**
 | Used only when `loa.source.type` is set to `file`. The location of the source file on the disk. It's not a problem if it contains non-pdf files.
 
 | **loa.source.file.encoding**
-| Used only when `loa.source.type` is set to `file`. It can be set to `none` or gzip. If it's set to `none` then the file will be read as a non-compressed file. If it's set to `gzip` then it will be red as a gzipped file, being unzipped on the fly. *(Default value: none)*
+| Used only when `loa.source.type` is set to `file`. It can be set to `none` or gzip. If it's set to `none` then the file will be read as a non-compressed file. If it's set to `gzip` then it will be read as a gzipped file, being unzipped on the fly. *(Default value: none)*
 
 | **loa.source.file.skip-lines**
 | Skip the number of lines before starting to process the document locations in the file. Can be used to quickly get back to the last processed line if the application is restarted for any reason. *(Default value: 0)*
-
-| **loa.queue.producer-pool-size**
-| The number of consumer connections to the <<Queue Application>>.*(Default value: 10)*
 |===

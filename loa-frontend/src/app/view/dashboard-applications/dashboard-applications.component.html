@@ -149,8 +149,57 @@
   </div>
 </div>
 
+<div class="modal fade" id="stagingApplicationModal" tabindex="-1" aria-labelledby="stagingApplicationModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="stagingApplicationModalLabel">Staging Application</h5>
+        <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>
+          The <b>Staging Application</b> is a very simple webserver that has three endpoints.
+        </p>
+
+        <p>
+          A <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/POST">POST</a> endpoint stores documents
+          on the staging location.
+        </p>
+
+        <p>
+          A <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/GET">GET</a> endpoint return the stored
+          document on the staging location and removes it from the stage.
+        </p>
+
+        <p>
+          A <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/DELETE">DELETE</a> endpoint removes the
+          stored document from the staging location. This endpoint is only used when the <b>Vault Application</b>
+          determines that the document is a duplicate based on its checksum, filesize and type. In this case,
+          downloading the document is not needed, it can safely be removed.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-warning" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="card mb-2">
   <div class="card-body">
+    <span class="bi bi-question-circle" style="float: right; line-height: 0; cursor: pointer;"
+          data-bs-toggle="modal" data-bs-target="#stagingApplicationModal">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-question-circle"
+           viewBox="0 0 16 16">
+        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"></path>
+        <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0
+        1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0
+        .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056
+        0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286zm1.557 5.763c0 .533.425.927 1.01.927.609 0
+        1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"></path>
+      </svg>
+    </span>
     <h5 class="card-title">Staging Applications</h5>
     <div class="row">
       <div class="col-12 col-md-4 mb-3 mb-md-0" *ngFor="let staging of applications.stagings; let last = last;"
@@ -232,7 +281,6 @@
         <div class="card application-card">
           <div class="card-body">
             <p class="m-0">Host: {{generator.host}}</p>
-            <p class="m-0">Port: {{generator.port}}</p>
           </div>
         </div>
       </div>
@@ -240,8 +288,61 @@
   </div>
 </div>
 
+<div class="modal fade" id="downloaderApplicationModal" tabindex="-1" aria-labelledby="downloaderApplicationModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="downloaderApplicationModalLabel">Downloader Application</h5>
+        <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>
+          The <b>Downloader Application</b> connects to the <b>Queue Application</b>, grabs document locations from the
+          document location queue.
+        </p>
+
+        <p>
+          Then the documents are validated and the valid documents being sent to the <b>Staging Application</b>. If
+          compression is enabled, then the documents are compressed before being uploaded.
+        </p>
+
+        <p>
+          Some document metadata is also put into the document queue on the <b>Queue Application</b>.
+        </p>
+
+        <p>
+          The metadata is necessary, so the <b>Vault Application</b> will be able to download the document from the
+          <b>Staging Application</b> and archive it.
+        </p>
+
+        <p>
+          The <b>Downloader Application</b> is scalable so if one machine is working at full capacity (either it's at
+          100% CPU or RAM), but the network is still not saturated, a new application can be started on a different
+          machine.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-warning" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="card mb-2">
   <div class="card-body">
+    <span class="bi bi-question-circle" style="float: right; line-height: 0; cursor: pointer;"
+          data-bs-toggle="modal" data-bs-target="#downloaderApplicationModal">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-question-circle"
+           viewBox="0 0 16 16">
+        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"></path>
+        <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0
+        1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0
+        .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056
+        0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286zm1.557 5.763c0 .533.425.927 1.01.927.609 0
+        1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"></path>
+      </svg>
+    </span>
     <h5 class="card-title">Downloader Applications</h5>
     <div class="row">
       <div class="col-12 col-md-4 mb-3 mb-md-0" *ngFor="let downloader of applications.downloaders; let last = last;"
@@ -249,7 +350,6 @@
         <div class="card application-card">
           <div class="card-body">
             <p class="m-0">Host: {{downloader.host}}</p>
-            <p class="m-0">Port: {{downloader.port}}</p>
             <p class="m-0">Parallelism: {{downloader.parallelism}}</p>
           </div>
         </div>
@@ -258,8 +358,54 @@
   </div>
 </div>
 
+<div class="modal fade" id="indexerApplicationModal" tabindex="-1" aria-labelledby="indexerApplicationModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="indexerApplicationModalLabel">Indexer Application</h5>
+        <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+
+        <p>
+          The Indexer Application is responsible to index the documents into <a
+          href="https://www.elastic.co/what-is/elasticsearch">Elasticsearch</a>. The indexed documents will be
+          searchable by the <b>Web Application</b>.
+        </p>
+
+        <p>
+          The application queries document that has the `DOWNLOADED`, download the document's content from the
+          responsible <b>Vault Application</b>, extract the data and metadata from the content and saves it into the
+          Elasticsearch cluster.
+        </p>
+
+        <p>
+          After a document is inserted into Elasticsearch, it can be searched by the <b>Web Application</b>. Not indexed
+          document's can't be searched and opened on the web UI.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-warning" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="card mb-2">
   <div class="card-body">
+    <span class="bi bi-question-circle" style="float: right; line-height: 0; cursor: pointer;"
+          data-bs-toggle="modal" data-bs-target="#indexerApplicationModal">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-question-circle"
+           viewBox="0 0 16 16">
+        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"></path>
+        <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0
+        1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0
+        .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056
+        0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286zm1.557 5.763c0 .533.425.927 1.01.927.609 0
+        1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"></path>
+      </svg>
+    </span>
     <h5 class="card-title">Indexer Applications</h5>
     <div class="row">
       <div class="col-12 col-md-4 mb-3 mb-md-0" *ngFor="let indexer of applications.indexers; let last = last;"
@@ -267,7 +413,6 @@
         <div class="card application-card">
           <div class="card-body">
             <p class="m-0">Host: {{indexer.host}}</p>
-            <p class="m-0">Port: {{indexer.port}}</p>
             <p class="m-0">Parallelism: {{indexer.parallelism}}</p>
             <p class="m-0">Batch size: {{indexer.batchSize}}</p>
           </div>
@@ -277,8 +422,97 @@
   </div>
 </div>
 
+<div class="modal fade" id="administratorApplicationModal" tabindex="-1"
+     aria-labelledby="administratorApplicationModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="administratorApplicationModalLabel">Administrator Application</h5>
+        <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+
+        <p>
+          This Administrator Application is responsible to provide basic database administrator tasks (query statistics,
+          initiate the re-crawling of failed tasks, etc).
+        </p>
+
+        <p>
+          The workflow for the <b>Administrator Application</b> is different for every command. Please look into the
+          commands table for documentation on the individual commands.
+        </p>
+
+        <table>
+          <thead style="font-weight: 700;">
+          <tr>
+            <td style="min-width: 140px;">Command</td>
+            <td>Description</td>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td>reindex</td>
+            <td>
+              This task will reset every document's status to <code>DOWNLOADED</code>. It is useful if a full reindex
+              is needed via the Indexer Application.
+            </td>
+          </tr>
+          <tr>
+            <td>silent-compressor</td>
+            <td>
+              This command will go through every document in the database and ask the <b>Vault Application</b> to
+              recompress them when the provided compression algorithm is not the same as provided.
+            </td>
+          </tr>
+          <tr>
+            <td>cleanup</td>
+            <td>
+              Removes every document with status <code>CORRUPT</code>. The documents will be removed from the
+              <b>Vault Application</b> and the database too.
+            </td>
+          </tr>
+          <tr>
+            <td>recollect-corrupt-documents</td>
+            <td>
+              Tries to recollect every document with status <code>CORRUPT</code>. The document's
+              <code>sourceLocations</code> variable stores the ids of the document locations where the document was
+              collected from. This command will try to re-download the document from these source locations. If any of
+              the downloads is successful, then the document's content will be replaced with non-corrupt data
+              (effectively reconstructing the document). Ifall of the downloads fails, then the <code>CORRUPT</code>
+              status will be kept.
+            </td>
+          </tr>
+          <tr>
+            <td>register-user</td>
+            <td>
+              Registers a user into the application suite. The <code>loa.command.register-user.name</code> and the
+              <code>loa.command.register-user.password</code> parameters should be provided.
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-warning" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="card mb-2">
   <div class="card-body">
+    <span class="bi bi-question-circle" style="float: right; line-height: 0; cursor: pointer;"
+          data-bs-toggle="modal" data-bs-target="#administratorApplicationModal">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-question-circle"
+           viewBox="0 0 16 16">
+        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"></path>
+        <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0
+        1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0
+        .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056
+        0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286zm1.557 5.763c0 .533.425.927 1.01.927.609 0
+        1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"></path>
+      </svg>
+    </span>
     <h5 class="card-title">Administrator Applications</h5>
     <div class="row">
       <div class="col-12 col-md-4 mb-3 mb-md-0" *ngFor="let administrator of applications.administrators;
@@ -286,7 +520,7 @@
         <div class="card application-card">
           <div class="card-body">
             <p class="m-0">Host: {{administrator.host}}</p>
-            <p class="m-0">Port: {{administrator.port}}</p>
+            <p class="m-0">Command: {{administrator.command}}</p>
           </div>
         </div>
       </div>

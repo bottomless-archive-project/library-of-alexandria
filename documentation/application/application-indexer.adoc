@@ -4,7 +4,11 @@ This application makes documents searchable by inserting them into an Elasticsea
 
 == Workflow
 
-The application looks for documents that has the `DOWNLOADED` status and indexes them by sending them to the Elasticsearch cluster.
+The Indexer Application is responsible to index the documents into https://www.elastic.co/what-is/elasticsearch[Elasticsearch]. The indexed documents will be searchable by the <<Web Application>>.
+
+The application queries document that has the `DOWNLOADED`, download the document's content from the responsible <<Vault Application>>, extract the data and metadata from the content and saves it into the Elasticsearch cluster.
+
+After a document is inserted into Elasticsearch, it can be searched by the <<Web Application>>. Not indexed document's can't be searched and opened on the web UI.
 
 .Parameters
 |===
@@ -17,5 +21,4 @@ The application looks for documents that has the `DOWNLOADED` status and indexes
 | The amount of documents to index that the application queries with each round-trip to the database. If the cursor timeout error happens frequently, this parameter should be set to a lower value. This would change the application to do more frequent calls to the database, lowering the chance of a timeout. *(Default value: 10)*
 
 include::../service/conductor/conductor-configuration.adoc[]
-
 |===

@@ -39,7 +39,4 @@ include::../service/conductor/conductor-configuration.adoc[]
 
 | **loa.vault.version-number**
 | This version number will be saved to the database for every document that has been archived. It will be used later on if it is necessary to run cleanup or fixing tasks that are specific to a given version. This way it will be easier to fix bugs or database inconsistencies introduced by a specific application version. Please do not change this, otherwise the official migration/fixer utilities are not going to be usable. *(Default value: 6)*
-
-| **loa.queue.consumer-pool-size**
-| The port open for the MongoDB database server. *(Default value: 10)*
 |===

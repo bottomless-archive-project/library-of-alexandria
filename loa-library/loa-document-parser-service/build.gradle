@@ -1,13 +1,13 @@
 dependencies {
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter'
 
-    implementation group: 'com.github.pemistahl', name: 'lingua', version: '1.2.1'
-    implementation group: 'org.apache.tika', name: 'tika-core', version: '2.4.1'
-    implementation group: 'org.apache.tika', name: 'tika-parser-pdf-module', version: '2.4.1'
-    implementation group: 'org.apache.tika', name: 'tika-parser-microsoft-module', version: '2.4.1'
-    implementation group: 'org.apache.tika', name: 'tika-parser-miscoffice-module', version: '2.4.1'
+    implementation group: 'com.github.pemistahl', name: 'lingua', version: '1.2.2'
+    implementation group: 'org.apache.tika', name: 'tika-core', version: '2.5.0'
+    implementation group: 'org.apache.tika', name: 'tika-parser-pdf-module', version: '2.5.0'
+    implementation group: 'org.apache.tika', name: 'tika-parser-microsoft-module', version: '2.5.0'
+    implementation group: 'org.apache.tika', name: 'tika-parser-miscoffice-module', version: '2.5.0'
 
-    implementation group: 'com.fasterxml.woodstox', name: 'woodstox-core', version: '6.3.1'
+    implementation group: 'com.fasterxml.woodstox', name: 'woodstox-core', version: '6.4.0'
 
     api project(':loa-library:loa-document-service')
 }

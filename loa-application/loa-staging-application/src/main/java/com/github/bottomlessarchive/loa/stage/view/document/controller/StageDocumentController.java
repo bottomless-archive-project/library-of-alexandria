@@ -36,9 +36,10 @@ public class StageDocumentController {
 
     @SneakyThrows
     @PostMapping("/document/{documentId}")
-    public Mono<Void> persistDocument(@PathVariable final String documentId,
-            @RequestPart("file") final Mono<FilePart> file) {
-        return file.flatMap(p -> p.transferTo(Path.of(stagingConfigurationProperties.location()).resolve(documentId))
+    public Mono<Void> persistDocument(@PathVariable final String documentId, @RequestPart("file") final Mono<FilePart> file) {
+        final Path documentLocation = Path.of(stagingConfigurationProperties.location()).resolve(documentId);
+
+        return file.flatMap(p -> p.transferTo(documentLocation)
                 .then(p.delete())
         );
     }
@@ -46,16 +47,16 @@ public class StageDocumentController {
     @SneakyThrows
     @GetMapping("/document/{documentId}")
     public Mono<Void> serveDocument(@PathVariable final String documentId, final ServerHttpResponse response) {
-        final Path file = Path.of(stagingConfigurationProperties.location()).resolve(documentId);
+        final Path documentLocation = Path.of(stagingConfigurationProperties.location()).resolve(documentId);
 
         return ((ZeroCopyHttpOutputMessage) response)
-                .writeWith(file, 0, Files.size(file))
+                .writeWith(documentLocation, 0, Files.size(documentLocation))
                 .then(
                         Mono.fromRunnable(() -> {
                             try {
-                                Files.deleteIfExists(file);
+                                Files.deleteIfExists(documentLocation);
                             } catch (IOException e) {
-                                log.error("Failed to delete staging file at: {}!", file);
+                                log.error("Failed to delete staging file at: {}!", documentLocation);
                             }
                         })
                 );

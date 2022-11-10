@@ -24,12 +24,13 @@ public class FileCollector {
     private final FileManipulatorService fileManipulatorService;
     private final ZipFileManipulatorService zipFileManipulatorService;
 
-    public void acquireFile(final URL fileLocation, final Path resultLocation, final DocumentType documentType) {
+    public void acquireFile(final String documentLocationId, final URL fileLocation, final Path resultLocation,
+            final DocumentType documentType) {
         try {
             final String protocol = fileLocation.getProtocol();
 
             if ("http".equals(protocol) || "https".equals(protocol)) {
-                fileDownloadManager.downloadFile(fileLocation, resultLocation);
+                fileDownloadManager.downloadFile(documentLocationId, fileLocation, resultLocation);
             } else if ("file".equals(protocol)) {
                 fileManipulatorService.copy(fileLocation.toURI(), resultLocation);
             }

@@ -30,7 +30,8 @@ export class SearchComponent implements OnInit {
     ['RTF', false],
     ['EPUB', false],
     ['MOBI', false],
-    ['FB2', false]
+    ['FB2', false],
+    ['TXT', false]
   ]);
   hits: SearchHit[] = [];
   hitCount = 0;

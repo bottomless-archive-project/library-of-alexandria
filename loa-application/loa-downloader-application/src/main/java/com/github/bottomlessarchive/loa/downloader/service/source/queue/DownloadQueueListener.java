@@ -6,7 +6,7 @@ import com.github.bottomlessarchive.loa.location.domain.link.UrlLink;
 import com.github.bottomlessarchive.loa.location.service.id.factory.DocumentLocationIdFactory;
 import com.github.bottomlessarchive.loa.queue.service.QueueManipulator;
 import com.github.bottomlessarchive.loa.queue.service.domain.Queue;
-import com.github.bottomlessarchive.loa.downloader.service.document.DocumentLocationProcessor;
+import com.github.bottomlessarchive.loa.downloader.service.document.DocumentLocationProcessorWrapper;
 import com.github.bottomlessarchive.loa.queue.service.domain.message.DocumentLocationMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +25,7 @@ import java.net.URL;
 public class DownloadQueueListener implements CommandLineRunner {
 
     private final QueueManipulator queueManipulator;
-    private final DocumentLocationProcessor documentLocationProcessor;
+    private final DocumentLocationProcessorWrapper documentLocationProcessorWrapper;
     private final DocumentLocationEvaluator documentLocationEvaluator;
     private final DocumentLocationIdFactory documentLocationIdFactory;
 
@@ -54,7 +54,7 @@ public class DownloadQueueListener implements CommandLineRunner {
             MDC.put("documentLocationId", documentLocationId);
 
             final DocumentLocation documentLocation = DocumentLocation.builder()
-                    .id(documentLocationIdFactory.newDocumentLocationId(documentLocationURL))
+                    .id(documentLocationId)
                     .location(
                             UrlLink.builder()
                                     .url(documentLocationURL)
@@ -66,7 +66,7 @@ public class DownloadQueueListener implements CommandLineRunner {
             log.info("Processing location.");
 
             if (documentLocationEvaluator.shouldProcessDocumentLocation(documentLocation)) {
-                documentLocationProcessor.processDocumentLocation(documentLocation);
+                documentLocationProcessorWrapper.processDocumentLocation(documentLocation);
             } else {
                 log.info("Document location is a duplicate.");
             }

@@ -14,6 +14,7 @@ import org.apache.tika.parser.microsoft.OfficeParser;
 import org.apache.tika.parser.microsoft.ooxml.OOXMLParser;
 import org.apache.tika.parser.microsoft.rtf.RTFParser;
 import org.apache.tika.parser.pdf.PDFParser;
+import org.apache.tika.parser.txt.TXTParser;
 import org.apache.tika.parser.xml.FictionBookParser;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -47,6 +48,9 @@ public class DocumentParserConfiguration {
                 )),
                 ParserDecorator.withTypes(new FictionBookParser(), Set.of(
                         MediaType.parse(DocumentType.FB2.getMimeType())
+                )),
+                ParserDecorator.withTypes(new TXTParser(), Set.of(
+                        MediaType.parse(DocumentType.TXT.getMimeType())
                 ))
         );
 

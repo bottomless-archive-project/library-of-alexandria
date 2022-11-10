@@ -1,6 +1,6 @@
 package com.github.bottomlessarchive.loa.downloader.service.source.folder;
 
-import com.github.bottomlessarchive.loa.downloader.service.document.DocumentLocationProcessor;
+import com.github.bottomlessarchive.loa.downloader.service.document.DocumentLocationProcessorWrapper;
 import com.github.bottomlessarchive.loa.downloader.service.source.configuration.DownloaderFolderSourceConfiguration;
 import com.github.bottomlessarchive.loa.location.domain.DocumentLocation;
 import com.github.bottomlessarchive.loa.location.domain.link.UrlLink;
@@ -31,8 +31,8 @@ import java.util.stream.Stream;
 public class DocumentFolderReader implements CommandLineRunner {
 
     private final DownloaderFolderSourceConfiguration downloaderFolderSourceConfiguration;
+    private final DocumentLocationProcessorWrapper documentLocationProcessorWrapper;
     private final DocumentSourceConfiguration documentSourceConfiguration;
-    private final DocumentLocationProcessor documentLocationProcessor;
     @Qualifier("downloaderExecutorService")
     private final ExecutorService downloaderExecutorService;
     private final ApplicationContext applicationContext;
@@ -53,7 +53,7 @@ public class DocumentFolderReader implements CommandLineRunner {
         log.info("Started processing documents at folder: {}.", sourceFolder);
 
         try (Stream<Path> files = Files.list(sourceFolder)) {
-            files.forEach(path -> documentLocationProcessor.processDocumentLocation(buildDocumentSourceItem(path), () -> {
+            files.forEach(path -> documentLocationProcessorWrapper.processDocumentLocation(buildDocumentSourceItem(path), () -> {
                                 if (downloaderFolderSourceConfiguration.isShouldRemove()) {
                                     try {
                                         log.debug("Deleting file at: {}.", path);
