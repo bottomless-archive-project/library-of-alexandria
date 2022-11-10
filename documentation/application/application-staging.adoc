@@ -16,6 +16,6 @@ A https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/DELETE[DELETE] endpo
 |===
 | Parameter | Description
 
-| **loa.staging.path**
+| **loa.staging.location**
 | Where should the <<Staging Application>> put the files it acquires for staging.
 |===

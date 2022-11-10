@@ -4,17 +4,24 @@ import com.github.bottomlessarchive.loa.downloader.service.document.DocumentLoca
 import com.github.bottomlessarchive.loa.downloader.service.source.configuration.DownloaderFolderSourceConfiguration;
 import com.github.bottomlessarchive.loa.location.domain.DocumentLocation;
 import com.github.bottomlessarchive.loa.location.domain.link.UrlLink;
+import com.github.bottomlessarchive.loa.logging.service.MetricLogger;
 import com.github.bottomlessarchive.loa.source.configuration.DocumentSourceConfiguration;
+import io.micrometer.core.instrument.Counter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 @Slf4j
@@ -24,13 +31,26 @@ import java.util.stream.Stream;
 public class DocumentFolderReader implements CommandLineRunner {
 
     private final DownloaderFolderSourceConfiguration downloaderFolderSourceConfiguration;
-    private final DocumentSourceConfiguration documentSourceConfiguration;
     private final DocumentLocationProcessorWrapper documentLocationProcessorWrapper;
+    private final DocumentSourceConfiguration documentSourceConfiguration;
+    @Qualifier("downloaderExecutorService")
+    private final ExecutorService downloaderExecutorService;
+    private final ApplicationContext applicationContext;
+
+    private final MetricLogger metricLogger;
+
+    @Qualifier("processedDocumentCount")
+    private final Counter processedDocumentCount;
+
+    @Qualifier("archivedDocumentCount")
+    private final Counter archivedDocumentCount;
 
     @Override
     @SneakyThrows
     public void run(final String... args) {
         final Path sourceFolder = Path.of(downloaderFolderSourceConfiguration.getLocation());
+
+        log.info("Started processing documents at folder: {}.", sourceFolder);
 
         try (Stream<Path> files = Files.list(sourceFolder)) {
             files.forEach(path -> documentLocationProcessorWrapper.processDocumentLocation(buildDocumentSourceItem(path), () -> {
@@ -48,7 +68,9 @@ public class DocumentFolderReader implements CommandLineRunner {
             );
         }
 
-        log.info("Finished processing the folder.");
+        awaitTasksToFinish();
+        logFinalStatistics();
+        shutdownApplication();
     }
 
     @SneakyThrows
@@ -63,5 +85,26 @@ public class DocumentFolderReader implements CommandLineRunner {
                 )
                 .sourceName(documentSourceConfiguration.getName())
                 .build();
+    }
+
+    private void logFinalStatistics() {
+        metricLogger.logCounters(archivedDocumentCount, processedDocumentCount);
+
+        log.info("Finished processing the folder.");
+    }
+
+    private void awaitTasksToFinish() {
+        downloaderExecutorService.shutdown();
+        try {
+            if (!downloaderExecutorService.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS)) {
+                downloaderExecutorService.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            downloaderExecutorService.shutdownNow();
+        }
+    }
+
+    private void shutdownApplication() {
+        ((ConfigurableApplicationContext) applicationContext).close();
     }
 }
