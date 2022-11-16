@@ -1,3 +1,6 @@
+:application-type: ADMINISTRATOR_APPLICATION
+:application-name: Administrator Application
+
 = Administrator Application
 
 This application's goal is to provide basic database administrator tasks (query statistics, initiate the re-crawling of failed tasks, etc).

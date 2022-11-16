@@ -1,3 +1,6 @@
+:application-type: GENERATOR_APPLICATION
+:application-name: Generator Application
+
 = Generator Application
 
 This application's goal is to fill the <<Queue Application>> with downloadable document locations (links/urls).

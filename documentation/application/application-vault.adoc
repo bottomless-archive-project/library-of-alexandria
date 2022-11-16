@@ -1,3 +1,6 @@
+:application-type: VAULT_APPLICATION
+:application-name: Vault Application
+
 = Vault Application
 
 Responsible for storing documents and making them available via web endpoints.

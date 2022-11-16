@@ -1,3 +1,6 @@
+:application-type: QUEUE_APPLICATION
+:application-name: Queue Application
+
 = Queue Application
 
 This application's goal is to provide an abstraction layer between the applications.

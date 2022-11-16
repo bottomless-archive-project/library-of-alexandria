@@ -1,3 +1,6 @@
+:application-type: INDEXER_APPLICATION
+:application-name: Indexer Application
+
 = Indexer Application
 
 This application makes documents searchable by inserting them into an Elasticsearch cluster.

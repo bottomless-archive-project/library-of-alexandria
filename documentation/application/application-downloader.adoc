@@ -1,3 +1,6 @@
+:application-type: DOWNLOADER_APPLICATION
+:application-name: Downloader Application
+
 = Downloader Application
 
 This application grabs the document locations from the <<Queue Application>> and downloads the documents from those locations.

@@ -1,3 +1,6 @@
+:application-type: STAGING_APPLICATION
+:application-name: Staging Application
+
 = Staging Application
 
 This application is responsible for holding documents before they are being moved to their final place in one of the <<Vault Application>> instances.
@@ -15,6 +18,8 @@ A https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/DELETE[DELETE] endpo
 .Parameters
 |===
 | Parameter | Description
+
+include::../service/conductor/conductor-configuration.adoc[]
 
 | **loa.staging.location**
 | Where should the <<Staging Application>> put the files it acquires for staging.
