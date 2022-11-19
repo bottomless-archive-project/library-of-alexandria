@@ -1,8 +1,21 @@
+:application-type: DOWNLOADER_APPLICATION
+:application-name: Downloader Application
+
 = Downloader Application
+
+This application grabs the document locations from the <<Queue Application>> and downloads the documents from those locations.
 
 == Workflow
 
-This application is responsible for reading out the document locations from the <<Queue Application>> and downloading its contents.
+The <<Downloader Application>> connects to the <<Queue Application>>, grabs document locations from the document location queue.
+
+Then the documents are validated and the valid documents being sent to the <<Staging Application>>. If compression is enabled, then the documents are compressed before being uploaded.
+
+Some document metadata is also put into the document queue on the <<Queue Application>>.
+
+The metadata is necessary, so the <<Vault Application>> will be able to download the document from the <<Staging Application>> and archive it.
+
+The <<Downloader Application>> is scalable so if one machine is working at full capacity (either it's at 100% CPU or RAM), but the network is still not saturated, a new application can be started on a different machine.
 
 .Parameters
 |===

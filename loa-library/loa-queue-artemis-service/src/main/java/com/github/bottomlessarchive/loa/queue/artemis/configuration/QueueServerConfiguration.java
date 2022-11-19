@@ -51,6 +51,7 @@ public class QueueServerConfiguration {
         configuration.setJournalSyncTransactional(false);
         configuration.setJournalSyncNonTransactional(false);
         configuration.setMaxDiskUsage(-1);
+        configuration.setPagingDirectory(queueServerConfigurationProperties.dataDirectory() + "/paging");
         configuration.setJournalDirectory(queueServerConfigurationProperties.dataDirectory() + "/journal");
         configuration.setBindingsDirectory(queueServerConfigurationProperties.dataDirectory() + "/bindings");
         configuration.setLargeMessagesDirectory(queueServerConfigurationProperties.dataDirectory() + "/largemessages");

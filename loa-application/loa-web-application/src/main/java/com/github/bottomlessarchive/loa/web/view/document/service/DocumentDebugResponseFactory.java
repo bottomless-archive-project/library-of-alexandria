@@ -5,7 +5,7 @@ import com.github.bottomlessarchive.loa.indexer.service.search.DocumentSearchCli
 import com.github.bottomlessarchive.loa.location.service.factory.DocumentLocationEntityFactory;
 import com.github.bottomlessarchive.loa.location.service.factory.domain.DocumentLocation;
 import com.github.bottomlessarchive.loa.vault.client.service.VaultClientService;
-import com.github.bottomlessarchive.loa.web.view.document.response.DebugDocumentResponse;
+import com.github.bottomlessarchive.loa.web.view.document.response.DocumentDebugResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,13 +14,13 @@ import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
-public class DebugResponseFactory {
+public class DocumentDebugResponseFactory {
 
     private final VaultClientService vaultClientService;
     private final DocumentSearchClient documentSearchClient;
     private final DocumentLocationEntityFactory documentLocationEntityFactory;
 
-    public DebugDocumentResponse newDebugDocumentResponse(final DocumentEntity documentEntity) {
+    public DocumentDebugResponse newDocumentDebugResponse(final DocumentEntity documentEntity) {
         final boolean isInIndex = documentSearchClient.isDocumentInIndex(documentEntity.getId());
         final boolean isInVault = vaultClientService.documentExists(documentEntity);
 
@@ -29,7 +29,7 @@ public class DebugResponseFactory {
                 .map(DocumentLocation::getUrl)
                 .toList();
 
-        return DebugDocumentResponse.builder()
+        return DocumentDebugResponse.builder()
                 .id(documentEntity.getId())
                 .isInIndex(isInIndex)
                 .isInVault(isInVault)

@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-import java.util.Map;
+import java.util.Collections;
 
 @Service
 @RequiredArgsConstructor
@@ -27,7 +27,7 @@ public class DocumentLocationProcessorTaskFactory {
                                 .callback(callback)
                                 .task(
                                         MDCWrapperTask.builder()
-                                                .mdcParameters(Map.of("documentLocationId", documentLocation.getId()))
+                                                .mdcParameters(Collections.singletonMap("documentLocationId", documentLocation.getId()))
                                                 .task(new DocumentLocationProcessorTask(
                                                         documentLocation, documentLocationProcessingExecutor))
                                                 .build()

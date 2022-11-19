@@ -1,0 +1,7 @@
+= Application parameters
+
+This section describes each supported parameter for every application. Supplying these runtime parameters can be done by adding them to the runtime arguments of the application with the `--` prefix. For example:
+
+....
+java -jar loa-downloader-application-{release-number}.jar --loa.downloader.parallelism=10
+....

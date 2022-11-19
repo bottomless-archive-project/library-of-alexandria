@@ -12,7 +12,7 @@ import java.util.UUID;
 
 @Value
 @Builder
-public class DebugDocumentResponse {
+public class DocumentDebugResponse {
 
     UUID id;
     String vault;
