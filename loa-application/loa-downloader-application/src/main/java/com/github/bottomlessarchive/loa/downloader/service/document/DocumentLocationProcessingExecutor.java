@@ -2,11 +2,13 @@ package com.github.bottomlessarchive.loa.downloader.service.document;
 
 import com.github.bottomlessarchive.loa.checksum.service.ChecksumProvider;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentEntity;
-import com.github.bottomlessarchive.loa.document.service.domain.DocumentType;
 import com.github.bottomlessarchive.loa.document.service.entity.factory.DocumentEntityFactory;
 import com.github.bottomlessarchive.loa.downloader.service.document.domain.DocumentArchivingContext;
-import com.github.bottomlessarchive.loa.downloader.service.file.FileCollector;
 import com.github.bottomlessarchive.loa.file.FileManipulatorService;
+import com.github.bottomlessarchive.loa.io.service.collector.DocumentCollector;
+import com.github.bottomlessarchive.loa.location.domain.DocumentLocation;
+import com.github.bottomlessarchive.loa.location.domain.DocumentLocationResultType;
+import com.github.bottomlessarchive.loa.location.service.DocumentLocationManipulator;
 import com.github.bottomlessarchive.loa.stage.service.StageLocationFactory;
 import com.github.bottomlessarchive.loa.stage.service.domain.StageLocation;
 import com.github.bottomlessarchive.loa.validator.service.DocumentFileValidator;
@@ -14,7 +16,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.net.URL;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -24,49 +25,58 @@ import java.util.UUID;
 public class DocumentLocationProcessingExecutor {
 
     private final DocumentFileValidator documentFileValidator;
-    private final FileCollector fileCollector;
+    private final DocumentCollector documentCollector;
     private final DocumentArchiver documentArchiver;
     private final ChecksumProvider checksumProvider;
     private final DocumentEntityFactory documentEntityFactory;
     private final FileManipulatorService fileManipulatorService;
     private final StageLocationFactory stageLocationFactory;
+    private final DocumentIdFactory documentIdFactory;
+    private final DocumentLocationManipulator documentLocationManipulator;
 
-    public void executeProcessing(final String documentLocationId, final String documentLocationSource, final URL documentLocationURL,
-            final DocumentType documentType) {
-        log.info("Starting to download document {}.", documentLocationURL);
+    public void executeProcessing(final DocumentLocation documentLocation) {
+        log.debug("Starting to download document {}.", documentLocation.getLocation());
 
-        final UUID documentId = UUID.randomUUID();
+        final UUID documentId = documentIdFactory.newDocumentId();
 
-        final StageLocation stageLocation = stageLocationFactory.getLocation(documentId.toString(), documentType);
+        final StageLocation stageLocation = stageLocationFactory.getLocation(documentId);
 
         try {
-            fileCollector.acquireFile(documentLocationId, documentLocationURL, stageLocation.getPath(), documentType);
+            final DocumentLocationResultType documentLocationResultType = DocumentLocationResultType.valueOf(
+                    documentCollector.acquireDocument(documentLocation.getLocation(), stageLocation.getPath(),
+                            documentLocation.getType()).name());
+
+            documentLocationManipulator.updateDownloadResultCode(documentLocation.getId(), documentLocationResultType);
 
             final String checksum = checksumProvider.checksum(fileManipulatorService.getInputStream(stageLocation.getPath()));
             final long contentLength = fileManipulatorService.size(stageLocation.getPath());
 
             final Optional<DocumentEntity> documentEntityOptional = documentEntityFactory.getDocumentEntity(
-                    checksum, contentLength, documentType.toString());
+                    checksum, contentLength, documentLocation.getType().toString());
             if (documentEntityOptional.isPresent()) {
                 log.info("Document with id: {} is a duplicate.", documentId);
 
-                documentEntityFactory.addSourceLocation(documentEntityOptional.get().getId(), documentLocationId);
+                documentEntityFactory.addSourceLocation(documentEntityOptional.get().getId(), documentLocation.getId());
 
                 return;
             }
 
-            if (documentFileValidator.isValidDocument(documentId.toString(), documentType)) {
+            if (documentFileValidator.isValidDocument(documentId, stageLocation, documentLocation.getType())) {
                 final DocumentArchivingContext documentArchivingContext = DocumentArchivingContext.builder()
                         .id(documentId)
-                        .type(documentType)
-                        .source(documentLocationSource)
-                        .sourceLocationId(documentLocationId)
+                        .type(documentLocation.getType())
+                        .source(documentLocation.getSourceName())
+                        .sourceLocationId(documentLocation.getId())
                         .contents(stageLocation.getPath())
                         .build();
 
                 documentArchiver.archiveDocument(documentArchivingContext);
             } else {
                 log.info("Invalid document!");
+
+                if (documentLocationResultType.equals(DocumentLocationResultType.UNKNOWN)) {
+                    documentLocationManipulator.updateDownloadResultCode(documentLocation.getId(), DocumentLocationResultType.INVALID);
+                }
             }
         } catch (final Exception e) {
             log.info("Error downloading a document: {}!", e.getMessage());

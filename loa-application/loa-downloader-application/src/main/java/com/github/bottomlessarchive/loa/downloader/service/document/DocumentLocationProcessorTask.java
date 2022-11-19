@@ -7,10 +7,10 @@ import lombok.RequiredArgsConstructor;
 public class DocumentLocationProcessorTask implements Runnable {
 
     private final DocumentLocation documentLocation;
-    private final DocumentLocationProcessor documentLocationProcessor;
+    private final DocumentLocationProcessingExecutor documentLocationProcessingExecutor;
 
     @Override
     public void run() {
-        documentLocationProcessor.processDocumentLocation(documentLocation);
+        documentLocationProcessingExecutor.executeProcessing(documentLocation);
     }
 }

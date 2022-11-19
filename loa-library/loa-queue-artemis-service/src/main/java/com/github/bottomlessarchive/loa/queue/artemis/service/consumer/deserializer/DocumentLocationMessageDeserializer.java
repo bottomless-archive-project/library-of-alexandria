@@ -3,6 +3,7 @@ package com.github.bottomlessarchive.loa.queue.artemis.service.consumer.deserial
 import com.github.bottomlessarchive.loa.queue.artemis.configuration.QueueServerConfiguration;
 import com.github.bottomlessarchive.loa.queue.service.domain.Queue;
 import com.github.bottomlessarchive.loa.queue.service.domain.message.DocumentLocationMessage;
+import org.apache.activemq.artemis.api.core.ActiveMQBuffer;
 import org.apache.activemq.artemis.api.core.client.ClientMessage;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Service;
@@ -13,9 +14,13 @@ public class DocumentLocationMessageDeserializer implements MessageDeserializer<
 
     @Override
     public DocumentLocationMessage deserialize(final ClientMessage clientMessage) {
+        final ActiveMQBuffer bodyBuffer = clientMessage.getBodyBuffer();
+
         return DocumentLocationMessage.builder()
-                .sourceName(clientMessage.getBodyBuffer().readString())
-                .documentLocation(clientMessage.getBodyBuffer().readString())
+                .id(bodyBuffer.readString())
+                .type(bodyBuffer.readString())
+                .sourceName(bodyBuffer.readString())
+                .documentLocation(bodyBuffer.readString())
                 .build();
     }
 

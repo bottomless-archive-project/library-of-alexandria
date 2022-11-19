@@ -15,8 +15,7 @@ public class DocumentLocationCreationContextFactory {
     private final DownloaderConfigurationProperties downloaderConfigurationProperties;
 
     public DocumentLocationCreationContext newCreatingContext(final DocumentLocation documentLocation) {
-        final URL documentLocationURL = documentLocation.getLocation().toUrl()
-                .orElseThrow(() -> new IllegalStateException("URL is missing from document location!"));
+        final URL documentLocationURL = documentLocation.getLocation();
 
         return DocumentLocationCreationContext.builder()
                 .id(documentLocation.getId())

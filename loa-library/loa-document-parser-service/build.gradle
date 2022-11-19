@@ -9,5 +9,5 @@ dependencies {
 
     implementation group: 'com.fasterxml.woodstox', name: 'woodstox-core', version: '6.4.0'
 
-    api project(':loa-library:loa-document-service')
+    api project(':loa-library:loa-document-type-service')
 }

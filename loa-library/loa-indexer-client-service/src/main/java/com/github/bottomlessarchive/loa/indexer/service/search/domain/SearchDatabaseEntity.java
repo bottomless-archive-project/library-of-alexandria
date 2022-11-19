@@ -2,7 +2,7 @@ package com.github.bottomlessarchive.loa.indexer.service.search.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.github.bottomlessarchive.loa.document.service.domain.DocumentType;
+import com.github.bottomlessarchive.loa.type.domain.DocumentType;
 import lombok.Data;
 
 @Data

@@ -1,6 +1,6 @@
 package com.github.bottomlessarchive.loa.downloader.service.document.domain;
 
-import com.github.bottomlessarchive.loa.document.service.domain.DocumentType;
+import com.github.bottomlessarchive.loa.type.domain.DocumentType;
 import lombok.Builder;
 import lombok.Getter;
 

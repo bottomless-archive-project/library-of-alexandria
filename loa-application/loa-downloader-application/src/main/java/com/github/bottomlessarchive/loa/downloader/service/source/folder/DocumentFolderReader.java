@@ -3,7 +3,6 @@ package com.github.bottomlessarchive.loa.downloader.service.source.folder;
 import com.github.bottomlessarchive.loa.downloader.service.document.DocumentLocationProcessorWrapper;
 import com.github.bottomlessarchive.loa.downloader.service.source.configuration.DownloaderFolderSourceConfiguration;
 import com.github.bottomlessarchive.loa.location.domain.DocumentLocation;
-import com.github.bottomlessarchive.loa.location.domain.link.UrlLink;
 import com.github.bottomlessarchive.loa.logging.service.MetricLogger;
 import com.github.bottomlessarchive.loa.source.configuration.DocumentSourceConfiguration;
 import io.micrometer.core.instrument.Counter;
@@ -78,11 +77,7 @@ public class DocumentFolderReader implements CommandLineRunner {
         log.debug("Starting to parse document at location: {}.", file);
 
         return DocumentLocation.builder()
-                .location(
-                        UrlLink.builder()
-                                .url(file.toUri().toURL())
-                                .build()
-                )
+                .location(file.toUri().toURL())
                 .sourceName(documentSourceConfiguration.getName())
                 .build();
     }

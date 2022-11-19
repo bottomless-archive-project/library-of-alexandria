@@ -1,8 +1,8 @@
 package com.github.bottomlessarchive.loa.parser.service;
 
-import com.github.bottomlessarchive.loa.document.service.domain.DocumentType;
 import com.github.bottomlessarchive.loa.parser.domain.ParsingResult;
 import com.github.bottomlessarchive.loa.parser.domain.ParsingException;
+import com.github.bottomlessarchive.loa.type.domain.DocumentType;
 import com.github.pemistahl.lingua.api.Language;
 import com.github.pemistahl.lingua.api.LanguageDetector;
 import lombok.RequiredArgsConstructor;

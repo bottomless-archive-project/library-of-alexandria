@@ -1,6 +1,7 @@
 package com.github.bottomlessarchive.loa.document.service;
 
-import com.github.bottomlessarchive.loa.document.service.domain.DocumentType;
+import com.github.bottomlessarchive.loa.type.DocumentTypeCalculator;
+import com.github.bottomlessarchive.loa.type.domain.DocumentType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;

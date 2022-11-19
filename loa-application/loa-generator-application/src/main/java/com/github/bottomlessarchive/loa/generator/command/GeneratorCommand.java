@@ -1,18 +1,14 @@
 package com.github.bottomlessarchive.loa.generator.command;
 
-import com.github.bottomlessarchive.loa.location.service.validation.DocumentLocationValidator;
 import com.github.bottomlessarchive.loa.location.domain.DocumentLocation;
 import com.github.bottomlessarchive.loa.queue.service.QueueManipulator;
 import com.github.bottomlessarchive.loa.queue.service.domain.Queue;
 import com.github.bottomlessarchive.loa.queue.service.domain.message.DocumentLocationMessage;
 import com.github.bottomlessarchive.loa.source.source.DocumentLocationSource;
-import com.github.bottomlessarchive.loa.url.service.encoder.UrlEncoder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
-
-import java.util.Optional;
 
 @Slf4j
 @Component
@@ -20,8 +16,6 @@ import java.util.Optional;
 public class GeneratorCommand implements CommandLineRunner {
 
     private final DocumentLocationSource documentLocationFactory;
-    private final DocumentLocationValidator documentLocationValidator;
-    private final UrlEncoder urlEncoder;
     private final QueueManipulator queueManipulator;
 
     @Override
@@ -36,24 +30,17 @@ public class GeneratorCommand implements CommandLineRunner {
         }
 
         documentLocationFactory.streamLocations()
-                .filter(this::validate)
                 .map(this::transform)
-                .flatMap(Optional::stream)
                 .forEach(this::sendMessage);
     }
 
-    private boolean validate(final DocumentLocation documentLocation) {
-        return documentLocationValidator.validDocumentLocation(documentLocation);
-    }
-
-    private Optional<DocumentLocationMessage> transform(final DocumentLocation documentLocation) {
-        return documentLocation.getLocation().toUrl()
-                .flatMap(urlEncoder::encode)
-                .map(url -> DocumentLocationMessage.builder()
-                        .sourceName(documentLocation.getSourceName())
-                        .documentLocation(url.toString())
-                        .build()
-                );
+    private DocumentLocationMessage transform(final DocumentLocation documentLocation) {
+        return DocumentLocationMessage.builder()
+                .id(documentLocation.getId())
+                .type(documentLocation.getType().toString())
+                .sourceName(documentLocation.getSourceName())
+                .documentLocation(documentLocation.getLocation().toString())
+                .build();
     }
 
     private void sendMessage(final DocumentLocationMessage documentLocationMessage) {

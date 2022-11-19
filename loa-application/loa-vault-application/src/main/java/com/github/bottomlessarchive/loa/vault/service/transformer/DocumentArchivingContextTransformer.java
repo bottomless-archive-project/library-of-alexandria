@@ -1,8 +1,8 @@
 package com.github.bottomlessarchive.loa.vault.service.transformer;
 
 import com.github.bottomlessarchive.loa.compression.domain.DocumentCompression;
-import com.github.bottomlessarchive.loa.document.service.domain.DocumentType;
 import com.github.bottomlessarchive.loa.queue.service.domain.message.DocumentArchivingMessage;
+import com.github.bottomlessarchive.loa.type.domain.DocumentType;
 import com.github.bottomlessarchive.loa.vault.configuration.VaultConfigurationProperties;
 import com.github.bottomlessarchive.loa.vault.service.domain.DocumentArchivingContext;
 import lombok.RequiredArgsConstructor;

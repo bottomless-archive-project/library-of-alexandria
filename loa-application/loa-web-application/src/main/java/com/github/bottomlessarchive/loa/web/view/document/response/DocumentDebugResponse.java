@@ -2,7 +2,7 @@ package com.github.bottomlessarchive.loa.web.view.document.response;
 
 import com.github.bottomlessarchive.loa.compression.domain.DocumentCompression;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentStatus;
-import com.github.bottomlessarchive.loa.document.service.domain.DocumentType;
+import com.github.bottomlessarchive.loa.type.domain.DocumentType;
 import lombok.Builder;
 import lombok.Value;
 

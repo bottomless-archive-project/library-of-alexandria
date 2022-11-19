@@ -24,14 +24,20 @@ configure(subprojects.findAll {it.name != 'loa-frontend'}) {
     apply plugin: 'java'
 
     java {
+        modularity.inferModulePath = true
         toolchain {
-            languageVersion = JavaLanguageVersion.of(18)
+            languageVersion = JavaLanguageVersion.of(19)
         }
     }
 
     compileJava.dependsOn(processResources)
     compileJava {
         options.encoding = "UTF-8"
+        doFirst {
+            options.compilerArgs += [
+                    '--add-modules', 'jdk.incubator.concurrent'
+            ]
+        }
     }
     compileTestJava {
         options.encoding = "UTF-8"
@@ -72,11 +78,10 @@ configure(subprojects.findAll {it.name != 'loa-frontend'}) {
         compileOnly group: 'org.springframework.boot', name: 'spring-boot-configuration-processor'
         annotationProcessor group: 'org.springframework.boot', name: 'spring-boot-configuration-processor'
 
-        // Lombok
-        compileOnly group: 'org.projectlombok', name: 'lombok'
-        annotationProcessor group: 'org.projectlombok', name: 'lombok'
-        testCompileOnly group: 'org.projectlombok', name: 'lombok'
-        testAnnotationProcessor group: 'org.projectlombok', name: 'lombok'
+        compileOnly files('E:\\tmp\\lombok-jdk19-20221010.jar')
+        annotationProcessor files('E:\\tmp\\lombok-jdk19-20221010.jar')
+        testCompileOnly files('E:\\tmp\\lombok-jdk19-20221010.jar')
+        testAnnotationProcessor files('E:\\tmp\\lombok-jdk19-20221010.jar')
 
         // Testing
         testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'

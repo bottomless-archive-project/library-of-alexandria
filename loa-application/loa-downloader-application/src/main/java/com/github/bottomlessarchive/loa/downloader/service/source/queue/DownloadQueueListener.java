@@ -2,15 +2,13 @@ package com.github.bottomlessarchive.loa.downloader.service.source.queue;
 
 import com.github.bottomlessarchive.loa.downloader.service.document.DocumentLocationEvaluator;
 import com.github.bottomlessarchive.loa.location.domain.DocumentLocation;
-import com.github.bottomlessarchive.loa.location.domain.link.UrlLink;
-import com.github.bottomlessarchive.loa.location.service.id.factory.DocumentLocationIdFactory;
 import com.github.bottomlessarchive.loa.queue.service.QueueManipulator;
 import com.github.bottomlessarchive.loa.queue.service.domain.Queue;
 import com.github.bottomlessarchive.loa.downloader.service.document.DocumentLocationProcessorWrapper;
 import com.github.bottomlessarchive.loa.queue.service.domain.message.DocumentLocationMessage;
+import com.github.bottomlessarchive.loa.type.domain.DocumentType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.MDC;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
@@ -27,7 +25,6 @@ public class DownloadQueueListener implements CommandLineRunner {
     private final QueueManipulator queueManipulator;
     private final DocumentLocationProcessorWrapper documentLocationProcessorWrapper;
     private final DocumentLocationEvaluator documentLocationEvaluator;
-    private final DocumentLocationIdFactory documentLocationIdFactory;
 
     @Override
     public void run(final String... args) throws MalformedURLException {
@@ -49,17 +46,10 @@ public class DownloadQueueListener implements CommandLineRunner {
 
             final URL documentLocationURL = new URL(documentLocationMessage.getDocumentLocation());
 
-            final String documentLocationId = documentLocationIdFactory.newDocumentLocationId(documentLocationURL);
-
-            MDC.put("documentLocationId", documentLocationId);
-
             final DocumentLocation documentLocation = DocumentLocation.builder()
-                    .id(documentLocationId)
-                    .location(
-                            UrlLink.builder()
-                                    .url(documentLocationURL)
-                                    .build()
-                    )
+                    .id(documentLocationMessage.getId())
+                    .type(DocumentType.valueOf(documentLocationMessage.getType()))
+                    .location(documentLocationURL)
                     .sourceName(documentLocationMessage.getSourceName())
                     .build();
 
@@ -70,8 +60,6 @@ public class DownloadQueueListener implements CommandLineRunner {
             } else {
                 log.info("Document location is a duplicate.");
             }
-
-            MDC.clear();
         }
     }
 }

@@ -7,6 +7,8 @@ import lombok.Getter;
 @Builder
 public class DocumentLocationMessage {
 
+    private final String id;
     private final String sourceName;
     private final String documentLocation;
+    private final String type;
 }

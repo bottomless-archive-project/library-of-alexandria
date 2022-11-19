@@ -1,6 +1,5 @@
 dependencies {
     api project(':loa-library:loa-source-service')
-    implementation project(':loa-library:loa-io-service')
     implementation project(':loa-library:loa-file-service')
     implementation project(':loa-library:loa-logging-service')
 

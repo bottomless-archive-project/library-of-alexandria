@@ -1,7 +1,8 @@
 package com.github.bottomlessarchive.loa.source.file.service.location;
 
-import com.github.bottomlessarchive.loa.source.configuration.DocumentSourceConfiguration;
 import com.github.bottomlessarchive.loa.location.domain.DocumentLocation;
+import com.github.bottomlessarchive.loa.location.service.factory.DocumentLocationFactory;
+import com.github.bottomlessarchive.loa.source.configuration.DocumentSourceConfiguration;
 import com.github.bottomlessarchive.loa.source.file.configuration.FileDocumentSourceConfigurationProperties;
 import com.github.bottomlessarchive.loa.source.file.service.FileSourceFactory;
 import io.micrometer.core.instrument.Counter;
@@ -14,12 +15,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.io.BufferedReader;
 import java.io.CharArrayReader;
 import java.util.List;
+import java.util.Optional;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -33,6 +32,9 @@ class FileDocumentLocationSourceTest {
 
     @Mock
     private FileSourceFactory fileSourceFactory;
+
+    @Mock
+    private DocumentLocationFactory documentLocationFactory;
 
     @Mock
     private Counter processedDocumentLocationCount;
@@ -55,6 +57,8 @@ class FileDocumentLocationSourceTest {
     void testWhenSkipLinesAreSet() {
         when(fileDocumentSourceConfigurationProperties.skipLines())
                 .thenReturn(3L);
+        when(documentSourceConfiguration.getName())
+                .thenReturn("test-source");
         when(fileSourceFactory.newSourceReader())
                 .thenReturn(
                         new BufferedReader(
@@ -70,11 +74,21 @@ class FileDocumentLocationSourceTest {
                                 )
                         )
                 );
+        final DocumentLocation fourthDocumentLocation = DocumentLocation.builder()
+                .build();
+        final DocumentLocation fifthDocumentLocation = DocumentLocation.builder()
+                .build();
+        when(documentLocationFactory.newDocumentLocation("http://www.example.com/4", "test-source"))
+                .thenReturn(Optional.of(fourthDocumentLocation));
+        when(documentLocationFactory.newDocumentLocation("http://www.example.com/5", "test-source"))
+                .thenReturn(Optional.of(fifthDocumentLocation));
 
         final List<DocumentLocation> result = underTest.streamLocations().toList();
 
-        assertThat(result.size(), is(2));
-        verify(processedDocumentLocationCount, times(2)).increment();
+        assertThat(result)
+                .containsExactly(fourthDocumentLocation, fifthDocumentLocation);
+        verify(processedDocumentLocationCount, times(2))
+                .increment();
     }
 
     @Test
@@ -90,8 +104,6 @@ class FileDocumentLocationSourceTest {
                                                 http://www.example.com/1
                                                 http://www.example.com/2
                                                 http://www.example.com/3
-                                                http://www.example.com/4
-                                                http://www.example.com/5
                                                 """
                                                 .toCharArray()
                                 )
@@ -99,34 +111,24 @@ class FileDocumentLocationSourceTest {
                 );
         when(documentSourceConfiguration.getName())
                 .thenReturn("test-source");
+        final DocumentLocation firstDocumentLocation = DocumentLocation.builder()
+                .build();
+        final DocumentLocation secondDocumentLocation = DocumentLocation.builder()
+                .build();
+        final DocumentLocation thirdDocumentLocation = DocumentLocation.builder()
+                .build();
+        when(documentLocationFactory.newDocumentLocation("http://www.example.com/1", "test-source"))
+                .thenReturn(Optional.of(firstDocumentLocation));
+        when(documentLocationFactory.newDocumentLocation("http://www.example.com/2", "test-source"))
+                .thenReturn(Optional.of(secondDocumentLocation));
+        when(documentLocationFactory.newDocumentLocation("http://www.example.com/3", "test-source"))
+                .thenReturn(Optional.of(thirdDocumentLocation));
 
         final List<DocumentLocation> result = underTest.streamLocations().toList();
 
-        final DocumentLocation firstDocumentLocation = result.get(0);
-        assertTrue(firstDocumentLocation.getLocation().toUrl().isPresent());
-        assertEquals("http://www.example.com/1", firstDocumentLocation.getLocation().toUrl().get().toString());
-        assertEquals("test-source", firstDocumentLocation.getSourceName());
-
-        final DocumentLocation secondDocumentLocation = result.get(1);
-        assertTrue(secondDocumentLocation.getLocation().toUrl().isPresent());
-        assertEquals("http://www.example.com/2", secondDocumentLocation.getLocation().toUrl().get().toString());
-        assertEquals("test-source", secondDocumentLocation.getSourceName());
-
-        final DocumentLocation thirdDocumentLocation = result.get(2);
-        assertTrue(thirdDocumentLocation.getLocation().toUrl().isPresent());
-        assertEquals("http://www.example.com/3", thirdDocumentLocation.getLocation().toUrl().get().toString());
-        assertEquals("test-source", thirdDocumentLocation.getSourceName());
-
-        final DocumentLocation fourthDocumentLocation = result.get(3);
-        assertTrue(fourthDocumentLocation.getLocation().toUrl().isPresent());
-        assertEquals("http://www.example.com/4", fourthDocumentLocation.getLocation().toUrl().get().toString());
-        assertEquals("test-source", fourthDocumentLocation.getSourceName());
-
-        final DocumentLocation fifthDocumentLocation = result.get(4);
-        assertTrue(fifthDocumentLocation.getLocation().toUrl().isPresent());
-        assertEquals("http://www.example.com/5", fifthDocumentLocation.getLocation().toUrl().get().toString());
-        assertEquals("test-source", fifthDocumentLocation.getSourceName());
-
-        verify(processedDocumentLocationCount, times(5)).increment();
+        assertThat(result)
+                .containsExactly(firstDocumentLocation, secondDocumentLocation, thirdDocumentLocation);
+        verify(processedDocumentLocationCount, times(3))
+                .increment();
     }
 }
