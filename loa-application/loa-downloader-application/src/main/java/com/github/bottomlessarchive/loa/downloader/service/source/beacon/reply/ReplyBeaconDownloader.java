@@ -3,6 +3,8 @@ package com.github.bottomlessarchive.loa.downloader.service.source.beacon.reply;
 import com.github.bottomlessarchive.loa.beacon.service.client.BeaconClient;
 import com.github.bottomlessarchive.loa.beacon.service.client.domain.BeaconDocumentLocation;
 import com.github.bottomlessarchive.loa.beacon.service.client.domain.BeaconDocumentLocationResult;
+import com.github.bottomlessarchive.loa.document.service.domain.DocumentEntity;
+import com.github.bottomlessarchive.loa.document.service.entity.factory.DocumentEntityFactory;
 import com.github.bottomlessarchive.loa.downloader.service.document.DocumentArchiver;
 import com.github.bottomlessarchive.loa.downloader.service.document.DocumentLocationEvaluator;
 import com.github.bottomlessarchive.loa.downloader.service.document.domain.DocumentArchivingContext;
@@ -27,11 +29,13 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
+//TODO: Add support for non-reply beacon
 @ConditionalOnProperty(value = "loa.downloader.source", havingValue = "beacon-reply")
 public class ReplyBeaconDownloader implements CommandLineRunner {
 
@@ -39,6 +43,7 @@ public class ReplyBeaconDownloader implements CommandLineRunner {
     private final QueueManipulator queueManipulator;
     private final DocumentArchiver documentArchiver;
     private final StageLocationFactory stageLocationFactory;
+    private final DocumentEntityFactory documentEntityFactory;
     private final DocumentLocationEvaluator documentLocationEvaluator;
     private final DocumentLocationManipulator documentLocationManipulator;
     private final BeaconDocumentLocationFactory beaconDocumentLocationFactory;
@@ -85,6 +90,20 @@ public class ReplyBeaconDownloader implements CommandLineRunner {
         if (DocumentLocationResultType.OK.equals(documentLocationResultType)) {
             final UUID documentId = beaconDocumentLocationResult.getDocumentId()
                     .orElseThrow();
+
+            final Optional<DocumentEntity> documentEntityOptional = documentEntityFactory.getDocumentEntity(
+                    beaconDocumentLocationResult.getChecksum(), beaconDocumentLocationResult.getSize(),
+                    beaconDocumentLocationResult.getType().name());
+            if (documentEntityOptional.isPresent()) {
+                log.info("Document with id: {} is a duplicate.", documentId);
+
+                documentEntityFactory.addSourceLocation(documentEntityOptional.get().getId(), documentId.toString());
+
+                beaconClient.deleteDocumentFromBeacon(beaconDownloaderConfigurationProperties.activeBeacon(),
+                        documentEntityOptional.get().getId());
+
+                return;
+            }
 
             final StageLocation stageLocation = stageLocationFactory.getLocation(documentId);
 

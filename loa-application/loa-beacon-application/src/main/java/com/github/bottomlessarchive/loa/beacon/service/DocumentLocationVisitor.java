@@ -1,13 +1,11 @@
 package com.github.bottomlessarchive.loa.beacon.service;
 
-import com.github.bottomlessarchive.loa.beacon.configuration.BeaconConfigurationProperties;
 import com.github.bottomlessarchive.loa.beacon.service.domain.DocumentLocation;
 import com.github.bottomlessarchive.loa.beacon.service.domain.DocumentLocationResult;
 import com.github.bottomlessarchive.loa.checksum.service.ChecksumProvider;
 import com.github.bottomlessarchive.loa.io.service.collector.DocumentCollector;
 import com.github.bottomlessarchive.loa.stage.service.StageLocationFactory;
 import com.github.bottomlessarchive.loa.stage.service.domain.StageLocation;
-import com.github.bottomlessarchive.loa.type.domain.DocumentType;
 import com.github.bottomlessarchive.loa.url.service.downloader.DocumentLocationResultCalculator;
 import com.github.bottomlessarchive.loa.url.service.downloader.domain.DownloadResult;
 import com.github.bottomlessarchive.loa.validator.service.DocumentFileValidator;
@@ -16,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
 import java.net.URL;
-import java.nio.file.Path;
 import java.util.UUID;
 
 @Service
@@ -25,9 +22,9 @@ public class DocumentLocationVisitor {
 
     private final DocumentCollector documentCollector;
     private final ChecksumProvider checksumProvider;
+    private final StoragePathFactory storagePathFactory;
     private final DocumentFileValidator documentFileValidator;
     private final StageLocationFactory stageLocationFactory;
-    private final BeaconConfigurationProperties beaconConfigurationProperties;
     private final DocumentLocationResultCalculator documentLocationResultCalculator;
 
     public DocumentLocationResult visitDocumentLocation(final DocumentLocation documentLocation) {
@@ -57,7 +54,7 @@ public class DocumentLocationVisitor {
                             .type(documentLocation.getType())
                             .build();
                 } finally {
-                    stageLocation.moveTo(buildStoragePath(documentId, documentLocation.getType()));
+                    stageLocation.moveTo(storagePathFactory.buildStoragePath(documentId));
                 }
             } else {
                 return DocumentLocationResult.builder()
@@ -77,9 +74,5 @@ public class DocumentLocationVisitor {
                 stageLocation.cleanup();
             }
         }
-    }
-
-    private Path buildStoragePath(final UUID documentId, final DocumentType documentType) {
-        return Path.of(beaconConfigurationProperties.storagePath()).resolve(documentId + "." + documentType.getFileExtension());
     }
 }

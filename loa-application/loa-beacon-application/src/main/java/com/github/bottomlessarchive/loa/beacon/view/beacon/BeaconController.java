@@ -1,6 +1,7 @@
 package com.github.bottomlessarchive.loa.beacon.view.beacon;
 
 import com.github.bottomlessarchive.loa.beacon.service.DocumentLocationProcessor;
+import com.github.bottomlessarchive.loa.beacon.service.StoragePathFactory;
 import com.github.bottomlessarchive.loa.beacon.service.domain.DocumentLocation;
 import com.github.bottomlessarchive.loa.beacon.service.domain.DocumentLocationResult;
 import com.github.bottomlessarchive.loa.beacon.view.beacon.request.VisitDocumentLocationsRequest;
@@ -8,12 +9,17 @@ import com.github.bottomlessarchive.loa.beacon.view.beacon.response.DocumentLoca
 import com.github.bottomlessarchive.loa.beacon.view.beacon.response.VisitDocumentLocationsResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,6 +29,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BeaconController {
 
+    private final StoragePathFactory storagePathFactory;
     private final DocumentLocationProcessor documentLocationProcessor;
 
     @PostMapping("/visit-document-locations")
@@ -65,7 +72,12 @@ public class BeaconController {
     }
 
     @PostMapping("/document/{documentId}")
-    public byte[] returnDownloadedDocument(@PathVariable final UUID documentId) {
-        return new byte[]{}; //TODO
+    public Resource returnDownloadedDocument(@PathVariable final UUID documentId) {
+        return new FileSystemResource(storagePathFactory.buildStoragePath(documentId));
+    }
+
+    @DeleteMapping("/document/{documentId}")
+    public void deleteDownloadedDocument(@PathVariable final UUID documentId) throws IOException {
+        Files.delete(storagePathFactory.buildStoragePath(documentId));
     }
 }

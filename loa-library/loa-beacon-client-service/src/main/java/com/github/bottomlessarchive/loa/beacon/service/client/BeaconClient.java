@@ -95,8 +95,25 @@ public class BeaconClient {
         }
     }
 
+    public void deleteDocumentFromBeacon(final String beaconId, final UUID documentId) {
+        try {
+            //TODO: Authentication!
+            final Request request = new Request.Builder()
+                    .url("http://" + beaconApplicationMap.get(beaconId) + "/document/" + documentId)
+                    .delete()
+                    .build();
+
+            okHttpClient.newCall(request)
+                    .execute()
+                    .close();
+        } catch (IOException e) {
+            throw new BeaconClientException("Failed to send document locations for downloading!", e);
+        }
+    }
+
     //TODO: Retry and such
     public DownloadResult downloadDocumentFromBeacon(final String beaconId, final UUID documentId, final Path resultPath) {
+        //TODO: Authentication!
         try {
             return fileDownloadManager.downloadFile(new URL("http://" + beaconApplicationMap.get(beaconId) + "/document/" + documentId),
                     resultPath);
