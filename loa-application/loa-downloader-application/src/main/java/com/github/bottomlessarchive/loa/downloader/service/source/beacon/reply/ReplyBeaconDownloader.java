@@ -7,6 +7,7 @@ import com.github.bottomlessarchive.loa.downloader.service.document.DocumentArch
 import com.github.bottomlessarchive.loa.downloader.service.document.DocumentLocationEvaluator;
 import com.github.bottomlessarchive.loa.downloader.service.document.domain.DocumentArchivingContext;
 import com.github.bottomlessarchive.loa.downloader.service.source.beacon.configuration.BeaconDownloaderConfigurationProperties;
+import com.github.bottomlessarchive.loa.downloader.service.source.beacon.service.BeaconDocumentLocationFactory;
 import com.github.bottomlessarchive.loa.location.domain.DocumentLocation;
 import com.github.bottomlessarchive.loa.location.domain.DocumentLocationResultType;
 import com.github.bottomlessarchive.loa.location.service.DocumentLocationManipulator;
@@ -40,6 +41,7 @@ public class ReplyBeaconDownloader implements CommandLineRunner {
     private final StageLocationFactory stageLocationFactory;
     private final DocumentLocationEvaluator documentLocationEvaluator;
     private final DocumentLocationManipulator documentLocationManipulator;
+    private final BeaconDocumentLocationFactory beaconDocumentLocationFactory;
     private final BeaconDownloaderConfigurationProperties beaconDownloaderConfigurationProperties;
 
     @Override
@@ -72,16 +74,6 @@ public class ReplyBeaconDownloader implements CommandLineRunner {
         }
     }
 
-    //TODO: move to a factory
-    private BeaconDocumentLocation newBeaconDocumentLocation(final DocumentLocation location) {
-        return BeaconDocumentLocation.builder()
-                .id(location.getId())
-                .type(location.getType())
-                .location(location.getLocation())
-                .sourceName(location.getSourceName())
-                .build();
-    }
-
     private void processBeaconDocumentLocationResult(final BeaconDocumentLocationResult beaconDocumentLocationResult) {
         // Updating the location result is mandatory
         final DocumentLocationResultType documentLocationResultType = DocumentLocationResultType.valueOf(
@@ -90,7 +82,6 @@ public class ReplyBeaconDownloader implements CommandLineRunner {
         documentLocationManipulator.updateDownloadResultCode(beaconDocumentLocationResult.getId(), documentLocationResultType);
 
         //TODO: Filter duplicates based on the returned data (so we don't need to download the doc if it is a duplicate)
-
         if (DocumentLocationResultType.OK.equals(documentLocationResultType)) {
             final UUID documentId = beaconDocumentLocationResult.getDocumentId()
                     .orElseThrow();
@@ -124,12 +115,11 @@ public class ReplyBeaconDownloader implements CommandLineRunner {
     }
 
     private List<BeaconDocumentLocationResult> processDocumentLocationsByBeacon(final List<DocumentLocation> documentLocationMessages) {
-        return beaconClient.visitDocumentLocations(
-                beaconDownloaderConfigurationProperties.activeBeacon(),
-                documentLocationMessages.stream()
-                        .map(this::newBeaconDocumentLocation)
-                        .toList()
-        );
+        final List<BeaconDocumentLocation> beaconDocumentLocations = documentLocationMessages.stream()
+                .map(beaconDocumentLocationFactory::newBeaconDocumentLocation)
+                .toList();
+
+        return beaconClient.visitDocumentLocations(beaconDownloaderConfigurationProperties.activeBeacon(), beaconDocumentLocations);
     }
 
     private List<DocumentLocation> collectDocumentsToProcess() {
