@@ -43,7 +43,7 @@ public class ReplyBeaconDownloader implements CommandLineRunner {
     private final BeaconDownloaderConfigurationProperties beaconDownloaderConfigurationProperties;
 
     @Override
-    public void run(final String... args) throws MalformedURLException {
+    public void run(final String... args) {
         queueManipulator.silentlyInitializeQueue(Queue.DOCUMENT_LOCATION_QUEUE);
         if (log.isInfoEnabled()) {
             log.info("Initialized queue processing! There are {} messages available in the location queue!",
@@ -65,7 +65,7 @@ public class ReplyBeaconDownloader implements CommandLineRunner {
             final List<BeaconDocumentLocationResult> beaconDocumentLocationResults =
                     processDocumentLocationsByBeacon(documentLocationMessages);
 
-            log.info("Got back {} location reasults from beacon with name: {}.", beaconDocumentLocationResults.size(),
+            log.info("Got back {} location results from beacon with name: {}.", beaconDocumentLocationResults.size(),
                     beaconDownloaderConfigurationProperties.activeBeacon());
 
             beaconDocumentLocationResults.forEach(this::processBeaconDocumentLocationResult);
@@ -132,27 +132,30 @@ public class ReplyBeaconDownloader implements CommandLineRunner {
         );
     }
 
-    private List<DocumentLocation> collectDocumentsToProcess() throws MalformedURLException {
-        //TODO: 1000 should come from a config
-        final List<DocumentLocation> documentLocationMessages = new ArrayList<>(1000);
+    private List<DocumentLocation> collectDocumentsToProcess() {
+        final List<DocumentLocation> documentLocationMessages = new ArrayList<>(beaconDownloaderConfigurationProperties.requestSize());
 
-        while (documentLocationMessages.size() != 1000) {
+        while (documentLocationMessages.size() != beaconDownloaderConfigurationProperties.requestSize()) {
             final DocumentLocationMessage documentLocationMessage =
                     queueManipulator.readMessage(Queue.DOCUMENT_LOCATION_QUEUE, DocumentLocationMessage.class);
 
-            final DocumentLocation documentLocation = DocumentLocation.builder()
-                    .id(documentLocationMessage.getId())
-                    .location(new URL(documentLocationMessage.getDocumentLocation()))
-                    .type(DocumentType.valueOf(documentLocationMessage.getType()))
-                    .sourceName(documentLocationMessage.getSourceName())
-                    .build();
+            try {
+                final DocumentLocation documentLocation = DocumentLocation.builder()
+                        .id(documentLocationMessage.getId())
+                        .location(new URL(documentLocationMessage.getDocumentLocation()))
+                        .type(DocumentType.valueOf(documentLocationMessage.getType()))
+                        .sourceName(documentLocationMessage.getSourceName())
+                        .build();
 
-            log.info("Processing location.");
+                log.info("Processing location.");
 
-            if (documentLocationEvaluator.shouldProcessDocumentLocation(documentLocation)) {
-                documentLocationMessages.add(documentLocation);
-            } else {
-                log.info("Document location is a duplicate.");
+                if (documentLocationEvaluator.shouldProcessDocumentLocation(documentLocation)) {
+                    documentLocationMessages.add(documentLocation);
+                } else {
+                    log.info("Document location is a duplicate.");
+                }
+            } catch (MalformedURLException e) {
+                log.error("Incorrect document location! This shouldn't happen!", e);
             }
         }
 
