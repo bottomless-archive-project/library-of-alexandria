@@ -4,10 +4,10 @@ import com.aayushatharva.brotli4j.Brotli4jLoader;
 import com.aayushatharva.brotli4j.decoder.BrotliInputStream;
 import com.aayushatharva.brotli4j.encoder.BrotliOutputStream;
 import com.github.bottomlessarchive.loa.compression.domain.CompressionException;
+import jakarta.annotation.PostConstruct;
 import org.apache.commons.compress.utils.IOUtils;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;

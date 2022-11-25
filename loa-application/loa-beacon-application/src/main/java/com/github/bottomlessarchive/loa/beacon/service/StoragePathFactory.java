@@ -1,7 +1,6 @@
 package com.github.bottomlessarchive.loa.beacon.service;
 
 import com.github.bottomlessarchive.loa.beacon.configuration.BeaconConfigurationProperties;
-import com.github.bottomlessarchive.loa.type.domain.DocumentType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

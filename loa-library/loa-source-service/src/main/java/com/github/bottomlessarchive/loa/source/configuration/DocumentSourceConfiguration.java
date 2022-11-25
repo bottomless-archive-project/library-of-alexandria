@@ -4,13 +4,11 @@ import com.github.bottomlessarchive.loa.source.domain.DocumentSourceType;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.ConstructorBinding;
 
 /**
  * Contains the configurations that could be set from the property files regarding the document location source processing.
  */
 @Getter
-@ConstructorBinding
 @RequiredArgsConstructor
 @ConfigurationProperties("loa.source")
 public class DocumentSourceConfiguration {

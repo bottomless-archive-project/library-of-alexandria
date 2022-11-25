@@ -5,6 +5,7 @@ import com.github.bottomlessarchive.loa.web.view.user.response.InfoResponse;
 import com.github.bottomlessarchive.loa.web.view.user.request.LoginRequest;
 import com.github.bottomlessarchive.loa.web.view.user.response.LoginResponse;
 import com.github.bottomlessarchive.loa.web.view.user.response.domain.LoginResult;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpSession;
 import java.util.Optional;
 import java.util.UUID;
 

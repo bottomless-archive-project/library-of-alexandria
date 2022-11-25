@@ -1,12 +1,13 @@
 package com.github.bottomlessarchive.loa.parser.configuration;
 
+import jakarta.annotation.PostConstruct;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.springframework.context.annotation.Configuration;
 
-import javax.annotation.PostConstruct;
 import java.util.Arrays;
 
+//TODO: Review if this is still necessary
 @Configuration
 public class LoggerConfiguration {
 
