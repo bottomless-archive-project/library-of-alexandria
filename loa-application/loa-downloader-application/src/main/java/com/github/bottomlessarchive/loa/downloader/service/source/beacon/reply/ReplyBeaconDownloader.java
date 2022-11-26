@@ -86,7 +86,6 @@ public class ReplyBeaconDownloader implements CommandLineRunner {
 
         documentLocationManipulator.updateDownloadResultCode(beaconDocumentLocationResult.getId(), documentLocationResultType);
 
-        //TODO: Filter duplicates based on the returned data (so we don't need to download the doc if it is a duplicate)
         if (DocumentLocationResultType.OK.equals(documentLocationResultType)) {
             final UUID documentId = beaconDocumentLocationResult.getDocumentId()
                     .orElseThrow();
