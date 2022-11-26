@@ -78,9 +78,6 @@ configure(subprojects.findAll {it.name != 'loa-frontend'}) {
     }
 
     dependencies {
-        //TODO: This should be removed at the end of the migration
-        runtimeOnly("org.springframework.boot:spring-boot-properties-migrator")
-
         // Spring starters
         implementation group: 'org.springframework.boot', name: 'spring-boot-starter'
 
