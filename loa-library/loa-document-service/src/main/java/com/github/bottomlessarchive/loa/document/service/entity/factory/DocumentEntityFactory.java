@@ -1,6 +1,7 @@
 package com.github.bottomlessarchive.loa.document.service.entity.factory;
 
 import com.github.bottomlessarchive.loa.document.repository.DocumentRepository;
+import com.github.bottomlessarchive.loa.document.service.domain.DuplicateDocumentException;
 import com.github.bottomlessarchive.loa.document.service.entity.factory.domain.DocumentCreationContext;
 import com.github.bottomlessarchive.loa.repository.service.HexConverter;
 import com.github.bottomlessarchive.loa.document.repository.domain.DocumentDatabaseEntity;
@@ -8,6 +9,7 @@ import com.github.bottomlessarchive.loa.document.service.domain.DocumentEntity;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentStatus;
 import com.github.bottomlessarchive.loa.document.service.entity.transformer.DocumentEntityTransformer;
 import com.github.bottomlessarchive.loa.type.domain.DocumentType;
+import com.mongodb.MongoWriteException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +26,8 @@ import java.util.stream.StreamSupport;
 @Service
 @RequiredArgsConstructor
 public class DocumentEntityFactory {
+
+    private static final int DUPLICATE_DOCUMENT_ID_ERROR_CODE = 11000;
 
     private final HexConverter hexConverter;
     private final DocumentRepository documentRepository;
@@ -89,7 +93,7 @@ public class DocumentEntityFactory {
     /**
      * Return the number of documents available in the database grouped by status.
      *
-     * @return the count of documents grouped by status
+     * @return the map of the document count grouped by status
      */
     public Map<DocumentStatus, Integer> getCountByStatus() {
         return documentRepository.countByStatus().entrySet().stream()
@@ -99,7 +103,7 @@ public class DocumentEntityFactory {
     /**
      * Return the number of documents available in the database grouped by type.
      *
-     * @return the count of documents grouped by type
+     * @return the map of the document count grouped by type
      */
     public Map<DocumentType, Integer> getCountByType() {
         return documentRepository.countByType().entrySet().stream()
@@ -145,7 +149,16 @@ public class DocumentEntityFactory {
             documentDatabaseEntity.setSourceLocations(Collections.emptySet());
         }
 
-        documentRepository.insertDocument(documentDatabaseEntity);
+        try {
+            documentRepository.insertDocument(documentDatabaseEntity);
+        } catch (final MongoWriteException e) {
+            if (e.getError().getCode() == DUPLICATE_DOCUMENT_ID_ERROR_CODE) {
+                throw new DuplicateDocumentException("Document with id: " + documentDatabaseEntity.getId() + " and checksum: "
+                        + new String(documentDatabaseEntity.getChecksum()) + " is a duplicate!", e);
+            }
+
+            throw e;
+        }
 
         return documentEntityTransformer.transform(documentDatabaseEntity);
     }

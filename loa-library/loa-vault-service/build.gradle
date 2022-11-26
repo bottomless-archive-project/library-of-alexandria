@@ -1,8 +1,4 @@
 dependencies {
-    // TODO: This shouldn't be here! It's only here because of com.github.bottomlessarchive.loa.vault.service.archive.ArchivingService.isDuplicateIndexError.
-    // However, instead of checking that there, we should catch it in a lower layer. and throw our own exception there!
-    implementation group: 'org.mongodb', name: 'mongodb-driver-reactivestreams'
-
     implementation group: 'commons-io', name: 'commons-io', version: '2.11.0'
     implementation group: 'software.amazon.awssdk', name: 's3', version: '2.18.17'
 
