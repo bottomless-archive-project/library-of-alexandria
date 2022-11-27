@@ -29,6 +29,7 @@ public class DocumentEntityTransformer {
                 .downloaderVersion(documentDatabaseEntity.getDownloaderVersion())
                 .compression(DocumentCompression.valueOf(documentDatabaseEntity.getCompression()))
                 .source(documentDatabaseEntity.getSource())
+                .beacon(documentDatabaseEntity.getBeacon())
                 .sourceLocations(documentDatabaseEntity.getSourceLocations().stream()
                         .map(hexConverter::encode)
                         .collect(Collectors.toSet())

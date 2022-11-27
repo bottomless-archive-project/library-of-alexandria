@@ -142,6 +142,7 @@ public class DocumentEntityFactory {
         documentDatabaseEntity.setCompression(documentCreationContext.getCompression().name());
         documentDatabaseEntity.setDownloadDate(Instant.now());
         documentDatabaseEntity.setSource(documentCreationContext.getSource());
+        documentDatabaseEntity.setBeacon(documentDatabaseEntity.getBeacon());
 
         if (documentCreationContext.getSourceLocationId().isPresent()) {
             documentDatabaseEntity.setSourceLocations(Set.of(hexConverter.decode(documentCreationContext.getSourceLocationId().get())));

@@ -18,6 +18,11 @@ public enum DocumentStatus {
     INDEXED,
 
     /**
+     * The document is not in the vaults but on one of the beacon machines.
+     */
+    ON_BEACON,
+
+    /**
      * The document is not available in the vault, or the data that is available are corrupt in any for or shape. This means that a corrupt
      * document mostly likely can't be opened, indexed or restored.
      */

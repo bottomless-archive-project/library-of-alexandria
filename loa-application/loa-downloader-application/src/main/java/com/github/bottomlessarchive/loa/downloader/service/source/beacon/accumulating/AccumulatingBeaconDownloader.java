@@ -4,7 +4,10 @@ import com.github.bottomlessarchive.loa.beacon.service.client.BeaconClient;
 import com.github.bottomlessarchive.loa.beacon.service.client.domain.BeaconDocumentLocation;
 import com.github.bottomlessarchive.loa.beacon.service.client.domain.BeaconDocumentLocationResult;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentEntity;
+import com.github.bottomlessarchive.loa.document.service.domain.DocumentStatus;
 import com.github.bottomlessarchive.loa.document.service.entity.factory.DocumentEntityFactory;
+import com.github.bottomlessarchive.loa.document.service.entity.factory.domain.DocumentCreationContext;
+import com.github.bottomlessarchive.loa.downloader.configuration.DownloaderConfigurationProperties;
 import com.github.bottomlessarchive.loa.downloader.service.source.beacon.configuration.BeaconDownloaderConfigurationProperties;
 import com.github.bottomlessarchive.loa.downloader.service.source.beacon.service.BeaconDocumentLocationFactory;
 import com.github.bottomlessarchive.loa.downloader.service.source.beacon.service.DocumentLocationCollector;
@@ -35,6 +38,7 @@ public class AccumulatingBeaconDownloader implements CommandLineRunner {
     private final DocumentLocationCollector documentLocationCollector;
     private final DocumentLocationManipulator documentLocationManipulator;
     private final BeaconDocumentLocationFactory beaconDocumentLocationFactory;
+    private final DownloaderConfigurationProperties downloaderConfigurationProperties;
     private final BeaconDownloaderConfigurationProperties beaconDownloaderConfigurationProperties;
 
     @Override
@@ -91,7 +95,21 @@ public class AccumulatingBeaconDownloader implements CommandLineRunner {
                 return;
             }
 
-            //TODO: Insert the documents here with the status of ON_BEACON and the beacon name as well.
+            //TODO: Add a loader that inserts documents into the vault that are coming from an accumulating beacon's folder
+
+            documentEntityFactory.newDocumentEntity(
+                    DocumentCreationContext.builder()
+                            .id(beaconDocumentLocationResult.getDocumentId().get())
+                            .type(beaconDocumentLocationResult.getType())
+                            .status(DocumentStatus.ON_BEACON)
+                            .beacon(beaconDownloaderConfigurationProperties.activeBeacon())
+                            .source(beaconDocumentLocationResult.getSourceName())
+                            .sourceLocationId(beaconDocumentLocationResult.getId())
+                            .versionNumber(downloaderConfigurationProperties.versionNumber())
+                            .checksum(beaconDocumentLocationResult.getChecksum())
+                            .fileSize(beaconDocumentLocationResult.getSize())
+                            .build()
+            );
         }
     }
 }

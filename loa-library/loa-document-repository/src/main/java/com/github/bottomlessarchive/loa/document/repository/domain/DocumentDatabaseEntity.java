@@ -19,6 +19,7 @@ public class DocumentDatabaseEntity {
     private String type;
     private String status;
     private String source;
+    private String beacon;
     private Set<byte[]> sourceLocations;
     private String compression;
     private byte[] checksum;
