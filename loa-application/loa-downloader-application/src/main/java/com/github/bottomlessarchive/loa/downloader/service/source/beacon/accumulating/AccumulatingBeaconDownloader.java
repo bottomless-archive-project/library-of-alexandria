@@ -1,12 +1,10 @@
-package com.github.bottomlessarchive.loa.downloader.service.source.beacon.reply;
+package com.github.bottomlessarchive.loa.downloader.service.source.beacon.accumulating;
 
 import com.github.bottomlessarchive.loa.beacon.service.client.BeaconClient;
 import com.github.bottomlessarchive.loa.beacon.service.client.domain.BeaconDocumentLocation;
 import com.github.bottomlessarchive.loa.beacon.service.client.domain.BeaconDocumentLocationResult;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentEntity;
 import com.github.bottomlessarchive.loa.document.service.entity.factory.DocumentEntityFactory;
-import com.github.bottomlessarchive.loa.downloader.service.document.DocumentArchiver;
-import com.github.bottomlessarchive.loa.downloader.service.document.domain.DocumentArchivingContext;
 import com.github.bottomlessarchive.loa.downloader.service.source.beacon.configuration.BeaconDownloaderConfigurationProperties;
 import com.github.bottomlessarchive.loa.downloader.service.source.beacon.service.BeaconDocumentLocationFactory;
 import com.github.bottomlessarchive.loa.downloader.service.source.beacon.service.DocumentLocationCollector;
@@ -15,8 +13,6 @@ import com.github.bottomlessarchive.loa.location.domain.DocumentLocationResultTy
 import com.github.bottomlessarchive.loa.location.service.DocumentLocationManipulator;
 import com.github.bottomlessarchive.loa.queue.service.QueueManipulator;
 import com.github.bottomlessarchive.loa.queue.service.domain.Queue;
-import com.github.bottomlessarchive.loa.stage.service.StageLocationFactory;
-import com.github.bottomlessarchive.loa.stage.service.domain.StageLocation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
@@ -30,13 +26,11 @@ import java.util.UUID;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@ConditionalOnProperty(value = "loa.downloader.source", havingValue = "beacon-reply")
-public class ReplyBeaconDownloader implements CommandLineRunner {
+@ConditionalOnProperty(value = "loa.downloader.source", havingValue = "beacon-accumulating")
+public class AccumulatingBeaconDownloader implements CommandLineRunner {
 
     private final BeaconClient beaconClient;
     private final QueueManipulator queueManipulator;
-    private final DocumentArchiver documentArchiver;
-    private final StageLocationFactory stageLocationFactory;
     private final DocumentEntityFactory documentEntityFactory;
     private final DocumentLocationCollector documentLocationCollector;
     private final DocumentLocationManipulator documentLocationManipulator;
@@ -97,30 +91,7 @@ public class ReplyBeaconDownloader implements CommandLineRunner {
                 return;
             }
 
-            final StageLocation stageLocation = stageLocationFactory.getLocation(documentId);
-
-            try {
-                log.info("Downloading document from beacon: {}.", beaconDownloaderConfigurationProperties.activeBeacon());
-
-                beaconClient.downloadDocumentFromBeacon(beaconDownloaderConfigurationProperties.activeBeacon(),
-                        documentId, stageLocation.getPath());
-
-                final DocumentArchivingContext documentArchivingContext = DocumentArchivingContext.builder()
-                        .id(documentId)
-                        .type(beaconDocumentLocationResult.getType())
-                        .source(beaconDocumentLocationResult.getSourceName())
-                        .sourceLocationId(beaconDocumentLocationResult.getId())
-                        .contents(stageLocation.getPath())
-                        .build();
-
-                documentArchiver.archiveDocument(documentArchivingContext);
-            } catch (final Exception e) {
-                log.info("Error downloading a document: {}!", e.getMessage());
-            } finally {
-                if (stageLocation.exists()) {
-                    stageLocation.cleanup();
-                }
-            }
+            //TODO: Insert the documents here with the status of ON_BEACON and the beacon name as well.
         }
     }
 }

@@ -38,6 +38,13 @@ public class ArtemisQueueManipulator implements QueueManipulator {
     private final MessageSerializerProvider messageSerializerProvider;
     private final MessageDeserializerProvider messageDeserializerProvider;
 
+    /**
+     * Initialize the queues in the Queue Application if it does not exist. If one of the queues already exist it does nothing for that
+     * queue.
+     *
+     * @param queues the queues to initialize
+     * @throws QueueException when an error happens while trying to create the queue
+     */
     @Override
     public void silentlyInitializeQueues(final Queue... queues) {
         for (final Queue queue : queues) {
