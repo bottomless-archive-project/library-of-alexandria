@@ -38,6 +38,13 @@ public class ArtemisQueueManipulator implements QueueManipulator {
     private final MessageSerializerProvider messageSerializerProvider;
     private final MessageDeserializerProvider messageDeserializerProvider;
 
+    @Override
+    public void silentlyInitializeQueues(final Queue... queues) {
+        for (final Queue queue : queues) {
+            silentlyInitializeQueue(queue);
+        }
+    }
+
     /**
      * Initialize the queue in the Queue Application if it doesn't exist. If the queue already exist it does nothing.
      *
@@ -53,6 +60,9 @@ public class ArtemisQueueManipulator implements QueueManipulator {
             if (!queueQuery.isExists()) {
                 initializeQueue(queue);
             }
+
+            log.info("Initialized queue processing! There are {} messages available in the {} queue!", getMessageCount(queue),
+                    queue.getName());
         } catch (final ActiveMQException e) {
             throw new QueueException("Unable to initialize the " + queue.getName() + " queue!", e);
         }

@@ -6,6 +6,15 @@ import com.github.bottomlessarchive.loa.queue.service.domain.QueueException;
 public interface QueueManipulator {
 
     /**
+     * Initialize the queues in the Queue Application if it does not exist. If one of the queues already exist it does nothing for that
+     * queue.
+     *
+     * @param queues the queues to initialize
+     * @throws QueueException when an error happens while trying to create the queue
+     */
+    void silentlyInitializeQueues(Queue... queues);
+
+    /**
      * Initialize the queue in the Queue Application if it does not exist. If the queue already exist it does nothing.
      *
      * @param queue the queue to initialize

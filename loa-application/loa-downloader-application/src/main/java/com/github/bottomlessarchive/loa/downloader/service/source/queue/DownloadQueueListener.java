@@ -28,17 +28,7 @@ public class DownloadQueueListener implements CommandLineRunner {
 
     @Override
     public void run(final String... args) throws MalformedURLException {
-        queueManipulator.silentlyInitializeQueue(Queue.DOCUMENT_LOCATION_QUEUE);
-        if (log.isInfoEnabled()) {
-            log.info("Initialized queue processing! There are {} messages available in the location queue!",
-                    queueManipulator.getMessageCount(Queue.DOCUMENT_LOCATION_QUEUE));
-        }
-
-        queueManipulator.silentlyInitializeQueue(Queue.DOCUMENT_ARCHIVING_QUEUE);
-        if (log.isInfoEnabled()) {
-            log.info("Initialized queue processing! There are {} messages available in the archiving queue!",
-                    queueManipulator.getMessageCount(Queue.DOCUMENT_ARCHIVING_QUEUE));
-        }
+        queueManipulator.silentlyInitializeQueues(Queue.DOCUMENT_LOCATION_QUEUE, Queue.DOCUMENT_ARCHIVING_QUEUE);
 
         while (true) {
             final DocumentLocationMessage documentLocationMessage =

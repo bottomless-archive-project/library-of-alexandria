@@ -35,7 +35,6 @@ import java.util.UUID;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-//TODO: Add support for non-reply beacon
 @ConditionalOnProperty(value = "loa.downloader.source", havingValue = "beacon-reply")
 public class ReplyBeaconDownloader implements CommandLineRunner {
 
@@ -51,17 +50,7 @@ public class ReplyBeaconDownloader implements CommandLineRunner {
 
     @Override
     public void run(final String... args) {
-        queueManipulator.silentlyInitializeQueue(Queue.DOCUMENT_LOCATION_QUEUE);
-        if (log.isInfoEnabled()) {
-            log.info("Initialized queue processing! There are {} messages available in the location queue!",
-                    queueManipulator.getMessageCount(Queue.DOCUMENT_LOCATION_QUEUE));
-        }
-
-        queueManipulator.silentlyInitializeQueue(Queue.DOCUMENT_ARCHIVING_QUEUE);
-        if (log.isInfoEnabled()) {
-            log.info("Initialized queue processing! There are {} messages available in the archiving queue!",
-                    queueManipulator.getMessageCount(Queue.DOCUMENT_ARCHIVING_QUEUE));
-        }
+        queueManipulator.silentlyInitializeQueues(Queue.DOCUMENT_LOCATION_QUEUE, Queue.DOCUMENT_ARCHIVING_QUEUE);
 
         while (true) {
             final List<DocumentLocation> documentLocationMessages = collectDocumentsToProcess();
@@ -122,7 +111,6 @@ public class ReplyBeaconDownloader implements CommandLineRunner {
 
                 documentArchiver.archiveDocument(documentArchivingContext);
             } catch (final Exception e) {
-                //TODO: Handle this normally! Ie retry until we can get the document etc!
                 log.info("Error downloading a document: {}!", e.getMessage());
             } finally {
                 if (stageLocation.exists()) {

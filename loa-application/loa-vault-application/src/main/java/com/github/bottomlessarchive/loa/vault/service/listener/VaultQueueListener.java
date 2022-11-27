@@ -35,11 +35,6 @@ public class VaultQueueListener implements CommandLineRunner {
     public void run(final String... args) throws InterruptedException {
         queueManipulator.silentlyInitializeQueue(Queue.DOCUMENT_ARCHIVING_QUEUE);
 
-        if (log.isInfoEnabled()) {
-            log.info("Initialized queue processing! There are {} messages available in the archiving queue!",
-                    queueManipulator.getMessageCount(Queue.DOCUMENT_ARCHIVING_QUEUE));
-        }
-
         while (true) {
             final DocumentArchivingMessage documentArchivingMessage = queueManipulator.readMessage(
                     Queue.DOCUMENT_ARCHIVING_QUEUE, DocumentArchivingMessage.class);
