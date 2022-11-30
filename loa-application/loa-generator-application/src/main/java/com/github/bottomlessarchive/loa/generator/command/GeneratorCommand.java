@@ -24,11 +24,6 @@ public class GeneratorCommand implements CommandLineRunner {
 
         queueManipulator.silentlyInitializeQueue(Queue.DOCUMENT_LOCATION_QUEUE);
 
-        if (log.isInfoEnabled()) {
-            log.info("There are {} messages already available in the queue!",
-                    queueManipulator.getMessageCount(Queue.DOCUMENT_LOCATION_QUEUE));
-        }
-
         documentLocationFactory.streamLocations()
                 .map(this::transform)
                 .forEach(this::sendMessage);
