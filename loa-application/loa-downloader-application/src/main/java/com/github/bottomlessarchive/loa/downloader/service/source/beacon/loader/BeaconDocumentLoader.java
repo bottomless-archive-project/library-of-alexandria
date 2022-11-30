@@ -46,7 +46,7 @@ public class BeaconDocumentLoader implements CommandLineRunner {
     private final Counter archivedDocumentCount;
 
     @Override
-    public void run(String... args) throws IOException {
+    public void run(final String... args) throws IOException {
         final Path sourceFolder = Path.of(beaconDownloaderConfigurationProperties.location());
 
         log.info("Started processing documents at folder: {}.", sourceFolder);
