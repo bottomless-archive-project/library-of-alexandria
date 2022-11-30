@@ -25,6 +25,7 @@ public class DocumentArchivingMessageFactory {
         return DocumentArchivingMessage.builder()
                 .id(documentArchivingContext.getId().toString())
                 .type(documentArchivingContext.getType().toString())
+                .fromBeacon(documentArchivingContext.isFromBeacon())
                 .source(documentArchivingContext.getSource())
                 .sourceLocationId(documentArchivingContext.getSourceLocationId())
                 .contentLength(fileManipulatorService.size(compressedContent))

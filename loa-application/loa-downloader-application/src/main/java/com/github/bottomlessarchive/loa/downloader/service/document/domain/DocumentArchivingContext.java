@@ -16,4 +16,5 @@ public class DocumentArchivingContext {
     private final String source;
     private final String sourceLocationId;
     private final Path contents;
+    private final boolean fromBeacon;
 }

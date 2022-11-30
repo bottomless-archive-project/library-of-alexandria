@@ -47,13 +47,13 @@ public class DocumentFolderReader implements CommandLineRunner {
     @Override
     @SneakyThrows
     public void run(final String... args) {
-        final Path sourceFolder = Path.of(downloaderFolderSourceConfiguration.getLocation());
+        final Path sourceFolder = Path.of(downloaderFolderSourceConfiguration.location());
 
         log.info("Started processing documents at folder: {}.", sourceFolder);
 
         try (Stream<Path> files = Files.list(sourceFolder)) {
             files.forEach(path -> documentLocationProcessorWrapper.processDocumentLocation(buildDocumentSourceItem(path), () -> {
-                                if (downloaderFolderSourceConfiguration.isShouldRemove()) {
+                                if (downloaderFolderSourceConfiguration.shouldRemove()) {
                                     try {
                                         log.debug("Deleting file at: {}.", path);
 

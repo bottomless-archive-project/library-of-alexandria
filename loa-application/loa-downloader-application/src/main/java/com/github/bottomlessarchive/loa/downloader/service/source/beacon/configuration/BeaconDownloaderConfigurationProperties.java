@@ -7,6 +7,7 @@ public record BeaconDownloaderConfigurationProperties(
 
         //TODO: Support more than one beacons!
         String activeBeacon,
-        int requestSize
+        int requestSize,
+        String location
 ) {
 }

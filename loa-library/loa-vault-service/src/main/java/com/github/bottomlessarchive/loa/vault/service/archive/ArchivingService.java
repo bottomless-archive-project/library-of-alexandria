@@ -34,7 +34,13 @@ public class ArchivingService {
         // Retry until we eventually succeed to save the document
         while (true) {
             try {
-                final DocumentEntity documentEntity = documentEntityFactory.newDocumentEntity(documentCreationContext);
+                final DocumentEntity documentEntity = documentArchivingContext.isFromBeacon()
+                        ? documentEntityFactory.getDocumentEntity(documentArchivingContext.getId()).orElseThrow()
+                        : documentEntityFactory.newDocumentEntity(documentCreationContext);
+
+                if (documentArchivingContext.isFromBeacon()) {
+                    documentManipulator.updateCompression(documentArchivingContext.getId(), documentArchivingContext.getCompression());
+                }
 
                 try (InputStream documentContent = stagingClient.grabFromStaging(documentArchivingContext.getId())) {
                     vaultDocumentManager.archiveDocument(documentEntity, documentArchivingContext, documentContent);

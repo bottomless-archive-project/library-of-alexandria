@@ -15,6 +15,7 @@ public class DocumentArchivingContext {
     private final UUID id;
     private final String vault;
     private final DocumentType type;
+    private final boolean fromBeacon;
     private final String source;
     private final String sourceLocationId;
     private final long contentLength;

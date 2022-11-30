@@ -15,6 +15,7 @@ public class DocumentArchivingMessage {
     private final String type;
     private final String source;
     private final String checksum;
+    private final boolean fromBeacon;
     private final String sourceLocationId;
     private final long contentLength;
     private final long originalContentLength;

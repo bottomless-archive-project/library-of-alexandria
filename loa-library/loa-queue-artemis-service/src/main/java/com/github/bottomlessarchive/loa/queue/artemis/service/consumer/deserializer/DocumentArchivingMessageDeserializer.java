@@ -17,6 +17,7 @@ public class DocumentArchivingMessageDeserializer implements MessageDeserializer
         final ActiveMQBuffer contentBuffer = clientMessage.getBodyBuffer();
 
         final String id = contentBuffer.readString();
+        final boolean fromBeacon = contentBuffer.readBoolean();
         final String type = contentBuffer.readString();
         final String source = contentBuffer.readString();
         final boolean hasSourceLocationId = contentBuffer.readBoolean();
@@ -29,6 +30,7 @@ public class DocumentArchivingMessageDeserializer implements MessageDeserializer
 
         return DocumentArchivingMessage.builder()
                 .id(id)
+                .fromBeacon(fromBeacon)
                 .type(type)
                 .source(source)
                 .sourceLocationId(sourceLocationId)
