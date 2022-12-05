@@ -32,25 +32,33 @@ public class VaultQueueListener implements CommandLineRunner {
     private final ExecutorService vaultExecutorService;
 
     @Override
-    public void run(final String... args) throws InterruptedException {
+    public void run(final String... args) {
         queueManipulator.silentlyInitializeQueue(Queue.DOCUMENT_ARCHIVING_QUEUE);
 
-        while (true) {
-            final DocumentArchivingMessage documentArchivingMessage = queueManipulator.readMessage(
-                    Queue.DOCUMENT_ARCHIVING_QUEUE, DocumentArchivingMessage.class);
+        final Thread t = new Thread(() -> {
+            while (true) {
+                final DocumentArchivingMessage documentArchivingMessage = queueManipulator.readMessage(
+                        Queue.DOCUMENT_ARCHIVING_QUEUE, DocumentArchivingMessage.class);
 
-            log.debug("Got new archiving message: {}!", documentArchivingMessage);
+                log.debug("Got new archiving message: {}!", documentArchivingMessage);
 
-            vaultSemaphore.acquire();
+                try {
+                    vaultSemaphore.acquire();
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
 
-            vaultExecutorService.execute(() -> {
-                final DocumentArchivingContext documentArchivingContext = documentArchivingContextTransformer.transform(
-                        documentArchivingMessage);
+                vaultExecutorService.execute(() -> {
+                    final DocumentArchivingContext documentArchivingContext = documentArchivingContextTransformer.transform(
+                            documentArchivingMessage);
 
-                archivingService.archiveDocument(documentArchivingContext);
+                    archivingService.archiveDocument(documentArchivingContext);
 
-                vaultSemaphore.release();
-            });
-        }
+                    vaultSemaphore.release();
+                });
+            }
+        });
+
+        t.start();
     }
 }

@@ -1,0 +1,8 @@
+subprojects {
+    dependencies {
+        testImplementation group: 'org.testcontainers', name: 'junit-jupiter', version: '1.17.6'
+        testImplementation group: 'org.testcontainers', name: 'testcontainers', version: '1.17.6'
+
+        testImplementation group: 'com.github.tomakehurst', name: 'wiremock-jre8-standalone', version: '2.35.0'
+    }
+}
