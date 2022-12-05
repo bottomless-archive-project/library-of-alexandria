@@ -18,7 +18,7 @@ public class VaultParallelismConfiguration {
 
     @Bean
     public Semaphore vaultSemaphore() {
-        return new Semaphore(vaultConfigurationProperties.parallelism() * 3);
+        return new Semaphore(vaultConfigurationProperties.parallelism());
     }
 
     @Bean
@@ -26,6 +26,6 @@ public class VaultParallelismConfiguration {
         log.info("Initializing the vault processor with parallelism level of {}.",
                 vaultConfigurationProperties.parallelism());
 
-        return Executors.newFixedThreadPool(vaultConfigurationProperties.parallelism());
+        return Executors.newVirtualThreadPerTaskExecutor();
     }
 }

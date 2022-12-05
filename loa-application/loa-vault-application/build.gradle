@@ -28,6 +28,7 @@ dependencies {
 
     implementation project(':loa-library:loa-vault-service')
     implementation project(':loa-library:loa-document-view')
+    implementation project(':loa-library:loa-threading-service')
     implementation project(':loa-library:loa-queue-artemis-service')
     implementation project(':loa-library:loa-staging-client-service')
     implementation project(':loa-library:loa-conductor-client-service')
