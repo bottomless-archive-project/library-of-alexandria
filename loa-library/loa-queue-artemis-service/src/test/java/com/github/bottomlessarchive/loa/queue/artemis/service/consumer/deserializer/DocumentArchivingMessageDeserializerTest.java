@@ -33,17 +33,16 @@ class DocumentArchivingMessageDeserializerTest {
 
         final DocumentArchivingMessage result = underTest.deserialize(clientMessage);
 
-        assertThat(result.getId())
+        assertThat(result.id())
                 .isEqualTo("id");
-        assertThat(result.getType())
+        assertThat(result.type())
                 .isEqualTo("type");
-        assertThat(result.getSource())
+        assertThat(result.source())
                 .isEqualTo("source");
-        assertThat(result.getSourceLocationId().isPresent())
-                .isTrue();
-        assertThat(result.getSourceLocationId().get())
-                .isEqualTo("sourceLocationId");
-        assertThat(result.getContentLength())
+        assertThat(result.sourceLocationId())
+                .isPresent()
+                .hasValue("sourceLocationId");
+        assertThat(result.contentLength())
                 .isEqualTo(5);
     }
 
@@ -62,15 +61,15 @@ class DocumentArchivingMessageDeserializerTest {
 
         final DocumentArchivingMessage result = underTest.deserialize(clientMessage);
 
-        assertThat(result.getId())
+        assertThat(result.id())
                 .isEqualTo("id");
-        assertThat(result.getType())
+        assertThat(result.type())
                 .isEqualTo("type");
-        assertThat(result.getSource())
+        assertThat(result.source())
                 .isEqualTo("source");
-        assertThat(result.getSourceLocationId().isPresent())
-                .isFalse();
-        assertThat(result.getContentLength())
+        assertThat(result.sourceLocationId())
+                .isEmpty();
+        assertThat(result.contentLength())
                 .isEqualTo(5);
     }
 }

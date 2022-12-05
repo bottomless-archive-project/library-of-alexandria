@@ -8,6 +8,8 @@ import org.apache.activemq.artemis.api.core.client.ClientMessage;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @ConditionalOnMissingBean(QueueServerConfiguration.class)
 public class DocumentArchivingMessageDeserializer implements MessageDeserializer<DocumentArchivingMessage> {
@@ -33,7 +35,7 @@ public class DocumentArchivingMessageDeserializer implements MessageDeserializer
                 .fromBeacon(fromBeacon)
                 .type(type)
                 .source(source)
-                .sourceLocationId(sourceLocationId)
+                .sourceLocationId(Optional.ofNullable(sourceLocationId))
                 .contentLength(contentLength)
                 .originalContentLength(originalContentLength)
                 .checksum(checksum)

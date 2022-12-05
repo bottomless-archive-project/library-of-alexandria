@@ -18,19 +18,19 @@ public class DocumentArchivingContextTransformer {
 
     public DocumentArchivingContext transform(final DocumentArchivingMessage documentArchivingMessage) {
         return DocumentArchivingContext.builder()
-                .id(UUID.fromString(documentArchivingMessage.getId()))
+                .id(UUID.fromString(documentArchivingMessage.id()))
                 .vault(vaultConfigurationProperties.name())
-                .type(DocumentType.valueOf(documentArchivingMessage.getType()))
-                .fromBeacon(documentArchivingMessage.isFromBeacon())
-                .source(documentArchivingMessage.getSource())
-                .sourceLocationId(documentArchivingMessage.getSourceLocationId()
+                .type(DocumentType.valueOf(documentArchivingMessage.type()))
+                .fromBeacon(documentArchivingMessage.fromBeacon())
+                .source(documentArchivingMessage.source())
+                .sourceLocationId(documentArchivingMessage.sourceLocationId()
                         .orElse(null)
                 )
-                .contentLength(documentArchivingMessage.getContentLength())
-                .originalContentLength(documentArchivingMessage.getOriginalContentLength())
-                .checksum(documentArchivingMessage.getChecksum())
+                .contentLength(documentArchivingMessage.contentLength())
+                .originalContentLength(documentArchivingMessage.originalContentLength())
+                .checksum(documentArchivingMessage.checksum())
                 .versionNumber(vaultConfigurationProperties.versionNumber())
-                .compression(DocumentCompression.valueOf(documentArchivingMessage.getCompression()))
+                .compression(DocumentCompression.valueOf(documentArchivingMessage.compression()))
                 .build();
     }
 }

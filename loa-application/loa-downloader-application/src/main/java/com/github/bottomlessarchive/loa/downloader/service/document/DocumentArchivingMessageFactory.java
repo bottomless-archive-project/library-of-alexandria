@@ -10,6 +10,7 @@ import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
 
 import java.nio.file.Path;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -27,7 +28,7 @@ public class DocumentArchivingMessageFactory {
                 .type(documentArchivingContext.getType().toString())
                 .fromBeacon(documentArchivingContext.isFromBeacon())
                 .source(documentArchivingContext.getSource())
-                .sourceLocationId(documentArchivingContext.getSourceLocationId())
+                .sourceLocationId(Optional.ofNullable(documentArchivingContext.getSourceLocationId()))
                 .contentLength(fileManipulatorService.size(compressedContent))
                 .originalContentLength(fileManipulatorService.size(documentArchivingContext.getContents()))
                 .checksum(checksumProvider.checksum(fileManipulatorService.getInputStream(documentArchivingContext.getContents())))

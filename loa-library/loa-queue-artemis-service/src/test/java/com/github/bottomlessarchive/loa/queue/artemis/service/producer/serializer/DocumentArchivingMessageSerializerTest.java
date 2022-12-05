@@ -12,6 +12,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Optional;
+
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -36,7 +38,7 @@ class DocumentArchivingMessageSerializerTest {
                 .id("id")
                 .type("type")
                 .source("source")
-                .sourceLocationId("sourceLocationId")
+                .sourceLocationId(Optional.of("sourceLocationId"))
                 .contentLength(5)
                 .originalContentLength(8)
                 .checksum("checksum")
@@ -71,7 +73,7 @@ class DocumentArchivingMessageSerializerTest {
                 .id("id")
                 .type("type")
                 .source("source")
-                .sourceLocationId(null)
+                .sourceLocationId(Optional.empty())
                 .contentLength(5)
                 .originalContentLength(8)
                 .checksum("checksum")

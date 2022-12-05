@@ -20,9 +20,9 @@ import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.utility.DockerImageName;
 
 import java.io.File;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Locale;
@@ -56,6 +56,7 @@ class VaultIntegrationTest {
     @SuppressWarnings("unchecked")
     public static final GenericContainer ARTEMIS_CONTAINER = new GenericContainer("vromero/activemq-artemis")
             .withExposedPorts(61616)
+            .withStartupTimeout(Duration.ofMinutes(5))
             .withLogConsumer(new Slf4jLogConsumer(log).withPrefix("AMQ-LOG"))
             .withEnv("DISABLE_SECURITY", "true")
             .withEnv("BROKER_CONFIG_GLOBAL_MAX_SIZE", "50000")
@@ -63,8 +64,9 @@ class VaultIntegrationTest {
             .withEnv("BROKER_CONFIG_MAX_DISK_USAGE", "100");
 
     @Container
-    public static final MongoDBContainer MONGO_CONTAINER = new MongoDBContainer(
-            DockerImageName.parse("mongo:6.0.1"));
+    public static final MongoDBContainer MONGO_CONTAINER = new MongoDBContainer("mongo:6.0.1")
+            .withStartupTimeout(Duration.ofMinutes(5))
+            .withLogConsumer(new Slf4jLogConsumer(log).withPrefix("MONGO-LOG"));
 
     @BeforeAll
     static void setup() {
@@ -93,7 +95,7 @@ class VaultIntegrationTest {
                         .contentLength(555)
                         .originalContentLength(444)
                         .source("test-source")
-                        .sourceLocationId(null)
+                        .sourceLocationId(Optional.empty())
                         .build()
         );
 

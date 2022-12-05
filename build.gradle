@@ -20,7 +20,7 @@ buildscript {
     }
 }
 
-configure(subprojects.findAll {it.name != 'loa-frontend'}) {
+configure(subprojects.findAll { it.name != 'loa-frontend' }) {
     apply plugin: 'java'
 
     java {
@@ -42,13 +42,30 @@ configure(subprojects.findAll {it.name != 'loa-frontend'}) {
         options.encoding = "UTF-8"
         doFirst {
             options.compilerArgs += [
-                    '--add-modules', 'jdk.incubator.concurrent', '-parameters'
+                    '--enable-preview', '--add-modules', 'jdk.incubator.concurrent', '-parameters'
             ]
         }
     }
     compileTestJava {
         options.encoding = "UTF-8"
+        doFirst {
+            options.compilerArgs += [
+                    '--enable-preview', '--add-modules', 'jdk.incubator.concurrent'
+            ]
+        }
     }
+
+    /*tasks.withType(Test).tap {
+        configureEach {
+            jvmArgs += "--enable-preview"
+        }
+    }
+
+    tasks.withType(JavaExec).tap {
+        configureEach {
+            jvmArgs += '--enable-preview'
+        }
+    }*/
 
     apply plugin: 'io.spring.dependency-management'
 
@@ -59,9 +76,9 @@ configure(subprojects.findAll {it.name != 'loa-frontend'}) {
     }
 
     test {
-        useJUnitPlatform {
-            includeEngines 'junit-jupiter'
-        }
+        jvmArgs(['--enable-preview'])
+
+        useJUnitPlatform()
     }
 
     apply plugin: 'com.adarshr.test-logger'

@@ -65,22 +65,22 @@ class DocumentArchivingMessageFactoryTest {
         final DocumentArchivingMessage result = documentArchivingMessageFactory.newDocumentArchivingMessage(
                 documentArchivingContext, compressedContent);
 
-        assertThat(result.getId())
+        assertThat(result.id())
                 .isEqualTo(documentId.toString());
-        assertThat(result.getType())
+        assertThat(result.type())
                 .isEqualTo("DOC");
-        assertThat(result.getSource())
+        assertThat(result.source())
                 .isEqualTo("test-source");
-        assertThat(result.getSourceLocationId())
+        assertThat(result.sourceLocationId())
                 .isPresent()
                 .hasValue("test-source-location-id");
-        assertThat(result.getContentLength())
+        assertThat(result.contentLength())
                 .isEqualTo(10L);
-        assertThat(result.getOriginalContentLength())
+        assertThat(result.originalContentLength())
                 .isEqualTo(8L);
-        assertThat(result.getChecksum())
+        assertThat(result.checksum())
                 .isEqualTo("test-checksum");
-        assertThat(result.getCompression())
+        assertThat(result.compression())
                 .isEqualTo("GZIP");
     }
 }

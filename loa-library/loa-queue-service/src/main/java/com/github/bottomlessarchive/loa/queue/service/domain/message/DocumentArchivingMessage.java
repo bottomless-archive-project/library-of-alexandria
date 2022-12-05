@@ -1,31 +1,33 @@
 package com.github.bottomlessarchive.loa.queue.service.domain.message;
 
 import lombok.Builder;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.NonNull;
 
 import java.util.Optional;
 
-@Getter
 @Builder
-@ToString
-public class DocumentArchivingMessage {
+public record DocumentArchivingMessage(
 
-    private final String id;
-    private final String type;
-    private final String source;
-    private final String checksum;
-    private final boolean fromBeacon;
-    private final String sourceLocationId;
-    private final long contentLength;
-    private final long originalContentLength;
-    private final String compression;
+        @NonNull
+        String id,
 
-    public boolean hasSourceLocationId() {
-        return sourceLocationId != null;
-    }
+        @NonNull
+        String type,
 
-    public Optional<String> getSourceLocationId() {
-        return Optional.ofNullable(sourceLocationId);
-    }
+        @NonNull
+        String source,
+
+        @NonNull
+        String checksum,
+
+        @NonNull
+        Optional<String> sourceLocationId,
+
+        @NonNull
+        String compression,
+
+        boolean fromBeacon,
+        long contentLength,
+        long originalContentLength
+) {
 }

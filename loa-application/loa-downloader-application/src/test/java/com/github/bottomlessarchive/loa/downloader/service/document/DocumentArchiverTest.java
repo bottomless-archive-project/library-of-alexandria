@@ -16,6 +16,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.nio.file.Path;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.mockito.Mockito.mock;
@@ -59,6 +60,14 @@ class DocumentArchiverTest {
         when(fileCompressionService.compressDocument(documentContentLocation))
                 .thenReturn(compressedDocumentContentLocation);
         final DocumentArchivingMessage documentArchivingMessage = DocumentArchivingMessage.builder()
+                .id("id")
+                .type("type")
+                .source("source")
+                .sourceLocationId(Optional.of("sourceLocationId"))
+                .contentLength(0)
+                .originalContentLength(0)
+                .checksum("checksum")
+                .compression("compression")
                 .build();
         when(documentArchivingMessageFactory.newDocumentArchivingMessage(documentArchivingContext, compressedDocumentContentLocation))
                 .thenReturn(documentArchivingMessage);
