@@ -11,7 +11,7 @@ import java.util.UUID;
 
 @Getter
 @Builder
-public class DocumentCreationContext {
+public class DocumentCreationContext { //TODO: should be a record
 
     private final UUID id;
     private final String vault;

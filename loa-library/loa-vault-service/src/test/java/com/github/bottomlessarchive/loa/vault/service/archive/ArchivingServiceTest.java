@@ -157,7 +157,7 @@ class ArchivingServiceTest {
                 .id(DOCUMENT_ID)
                 .contentLength(CONTENT.length)
                 .originalContentLength(8L)
-                .sourceLocationId(SOURCE_LOCATION_ID)
+                .sourceLocationId(Optional.of(SOURCE_LOCATION_ID))
                 .type(DocumentType.PDF)
                 .checksum("test-checksum")
                 .build();

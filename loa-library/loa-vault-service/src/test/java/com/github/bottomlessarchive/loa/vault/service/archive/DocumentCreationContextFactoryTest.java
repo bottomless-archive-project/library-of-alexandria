@@ -10,6 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -33,7 +34,7 @@ class DocumentCreationContextFactoryTest {
                 .compression(DocumentCompression.GZIP)
                 .versionNumber(123)
                 .checksum("textchecksum")
-                .sourceLocationId("locationId")
+                .sourceLocationId(Optional.of("locationId"))
                 .build();
 
         final DocumentCreationContext result = underTest.newContext(documentArchivingContext);
@@ -59,7 +60,7 @@ class DocumentCreationContextFactoryTest {
                 .source("unknown")
                 .type(DocumentType.PDF)
                 .versionNumber(123)
-                .sourceLocationId(null)
+                .sourceLocationId(Optional.empty())
                 .build();
 
         final DocumentCreationContext result = underTest.newContext(documentArchivingContext);

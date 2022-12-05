@@ -35,9 +35,9 @@ public class VaultDocumentManager {
      */
     public void archiveDocument(final DocumentEntity documentEntity, final DocumentArchivingContext documentArchivingContext,
             final InputStream documentContent) {
-        log.info("Archiving document with id: {}.", documentArchivingContext.getId());
+        log.info("Archiving document with id: {}.", documentArchivingContext.id());
 
-        vaultDocumentStorage.persistDocument(documentEntity, documentContent, documentArchivingContext.getContentLength());
+        vaultDocumentStorage.persistDocument(documentEntity, documentContent, documentArchivingContext.contentLength());
     }
 
     /**

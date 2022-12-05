@@ -12,17 +12,17 @@ public class DocumentCreationContextFactory {
 
     public DocumentCreationContext newContext(final DocumentArchivingContext documentArchivingContext) {
         return DocumentCreationContext.builder()
-                .id(documentArchivingContext.getId())
-                .vault(documentArchivingContext.getVault())
-                .type(documentArchivingContext.getType())
+                .id(documentArchivingContext.id())
+                .vault(documentArchivingContext.vault())
+                .type(documentArchivingContext.type())
                 .status(DocumentStatus.CREATED)
-                .source(documentArchivingContext.getSource())
-                .sourceLocationId(documentArchivingContext.getSourceLocationId()
+                .source(documentArchivingContext.source())
+                .sourceLocationId(documentArchivingContext.sourceLocationId()
                         .orElse(null))
-                .versionNumber(documentArchivingContext.getVersionNumber())
-                .compression(documentArchivingContext.getCompression())
-                .checksum(documentArchivingContext.getChecksum())
-                .fileSize(documentArchivingContext.getOriginalContentLength())
+                .versionNumber(documentArchivingContext.versionNumber())
+                .compression(documentArchivingContext.compression())
+                .checksum(documentArchivingContext.checksum())
+                .fileSize(documentArchivingContext.originalContentLength())
                 .build();
     }
 }

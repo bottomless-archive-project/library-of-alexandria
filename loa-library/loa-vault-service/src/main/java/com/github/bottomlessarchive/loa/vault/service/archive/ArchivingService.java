@@ -34,15 +34,15 @@ public class ArchivingService {
         // Retry until we eventually succeed to save the document
         while (true) {
             try {
-                final DocumentEntity documentEntity = documentArchivingContext.isFromBeacon()
-                        ? documentEntityFactory.getDocumentEntity(documentArchivingContext.getId()).orElseThrow()
+                final DocumentEntity documentEntity = documentArchivingContext.fromBeacon()
+                        ? documentEntityFactory.getDocumentEntity(documentArchivingContext.id()).orElseThrow()
                         : documentEntityFactory.newDocumentEntity(documentCreationContext);
 
-                if (documentArchivingContext.isFromBeacon()) {
-                    documentManipulator.updateCompression(documentArchivingContext.getId(), documentArchivingContext.getCompression());
+                if (documentArchivingContext.fromBeacon()) {
+                    documentManipulator.updateCompression(documentArchivingContext.id(), documentArchivingContext.compression());
                 }
 
-                try (InputStream documentContent = stagingClient.grabFromStaging(documentArchivingContext.getId())) {
+                try (InputStream documentContent = stagingClient.grabFromStaging(documentArchivingContext.id())) {
                     vaultDocumentManager.archiveDocument(documentEntity, documentArchivingContext, documentContent);
 
                     documentManipulator.markDownloaded(documentEntity.getId());
@@ -55,7 +55,7 @@ public class ArchivingService {
             } catch (final DuplicateDocumentException duplicateDocumentException) {
                 handleDuplicate(documentArchivingContext);
 
-                stagingClient.deleteFromStaging(documentArchivingContext.getId());
+                stagingClient.deleteFromStaging(documentArchivingContext.id());
 
                 // It is a duplicate
                 return;
@@ -67,9 +67,9 @@ public class ArchivingService {
     }
 
     private void handleDuplicate(final DocumentArchivingContext documentArchivingContext) {
-        log.info("Document with id {} is a duplicate.", documentArchivingContext.getId());
+        log.info("Document with id {} is a duplicate.", documentArchivingContext.id());
 
-        getOriginalDocumentEntity(documentArchivingContext.getChecksum(), documentArchivingContext)
+        getOriginalDocumentEntity(documentArchivingContext.checksum(), documentArchivingContext)
                 .ifPresent(originalDocumentEntity -> {
                     logAddingSourceLocation(originalDocumentEntity, documentArchivingContext);
                     addSourceLocation(originalDocumentEntity, documentArchivingContext);
@@ -78,27 +78,26 @@ public class ArchivingService {
 
     private Optional<DocumentEntity> getOriginalDocumentEntity(final String checksum,
             final DocumentArchivingContext documentArchivingContext) {
-        return documentEntityFactory.getDocumentEntity(checksum, documentArchivingContext.getOriginalContentLength(),
-                documentArchivingContext.getType().toString());
+        return documentEntityFactory.getDocumentEntity(checksum, documentArchivingContext.originalContentLength(),
+                documentArchivingContext.type().toString());
     }
 
     private void logAddingSourceLocation(final DocumentEntity originalDocumentEntity,
             final DocumentArchivingContext documentArchivingContext) {
 
-        if (documentArchivingContext.getSourceLocationId().isPresent()) {
-            if (log.isInfoEnabled()) {
-                log.info("Adding new source location: {} to document: {}.", documentArchivingContext.getSourceLocationId().get(),
-                        originalDocumentEntity.getId());
-            }
-        } else {
-            if (log.isInfoEnabled()) {
-                log.info("Doesn't add a new source location to document: {} because it is null.", originalDocumentEntity.getId());
-            }
+        if (log.isInfoEnabled()) {
+            documentArchivingContext.sourceLocationId()
+                    .ifPresentOrElse(
+                            sourceLocationId -> log.info("Adding new source location: {} to document: {}.", sourceLocationId,
+                                    originalDocumentEntity.getId()),
+                            () -> log.info("Doesn't add a new source location to document: {} because it is null.",
+                                    originalDocumentEntity.getId())
+                    );
         }
     }
 
     private void addSourceLocation(final DocumentEntity originalDocumentEntity, final DocumentArchivingContext documentArchivingContext) {
-        documentArchivingContext.getSourceLocationId().ifPresent(sourceLocationId ->
-                documentEntityFactory.addSourceLocation(originalDocumentEntity.getId(), sourceLocationId));
+        documentArchivingContext.sourceLocationId()
+                .ifPresent(sourceLocationId -> documentEntityFactory.addSourceLocation(originalDocumentEntity.getId(), sourceLocationId));
     }
 }
