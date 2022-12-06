@@ -16,6 +16,11 @@ public class VaultQueueListener implements CommandLineRunner {
     private final ThreadManipulator threadManipulator;
     private final ArchivingMessageProcessor archivingMessageProcessor;
 
+    /**
+     * Starts the processing of new archival documents.
+     *
+     * @param args not used
+     */
     @Override
     public void run(final String... args) {
         threadManipulator.runInNewThread(archivingMessageProcessor::processMessages);
