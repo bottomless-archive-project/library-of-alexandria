@@ -57,7 +57,7 @@ class ArtemisQueueManipulatorTest {
         when(queueConsumerProvider.getConsumer(Queue.DOCUMENT_ARCHIVING_QUEUE))
                 .thenReturn(queueConsumer);
         final ClientMessage clientMessage = mock(ClientMessage.class);
-        when(clientConsumer.receive())
+        when(clientConsumer.receive(100))
                 .thenReturn(clientMessage);
 
         final MessageDeserializer<String> messageDeserializer = mock(MessageDeserializer.class);
@@ -66,10 +66,11 @@ class ArtemisQueueManipulatorTest {
         when(messageDeserializer.deserialize(clientMessage))
                 .thenReturn("function-result");
 
-        final String result = underTest.readMessage(Queue.DOCUMENT_ARCHIVING_QUEUE, String.class);
+        final Optional<String> result = underTest.readMessage(Queue.DOCUMENT_ARCHIVING_QUEUE, String.class);
 
         assertThat(result)
-                .isEqualTo("function-result");
+                .isPresent()
+                .contains("function-result");
     }
 
     @Test
@@ -80,7 +81,7 @@ class ArtemisQueueManipulatorTest {
                 .build();
         when(queueConsumerProvider.getConsumer(Queue.DOCUMENT_ARCHIVING_QUEUE))
                 .thenReturn(queueConsumer);
-        when(clientConsumer.receive())
+        when(clientConsumer.receive(100))
                 .thenThrow(new ActiveMQException("large-message-error"));
 
         assertThrows(QueueException.class, () -> underTest.readMessage(Queue.DOCUMENT_ARCHIVING_QUEUE, String.class));

@@ -21,6 +21,8 @@ import org.apache.activemq.artemis.api.core.client.ClientSessionFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 /**
  * A {@link QueueManipulator} implementation for Apache Artemis.
  *
@@ -154,15 +156,21 @@ public class ArtemisQueueManipulator implements QueueManipulator {
      */
     @Override
     @SuppressWarnings("unchecked")
-    public <T> T readMessage(final Queue queue, final Class<T> resultType) {
+    public <T> Optional<T> readMessage(final Queue queue, final Class<T> resultType) {
         try {
             final ClientMessage clientMessage = queueConsumerProvider.getConsumer(queue)
                     .getClientConsumer()
-                    .receive();
+                    .receive(100);
 
-            return (T) messageDeserializerProvider.getDeserializer(queue)
+            if (clientMessage == null) {
+                return Optional.empty();
+            }
+
+            final T deserializedClientMessage = (T) messageDeserializerProvider.getDeserializer(queue)
                     .orElseThrow(() -> new QueueException("No deserializer found for queue: " + queue.getName() + "!"))
                     .deserialize(clientMessage);
+
+            return Optional.of(deserializedClientMessage);
         } catch (final ActiveMQException e) {
             throw new QueueException("Unable to read message from the " + queue.getName() + " queue!", e);
         }

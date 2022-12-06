@@ -14,6 +14,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -27,15 +28,19 @@ public class DocumentLocationCollector {
         final List<DocumentLocation> documentLocationMessages = new ArrayList<>(documentCountToCollect);
 
         while (documentLocationMessages.size() != documentCountToCollect) {
-            final DocumentLocationMessage documentLocationMessage =
+            final Optional<DocumentLocationMessage> documentLocationMessage =
                     queueManipulator.readMessage(Queue.DOCUMENT_LOCATION_QUEUE, DocumentLocationMessage.class);
+
+            if (documentLocationMessage.isEmpty()) {
+                continue;
+            }
 
             try {
                 final DocumentLocation documentLocation = DocumentLocation.builder()
-                        .id(documentLocationMessage.getId())
-                        .location(new URL(documentLocationMessage.getDocumentLocation()))
-                        .type(DocumentType.valueOf(documentLocationMessage.getType()))
-                        .sourceName(documentLocationMessage.getSourceName())
+                        .id(documentLocationMessage.get().getId())
+                        .location(new URL(documentLocationMessage.get().getDocumentLocation()))
+                        .type(DocumentType.valueOf(documentLocationMessage.get().getType()))
+                        .sourceName(documentLocationMessage.get().getSourceName())
                         .build();
 
                 log.info("Processing location.");

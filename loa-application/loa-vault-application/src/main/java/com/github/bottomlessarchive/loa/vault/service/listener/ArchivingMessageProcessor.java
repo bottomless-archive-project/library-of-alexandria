@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Semaphore;
 
@@ -34,9 +35,13 @@ public class ArchivingMessageProcessor {
     public void processMessages() {
         queueManipulator.silentlyInitializeQueue(Queue.DOCUMENT_ARCHIVING_QUEUE);
 
-        while (true) {
-            final DocumentArchivingMessage documentArchivingMessage = queueManipulator.readMessage(
+        while (true) { // TODO: If app is shutting down then end the loop
+            final Optional<DocumentArchivingMessage> documentArchivingMessage = queueManipulator.readMessage(
                     Queue.DOCUMENT_ARCHIVING_QUEUE, DocumentArchivingMessage.class);
+
+            if (documentArchivingMessage.isEmpty()) {
+                continue;
+            }
 
             log.debug("Got new archiving message: {}!", documentArchivingMessage);
 
@@ -44,7 +49,7 @@ public class ArchivingMessageProcessor {
 
             vaultExecutorService.execute(() -> {
                 final DocumentArchivingContext documentArchivingContext = documentArchivingContextTransformer.transform(
-                        documentArchivingMessage);
+                        documentArchivingMessage.get());
 
                 archivingService.archiveDocument(documentArchivingContext);
 

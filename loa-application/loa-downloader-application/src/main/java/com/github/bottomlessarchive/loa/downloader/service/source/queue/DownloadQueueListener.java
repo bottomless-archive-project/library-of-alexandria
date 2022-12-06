@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -31,16 +32,20 @@ public class DownloadQueueListener implements CommandLineRunner {
         queueManipulator.silentlyInitializeQueues(Queue.DOCUMENT_LOCATION_QUEUE, Queue.DOCUMENT_ARCHIVING_QUEUE);
 
         while (true) {
-            final DocumentLocationMessage documentLocationMessage =
+            final Optional<DocumentLocationMessage> documentLocationMessage =
                     queueManipulator.readMessage(Queue.DOCUMENT_LOCATION_QUEUE, DocumentLocationMessage.class);
 
-            final URL documentLocationURL = new URL(documentLocationMessage.getDocumentLocation());
+            if (documentLocationMessage.isEmpty()) {
+                continue;
+            }
+
+            final URL documentLocationURL = new URL(documentLocationMessage.get().getDocumentLocation());
 
             final DocumentLocation documentLocation = DocumentLocation.builder()
-                    .id(documentLocationMessage.getId())
-                    .type(DocumentType.valueOf(documentLocationMessage.getType()))
+                    .id(documentLocationMessage.get().getId())
+                    .type(DocumentType.valueOf(documentLocationMessage.get().getType()))
                     .location(documentLocationURL)
-                    .sourceName(documentLocationMessage.getSourceName())
+                    .sourceName(documentLocationMessage.get().getSourceName())
                     .build();
 
             log.info("Processing location.");

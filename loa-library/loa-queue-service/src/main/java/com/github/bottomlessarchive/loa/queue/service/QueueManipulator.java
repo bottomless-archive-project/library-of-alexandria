@@ -3,6 +3,8 @@ package com.github.bottomlessarchive.loa.queue.service;
 import com.github.bottomlessarchive.loa.queue.service.domain.Queue;
 import com.github.bottomlessarchive.loa.queue.service.domain.QueueException;
 
+import java.util.Optional;
+
 public interface QueueManipulator {
 
     /**
@@ -55,5 +57,5 @@ public interface QueueManipulator {
      * @return the message that's being read
      * @throws QueueException when an error happens while trying to read the message
      */
-    <T> T readMessage(Queue queue, Class<T> resultType);
+    <T> Optional<T> readMessage(Queue queue, Class<T> resultType);
 }
