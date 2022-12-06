@@ -3,5 +3,7 @@ dependencies {
 
     api project(':loa-library:loa-compression-service')
     api project(':loa-library:loa-document-type-service')
+
+    implementation project(':loa-library:loa-number-service')
     implementation project(':loa-library:loa-document-repository')
 }

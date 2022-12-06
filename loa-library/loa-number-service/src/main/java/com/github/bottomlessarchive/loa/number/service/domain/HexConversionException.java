@@ -1,4 +1,4 @@
-package com.github.bottomlessarchive.loa.repository.service.domain;
+package com.github.bottomlessarchive.loa.number.service.domain;
 
 public class HexConversionException extends RuntimeException {
 

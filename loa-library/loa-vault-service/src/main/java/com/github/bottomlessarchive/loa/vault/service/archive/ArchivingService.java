@@ -8,6 +8,7 @@ import com.github.bottomlessarchive.loa.document.service.entity.factory.domain.D
 import com.github.bottomlessarchive.loa.staging.service.client.StagingClient;
 import com.github.bottomlessarchive.loa.vault.service.VaultDocumentManager;
 import com.github.bottomlessarchive.loa.vault.service.domain.DocumentArchivingContext;
+import com.github.bottomlessarchive.loa.number.service.domain.HexConversionException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -59,6 +60,10 @@ public class ArchivingService {
 
                 // It is a duplicate
                 return;
+            } catch (HexConversionException e) {
+                // This should never happen under normal circumstances
+                throw new IllegalStateException("Hex conversion failed! This should never happen under normal circumstances,"
+                        + " please report it to the developers as soon as possible!", e);
             } catch (final Exception e) {
                 // We were unable to save it! Needs to retry!
                 log.error("Failed to save document!", e);

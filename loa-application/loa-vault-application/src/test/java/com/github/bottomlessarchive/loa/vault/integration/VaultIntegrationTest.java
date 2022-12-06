@@ -78,7 +78,7 @@ class VaultIntegrationTest {
     }
 
     @Test
-    void testNewDocumentArchival() throws InterruptedException {
+    void testDocumentArchival() throws InterruptedException {
         expectNonStartupServiceCalls();
 
         final UUID documentId = UUID.randomUUID();
@@ -134,6 +134,92 @@ class VaultIntegrationTest {
                 .exists()
                 .binaryContent()
                 .isEqualTo(new byte[]{1, 2, 3, 4, 5});
+    }
+
+    @Test
+    void testDocumentArchivalWhenDocumentIsDuplicate() throws InterruptedException {
+        expectNonStartupServiceCalls();
+
+        final UUID documentId = UUID.randomUUID();
+
+        expectStagingGetDocumentCall(documentId, new byte[]{1, 2, 3, 4, 5});
+
+        queueManipulator.sendMessage(Queue.DOCUMENT_ARCHIVING_QUEUE,
+                DocumentArchivingMessage.builder()
+                        .id(documentId.toString())
+                        .fromBeacon(false)
+                        .type(DocumentType.PDF.name())
+                        .checksum("127816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad")
+                        .compression(DocumentCompression.NONE.name())
+                        .contentLength(555)
+                        .originalContentLength(444)
+                        .source("test-source")
+                        .sourceLocationId(Optional.empty())
+                        .build()
+        );
+
+        final UUID duplicateDocumentId = UUID.randomUUID();
+
+        expectStagingGetDocumentCall(documentId, new byte[]{1, 2, 3, 4, 5});
+
+        queueManipulator.sendMessage(Queue.DOCUMENT_ARCHIVING_QUEUE,
+                DocumentArchivingMessage.builder()
+                        .id(duplicateDocumentId.toString())
+                        .fromBeacon(false)
+                        .type(DocumentType.PDF.name())
+                        .checksum("127816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad")
+                        .compression(DocumentCompression.NONE.name())
+                        .contentLength(555)
+                        .originalContentLength(444)
+                        .source("test-source")
+                        .sourceLocationId(Optional.of("123456bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"))
+                        .build()
+        );
+
+        Thread.sleep(5000); // So the message is actually processed
+
+        final Optional<DocumentEntity> documentEntity = documentEntityFactory.getDocumentEntity(documentId);
+
+        assertThat(documentEntity)
+                .isPresent()
+                .hasValueSatisfying(document -> {
+                    assertThat(document.getId())
+                            .isEqualTo(documentId);
+                    assertThat(document.getVault())
+                            .isEqualTo("default");
+                    assertThat(document.getType())
+                            .isEqualTo(DocumentType.PDF);
+                    assertThat(document.getStatus())
+                            .isEqualTo(DocumentStatus.DOWNLOADED);
+                    assertThat(document.getDownloadDate())
+                            .isBetween(Instant.now().minus(1, ChronoUnit.MINUTES), Instant.now());
+                    assertThat(document.getChecksum())
+                            .isEqualTo("127816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad");
+                    assertThat(document.getFileSize())
+                            .isEqualTo(444);
+                    assertThat(document.getCompression())
+                            .isEqualTo(DocumentCompression.NONE);
+                    assertThat(document.getSource())
+                            .isEqualTo("test-source");
+                    assertThat(document.getBeacon())
+                            .isEmpty();
+                    assertThat(document.getSourceLocations())
+                            .hasSize(1)
+                            .contains("123456bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad");
+                });
+
+        assertThat(new File("./build/" + documentId + ".pdf"))
+                .exists()
+                .binaryContent()
+                .isEqualTo(new byte[]{1, 2, 3, 4, 5});
+
+        final Optional<DocumentEntity> duplicateDocumentEntity = documentEntityFactory.getDocumentEntity(duplicateDocumentId);
+
+        assertThat(duplicateDocumentEntity)
+                .isEmpty();
+
+        assertThat(new File("./build/" + duplicateDocumentId + ".pdf"))
+                .doesNotExist();
     }
 
     private void expectNonStartupServiceCalls() {

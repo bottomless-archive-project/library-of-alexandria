@@ -5,7 +5,7 @@ import com.github.bottomlessarchive.loa.location.repository.DocumentLocationRepo
 import com.github.bottomlessarchive.loa.location.repository.domain.DocumentLocationDatabaseEntity;
 import com.github.bottomlessarchive.loa.location.service.factory.domain.DocumentLocation;
 import com.github.bottomlessarchive.loa.location.service.factory.domain.DocumentLocationCreationContext;
-import com.github.bottomlessarchive.loa.repository.service.HexConverter;
+import com.github.bottomlessarchive.loa.number.service.HexConverter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

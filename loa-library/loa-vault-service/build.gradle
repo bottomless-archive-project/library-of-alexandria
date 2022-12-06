@@ -2,6 +2,7 @@ dependencies {
     implementation group: 'commons-io', name: 'commons-io', version: '2.11.0'
     implementation group: 'software.amazon.awssdk', name: 's3', version: '2.18.17'
 
+    implementation project(':loa-library:loa-number-service')
     implementation project(':loa-library:loa-document-service')
     implementation project(':loa-library:loa-staging-client-service')
 

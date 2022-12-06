@@ -4,7 +4,7 @@ import com.github.bottomlessarchive.loa.document.repository.domain.DocumentDatab
 import com.github.bottomlessarchive.loa.document.repository.domain.DocumentStatusAggregateEntity;
 import com.github.bottomlessarchive.loa.document.repository.domain.DocumentTypeAggregateEntity;
 import com.github.bottomlessarchive.loa.repository.configuration.RepositoryMetadataContainer;
-import com.github.bottomlessarchive.loa.repository.service.HexConverter;
+import com.github.bottomlessarchive.loa.number.service.HexConverter;
 import com.mongodb.client.AggregateIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;

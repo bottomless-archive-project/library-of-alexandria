@@ -1,7 +1,7 @@
 package com.github.bottomlessarchive.loa.document.service.entity.transformer;
 
 import com.github.bottomlessarchive.loa.compression.domain.DocumentCompression;
-import com.github.bottomlessarchive.loa.repository.service.HexConverter;
+import com.github.bottomlessarchive.loa.number.service.HexConverter;
 import com.github.bottomlessarchive.loa.document.repository.domain.DocumentDatabaseEntity;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentEntity;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentStatus;

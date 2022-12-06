@@ -1,6 +1,6 @@
-package com.github.bottomlessarchive.loa.repository.service;
+package com.github.bottomlessarchive.loa.number.service;
 
-import com.github.bottomlessarchive.loa.repository.service.domain.HexConversionException;
+import com.github.bottomlessarchive.loa.number.service.domain.HexConversionException;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 import org.springframework.stereotype.Service;
