@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -23,6 +24,7 @@ public class ArchivingMessageProcessor {
 
     private final ArchivingService archivingService;
     private final QueueManipulator queueManipulator;
+    private final ConfigurableApplicationContext applicationContext;
     private final DocumentArchivingContextTransformer documentArchivingContextTransformer;
 
     @Qualifier("vaultSemaphore")
@@ -35,7 +37,7 @@ public class ArchivingMessageProcessor {
     public void processMessages() {
         queueManipulator.silentlyInitializeQueue(Queue.DOCUMENT_ARCHIVING_QUEUE);
 
-        while (true) { // TODO: If app is shutting down then end the loop
+        while (applicationContext.isActive()) {
             final Optional<DocumentArchivingMessage> documentArchivingMessage = queueManipulator.readMessage(
                     Queue.DOCUMENT_ARCHIVING_QUEUE, DocumentArchivingMessage.class);
 
