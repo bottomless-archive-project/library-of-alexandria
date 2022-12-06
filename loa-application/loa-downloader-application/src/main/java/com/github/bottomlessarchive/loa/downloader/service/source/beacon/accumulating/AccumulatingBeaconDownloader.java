@@ -104,7 +104,7 @@ public class AccumulatingBeaconDownloader implements CommandLineRunner {
                             .status(DocumentStatus.ON_BEACON)
                             .beacon(beaconDownloaderConfigurationProperties.activeBeacon())
                             .source(beaconDocumentLocationResult.getSourceName())
-                            .sourceLocationId(beaconDocumentLocationResult.getId())
+                            .sourceLocationId(Optional.of(beaconDocumentLocationResult.getId()))
                             .versionNumber(downloaderConfigurationProperties.versionNumber())
                             .checksum(beaconDocumentLocationResult.getChecksum())
                             .fileSize(beaconDocumentLocationResult.getSize())

@@ -4,28 +4,40 @@ import com.github.bottomlessarchive.loa.compression.domain.DocumentCompression;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentStatus;
 import com.github.bottomlessarchive.loa.type.domain.DocumentType;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.NonNull;
 
 import java.util.Optional;
 import java.util.UUID;
 
-@Getter
 @Builder
-public class DocumentCreationContext { //TODO: should be a record
+public record DocumentCreationContext(
 
-    private final UUID id;
-    private final String vault;
-    private final DocumentType type;
-    private final String source;
-    private final String beacon;
-    private final String sourceLocationId;
-    private final String checksum;
-    private final long fileSize;
-    private final DocumentStatus status;
-    private final DocumentCompression compression;
-    private final int versionNumber;
+        @NonNull
+        UUID id,
 
-    public Optional<String> getSourceLocationId() {
-        return Optional.ofNullable(sourceLocationId);
-    }
+        @NonNull
+        String vault,
+
+        @NonNull
+        DocumentType type,
+
+        @NonNull
+        String source,
+
+        @NonNull
+        Optional<String> sourceLocationId,
+
+        @NonNull
+        String checksum,
+
+        @NonNull
+        DocumentStatus status,
+
+        @NonNull
+        DocumentCompression compression,
+
+        String beacon,
+        long fileSize,
+        int versionNumber
+) {
 }

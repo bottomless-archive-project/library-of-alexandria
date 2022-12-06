@@ -3,7 +3,6 @@ package com.github.bottomlessarchive.loa.vault.service.domain;
 import com.github.bottomlessarchive.loa.compression.domain.DocumentCompression;
 import com.github.bottomlessarchive.loa.type.domain.DocumentType;
 import lombok.Builder;
-import lombok.Getter;
 import lombok.NonNull;
 
 import java.util.Optional;

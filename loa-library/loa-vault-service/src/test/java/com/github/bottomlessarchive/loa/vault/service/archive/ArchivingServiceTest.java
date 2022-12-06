@@ -1,7 +1,9 @@
 package com.github.bottomlessarchive.loa.vault.service.archive;
 
+import com.github.bottomlessarchive.loa.compression.domain.DocumentCompression;
 import com.github.bottomlessarchive.loa.document.service.DocumentManipulator;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentEntity;
+import com.github.bottomlessarchive.loa.document.service.domain.DocumentStatus;
 import com.github.bottomlessarchive.loa.document.service.domain.DuplicateDocumentException;
 import com.github.bottomlessarchive.loa.document.service.entity.factory.DocumentEntityFactory;
 import com.github.bottomlessarchive.loa.document.service.entity.factory.domain.DocumentCreationContext;
@@ -60,8 +62,7 @@ class ArchivingServiceTest {
     @SneakyThrows
     void testWhenPersistingAValidDocument() {
         final DocumentArchivingContext documentArchivingContext = createDocumentArchivingContext();
-        final DocumentCreationContext documentCreationContext = DocumentCreationContext.builder()
-                .build();
+        final DocumentCreationContext documentCreationContext = createDocumentCreationContext();
         when(documentCreationContextFactory.newContext(documentArchivingContext))
                 .thenReturn(documentCreationContext);
         final InputStream content = new ByteArrayInputStream(CONTENT);
@@ -85,8 +86,7 @@ class ArchivingServiceTest {
     @Test
     void testRetryWhenErrorHappensWhilePersisting() {
         final DocumentArchivingContext documentArchivingContext = createDocumentArchivingContext();
-        final DocumentCreationContext documentCreationContext = DocumentCreationContext.builder()
-                .build();
+        final DocumentCreationContext documentCreationContext = createDocumentCreationContext();
         when(documentCreationContextFactory.newContext(documentArchivingContext))
                 .thenReturn(documentCreationContext);
 
@@ -119,16 +119,18 @@ class ArchivingServiceTest {
         final DocumentArchivingContext documentArchivingContext = DocumentArchivingContext.builder()
                 .id(DOCUMENT_ID)
                 .contentLength(CONTENT.length)
-                .sourceLocationId(null) // The source location is not available
+                .sourceLocationId(Optional.empty()) // The source location is not available
                 .type(DocumentType.PDF)
                 .checksum("test-checksum")
+                .source("test-source")
+                .vault("test-vault")
                 .contentLength(6L)
                 .originalContentLength(8L)
+                .compression(DocumentCompression.NONE)
                 .build();
         when(stagingClient.grabFromStaging(DOCUMENT_ID))
                 .thenReturn(new ByteArrayInputStream(CONTENT));
-        final DocumentCreationContext documentCreationContext = DocumentCreationContext.builder()
-                .build();
+        final DocumentCreationContext documentCreationContext = createDocumentCreationContext();
         when(documentCreationContextFactory.newContext(documentArchivingContext))
                 .thenReturn(documentCreationContext);
         final DocumentEntity documentEntity = DocumentEntity.builder()
@@ -160,6 +162,24 @@ class ArchivingServiceTest {
                 .sourceLocationId(Optional.of(SOURCE_LOCATION_ID))
                 .type(DocumentType.PDF)
                 .checksum("test-checksum")
+                .source("test-source")
+                .vault("test-1")
+                .compression(DocumentCompression.NONE)
+                .build();
+    }
+
+    private DocumentCreationContext createDocumentCreationContext() {
+        return DocumentCreationContext.builder()
+                .id(UUID.randomUUID())
+                .vault("test-vault")
+                .type(DocumentType.PDF)
+                .status(DocumentStatus.CORRUPT)
+                .checksum("12345")
+                .fileSize(200)
+                .versionNumber(5)
+                .compression(DocumentCompression.GZIP)
+                .source("test-source")
+                .sourceLocationId(Optional.empty())
                 .build();
     }
 }

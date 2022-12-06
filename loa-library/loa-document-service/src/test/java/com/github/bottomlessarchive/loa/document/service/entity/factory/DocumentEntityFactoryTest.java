@@ -18,6 +18,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -57,7 +58,7 @@ class DocumentEntityFactoryTest {
                 .versionNumber(5)
                 .compression(DocumentCompression.GZIP)
                 .source("test-source")
-                .sourceLocationId("test-location-id")
+                .sourceLocationId(Optional.of("test-location-id"))
                 .build();
         when(hexConverter.decode("12345"))
                 .thenReturn(new byte[]{5, 6, 7});
@@ -110,7 +111,7 @@ class DocumentEntityFactoryTest {
                 .versionNumber(5)
                 .compression(DocumentCompression.GZIP)
                 .source("test-source")
-                .sourceLocationId(null)
+                .sourceLocationId(Optional.empty())
                 .build();
         when(hexConverter.decode("12345"))
                 .thenReturn(new byte[]{5, 6, 7});

@@ -30,6 +30,7 @@ class DocumentCreationContextFactoryTest {
                 .contentLength(4)
                 .originalContentLength(6L)
                 .source("unknown")
+                .vault("test-1")
                 .type(DocumentType.PDF)
                 .compression(DocumentCompression.GZIP)
                 .versionNumber(123)
@@ -39,32 +40,16 @@ class DocumentCreationContextFactoryTest {
 
         final DocumentCreationContext result = underTest.newContext(documentArchivingContext);
 
-        assertThat(result.getId(), is(id));
-        assertThat(result.getFileSize(), is(6L));
-        assertThat(result.getSource(), is("unknown"));
-        assertThat(result.getType(), is(DocumentType.PDF));
-        assertThat(result.getChecksum(), is("textchecksum"));
-        assertThat(result.getVersionNumber(), is(123));
-        assertThat(result.getCompression(), is(DocumentCompression.GZIP));
-        assertThat(result.getStatus(), is(DocumentStatus.CREATED));
-        assertThat(result.getSourceLocationId().isPresent(), is(true));
-        assertThat(result.getSourceLocationId().get(), is("locationId"));
-    }
-
-    @Test
-    void testNewContextWhenSourceLocationIdIsNull() {
-        final UUID id = UUID.randomUUID();
-        final DocumentArchivingContext documentArchivingContext = DocumentArchivingContext.builder()
-                .id(id)
-                .contentLength(4)
-                .source("unknown")
-                .type(DocumentType.PDF)
-                .versionNumber(123)
-                .sourceLocationId(Optional.empty())
-                .build();
-
-        final DocumentCreationContext result = underTest.newContext(documentArchivingContext);
-
-        assertThat(result.getSourceLocationId().isEmpty(), is(true));
+        assertThat(result.id(), is(id));
+        assertThat(result.fileSize(), is(6L));
+        assertThat(result.source(), is("unknown"));
+        assertThat(result.vault(), is("test-1"));
+        assertThat(result.type(), is(DocumentType.PDF));
+        assertThat(result.checksum(), is("textchecksum"));
+        assertThat(result.versionNumber(), is(123));
+        assertThat(result.compression(), is(DocumentCompression.GZIP));
+        assertThat(result.status(), is(DocumentStatus.CREATED));
+        assertThat(result.sourceLocationId().isPresent(), is(true));
+        assertThat(result.sourceLocationId().get(), is("locationId"));
     }
 }
