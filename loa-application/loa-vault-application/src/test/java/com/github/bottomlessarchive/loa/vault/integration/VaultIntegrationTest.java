@@ -5,6 +5,7 @@ import com.github.bottomlessarchive.loa.compression.domain.DocumentCompression;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentEntity;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentStatus;
 import com.github.bottomlessarchive.loa.document.service.entity.factory.DocumentEntityFactory;
+import com.github.bottomlessarchive.loa.document.service.entity.factory.domain.DocumentCreationContext;
 import com.github.bottomlessarchive.loa.queue.service.QueueManipulator;
 import com.github.bottomlessarchive.loa.queue.service.domain.Queue;
 import com.github.bottomlessarchive.loa.queue.service.domain.message.DocumentArchivingMessage;
@@ -220,6 +221,85 @@ class VaultIntegrationTest {
 
         assertThat(new File("./build/" + duplicateDocumentId + ".pdf"))
                 .doesNotExist();
+    }
+
+    @Test
+    void testDocumentArchivalWhenDocumentIsLoadedFromBeacon() throws InterruptedException {
+        expectNonStartupServiceCalls();
+
+        final UUID documentId = UUID.randomUUID();
+
+        expectStagingGetDocumentCall(documentId, new byte[]{1, 2, 3, 4, 5});
+
+        // Save document - it is done by the downloader on the normal flow
+        documentEntityFactory.newDocumentEntity(
+                DocumentCreationContext.builder()
+                        .id(documentId)
+                        .type(DocumentType.PDF)
+                        .status(DocumentStatus.ON_BEACON)
+                        .beacon("test-beacon")
+                        .source("test-source")
+                        .sourceLocationId(Optional.of("543216bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"))
+                        .versionNumber(6)
+                        .checksum("ab7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad")
+                        .fileSize(5)
+                        .compression(DocumentCompression.NONE)
+                        .build()
+        );
+
+        // Send the message that the loader would send
+        queueManipulator.sendMessage(Queue.DOCUMENT_ARCHIVING_QUEUE,
+                DocumentArchivingMessage.builder()
+                        .id(documentId.toString())
+                        .type(DocumentType.PDF.name())
+                        .fromBeacon(true)
+                        .source("test-source")
+                        .sourceLocationId(Optional.empty())
+                        .contentLength(4)
+                        .originalContentLength(5)
+                        .checksum("ab7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad")
+                        .compression(DocumentCompression.GZIP.name())
+                        .build()
+        );
+
+        Thread.sleep(5000); // So the message is actually processed
+
+        final Optional<DocumentEntity> documentEntity = documentEntityFactory.getDocumentEntity(documentId);
+
+        assertThat(documentEntity)
+                .isPresent()
+                .hasValueSatisfying(document -> {
+                    assertThat(document.getId())
+                            .isEqualTo(documentId);
+                    assertThat(document.getVault())
+                            .isEqualTo("default");
+                    assertThat(document.getType())
+                            .isEqualTo(DocumentType.PDF);
+                    assertThat(document.getStatus())
+                            .isEqualTo(DocumentStatus.DOWNLOADED);
+                    assertThat(document.getDownloadDate())
+                            .isBetween(Instant.now().minus(1, ChronoUnit.MINUTES), Instant.now());
+                    assertThat(document.getChecksum())
+                            .isEqualTo("ab7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad");
+                    assertThat(document.getFileSize())
+                            .isEqualTo(5);
+                    assertThat(document.getCompression())
+                            .isEqualTo(DocumentCompression.GZIP);
+                    assertThat(document.getSource())
+                            .isEqualTo("test-source");
+                    assertThat(document.getVault())
+                            .isEqualTo("default");
+                    assertThat(document.getBeacon())
+                            .isEmpty();
+                    assertThat(document.getSourceLocations())
+                            .hasSize(1)
+                            .contains("543216bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad");
+                });
+
+        assertThat(new File("./build/" + documentId + ".pdf"))
+                .exists()
+                .binaryContent()
+                .isEqualTo(new byte[]{1, 2, 3, 4, 5});
     }
 
     private void expectNonStartupServiceCalls() {

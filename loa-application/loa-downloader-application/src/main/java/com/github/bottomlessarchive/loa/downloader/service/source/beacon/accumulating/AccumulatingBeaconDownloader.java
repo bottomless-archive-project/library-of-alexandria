@@ -95,8 +95,6 @@ public class AccumulatingBeaconDownloader implements CommandLineRunner {
                 return;
             }
 
-            //TODO: Add a loader that inserts documents into the vault that are coming from an accumulating beacon's folder
-
             documentEntityFactory.newDocumentEntity(
                     DocumentCreationContext.builder()
                             .id(beaconDocumentLocationResult.getDocumentId().get())

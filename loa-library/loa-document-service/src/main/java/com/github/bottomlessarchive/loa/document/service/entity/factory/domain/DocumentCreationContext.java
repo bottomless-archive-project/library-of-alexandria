@@ -16,9 +16,6 @@ public record DocumentCreationContext(
         UUID id,
 
         @NonNull
-        String vault,
-
-        @NonNull
         DocumentType type,
 
         @NonNull
@@ -35,6 +32,9 @@ public record DocumentCreationContext(
 
         @NonNull
         DocumentCompression compression,
+
+        // Can be null if it is on a beacon's local disk
+        String vault,
 
         String beacon,
         long fileSize,

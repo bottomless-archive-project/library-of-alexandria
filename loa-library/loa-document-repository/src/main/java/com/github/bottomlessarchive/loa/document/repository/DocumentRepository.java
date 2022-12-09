@@ -25,7 +25,9 @@ import static com.mongodb.client.model.Accumulators.sum;
 import static com.mongodb.client.model.Aggregates.group;
 import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Updates.combine;
 import static com.mongodb.client.model.Updates.set;
+import static com.mongodb.client.model.Updates.unset;
 
 @Component
 @RequiredArgsConstructor
@@ -73,6 +75,16 @@ public class DocumentRepository {
 
     public void updateStatus(final UUID documentId, final String status) {
         documentDatabaseEntityMongoCollection.updateOne(eq("_id", documentId), set("status", status));
+    }
+
+    public void updateDocumentWhenMovedFromVault(final UUID documentId, final String vault, final String compression) {
+        documentDatabaseEntityMongoCollection.updateOne(eq("_id", documentId),
+                combine(
+                        unset("beacon"),
+                        set("vault", vault),
+                        set("compression", compression)
+                )
+        );
     }
 
     /**
