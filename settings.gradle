@@ -54,6 +54,7 @@ include 'loa-library:loa-application-domain'
 include 'loa-library:loa-conductor-domain'
 include 'loa-library:loa-conductor-service'
 include 'loa-library:loa-conductor-client-service'
+include 'loa-library:loa-conductor-client-test'
 include 'loa-library:loa-staging-client-service'
 include 'loa-library:loa-threading-service'
 

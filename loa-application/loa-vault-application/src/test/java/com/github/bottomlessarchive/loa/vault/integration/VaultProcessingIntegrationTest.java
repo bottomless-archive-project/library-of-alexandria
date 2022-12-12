@@ -26,13 +26,13 @@ import java.io.File;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Locale;
 import java.util.UUID;
 import java.util.Optional;
 
+import static com.github.bottomlessarchive.loa.conductor.service.ConductorClientTestUtility.expectQueryServiceCall;
+import static com.github.bottomlessarchive.loa.conductor.service.ConductorClientTestUtility.expectRegisterServiceCall;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.ok;
-import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -45,7 +45,7 @@ import static org.assertj.core.api.Assertions.assertThat;
         }
 )
 @WireMockTest(httpPort = 2000)
-class VaultIntegrationTest {
+class VaultProcessingIntegrationTest {
 
     @Autowired
     private QueueManipulator queueManipulator;
@@ -54,8 +54,7 @@ class VaultIntegrationTest {
     private DocumentEntityFactory documentEntityFactory;
 
     @Container
-    @SuppressWarnings("unchecked")
-    public static final GenericContainer ARTEMIS_CONTAINER = new GenericContainer("vromero/activemq-artemis")
+    private static final GenericContainer<?> ARTEMIS_CONTAINER = new GenericContainer<>("vromero/activemq-artemis")
             .withExposedPorts(61616)
             .withStartupTimeout(Duration.ofMinutes(5))
             .withLogConsumer(new Slf4jLogConsumer(log).withPrefix("AMQ-LOG"))
@@ -65,17 +64,13 @@ class VaultIntegrationTest {
             .withEnv("BROKER_CONFIG_MAX_DISK_USAGE", "100");
 
     @Container
-    public static final MongoDBContainer MONGO_CONTAINER = new MongoDBContainer("mongo:6.0.1")
+    private static final MongoDBContainer MONGO_CONTAINER = new MongoDBContainer("mongo:6.0.1")
             .withStartupTimeout(Duration.ofMinutes(5))
             .withLogConsumer(new Slf4jLogConsumer(log).withPrefix("MONGO-LOG"));
 
     @BeforeAll
     static void setup() {
-        // These things are being queried at startup
-        expectRegisterServiceCall(ApplicationType.VAULT_APPLICATION);
-
-        expectQueryServiceCall(ApplicationType.DOCUMENT_DATABASE, "127.0.0.1", MONGO_CONTAINER.getFirstMappedPort());
-        expectQueryServiceCall(ApplicationType.QUEUE_APPLICATION, "127.0.0.1", ARTEMIS_CONTAINER.getFirstMappedPort());
+        expectStartupServiceCalls();
     }
 
     @Test
@@ -302,34 +297,15 @@ class VaultIntegrationTest {
                 .isEqualTo(new byte[]{1, 2, 3, 4, 5});
     }
 
+    private static void expectStartupServiceCalls() {
+        expectRegisterServiceCall(ApplicationType.VAULT_APPLICATION);
+
+        expectQueryServiceCall(ApplicationType.DOCUMENT_DATABASE, "127.0.0.1", MONGO_CONTAINER.getFirstMappedPort());
+        expectQueryServiceCall(ApplicationType.QUEUE_APPLICATION, "127.0.0.1", ARTEMIS_CONTAINER.getFirstMappedPort());
+    }
+
     private void expectNonStartupServiceCalls() {
         expectQueryServiceCall(ApplicationType.STAGING_APPLICATION, "127.0.0.1", 2000);
-    }
-
-    private static void expectRegisterServiceCall(final ApplicationType applicationType) {
-        stubFor(
-                post("/service/" + applicationType.name().replaceAll("_", "-").toLowerCase(Locale.ENGLISH))
-                        .willReturn(
-                                ok()
-                                        .withHeader("Content-Type", "application/json")
-                                        .withBody("{\"id\":\"" + UUID.randomUUID() + "\"}")
-                        )
-        );
-    }
-
-    private static void expectQueryServiceCall(final ApplicationType applicationType, final String host, final int port) {
-        stubFor(
-                get("/service/" + applicationType.name().replaceAll("_", "-").toLowerCase(Locale.ENGLISH))
-                        .willReturn(
-                                ok()
-                                        .withHeader("Content-Type", "application/json")
-                                        .withBody("{\"applicationType\":\"" + applicationType + "\",\"instances\":[{\"id\":"
-                                                + "\"1e0d6192-5a47-4dfa-b8d3-ba64f01de11a\",\"location\":\"" + host + "\",\"port\":"
-                                                + port + ",\"lastHeartbeat\":\"2022-12-03T18:23:40.319067100Z\",\"properties\":[{"
-                                                + "\"name\":\"archivingQueueCount\",\"value\":\"-1\"},{\"name\":\"locationQueueCount\","
-                                                + "\"value\":\"-1\"}]}]}")
-                        )
-        );
     }
 
     private void expectStagingGetDocumentCall(final UUID documentId, final byte[] documentContent) {

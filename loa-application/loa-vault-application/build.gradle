@@ -33,5 +33,6 @@ dependencies {
     implementation project(':loa-library:loa-staging-client-service')
     implementation project(':loa-library:loa-conductor-client-service')
 
+    testImplementation project(':loa-library:loa-conductor-client-test')
     testImplementation group: 'org.testcontainers', name: 'mongodb', version: '1.17.6'
 }

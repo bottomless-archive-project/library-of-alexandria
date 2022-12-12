@@ -1,0 +1,5 @@
+dependencies {
+    api project(':loa-library:loa-application-domain')
+
+    implementation group: 'com.github.tomakehurst', name: 'wiremock-jre8-standalone', version: '2.35.0'
+}
