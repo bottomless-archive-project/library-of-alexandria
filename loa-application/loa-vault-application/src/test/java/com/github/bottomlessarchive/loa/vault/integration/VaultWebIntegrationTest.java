@@ -6,13 +6,20 @@ import com.github.bottomlessarchive.loa.document.service.domain.DocumentStatus;
 import com.github.bottomlessarchive.loa.document.service.entity.factory.DocumentEntityFactory;
 import com.github.bottomlessarchive.loa.document.service.entity.factory.domain.DocumentCreationContext;
 import com.github.bottomlessarchive.loa.type.domain.DocumentType;
+import com.github.bottomlessarchive.loa.vault.service.location.file.FileFactory;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
+import com.google.common.jimfs.Configuration;
+import com.google.common.jimfs.Jimfs;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.MongoDBContainer;
@@ -20,13 +27,20 @@ import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import java.io.ByteArrayInputStream;
+import java.nio.file.FileSystem;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Optional;
 import java.util.UUID;
 
 import static com.github.bottomlessarchive.loa.conductor.service.ConductorClientTestUtility.expectQueryServiceCall;
 import static com.github.bottomlessarchive.loa.conductor.service.ConductorClientTestUtility.expectRegisterServiceCall;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Slf4j
@@ -35,7 +49,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         properties = {
                 "loa.conductor.port=2000",
                 "loa.vault.archiving=false",
-                "loa.vault.location.file.path=./build/"
+                "loa.vault.location.file.path=/vault/"
         }
 )
 @AutoConfigureMockMvc
@@ -47,6 +61,11 @@ class VaultWebIntegrationTest {
 
     @Autowired
     private DocumentEntityFactory documentEntityFactory;
+
+    @MockBean
+    private FileFactory fileFactory;
+
+    private FileSystem fileSystem;
 
     //TODO: Why does the application connect to the queue even if loa.vault.archiving is disabled?
     @Container
@@ -69,6 +88,17 @@ class VaultWebIntegrationTest {
         expectStartupServiceCalls();
     }
 
+    @BeforeEach
+    public void setupEach() {
+        fileSystem = Jimfs.newFileSystem(Configuration.unix());
+    }
+
+    @AfterEach
+    @SneakyThrows
+    public void teardownEach() {
+        fileSystem.close();
+    }
+
     @Test
     void testQueryDocumentWhenDocumentIsNotInVault() throws Exception {
         final UUID documentId = UUID.randomUUID();
@@ -89,6 +119,45 @@ class VaultWebIntegrationTest {
 
         mockMvc.perform(get("/document/" + documentId))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void testQueryDocumentWhenDocumentIsInVault() throws Exception {
+        final UUID documentId = UUID.randomUUID();
+
+        documentEntityFactory.newDocumentEntity(
+                DocumentCreationContext.builder()
+                        .id(documentId)
+                        .type(DocumentType.PDF)
+                        .status(DocumentStatus.DOWNLOADED)
+                        .checksum("ba8016bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad")
+                        .compression(DocumentCompression.NONE)
+                        .vault("default")
+                        .fileSize(123)
+                        .source("test-source")
+                        .sourceLocationId(Optional.empty())
+                        .build()
+        );
+
+        final Path fakeDocumentContent = setupFakeFile("/vault/" + documentId + ".pdf", new byte[]{1, 2, 3, 4});
+
+        when(fileFactory.newFile("/vault/", documentId + ".pdf"))
+                .thenReturn(fakeDocumentContent);
+
+        mockMvc.perform(get("/document/" + documentId))
+                .andExpect(status().isOk())
+                .andExpect(content().bytes(new byte[]{1, 2, 3, 4}))
+                .andExpect(header().stringValues("Content-Type", "application/pdf"));
+    }
+
+    @SneakyThrows
+    private Path setupFakeFile(final String fileNameAndPath, final byte[] testFileContent) {
+        final Path testFilePath = fileSystem.getPath(fileNameAndPath);
+
+        Files.createDirectories(testFilePath.getParent());
+        Files.copy(new ByteArrayInputStream(testFileContent), testFilePath);
+
+        return testFilePath;
     }
 
     private static void expectStartupServiceCalls() {
