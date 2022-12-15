@@ -47,13 +47,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Testcontainers
 @SpringBootTest(
         properties = {
-                "loa.conductor.port=2000",
+                "loa.conductor.port=2002",
                 "loa.vault.archiving=false",
                 "loa.vault.location.file.path=/vault/"
         }
 )
 @AutoConfigureMockMvc
-@WireMockTest(httpPort = 2000)
+@WireMockTest(httpPort = 2002)
 class VaultWebIntegrationTest {
 
     @Autowired
@@ -148,6 +148,35 @@ class VaultWebIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(content().bytes(new byte[]{1, 2, 3, 4}))
                 .andExpect(header().stringValues("Content-Type", "application/pdf"));
+    }
+
+    @Test
+    void testQueryDocumentWhenDocumentNotFoundInVault() throws Exception {
+        expectRegisterServiceCall(ApplicationType.VAULT_APPLICATION);
+
+        final UUID documentId = UUID.randomUUID();
+
+        documentEntityFactory.newDocumentEntity(
+                DocumentCreationContext.builder()
+                        .id(documentId)
+                        .type(DocumentType.PDF)
+                        .status(DocumentStatus.DOWNLOADED)
+                        .checksum("ba8016bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad")
+                        .compression(DocumentCompression.NONE)
+                        .vault("default")
+                        .fileSize(123)
+                        .source("test-source")
+                        .sourceLocationId(Optional.empty())
+                        .build()
+        );
+
+        //final Path fakeDocumentContent = setupFakeFile("/vault/" + documentId + ".pdf", new byte[]{1, 2, 3, 4});
+
+        when(fileFactory.newFile("/vault/", documentId + ".pdf"))
+                .thenReturn(fileSystem.getPath("/vault/", documentId + ".pdf"));
+
+        mockMvc.perform(get("/document/" + documentId))
+                .andExpect(status().isBadRequest());
     }
 
     @SneakyThrows
