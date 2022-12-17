@@ -10,6 +10,7 @@ import com.github.bottomlessarchive.loa.vault.service.location.file.FileFactory;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import com.google.common.jimfs.Configuration;
 import com.google.common.jimfs.Jimfs;
+import com.thomaskasene.wiremock.junit.WireMockStubs;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
@@ -44,6 +45,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Slf4j
+@WireMockStubs
 @Testcontainers
 @SpringBootTest(
         properties = {
@@ -52,9 +54,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 "loa.vault.location.file.path=/vault/"
         }
 )
-@AutoConfigureMockMvc
 @WireMockTest(httpPort = 2002)
-class VaultWebIntegrationTest {
+@AutoConfigureMockMvc
+class VaultViewDefaultIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -100,7 +102,7 @@ class VaultWebIntegrationTest {
     }
 
     @Test
-    void testQueryDocumentWhenDocumentIsNotInVault() throws Exception {
+    void testQueryDocumentWhenDocumentIsInDifferentVault() throws Exception {
         final UUID documentId = UUID.randomUUID();
 
         documentEntityFactory.newDocumentEntity(
@@ -152,28 +154,9 @@ class VaultWebIntegrationTest {
 
     @Test
     void testQueryDocumentWhenDocumentNotFoundInVault() throws Exception {
-        expectRegisterServiceCall(ApplicationType.VAULT_APPLICATION);
-
         final UUID documentId = UUID.randomUUID();
 
-        documentEntityFactory.newDocumentEntity(
-                DocumentCreationContext.builder()
-                        .id(documentId)
-                        .type(DocumentType.PDF)
-                        .status(DocumentStatus.DOWNLOADED)
-                        .checksum("ba8016bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad")
-                        .compression(DocumentCompression.NONE)
-                        .vault("default")
-                        .fileSize(123)
-                        .source("test-source")
-                        .sourceLocationId(Optional.empty())
-                        .build()
-        );
-
-        //final Path fakeDocumentContent = setupFakeFile("/vault/" + documentId + ".pdf", new byte[]{1, 2, 3, 4});
-
-        when(fileFactory.newFile("/vault/", documentId + ".pdf"))
-                .thenReturn(fileSystem.getPath("/vault/", documentId + ".pdf"));
+        // Do not insert the entity's data to the database
 
         mockMvc.perform(get("/document/" + documentId))
                 .andExpect(status().isBadRequest());

@@ -11,6 +11,7 @@ import com.github.bottomlessarchive.loa.queue.service.domain.Queue;
 import com.github.bottomlessarchive.loa.queue.service.domain.message.DocumentArchivingMessage;
 import com.github.bottomlessarchive.loa.type.domain.DocumentType;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
+import com.thomaskasene.wiremock.junit.WireMockStubs;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -37,6 +38,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Slf4j
+@WireMockStubs
 @Testcontainers
 @SpringBootTest(
         properties = {
