@@ -44,7 +44,7 @@ class VaultViewModificationDisabledIntegrationTest {
 
     //TODO: Why does the application connect to the queue even if loa.vault.archiving is disabled?
     @Container
-    private static final GenericContainer<?> ARTEMIS_CONTAINER = new GenericContainer<>("vromero/activemq-artemis")
+    private static final GenericContainer<?> ARTEMIS_CONTAINER = new GenericContainer<>("vromero/activemq-artemis:2.16.0")
             .withExposedPorts(61616)
             .withStartupTimeout(Duration.ofMinutes(5))
             .withLogConsumer(new Slf4jLogConsumer(log).withPrefix("AMQ-LOG"))
