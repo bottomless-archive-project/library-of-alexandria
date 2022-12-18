@@ -38,7 +38,9 @@ import java.util.UUID;
 
 import static com.github.bottomlessarchive.loa.conductor.service.ConductorClientTestUtility.expectQueryServiceCall;
 import static com.github.bottomlessarchive.loa.conductor.service.ConductorClientTestUtility.expectRegisterServiceCall;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
@@ -154,7 +156,7 @@ class VaultViewDefaultIntegrationTest {
     }
 
     @Test
-    void testQueryDocumentWhenDocumentNotFoundInVault() throws Exception {
+    void testQueryDocumentWhenDocumentNotFoundInDatabase() throws Exception {
         final UUID documentId = UUID.randomUUID();
 
         // Do not insert the entity's data to the database
@@ -162,6 +164,70 @@ class VaultViewDefaultIntegrationTest {
         mockMvc.perform(get("/document/" + documentId))
                 .andExpect(status().isBadRequest())
                 .andExpect(status().reason("Document not found with id " + documentId + " or already removed!"));
+    }
+
+    @Test
+    void testDeleteDocumentWhenDocumentIsInDifferentVault() throws Exception {
+        final UUID documentId = UUID.randomUUID();
+
+        documentEntityFactory.newDocumentEntity(
+                DocumentCreationContext.builder()
+                        .id(documentId)
+                        .type(DocumentType.PDF)
+                        .status(DocumentStatus.DOWNLOADED)
+                        .checksum("ba7926bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad")
+                        .compression(DocumentCompression.NONE)
+                        .vault("not-this-one")
+                        .fileSize(123)
+                        .source("test-source")
+                        .sourceLocationId(Optional.empty())
+                        .build()
+        );
+
+        mockMvc.perform(delete("/document/" + documentId))
+                .andExpect(status().isBadRequest())
+                .andExpect(status().reason("Document with id " + documentId + " is available on a different vault!"));
+    }
+
+    @Test
+    void testDeleteDocumentWhenDocumentNotFoundInDatabase() throws Exception {
+        final UUID documentId = UUID.randomUUID();
+
+        mockMvc.perform(delete("/document/" + documentId))
+                .andExpect(status().isBadRequest())
+                .andExpect(status().reason("Document not found with id " + documentId + " or already removed!"));
+    }
+
+    @Test
+    void testDeleteDocumentWhenDocumentIsInVault() throws Exception {
+        final UUID documentId = UUID.randomUUID();
+
+        documentEntityFactory.newDocumentEntity(
+                DocumentCreationContext.builder()
+                        .id(documentId)
+                        .type(DocumentType.PDF)
+                        .status(DocumentStatus.DOWNLOADED)
+                        .checksum("ba8019bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad")
+                        .compression(DocumentCompression.NONE)
+                        .vault("default")
+                        .fileSize(123)
+                        .source("test-source")
+                        .sourceLocationId(Optional.empty())
+                        .build()
+        );
+
+        final Path fakeDocumentContent = setupFakeFile("/vault/" + documentId + ".pdf", new byte[]{1, 2, 3, 4});
+
+        when(fileFactory.newFile("/vault/", documentId + ".pdf"))
+                .thenReturn(fakeDocumentContent);
+
+        mockMvc.perform(delete("/document/" + documentId))
+                .andExpect(status().isOk());
+
+        assertThat(fakeDocumentContent)
+                .doesNotExist();
+        assertThat(documentEntityFactory.getDocumentEntity(documentId))
+                .isEmpty();
     }
 
     @SneakyThrows
