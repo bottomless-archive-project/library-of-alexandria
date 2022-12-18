@@ -120,7 +120,8 @@ class VaultViewDefaultIntegrationTest {
         );
 
         mockMvc.perform(get("/document/" + documentId))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(status().reason("Document with id " + documentId + " is available on a different vault!"));
     }
 
     @Test
