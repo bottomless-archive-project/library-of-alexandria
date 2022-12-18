@@ -159,7 +159,8 @@ class VaultViewDefaultIntegrationTest {
         // Do not insert the entity's data to the database
 
         mockMvc.perform(get("/document/" + documentId))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(status().reason("Document not found with id " + documentId + " or already removed!"));
     }
 
     @SneakyThrows
