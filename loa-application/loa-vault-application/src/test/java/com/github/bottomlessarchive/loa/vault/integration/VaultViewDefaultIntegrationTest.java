@@ -42,6 +42,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -144,10 +145,9 @@ class VaultViewDefaultIntegrationTest {
                         .build()
         );
 
-        final Path fakeDocumentContent = setupFakeFile("/vault/" + documentId + ".pdf", new byte[]{1, 2, 3, 4});
-
+        final Path fakeDocumentPath = setupFakeFile("/vault/" + documentId + ".pdf", new byte[]{1, 2, 3, 4});
         when(fileFactory.newFile("/vault/", documentId + ".pdf"))
-                .thenReturn(fakeDocumentContent);
+                .thenReturn(fakeDocumentPath);
 
         mockMvc.perform(get("/document/" + documentId))
                 .andExpect(status().isOk())
@@ -216,28 +216,84 @@ class VaultViewDefaultIntegrationTest {
                         .build()
         );
 
-        final Path fakeDocumentContent = setupFakeFile("/vault/" + documentId + ".pdf", new byte[]{1, 2, 3, 4});
-
+        final Path fakeDocumentPath = setupFakeFile("/vault/" + documentId + ".pdf", new byte[]{1, 2, 3, 4});
         when(fileFactory.newFile("/vault/", documentId + ".pdf"))
-                .thenReturn(fakeDocumentContent);
+                .thenReturn(fakeDocumentPath);
 
         mockMvc.perform(delete("/document/" + documentId))
                 .andExpect(status().isOk());
 
-        assertThat(fakeDocumentContent)
+        assertThat(fakeDocumentPath)
                 .doesNotExist();
         assertThat(documentEntityFactory.getDocumentEntity(documentId))
                 .isEmpty();
     }
 
+    @Test
+    void testRecompressDocumentWhenDocumentNotFoundInDatabase() throws Exception {
+        final UUID documentId = UUID.randomUUID();
+
+        mockMvc.perform(
+                        put("/document/" + documentId + "/recompress")
+                                .contentType("application/json")
+                                .content("{\"compression\": \"NONE\"}")
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(status().reason("Document not found with id " + documentId + " or already removed!"));
+    }
+
+    @Test
+    void testRecompressDocumentWhenDocumentIsUncompressedAndTargetIsGzip() throws Exception {
+        final UUID documentId = UUID.randomUUID();
+
+        documentEntityFactory.newDocumentEntity(
+                DocumentCreationContext.builder()
+                        .id(documentId)
+                        .type(DocumentType.PDF)
+                        .status(DocumentStatus.DOWNLOADED)
+                        .checksum("ba8020bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad")
+                        .compression(DocumentCompression.NONE)
+                        .vault("default")
+                        .fileSize(123)
+                        .source("test-source")
+                        .sourceLocationId(Optional.empty())
+                        .build()
+        );
+
+        final Path fakeDocumentPath = setupFakeFile("/vault/" + documentId + ".pdf", new byte[]{1, 2, 3, 4});
+        when(fileFactory.newFile("/vault/", documentId + ".pdf"))
+                .thenReturn(fakeDocumentPath);
+
+        final Path resultDocumentPath = createFakePath("/vault/" + documentId + ".pdf.gz");
+        when(fileFactory.newFile("/vault/", documentId + ".pdf.gz"))
+                .thenReturn(resultDocumentPath);
+
+        mockMvc.perform(
+                        put("/document/" + documentId + "/recompress")
+                                .contentType("application/json")
+                                .content("{\"compression\": \"GZIP\"}")
+                )
+                .andExpect(status().isOk());
+
+        assertThat(fakeDocumentPath)
+                .doesNotExist();
+        assertThat(resultDocumentPath)
+                .binaryContent()
+                .isEqualTo(new byte[]{4, 3, 2, 1});
+    }
+
     @SneakyThrows
     private Path setupFakeFile(final String fileNameAndPath, final byte[] testFileContent) {
-        final Path testFilePath = fileSystem.getPath(fileNameAndPath);
+        final Path testFilePath = createFakePath(fileNameAndPath);
 
         Files.createDirectories(testFilePath.getParent());
         Files.copy(new ByteArrayInputStream(testFileContent), testFilePath);
 
         return testFilePath;
+    }
+
+    private Path createFakePath(final String fileNameAndPath) {
+        return fileSystem.getPath(fileNameAndPath);
     }
 
     private static void expectStartupServiceCalls() {

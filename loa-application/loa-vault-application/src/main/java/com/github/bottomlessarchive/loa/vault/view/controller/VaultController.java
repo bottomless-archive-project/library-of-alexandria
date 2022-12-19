@@ -1,6 +1,7 @@
 package com.github.bottomlessarchive.loa.vault.view.controller;
 
 import com.github.bottomlessarchive.loa.document.service.DocumentManipulator;
+import com.github.bottomlessarchive.loa.document.service.domain.DocumentEntity;
 import com.github.bottomlessarchive.loa.document.service.entity.factory.DocumentEntityFactory;
 import com.github.bottomlessarchive.loa.document.view.service.MediaTypeCalculator;
 import com.github.bottomlessarchive.loa.vault.configuration.VaultConfigurationProperties;
@@ -79,17 +80,15 @@ public class VaultController {
             throw new InvalidRequestException("Modification is disabled on this vault instance!");
         }
 
-        documentEntityFactory.getDocumentEntity(UUID.fromString(documentId))
-                .ifPresentOrElse(documentEntity -> {
-                    if (!documentEntity.isInVault(vaultConfigurationProperties.name())) {
-                        throw new InvalidRequestException("Document with id " + documentId + " is available on a different vault!");
-                    }
+        final DocumentEntity documentEntity = documentEntityFactory.getDocumentEntity(UUID.fromString(documentId))
+                .orElseThrow(() -> new InvalidRequestException("Document not found with id " + documentId + " or already removed!"));
 
-                    vaultDocumentManager.removeDocument(documentEntity);
-                    documentEntityFactory.removeDocumentEntity(documentEntity);
-                }, () -> {
-                    throw new InvalidRequestException("Document not found with id " + documentId + " or already removed!");
-                });
+        if (!documentEntity.isInVault(vaultConfigurationProperties.name())) {
+            throw new InvalidRequestException("Document with id " + documentId + " is available on a different vault!");
+        }
+
+        vaultDocumentManager.removeDocument(documentEntity);
+        documentEntityFactory.removeDocumentEntity(documentEntity);
     }
 
     /**
@@ -105,16 +104,14 @@ public class VaultController {
             throw new InvalidRequestException("Modification is disabled on this vault instance!");
         }
 
-        documentEntityFactory.getDocumentEntity(UUID.fromString(documentId))
-                .ifPresentOrElse(documentEntity -> {
-                    if (!documentEntity.isInVault(vaultConfigurationProperties.name())) {
-                        throw new InvalidRequestException("Document with id " + documentId + " is available on a different vault!");
-                    }
+        final DocumentEntity documentEntity = documentEntityFactory.getDocumentEntity(UUID.fromString(documentId))
+                .orElseThrow(() -> new InvalidRequestException("Document not found with id " + documentId + " or already removed!"));
 
-                    recompressorService.recompress(documentEntity, recompressRequest.getCompression());
-                }, () -> {
-                    throw new InvalidRequestException("Document not found with id " + documentId + "!");
-                });
+        if (!documentEntity.isInVault(vaultConfigurationProperties.name())) {
+            throw new InvalidRequestException("Document with id " + documentId + " is available on a different vault!");
+        }
+
+        recompressorService.recompress(documentEntity, recompressRequest.getCompression());
     }
 
     @GetMapping("/document/{documentId}/exists")

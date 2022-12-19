@@ -22,6 +22,7 @@ import java.util.UUID;
 import static com.github.bottomlessarchive.loa.conductor.service.ConductorClientTestUtility.expectQueryServiceCall;
 import static com.github.bottomlessarchive.loa.conductor.service.ConductorClientTestUtility.expectRegisterServiceCall;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Slf4j
@@ -68,6 +69,19 @@ class VaultViewModificationDisabledIntegrationTest {
         final UUID documentId = UUID.randomUUID();
 
         mockMvc.perform(delete("/document/" + documentId))
+                .andExpect(status().isBadRequest())
+                .andExpect(status().reason("Modification is disabled on this vault instance!"));
+    }
+
+    @Test
+    void testRecompressDocumentWhenDocumentModificationIsDisabled() throws Exception {
+        final UUID documentId = UUID.randomUUID();
+
+        mockMvc.perform(
+                        put("/document/" + documentId + "/recompress")
+                                .contentType("application/json")
+                                .content("{\"compression\": \"NONE\"}")
+                )
                 .andExpect(status().isBadRequest())
                 .andExpect(status().reason("Modification is disabled on this vault instance!"));
     }
