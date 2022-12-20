@@ -1,6 +1,7 @@
 package com.github.bottomlessarchive.loa.vault.service.location.file;
 
 import com.github.bottomlessarchive.loa.compression.domain.DocumentCompression;
+import com.github.bottomlessarchive.loa.file.FileManipulatorService;
 import com.github.bottomlessarchive.loa.vault.service.location.file.configuration.FileConfigurationProperties;
 import com.github.bottomlessarchive.loa.vault.service.location.file.domain.FileVaultLocation;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentEntity;
@@ -20,7 +21,7 @@ import java.io.File;
 @ConditionalOnProperty(value = "loa.vault.location.type", havingValue = "file", matchIfMissing = true)
 public class FileVaultLocationFactory implements VaultLocationFactory {
 
-    private final FileFactory fileFactory;
+    private final FileManipulatorService fileManipulatorService;
     private final FileConfigurationProperties fileConfigurationProperties;
 
     /**
@@ -45,10 +46,10 @@ public class FileVaultLocationFactory implements VaultLocationFactory {
     @Override
     public VaultLocation getLocation(final DocumentEntity documentEntity, final DocumentCompression compression) {
         if (compression == DocumentCompression.NONE) {
-            return new FileVaultLocation(fileFactory.newFile(fileConfigurationProperties.path(),
+            return new FileVaultLocation(fileManipulatorService.newFile(fileConfigurationProperties.path(),
                     documentEntity.getId() + "." + documentEntity.getType().getFileExtension()), compression);
         } else {
-            return new FileVaultLocation(fileFactory.newFile(fileConfigurationProperties.path(),
+            return new FileVaultLocation(fileManipulatorService.newFile(fileConfigurationProperties.path(),
                     documentEntity.getId() + "." + documentEntity.getType().getFileExtension() + "."
                             + compression.getFileExtension()), compression);
         }

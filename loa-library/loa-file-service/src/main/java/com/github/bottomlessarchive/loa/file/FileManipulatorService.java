@@ -39,4 +39,12 @@ public class FileManipulatorService {
     public void move(final Path sourcePath, final Path destinationPath, final CopyOption... copyOptions) throws IOException {
         Files.move(sourcePath, destinationPath, copyOptions);
     }
+
+    public Path newFile(final String filePath, final String fileName) {
+        return Path.of(filePath, fileName);
+    }
+
+    public Path newFile(final String filePath) {
+        return Path.of(filePath);
+    }
 }

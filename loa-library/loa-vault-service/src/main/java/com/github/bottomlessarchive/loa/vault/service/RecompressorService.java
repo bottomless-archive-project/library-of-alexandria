@@ -1,8 +1,11 @@
 package com.github.bottomlessarchive.loa.vault.service;
 
 import com.github.bottomlessarchive.loa.compression.domain.DocumentCompression;
+import com.github.bottomlessarchive.loa.compression.service.file.FileCompressionService;
 import com.github.bottomlessarchive.loa.document.service.DocumentManipulator;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentEntity;
+import com.github.bottomlessarchive.loa.stage.service.StageLocationFactory;
+import com.github.bottomlessarchive.loa.stage.service.domain.StageLocation;
 import com.github.bottomlessarchive.loa.vault.domain.exception.StorageAccessException;
 import com.github.bottomlessarchive.loa.vault.service.backend.service.VaultDocumentStorage;
 import com.github.bottomlessarchive.loa.vault.service.location.VaultLocation;
@@ -11,9 +14,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -24,6 +29,8 @@ public class RecompressorService {
     private final DocumentManipulator documentManipulator;
     private final VaultLocationFactory vaultLocationFactory;
     private final VaultDocumentStorage vaultDocumentStorage;
+    private final StageLocationFactory stageLocationFactory;
+    private final FileCompressionService fileCompressionService;
 
     //TODO: This can be optimized. We shouldn't read the whole document into memory!
     public void recompress(final DocumentEntity documentEntity, final DocumentCompression documentCompression) {
@@ -34,14 +41,21 @@ public class RecompressorService {
 
         try (InputStream documentContentInputStream = vaultDocumentManager.readDocument(documentEntity)
                 .getInputStream()) {
-            final byte[] documentContent = documentContentInputStream.readAllBytes();
 
+            final StageLocation originalContent = stageLocationFactory.getLocation(UUID.randomUUID());
+            Files.write(originalContent.getPath(), documentContentInputStream.readAllBytes());
+
+            final Path compressedFilePath = fileCompressionService.compressDocument(originalContent.getPath(), documentCompression);
+
+            originalContent.cleanup();
             vaultDocumentManager.removeDocument(documentEntity);
 
             final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentEntity, documentCompression);
 
-            vaultDocumentStorage.persistDocument(documentEntity, new ByteArrayInputStream(documentContent), vaultLocation,
-                    documentContent.length);
+            vaultDocumentStorage.persistDocument(documentEntity, Files.newInputStream(compressedFilePath), vaultLocation,
+                    Files.size(compressedFilePath));
+
+            Files.delete(compressedFilePath);
 
             documentManipulator.updateCompression(documentEntity.getId(), documentCompression);
         } catch (final IOException e) {

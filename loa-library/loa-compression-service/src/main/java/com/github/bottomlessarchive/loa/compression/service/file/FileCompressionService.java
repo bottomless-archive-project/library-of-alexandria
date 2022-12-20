@@ -16,11 +16,15 @@ public class FileCompressionService {
     private final CompressionConfigurationProperties compressionConfigurationProperties;
 
     public Path compressDocument(final Path fileLocation) {
-        if (compressionConfigurationProperties.algorithm() == DocumentCompression.NONE) {
+        return compressDocument(fileLocation, compressionConfigurationProperties.algorithm());
+    }
+
+    public Path compressDocument(final Path fileLocation, final DocumentCompression documentCompression) {
+        if (documentCompression == DocumentCompression.NONE) {
             return fileLocation;
         }
 
-        return compressorServiceProvider.getCompressionService(
-                compressionConfigurationProperties.algorithm()).compress(fileLocation);
+        return compressorServiceProvider.getCompressionService(documentCompression)
+                .compress(fileLocation);
     }
 }

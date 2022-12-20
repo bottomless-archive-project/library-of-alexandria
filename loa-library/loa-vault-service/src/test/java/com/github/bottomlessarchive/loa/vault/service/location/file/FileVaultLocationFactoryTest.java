@@ -1,6 +1,7 @@
 package com.github.bottomlessarchive.loa.vault.service.location.file;
 
 import com.github.bottomlessarchive.loa.compression.domain.DocumentCompression;
+import com.github.bottomlessarchive.loa.file.FileManipulatorService;
 import com.github.bottomlessarchive.loa.type.domain.DocumentType;
 import com.github.bottomlessarchive.loa.vault.service.location.file.configuration.FileConfigurationProperties;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentEntity;
@@ -34,7 +35,7 @@ class FileVaultLocationFactoryTest {
             .build();
 
     @Mock
-    private FileFactory fileFactory;
+    private FileManipulatorService fileManipulatorService;
 
     @Mock
     private FileConfigurationProperties fileConfigurationProperties;
@@ -53,7 +54,7 @@ class FileVaultLocationFactoryTest {
         final VaultLocation result = underTest.getLocation(DOCUMENT_ENTITY, DocumentCompression.NONE);
 
         assertThat(result, is(notNullValue()));
-        verify(fileFactory).newFile("testpath", "123e4567-e89b-12d3-a456-556642440000.epub");
+        verify(fileManipulatorService).newFile("testpath", "123e4567-e89b-12d3-a456-556642440000.epub");
     }
 
     @Test
@@ -61,7 +62,7 @@ class FileVaultLocationFactoryTest {
         final VaultLocation result = underTest.getLocation(DOCUMENT_ENTITY, DocumentCompression.GZIP);
 
         assertThat(result, is(notNullValue()));
-        verify(fileFactory).newFile("testpath", "123e4567-e89b-12d3-a456-556642440000.epub.gz");
+        verify(fileManipulatorService).newFile("testpath", "123e4567-e89b-12d3-a456-556642440000.epub.gz");
     }
 
     @Test
@@ -69,7 +70,7 @@ class FileVaultLocationFactoryTest {
         final VaultLocation result = underTest.getLocation(DOCUMENT_ENTITY);
 
         assertThat(result, is(notNullValue()));
-        verify(fileFactory, atMostOnce()).newFile(any(), any());
-        verify(fileFactory).newFile("testpath", "123e4567-e89b-12d3-a456-556642440000.epub.lzma");
+        verify(fileManipulatorService, atMostOnce()).newFile(any(), any());
+        verify(fileManipulatorService).newFile("testpath", "123e4567-e89b-12d3-a456-556642440000.epub.lzma");
     }
 }

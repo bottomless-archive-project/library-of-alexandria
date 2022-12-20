@@ -1,4 +1,4 @@
-package com.github.bottomlessarchive.loa.vault.service.location.file;
+package com.github.bottomlessarchive.loa.file;
 
 import org.junit.jupiter.api.Test;
 
@@ -8,9 +8,9 @@ import java.nio.file.Path;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
-class FileFactoryTest {
+class FileManipulatorServiceTest {
 
-    private final FileFactory underTest = new FileFactory();
+    private final FileManipulatorService underTest = new FileManipulatorService();
 
     @Test
     void testNewFile() {
