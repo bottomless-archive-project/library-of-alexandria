@@ -155,7 +155,7 @@ class VaultControllerTest {
                         ))
                 )
                 .andExpect(status().isBadRequest())
-                .andExpect(status().reason("Document not found with id 123e4567-e89b-12d3-a456-556642440000!"));
+                .andExpect(status().reason("Document not found with id 123e4567-e89b-12d3-a456-556642440000 or already removed!"));
     }
 
     @Test
