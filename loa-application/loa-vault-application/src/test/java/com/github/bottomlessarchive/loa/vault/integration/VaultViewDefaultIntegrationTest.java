@@ -145,7 +145,7 @@ class VaultViewDefaultIntegrationTest {
                 .andExpect(status().reason("Document with id " + documentId + " is available on a different vault!"));
     }
 
-    @Test //TODO: test with compressed document
+    @Test
     void testQueryDocumentWhenDocumentIsInVault() throws Exception {
         final UUID documentId = UUID.randomUUID();
 
@@ -165,6 +165,35 @@ class VaultViewDefaultIntegrationTest {
 
         final Path fakeDocumentPath = setupFakeFile("/vault/" + documentId + ".pdf", new byte[]{1, 2, 3, 4});
         when(fileManipulatorService.newFile("/vault/", documentId + ".pdf"))
+                .thenReturn(fakeDocumentPath);
+
+        mockMvc.perform(get("/document/" + documentId))
+                .andExpect(status().isOk())
+                .andExpect(content().bytes(new byte[]{1, 2, 3, 4}))
+                .andExpect(header().stringValues("Content-Type", "application/pdf"));
+    }
+
+    @Test
+    void testQueryDocumentWhenDocumentIsInVaultAndCompressedWithBrotli() throws Exception {
+        final UUID documentId = UUID.randomUUID();
+
+        documentEntityFactory.newDocumentEntity(
+                DocumentCreationContext.builder()
+                        .id(documentId)
+                        .type(DocumentType.PDF)
+                        .status(DocumentStatus.DOWNLOADED)
+                        .checksum("ba8016bf8f01cfea414140de5dae2223b00361a396177a9cb410ff62f29915ad")
+                        .compression(DocumentCompression.BROTLI)
+                        .vault("default")
+                        .fileSize(123)
+                        .source("test-source")
+                        .sourceLocationId(Optional.empty())
+                        .build()
+        );
+
+        final Path fakeDocumentPath = setupFakeFile("/vault/" + documentId + ".pdf.br",
+                new byte[]{-117, 1, -128, 1, 2, 3, 4, 3});
+        when(fileManipulatorService.newFile("/vault/", documentId + ".pdf.br"))
                 .thenReturn(fakeDocumentPath);
 
         mockMvc.perform(get("/document/" + documentId))
