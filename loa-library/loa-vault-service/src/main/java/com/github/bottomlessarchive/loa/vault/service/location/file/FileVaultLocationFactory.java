@@ -25,17 +25,6 @@ public class FileVaultLocationFactory implements VaultLocationFactory {
     private final FileConfigurationProperties fileConfigurationProperties;
 
     /**
-     * Create the location for a given {@link DocumentEntity}.
-     *
-     * @param documentEntity the entity to create the location for
-     * @return the location of the document
-     */
-    @Override
-    public VaultLocation getLocation(final DocumentEntity documentEntity) {
-        return getLocation(documentEntity, documentEntity.getCompression());
-    }
-
-    /**
      * Create the location for a given {@link DocumentEntity}. The filename part of the location is calculated using
      * the provided compression.
      *

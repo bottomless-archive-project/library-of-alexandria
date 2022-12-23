@@ -26,6 +26,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.MongoDBContainer;
@@ -51,6 +52,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
@@ -589,6 +591,117 @@ class VaultViewDefaultIntegrationTest {
         mockMvc.perform(get("/document/" + documentId + "/exists"))
                 .andExpect(status().isOk())
                 .andExpect(content().string("{\"exists\":true}"));
+    }
+
+    @Test
+    void testReplaceDocumentWhenDocumentIsInDifferentVault() throws Exception {
+        final UUID documentId = UUID.randomUUID();
+
+        documentEntityFactory.newDocumentEntity(
+                DocumentCreationContext.builder()
+                        .id(documentId)
+                        .type(DocumentType.PDF)
+                        .status(DocumentStatus.CORRUPT)
+                        .checksum("ba7928bf8f01cfea414140de5dae2223b00361a396197a9cb420ff61f20016ad")
+                        .compression(DocumentCompression.NONE)
+                        .vault("not-this-one")
+                        .fileSize(123)
+                        .source("test-source")
+                        .sourceLocationId(Optional.empty())
+                        .build()
+        );
+
+        MockMultipartFile mockMultipartFile = new MockMultipartFile("replacementFile", "dummy.pdf",
+                "application/pdf", "Some dataset...".getBytes());
+
+        mockMvc.perform(
+                        multipart("/document/" + documentId + "/replace")
+                                .file(mockMultipartFile)
+                                .with(pp -> {
+                                    pp.setMethod("PUT");
+                                    return pp;
+                                })
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(status().reason("Document with id " + documentId + " is available on a different vault!"));
+    }
+
+    @Test
+    void testReplaceDocumentWhenDocumentNotFoundInDatabase() throws Exception {
+        final UUID documentId = UUID.randomUUID();
+
+        MockMultipartFile mockMultipartFile = new MockMultipartFile("replacementFile", "dummy.pdf",
+                "application/pdf", "Some dataset...".getBytes());
+
+        mockMvc.perform(
+                        multipart("/document/" + documentId + "/replace")
+                                .file(mockMultipartFile)
+                                .with(pp -> {
+                                    pp.setMethod("PUT");
+                                    return pp;
+                                })
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(status().reason("Document not found with id " + documentId + " or already removed!"));
+    }
+
+    @Test
+    void testReplaceDocumentWhenDocumentIsInVault() throws Exception {
+        final UUID documentId = UUID.randomUUID();
+
+        documentEntityFactory.newDocumentEntity(
+                DocumentCreationContext.builder()
+                        .id(documentId)
+                        .type(DocumentType.PDF)
+                        .status(DocumentStatus.DOWNLOADED)
+                        .checksum("ba7928bf8f01cfea414140de5dae2223b00361a396197a9cb420ff61f20019ad")
+                        .compression(DocumentCompression.NONE)
+                        .vault("default")
+                        .fileSize(123)
+                        .source("test-source")
+                        .sourceLocationId(Optional.empty())
+                        .build()
+        );
+
+        final Path fakeDocumentPath = setupFakeFile("/vault/" + documentId + ".pdf", new byte[]{1, 2, 3, 4});
+        when(fileManipulatorService.newFile("/vault/", documentId + ".pdf"))
+                .thenReturn(fakeDocumentPath);
+
+        MockMultipartFile mockMultipartFile = new MockMultipartFile("replacementFile", "dummy.pdf",
+                "application/pdf", new byte[]{4, 3, 2, 1});
+
+        mockMvc.perform(
+                        multipart("/document/" + documentId + "/replace")
+                                .file(mockMultipartFile)
+                                .with(pp -> {
+                                    pp.setMethod("PUT");
+                                    return pp;
+                                })
+                )
+                .andExpect(status().isOk());
+
+        assertThat(fakeDocumentPath)
+                .binaryContent()
+                .isEqualTo(new byte[]{4, 3, 2, 1});
+
+        final Optional<DocumentEntity> documentInDatabase = documentEntityFactory.getDocumentEntity(documentId);
+
+        assertThat(documentInDatabase)
+                .isPresent()
+                .hasValueSatisfying(databaseEntity -> {
+                    assertThat(databaseEntity.getType())
+                            .isEqualTo(DocumentType.PDF);
+                    assertThat(databaseEntity.getStatus())
+                            .isEqualTo(DocumentStatus.DOWNLOADED);
+                    assertThat(databaseEntity.getCompression())
+                            .isEqualTo(DocumentCompression.NONE);
+                    assertThat(databaseEntity.getChecksum())
+                            .isEqualTo("ba7928bf8f01cfea414140de5dae2223b00361a396197a9cb420ff61f20019ad");
+                    assertThat(databaseEntity.getFileSize())
+                            .isEqualTo(4);
+                    assertThat(databaseEntity.getSourceLocations())
+                            .isEmpty();
+                });
     }
 
     @SneakyThrows

@@ -146,8 +146,7 @@ public class VaultController {
 
                     vaultDocumentManager.removeDocument(documentEntity);
 
-                    final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentEntity,
-                            documentEntity.getCompression());
+                    final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentEntity);
 
                     try {
                         vaultDocumentStorage.persistDocument(documentEntity, replacementFile.getInputStream(), vaultLocation,
@@ -156,9 +155,11 @@ public class VaultController {
                         throw new InvalidRequestException("Failed to save document!", e);
                     }
 
+                    //TODO: Merge these two calls
                     documentManipulator.markDownloaded(documentEntity.getId());
+                    documentManipulator.updateFileSize(documentEntity.getId(), replacementFile.getSize());
                 }, () -> {
-                    throw new InvalidRequestException("Document not found with id " + documentId + "!");
+                    throw new InvalidRequestException("Document not found with id " + documentId + " or already removed!");
                 });
     }
 }

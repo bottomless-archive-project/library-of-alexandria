@@ -77,6 +77,10 @@ public class DocumentRepository {
         documentDatabaseEntityMongoCollection.updateOne(eq("_id", documentId), set("status", status));
     }
 
+    public void updateFileSize(final UUID documentId, final long newFileSize) {
+        documentDatabaseEntityMongoCollection.updateOne(eq("_id", documentId), set("fileSize", newFileSize));
+    }
+
     public void updateDocumentWhenMovedFromVault(final UUID documentId, final String vault, final String compression) {
         documentDatabaseEntityMongoCollection.updateOne(eq("_id", documentId),
                 combine(

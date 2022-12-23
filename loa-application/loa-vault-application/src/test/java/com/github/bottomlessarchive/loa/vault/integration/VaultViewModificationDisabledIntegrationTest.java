@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.MongoDBContainer;
@@ -22,6 +23,7 @@ import java.util.UUID;
 import static com.github.bottomlessarchive.loa.conductor.service.ConductorClientTestUtility.expectQueryServiceCall;
 import static com.github.bottomlessarchive.loa.conductor.service.ConductorClientTestUtility.expectRegisterServiceCall;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -81,6 +83,25 @@ class VaultViewModificationDisabledIntegrationTest {
                         put("/document/" + documentId + "/recompress")
                                 .contentType("application/json")
                                 .content("{\"compression\": \"NONE\"}")
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(status().reason("Modification is disabled on this vault instance!"));
+    }
+
+    @Test
+    void testReplaceCorruptDocumentWhenDocumentModificationIsDisabled() throws Exception {
+        final UUID documentId = UUID.randomUUID();
+
+        MockMultipartFile mockMultipartFile = new MockMultipartFile("replacementFile", "dummy.pdf",
+                "application/pdf", "Some dataset...".getBytes());
+
+        mockMvc.perform(
+                        multipart("/document/" + documentId + "/replace")
+                                .file(mockMultipartFile)
+                                .with(pp -> {
+                                    pp.setMethod("PUT");
+                                    return pp;
+                                })
                 )
                 .andExpect(status().isBadRequest())
                 .andExpect(status().reason("Modification is disabled on this vault instance!"));

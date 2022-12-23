@@ -79,4 +79,8 @@ public class DocumentManipulator {
     public void updateDocumentWhenMovedFromVault(final UUID documentId, final String vault, final DocumentCompression documentCompression) {
         documentRepository.updateDocumentWhenMovedFromVault(documentId, vault, documentCompression.toString());
     }
+
+    public void updateFileSize(final UUID documentId, final long newFileSize) {
+        documentRepository.updateFileSize(documentId, newFileSize);
+    }
 }
