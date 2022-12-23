@@ -145,7 +145,7 @@ class VaultViewDefaultIntegrationTest {
                 .andExpect(status().reason("Document with id " + documentId + " is available on a different vault!"));
     }
 
-    @Test
+    @Test //TODO: test with compressed document
     void testQueryDocumentWhenDocumentIsInVault() throws Exception {
         final UUID documentId = UUID.randomUUID();
 
@@ -501,6 +501,65 @@ class VaultViewDefaultIntegrationTest {
         // The application should return before even doing anything
         verify(fileManipulatorService, never())
                 .newFile(any());
+    }
+
+    @Test
+    void testDocumentExistsWhenDocumentIsInDifferentVault() throws Exception {
+        final UUID documentId = UUID.randomUUID();
+
+        documentEntityFactory.newDocumentEntity(
+                DocumentCreationContext.builder()
+                        .id(documentId)
+                        .type(DocumentType.PDF)
+                        .status(DocumentStatus.DOWNLOADED)
+                        .checksum("ba7928bf8f01cfea414140de5dae2223b00361a396197a9cb420ff61f20015ad")
+                        .compression(DocumentCompression.NONE)
+                        .vault("not-this-one")
+                        .fileSize(123)
+                        .source("test-source")
+                        .sourceLocationId(Optional.empty())
+                        .build()
+        );
+
+        mockMvc.perform(get("/document/" + documentId + "/exists"))
+                .andExpect(status().isBadRequest())
+                .andExpect(status().reason("Document with id " + documentId + " is available on a different vault!"));
+    }
+
+    @Test
+    void testDocumentExistsWhenDocumentNotFoundInDatabase() throws Exception {
+        final UUID documentId = UUID.randomUUID();
+
+        mockMvc.perform(get("/document/" + documentId + "/exists"))
+                .andExpect(status().isBadRequest())
+                .andExpect(status().reason("Document not found with id " + documentId + " or already removed!"));
+    }
+
+    @Test
+    void testDocumentExistsWhenDocumentIsInTheVault() throws Exception {
+        final UUID documentId = UUID.randomUUID();
+
+        documentEntityFactory.newDocumentEntity(
+                DocumentCreationContext.builder()
+                        .id(documentId)
+                        .type(DocumentType.PDF)
+                        .status(DocumentStatus.DOWNLOADED)
+                        .checksum("ba7928bf8f01cfea414140de5dae2223b00361a396197a9cb420ff61f20016ad")
+                        .compression(DocumentCompression.NONE)
+                        .vault("default")
+                        .fileSize(123)
+                        .source("test-source")
+                        .sourceLocationId(Optional.empty())
+                        .build()
+        );
+
+        final Path fakeDocumentPath = setupFakeFile("/vault/" + documentId + ".pdf", new byte[]{1, 2, 3, 4});
+        when(fileManipulatorService.newFile("/vault/", documentId + ".pdf"))
+                .thenReturn(fakeDocumentPath);
+
+        mockMvc.perform(get("/document/" + documentId + "/exists"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("{\"exists\":true}"));
     }
 
     @SneakyThrows

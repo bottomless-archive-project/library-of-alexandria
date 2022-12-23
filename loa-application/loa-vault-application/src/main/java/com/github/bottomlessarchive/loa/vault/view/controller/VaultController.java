@@ -126,7 +126,7 @@ public class VaultController {
                             .exists(vaultDocumentManager.documentExists(documentEntity))
                             .build();
                 })
-                .orElseThrow(() -> new InvalidRequestException("Document not found with id " + documentId + "!"));
+                .orElseThrow(() -> new InvalidRequestException("Document not found with id " + documentId + " or already removed!"));
     }
 
     @PutMapping("/document/{documentId}/replace")
