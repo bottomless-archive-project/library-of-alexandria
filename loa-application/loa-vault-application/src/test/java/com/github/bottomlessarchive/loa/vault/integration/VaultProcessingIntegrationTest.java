@@ -14,6 +14,7 @@ import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import com.thomaskasene.wiremock.junit.WireMockStubs;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -75,10 +76,13 @@ class VaultProcessingIntegrationTest {
         expectStartupServiceCalls();
     }
 
+    @BeforeEach
+    public void setupEach() {
+        expectNonStartupServiceCalls();
+    }
+
     @Test
     void testDocumentArchival() throws InterruptedException {
-        expectNonStartupServiceCalls();
-
         final UUID documentId = UUID.randomUUID();
 
         expectStagingGetDocumentCall(documentId, new byte[]{1, 2, 3, 4, 5});
@@ -136,8 +140,6 @@ class VaultProcessingIntegrationTest {
 
     @Test
     void testDocumentArchivalWhenDocumentIsDuplicate() throws InterruptedException {
-        expectNonStartupServiceCalls();
-
         final UUID documentId = UUID.randomUUID();
 
         expectStagingGetDocumentCall(documentId, new byte[]{1, 2, 3, 4, 5});
@@ -222,8 +224,6 @@ class VaultProcessingIntegrationTest {
 
     @Test
     void testDocumentArchivalWhenDocumentIsLoadedFromBeacon() throws InterruptedException {
-        expectNonStartupServiceCalls();
-
         final UUID documentId = UUID.randomUUID();
 
         expectStagingGetDocumentCall(documentId, new byte[]{1, 2, 3, 4, 5});

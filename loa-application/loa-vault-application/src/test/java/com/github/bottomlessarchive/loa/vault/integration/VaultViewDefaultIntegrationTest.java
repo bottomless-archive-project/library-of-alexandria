@@ -2,6 +2,7 @@ package com.github.bottomlessarchive.loa.vault.integration;
 
 import com.github.bottomlessarchive.loa.application.domain.ApplicationType;
 import com.github.bottomlessarchive.loa.compression.domain.DocumentCompression;
+import com.github.bottomlessarchive.loa.document.service.domain.DocumentEntity;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentStatus;
 import com.github.bottomlessarchive.loa.document.service.entity.factory.DocumentEntityFactory;
 import com.github.bottomlessarchive.loa.document.service.entity.factory.domain.DocumentCreationContext;
@@ -45,6 +46,7 @@ import static com.github.bottomlessarchive.loa.conductor.service.ConductorClient
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -109,6 +111,8 @@ class VaultViewDefaultIntegrationTest {
 
     @BeforeEach
     public void setupEach() {
+        expectNonStartupServiceCalls();
+
         fileSystem = Jimfs.newFileSystem(Configuration.unix());
     }
 
@@ -307,7 +311,196 @@ class VaultViewDefaultIntegrationTest {
                 .binaryContent()
                 .isEqualTo(new byte[]{31, -117, 8, 0, 0, 0, 0, 0, 0, -1, 99, 100, 98, 102, 1, 0, -51, -5, 60, -74, 4, 0, 0, 0});
 
-        //TODO: Check if the db was changed as well!
+        final Optional<DocumentEntity> documentInDatabase = documentEntityFactory.getDocumentEntity(documentId);
+
+        assertThat(documentInDatabase)
+                .isPresent()
+                .hasValueSatisfying(databaseEntity -> {
+                    assertThat(databaseEntity.getType())
+                            .isEqualTo(DocumentType.PDF);
+                    assertThat(databaseEntity.getStatus())
+                            .isEqualTo(DocumentStatus.DOWNLOADED);
+                    assertThat(databaseEntity.getCompression())
+                            .isEqualTo(DocumentCompression.GZIP);
+                    assertThat(databaseEntity.getChecksum())
+                            .isEqualTo("ba8020bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad");
+                    assertThat(databaseEntity.getFileSize())
+                            .isEqualTo(123);
+                    assertThat(databaseEntity.getSourceLocations())
+                            .isEmpty();
+                });
+    }
+
+    @Test
+    void testRecompressDocumentWhenDocumentIsGzipAndTargetIsBrotli() throws Exception {
+        final UUID documentId = UUID.randomUUID();
+
+        documentEntityFactory.newDocumentEntity(
+                DocumentCreationContext.builder()
+                        .id(documentId)
+                        .type(DocumentType.PDF)
+                        .status(DocumentStatus.DOWNLOADED)
+                        .checksum("ba8030bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad")
+                        .compression(DocumentCompression.GZIP)
+                        .vault("default")
+                        .fileSize(123)
+                        .source("test-source")
+                        .sourceLocationId(Optional.empty())
+                        .build()
+        );
+
+        final Path fakeDocumentPath = setupFakeFile("/vault/" + documentId + ".pdf.gz", new byte[]{
+                31, -117, 8, 0, 0, 0, 0, 0, 0, -1, 99, 100, 98, 102, 1, 0, -51, -5, 60, -74, 4, 0, 0, 0});
+        when(fileManipulatorService.newFile("/vault/", documentId + ".pdf.gz"))
+                .thenReturn(fakeDocumentPath);
+
+        final Path resultDocumentPath = createFakePath("/vault/" + documentId + ".pdf.br");
+        when(fileManipulatorService.newFile("/vault/", documentId + ".pdf.br"))
+                .thenReturn(resultDocumentPath);
+
+        when(fileManipulatorService.newFile(eq("/stage/"), any()))
+                .thenAnswer(i -> createFakePath("/stage/" + i.getArgument(1)));
+
+        mockMvc.perform(
+                        put("/document/" + documentId + "/recompress")
+                                .contentType("application/json")
+                                .content("{\"compression\": \"BROTLI\"}")
+                )
+                .andExpect(status().isOk());
+
+        verify(stageLocationFactory)
+                .getLocation(uuidArgumentCaptor.capture());
+        assertThat(uuidArgumentCaptor.getAllValues())
+                .hasSize(1);
+        assertThat(createFakePath("/stage/" + uuidArgumentCaptor.getValue()))
+                .doesNotExist();
+        assertThat(createFakePath("/stage/" + uuidArgumentCaptor.getValue() + ".br"))
+                .doesNotExist();
+
+        assertThat(fakeDocumentPath)
+                .doesNotExist();
+        assertThat(resultDocumentPath)
+                .binaryContent()
+                .isEqualTo(new byte[]{-117, 1, -128, 1, 2, 3, 4, 3});
+
+        final Optional<DocumentEntity> documentInDatabase = documentEntityFactory.getDocumentEntity(documentId);
+
+        assertThat(documentInDatabase)
+                .isPresent()
+                .hasValueSatisfying(databaseEntity -> {
+                    assertThat(databaseEntity.getType())
+                            .isEqualTo(DocumentType.PDF);
+                    assertThat(databaseEntity.getStatus())
+                            .isEqualTo(DocumentStatus.DOWNLOADED);
+                    assertThat(databaseEntity.getCompression())
+                            .isEqualTo(DocumentCompression.BROTLI);
+                    assertThat(databaseEntity.getChecksum())
+                            .isEqualTo("ba8030bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad");
+                    assertThat(databaseEntity.getFileSize())
+                            .isEqualTo(123);
+                    assertThat(databaseEntity.getSourceLocations())
+                            .isEmpty();
+                });
+    }
+
+    @Test
+    void testRecompressDocumentWhenDocumentIsGzipAndTargetIsNone() throws Exception {
+        final UUID documentId = UUID.randomUUID();
+
+        documentEntityFactory.newDocumentEntity(
+                DocumentCreationContext.builder()
+                        .id(documentId)
+                        .type(DocumentType.PDF)
+                        .status(DocumentStatus.DOWNLOADED)
+                        .checksum("ba8040bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad")
+                        .compression(DocumentCompression.GZIP)
+                        .vault("default")
+                        .fileSize(123)
+                        .source("test-source")
+                        .sourceLocationId(Optional.empty())
+                        .build()
+        );
+
+        final Path fakeDocumentPath = setupFakeFile("/vault/" + documentId + ".pdf.gz", new byte[]{
+                31, -117, 8, 0, 0, 0, 0, 0, 0, -1, 99, 100, 98, 102, 1, 0, -51, -5, 60, -74, 4, 0, 0, 0});
+        when(fileManipulatorService.newFile("/vault/", documentId + ".pdf.gz"))
+                .thenReturn(fakeDocumentPath);
+
+        final Path resultDocumentPath = createFakePath("/vault/" + documentId + ".pdf");
+        when(fileManipulatorService.newFile("/vault/", documentId + ".pdf"))
+                .thenReturn(resultDocumentPath);
+
+        when(fileManipulatorService.newFile(eq("/stage/"), any()))
+                .thenAnswer(i -> createFakePath("/stage/" + i.getArgument(1)));
+
+        mockMvc.perform(
+                        put("/document/" + documentId + "/recompress")
+                                .contentType("application/json")
+                                .content("{\"compression\": \"NONE\"}")
+                )
+                .andExpect(status().isOk());
+
+        verify(stageLocationFactory)
+                .getLocation(uuidArgumentCaptor.capture());
+        assertThat(uuidArgumentCaptor.getAllValues())
+                .hasSize(1);
+        assertThat(createFakePath("/stage/" + uuidArgumentCaptor.getValue()))
+                .doesNotExist();
+
+        assertThat(fakeDocumentPath)
+                .doesNotExist();
+        assertThat(resultDocumentPath)
+                .binaryContent()
+                .isEqualTo(new byte[]{1, 2, 3, 4});
+
+        final Optional<DocumentEntity> documentInDatabase = documentEntityFactory.getDocumentEntity(documentId);
+
+        assertThat(documentInDatabase)
+                .isPresent()
+                .hasValueSatisfying(databaseEntity -> {
+                    assertThat(databaseEntity.getType())
+                            .isEqualTo(DocumentType.PDF);
+                    assertThat(databaseEntity.getStatus())
+                            .isEqualTo(DocumentStatus.DOWNLOADED);
+                    assertThat(databaseEntity.getCompression())
+                            .isEqualTo(DocumentCompression.NONE);
+                    assertThat(databaseEntity.getChecksum())
+                            .isEqualTo("ba8040bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad");
+                    assertThat(databaseEntity.getFileSize())
+                            .isEqualTo(123);
+                    assertThat(databaseEntity.getSourceLocations())
+                            .isEmpty();
+                });
+    }
+
+    @Test
+    void testRecompressDocumentWhenDocumentIsInTheSameCompressionAsTarget() throws Exception {
+        final UUID documentId = UUID.randomUUID();
+
+        documentEntityFactory.newDocumentEntity(
+                DocumentCreationContext.builder()
+                        .id(documentId)
+                        .type(DocumentType.PDF)
+                        .status(DocumentStatus.DOWNLOADED)
+                        .checksum("ba8050bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad")
+                        .compression(DocumentCompression.GZIP)
+                        .vault("default")
+                        .fileSize(123)
+                        .source("test-source")
+                        .sourceLocationId(Optional.empty())
+                        .build()
+        );
+
+        mockMvc.perform(
+                        put("/document/" + documentId + "/recompress")
+                                .contentType("application/json")
+                                .content("{\"compression\": \"GZIP\"}")
+                )
+                .andExpect(status().isOk());
+
+        // The application should return before even doing anything
+        verify(fileManipulatorService, never())
+                .newFile(any());
     }
 
     @SneakyThrows
@@ -333,5 +526,9 @@ class VaultViewDefaultIntegrationTest {
 
         expectQueryServiceCall(ApplicationType.DOCUMENT_DATABASE, "127.0.0.1", MONGO_CONTAINER.getFirstMappedPort());
         expectQueryServiceCall(ApplicationType.QUEUE_APPLICATION, "127.0.0.1", ARTEMIS_CONTAINER.getFirstMappedPort());
+    }
+
+    private void expectNonStartupServiceCalls() {
+        expectRegisterServiceCall(ApplicationType.VAULT_APPLICATION);
     }
 }

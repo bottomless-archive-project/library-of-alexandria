@@ -32,22 +32,25 @@ public class RecompressorService {
     private final StageLocationFactory stageLocationFactory;
     private final FileCompressionService fileCompressionService;
 
-    //TODO: This can be optimized. We shouldn't read the whole document into memory!
     public void recompress(final DocumentEntity documentEntity, final DocumentCompression documentCompression) {
         if (log.isInfoEnabled()) {
             log.info("Migrating archived document {} from {} compression to {}.", documentEntity.getId(),
                     documentEntity.getCompression(), documentCompression);
         }
 
+        if (documentEntity.getCompression().equals(documentCompression)) {
+            return;
+        }
+
         try (InputStream documentContentInputStream = vaultDocumentManager.readDocument(documentEntity)
                 .getInputStream()) {
 
             final StageLocation originalContent = stageLocationFactory.getLocation(UUID.randomUUID());
+            //TODO: This can be optimized. We shouldn't read the whole document into memory! Stream it instead!
             Files.write(originalContent.getPath(), documentContentInputStream.readAllBytes());
 
             final Path compressedFilePath = fileCompressionService.compressDocument(originalContent.getPath(), documentCompression);
 
-            originalContent.cleanup();
             vaultDocumentManager.removeDocument(documentEntity);
 
             final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentEntity, documentCompression);
@@ -55,7 +58,13 @@ public class RecompressorService {
             vaultDocumentStorage.persistDocument(documentEntity, Files.newInputStream(compressedFilePath), vaultLocation,
                     Files.size(compressedFilePath));
 
-            Files.delete(compressedFilePath);
+            originalContent.cleanup();
+
+            // In case when the compression target is NONE, then the path for the original content and the new content is the same
+            // the file is already deleted by the originalContent.cleanup() call.
+            if (!originalContent.getPath().equals(compressedFilePath)) {
+                Files.delete(compressedFilePath);
+            }
 
             documentManipulator.updateCompression(documentEntity.getId(), documentCompression);
         } catch (final IOException e) {
