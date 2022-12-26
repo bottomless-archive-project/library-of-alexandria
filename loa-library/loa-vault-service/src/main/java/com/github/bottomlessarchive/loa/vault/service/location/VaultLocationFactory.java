@@ -14,7 +14,7 @@ public interface VaultLocationFactory {
      * @param documentEntity the entity of the document to return the location for
      * @return the vault location belonging to the document
      */
-    default VaultLocation getLocation(DocumentEntity documentEntity) {
+    default VaultLocation getLocation(final DocumentEntity documentEntity) {
         return getLocation(documentEntity, documentEntity.getCompression());
     }
 

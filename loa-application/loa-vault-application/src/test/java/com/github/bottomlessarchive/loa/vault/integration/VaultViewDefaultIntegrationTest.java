@@ -602,7 +602,7 @@ class VaultViewDefaultIntegrationTest {
                         .id(documentId)
                         .type(DocumentType.PDF)
                         .status(DocumentStatus.CORRUPT)
-                        .checksum("ba7928bf8f01cfea414140de5dae2223b00361a396197a9cb420ff61f20016ad")
+                        .checksum("ba7928bf8f01cfea414140de5dae2223b00361a396197a9cb420ff61f20016bd")
                         .compression(DocumentCompression.NONE)
                         .vault("not-this-one")
                         .fileSize(123)
@@ -611,7 +611,7 @@ class VaultViewDefaultIntegrationTest {
                         .build()
         );
 
-        MockMultipartFile mockMultipartFile = new MockMultipartFile("replacementFile", "dummy.pdf",
+        final MockMultipartFile mockMultipartFile = new MockMultipartFile("replacementFile", "dummy.pdf",
                 "application/pdf", "Some dataset...".getBytes());
 
         mockMvc.perform(
@@ -630,7 +630,7 @@ class VaultViewDefaultIntegrationTest {
     void testReplaceDocumentWhenDocumentNotFoundInDatabase() throws Exception {
         final UUID documentId = UUID.randomUUID();
 
-        MockMultipartFile mockMultipartFile = new MockMultipartFile("replacementFile", "dummy.pdf",
+        final MockMultipartFile mockMultipartFile = new MockMultipartFile("replacementFile", "dummy.pdf",
                 "application/pdf", "Some dataset...".getBytes());
 
         mockMvc.perform(
@@ -667,7 +667,7 @@ class VaultViewDefaultIntegrationTest {
         when(fileManipulatorService.newFile("/vault/", documentId + ".pdf"))
                 .thenReturn(fakeDocumentPath);
 
-        MockMultipartFile mockMultipartFile = new MockMultipartFile("replacementFile", "dummy.pdf",
+        final MockMultipartFile mockMultipartFile = new MockMultipartFile("replacementFile", "dummy.pdf",
                 "application/pdf", new byte[]{4, 3, 2, 1});
 
         mockMvc.perform(

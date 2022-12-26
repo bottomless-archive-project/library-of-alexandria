@@ -341,7 +341,7 @@ class VaultControllerTest {
         when(documentEntityFactory.getDocumentEntity(UUID.fromString(TEST_DOCUMENT_ID)))
                 .thenReturn(Optional.of(documentEntity));
         final VaultLocation vaultLocation = mock(VaultLocation.class);
-        when(vaultLocationFactory.getLocation(documentEntity, documentEntity.getCompression()))
+        when(vaultLocationFactory.getLocation(documentEntity))
                 .thenReturn(vaultLocation);
 
         final byte[] newDocumentContent = {1, 2, 3, 4};

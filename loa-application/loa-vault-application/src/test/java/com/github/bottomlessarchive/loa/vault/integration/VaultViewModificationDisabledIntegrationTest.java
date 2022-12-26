@@ -92,7 +92,7 @@ class VaultViewModificationDisabledIntegrationTest {
     void testReplaceCorruptDocumentWhenDocumentModificationIsDisabled() throws Exception {
         final UUID documentId = UUID.randomUUID();
 
-        MockMultipartFile mockMultipartFile = new MockMultipartFile("replacementFile", "dummy.pdf",
+        final MockMultipartFile mockMultipartFile = new MockMultipartFile("replacementFile", "dummy.pdf",
                 "application/pdf", "Some dataset...".getBytes());
 
         mockMvc.perform(
