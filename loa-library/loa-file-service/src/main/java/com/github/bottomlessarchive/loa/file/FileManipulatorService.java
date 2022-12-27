@@ -24,6 +24,10 @@ public class FileManipulatorService {
         Files.delete(path);
     }
 
+    public void deleteIfExists(final Path path) throws IOException {
+        Files.deleteIfExists(path);
+    }
+
     public long size(final Path path) throws IOException {
         return Files.size(path);
     }

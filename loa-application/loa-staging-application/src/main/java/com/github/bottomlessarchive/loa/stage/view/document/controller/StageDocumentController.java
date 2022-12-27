@@ -1,5 +1,6 @@
 package com.github.bottomlessarchive.loa.stage.view.document.controller;
 
+import com.github.bottomlessarchive.loa.file.FileManipulatorService;
 import com.github.bottomlessarchive.loa.stage.configuration.StagingConfigurationProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -16,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
@@ -32,12 +32,13 @@ import java.nio.file.Path;
 @RequiredArgsConstructor
 public class StageDocumentController {
 
+    private final FileManipulatorService fileManipulatorService;
     private final StagingConfigurationProperties stagingConfigurationProperties;
 
     @SneakyThrows
     @PostMapping("/document/{documentId}")
     public Mono<Void> persistDocument(@PathVariable final String documentId, @RequestPart("file") final Mono<FilePart> file) {
-        final Path documentLocation = Path.of(stagingConfigurationProperties.location()).resolve(documentId);
+        final Path documentLocation = fileManipulatorService.newFile(stagingConfigurationProperties.location(), documentId);
 
         return file.flatMap(p -> p.transferTo(documentLocation)
                 .then(p.delete())
@@ -47,28 +48,24 @@ public class StageDocumentController {
     @SneakyThrows
     @GetMapping("/document/{documentId}")
     public Mono<Void> serveDocument(@PathVariable final String documentId, final ServerHttpResponse response) {
-        final Path documentLocation = Path.of(stagingConfigurationProperties.location()).resolve(documentId);
+        final Path documentLocation = fileManipulatorService.newFile(stagingConfigurationProperties.location(), documentId);
 
         return ((ZeroCopyHttpOutputMessage) response)
-                .writeWith(documentLocation, 0, Files.size(documentLocation))
-                .then(
-                        Mono.fromRunnable(() -> {
-                            try {
-                                Files.deleteIfExists(documentLocation);
-                            } catch (IOException e) {
-                                log.error("Failed to delete staging file at: {}!", documentLocation);
-                            }
-                        })
-                );
+                .writeWith(documentLocation, 0, fileManipulatorService.size(documentLocation))
+                .then(deleteIfExists(documentLocation));
     }
 
     @DeleteMapping("/document/{documentId}")
     public Mono<Void> deleteDocument(@PathVariable final String documentId) {
-        final Path file = Path.of(stagingConfigurationProperties.location()).resolve(documentId);
+        final Path documentLocation = fileManipulatorService.newFile(stagingConfigurationProperties.location(), documentId);
 
+        return deleteIfExists(documentLocation);
+    }
+
+    private Mono<Void> deleteIfExists(final Path file) {
         return Mono.fromRunnable(() -> {
             try {
-                Files.deleteIfExists(file);
+                fileManipulatorService.deleteIfExists(file);
             } catch (IOException e) {
                 log.error("Failed to delete staging file at: {}!", file);
             }

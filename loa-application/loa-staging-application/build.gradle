@@ -25,5 +25,10 @@ bootBuildImage {
 dependencies {
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-webflux'
 
+    implementation project(':loa-library:loa-file-service')
     implementation project(':loa-library:loa-conductor-client-service')
+
+    testImplementation project(':loa-library:loa-conductor-client-test')
+
+    testImplementation group: 'com.google.jimfs', name: 'jimfs', version: '1.2'
 }
