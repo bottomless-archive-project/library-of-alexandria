@@ -38,7 +38,7 @@ public class StageDocumentController {
     @SneakyThrows
     @PostMapping("/document/{documentId}")
     public Mono<Void> persistDocument(@PathVariable final String documentId, @RequestPart("file") final Mono<FilePart> file) {
-        final Path documentLocation = fileManipulatorService.newFile(stagingConfigurationProperties.location(), documentId);
+        final Path documentLocation = stagingConfigurationProperties.location().resolve(documentId);
 
         return file.flatMap(p -> p.transferTo(documentLocation)
                 .then(p.delete())
@@ -48,7 +48,7 @@ public class StageDocumentController {
     @SneakyThrows
     @GetMapping("/document/{documentId}")
     public Mono<Void> serveDocument(@PathVariable final String documentId, final ServerHttpResponse response) {
-        final Path documentLocation = fileManipulatorService.newFile(stagingConfigurationProperties.location(), documentId);
+        final Path documentLocation = stagingConfigurationProperties.location().resolve(documentId);
 
         return ((ZeroCopyHttpOutputMessage) response)
                 .writeWith(documentLocation, 0, fileManipulatorService.size(documentLocation))
@@ -57,7 +57,7 @@ public class StageDocumentController {
 
     @DeleteMapping("/document/{documentId}")
     public Mono<Void> deleteDocument(@PathVariable final String documentId) {
-        final Path documentLocation = fileManipulatorService.newFile(stagingConfigurationProperties.location(), documentId);
+        final Path documentLocation = stagingConfigurationProperties.location().resolve(documentId);
 
         return deleteIfExists(documentLocation);
     }

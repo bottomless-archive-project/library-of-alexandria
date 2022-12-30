@@ -12,6 +12,10 @@ public class InstanceExtensionContext {
         properties.put(propertyName, String.valueOf(propertyValue));
     }
 
+    public void setProperty(final String propertyName, final long propertyValue) {
+        properties.put(propertyName, String.valueOf(propertyValue));
+    }
+
     public void setProperty(final String propertyName, final String propertyValue) {
         properties.put(propertyName, propertyValue);
     }

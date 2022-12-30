@@ -2,11 +2,13 @@ package com.github.bottomlessarchive.loa.stage.integration;
 
 import com.github.bottomlessarchive.loa.application.domain.ApplicationType;
 import com.github.bottomlessarchive.loa.file.FileManipulatorService;
+import com.github.bottomlessarchive.loa.stage.configuration.StagingConfigurationProperties;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import com.google.common.jimfs.Configuration;
 import com.google.common.jimfs.Jimfs;
 import lombok.SneakyThrows;
-import org.junit.jupiter.api.AfterEach;
+import org.apache.commons.io.file.PathUtils;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -14,7 +16,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.MultipartBodyBuilder;
@@ -22,6 +27,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -47,22 +53,33 @@ class StageViewIntegrationTest {
     @SpyBean
     private FileManipulatorService fileManipulatorService;
 
-    private FileSystem fileSystem;
+    private static final FileSystem FILE_SYSTEM = Jimfs.newFileSystem(Configuration.unix());
+
+    @TestConfiguration
+    public static class ReplacementConfiguration {
+
+        @Bean
+        @Primary
+        public StagingConfigurationProperties stagingConfigurationProperties() throws IOException {
+            Files.createDirectories(FILE_SYSTEM.getPath("/stage"));
+
+            return new StagingConfigurationProperties(FILE_SYSTEM.getPath("/stage"));
+        }
+    }
 
     @BeforeAll
     static void setup() {
         expectStartupServiceCalls();
     }
 
-    @BeforeEach
-    public void setupEach() {
-        fileSystem = Jimfs.newFileSystem(Configuration.unix());
+    @AfterAll
+    static void teardown() throws IOException {
+        FILE_SYSTEM.close();
     }
 
-    @AfterEach
-    @SneakyThrows
-    public void teardownEach() {
-        fileSystem.close();
+    @BeforeEach
+    void setupEach() throws IOException {
+        PathUtils.cleanDirectory(FILE_SYSTEM.getPath("/stage"));
     }
 
     @Test
@@ -90,7 +107,7 @@ class StageViewIntegrationTest {
                 .expectStatus()
                 .isOk();
 
-        final Path resultFile = fileSystem.getPath("/stage/" + documentId);
+        final Path resultFile = FILE_SYSTEM.getPath("/stage/" + documentId);
 
         assertThat(resultFile)
                 .exists()
@@ -154,7 +171,7 @@ class StageViewIntegrationTest {
 
     @SneakyThrows
     private Path createFakePath(final String fileNameAndPath) {
-        final Path testFilePath = fileSystem.getPath(fileNameAndPath);
+        final Path testFilePath = FILE_SYSTEM.getPath(fileNameAndPath);
 
         Files.createDirectories(testFilePath.getParent());
 

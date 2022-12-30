@@ -4,9 +4,10 @@ import com.github.bottomlessarchive.loa.conductor.service.client.extension.Insta
 import com.github.bottomlessarchive.loa.conductor.service.client.extension.domain.InstanceExtensionContext;
 import com.github.bottomlessarchive.loa.stage.configuration.StagingConfigurationProperties;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
+import java.nio.file.Files;
 
 @Component
 @RequiredArgsConstructor
@@ -15,8 +16,8 @@ public class StagingFreeSpaceInstancePropertyExtensionProvider implements Instan
     private final StagingConfigurationProperties stagingConfigurationProperties;
 
     @Override
+    @SneakyThrows
     public void extendInstanceWithProperty(final InstanceExtensionContext instanceExtensionContext) {
-        instanceExtensionContext.setProperty("freeSpace", String.valueOf(
-                new File(stagingConfigurationProperties.location()).getUsableSpace()));
+        instanceExtensionContext.setProperty("freeSpace", Files.getFileStore(stagingConfigurationProperties.location()).getUsableSpace());
     }
 }

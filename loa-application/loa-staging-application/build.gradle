@@ -31,4 +31,5 @@ dependencies {
     testImplementation project(':loa-library:loa-conductor-client-test')
 
     testImplementation group: 'com.google.jimfs', name: 'jimfs', version: '1.2'
+    testImplementation group: 'commons-io', name: 'commons-io', version: '2.11.0'
 }

@@ -2,6 +2,8 @@ package com.github.bottomlessarchive.loa.stage.configuration;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import java.nio.file.Path;
+
 /**
  * Contains the configuration properties for the stage feature.
  *
@@ -9,6 +11,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  */
 @ConfigurationProperties("loa.staging")
 public record StagingConfigurationProperties(
-        String location
+        Path location
 ) {
 }
