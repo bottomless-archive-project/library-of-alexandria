@@ -1,7 +1,6 @@
 package com.github.bottomlessarchive.loa.stage.integration;
 
 import com.github.bottomlessarchive.loa.application.domain.ApplicationType;
-import com.github.bottomlessarchive.loa.file.FileManipulatorService;
 import com.github.bottomlessarchive.loa.stage.configuration.StagingConfigurationProperties;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import com.google.common.jimfs.Configuration;
@@ -17,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.ByteArrayResource;
@@ -35,7 +33,6 @@ import java.util.UUID;
 
 import static com.github.bottomlessarchive.loa.conductor.service.ConductorClientTestUtility.expectRegisterServiceCall;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
 
 @SpringBootTest(
         properties = {
@@ -49,9 +46,6 @@ class StageViewIntegrationTest {
 
     @Autowired
     private WebTestClient webTestClient;
-
-    @SpyBean
-    private FileManipulatorService fileManipulatorService;
 
     private static final FileSystem FILE_SYSTEM = Jimfs.newFileSystem(Configuration.unix());
 
@@ -69,7 +63,7 @@ class StageViewIntegrationTest {
 
     @BeforeAll
     static void setup() {
-        expectStartupServiceCalls();
+        expectRegisterServiceCall(ApplicationType.STAGING_APPLICATION);
     }
 
     @AfterAll
@@ -88,9 +82,6 @@ class StageViewIntegrationTest {
         final byte[] content = {1, 2, 3, 4};
 
         final MultipartBodyBuilder multipartBodyBuilder = new MultipartBodyBuilder();
-
-        when(fileManipulatorService.newFile("/stage/", documentId.toString()))
-                .thenReturn(createFakePath("/stage/" + documentId));
 
         multipartBodyBuilder.part("file", new ByteArrayResource(content) {
                     @Override
@@ -123,8 +114,6 @@ class StageViewIntegrationTest {
         final byte[] content = {1, 2, 3, 4};
 
         final Path contentPath = setupFakeFile("/stage/" + documentId, content);
-        when(fileManipulatorService.newFile("/stage/", documentId.toString()))
-                .thenReturn(contentPath);
 
         final byte[] responseBody = webTestClient.get()
                 .uri("/document/" + documentId)
@@ -147,8 +136,6 @@ class StageViewIntegrationTest {
         final byte[] content = {1, 2, 3, 4};
 
         final Path contentPath = setupFakeFile("/stage/" + documentId, content);
-        when(fileManipulatorService.newFile("/stage/", documentId.toString()))
-                .thenReturn(contentPath);
 
         webTestClient.delete()
                 .uri("/document/" + documentId)
@@ -162,23 +149,10 @@ class StageViewIntegrationTest {
 
     @SneakyThrows
     private Path setupFakeFile(final String fileNameAndPath, final byte[] testFileContent) {
-        final Path testFilePath = createFakePath(fileNameAndPath);
+        final Path testFilePath = FILE_SYSTEM.getPath(fileNameAndPath);
 
         Files.copy(new ByteArrayInputStream(testFileContent), testFilePath);
 
         return testFilePath;
-    }
-
-    @SneakyThrows
-    private Path createFakePath(final String fileNameAndPath) {
-        final Path testFilePath = FILE_SYSTEM.getPath(fileNameAndPath);
-
-        Files.createDirectories(testFilePath.getParent());
-
-        return testFilePath;
-    }
-
-    private static void expectStartupServiceCalls() {
-        expectRegisterServiceCall(ApplicationType.STAGING_APPLICATION);
     }
 }

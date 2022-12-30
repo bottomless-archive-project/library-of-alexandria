@@ -1,6 +1,5 @@
 package com.github.bottomlessarchive.loa.stage.view.document.controller;
 
-import com.github.bottomlessarchive.loa.file.FileManipulatorService;
 import com.github.bottomlessarchive.loa.stage.configuration.StagingConfigurationProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -17,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
@@ -32,7 +32,6 @@ import java.nio.file.Path;
 @RequiredArgsConstructor
 public class StageDocumentController {
 
-    private final FileManipulatorService fileManipulatorService;
     private final StagingConfigurationProperties stagingConfigurationProperties;
 
     @SneakyThrows
@@ -51,7 +50,7 @@ public class StageDocumentController {
         final Path documentLocation = stagingConfigurationProperties.location().resolve(documentId);
 
         return ((ZeroCopyHttpOutputMessage) response)
-                .writeWith(documentLocation, 0, fileManipulatorService.size(documentLocation))
+                .writeWith(documentLocation, 0, Files.size(documentLocation))
                 .then(deleteIfExists(documentLocation));
     }
 
@@ -65,7 +64,7 @@ public class StageDocumentController {
     private Mono<Void> deleteIfExists(final Path file) {
         return Mono.fromRunnable(() -> {
             try {
-                fileManipulatorService.deleteIfExists(file);
+                Files.deleteIfExists(file);
             } catch (IOException e) {
                 log.error("Failed to delete staging file at: {}!", file);
             }
