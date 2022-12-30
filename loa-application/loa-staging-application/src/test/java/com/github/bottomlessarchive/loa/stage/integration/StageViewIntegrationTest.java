@@ -9,17 +9,19 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
 
+import java.io.ByteArrayInputStream;
 import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -42,7 +44,7 @@ class StageViewIntegrationTest {
     @Autowired
     private WebTestClient webTestClient;
 
-    @MockBean
+    @SpyBean
     private FileManipulatorService fileManipulatorService;
 
     private FileSystem fileSystem;
@@ -94,6 +96,60 @@ class StageViewIntegrationTest {
                 .exists()
                 .binaryContent()
                 .isEqualTo(content);
+    }
+
+    @Test
+    // See: https://stackoverflow.com/questions/74964892/how-to-do-integration-tests-for-endpoints-that-use-zerocopyhttpoutputmessage
+    @Disabled
+    void testServeDocument() {
+        final UUID documentId = UUID.randomUUID();
+        final byte[] content = {1, 2, 3, 4};
+
+        final Path contentPath = setupFakeFile("/stage/" + documentId, content);
+        when(fileManipulatorService.newFile("/stage/", documentId.toString()))
+                .thenReturn(contentPath);
+
+        final byte[] responseBody = webTestClient.get()
+                .uri("/document/" + documentId)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .returnResult()
+                .getResponseBody();
+
+        assertThat(responseBody)
+                .isEqualTo(content);
+        assertThat(contentPath)
+                .doesNotExist();
+    }
+
+    @Test
+    void testDeleteDocument() {
+        final UUID documentId = UUID.randomUUID();
+        final byte[] content = {1, 2, 3, 4};
+
+        final Path contentPath = setupFakeFile("/stage/" + documentId, content);
+        when(fileManipulatorService.newFile("/stage/", documentId.toString()))
+                .thenReturn(contentPath);
+
+        webTestClient.delete()
+                .uri("/document/" + documentId)
+                .exchange()
+                .expectStatus()
+                .isOk();
+
+        assertThat(contentPath)
+                .doesNotExist();
+    }
+
+    @SneakyThrows
+    private Path setupFakeFile(final String fileNameAndPath, final byte[] testFileContent) {
+        final Path testFilePath = createFakePath(fileNameAndPath);
+
+        Files.copy(new ByteArrayInputStream(testFileContent), testFilePath);
+
+        return testFilePath;
     }
 
     @SneakyThrows
