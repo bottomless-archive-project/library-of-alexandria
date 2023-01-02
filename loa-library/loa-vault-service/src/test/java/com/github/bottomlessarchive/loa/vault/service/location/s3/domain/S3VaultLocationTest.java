@@ -1,6 +1,5 @@
 package com.github.bottomlessarchive.loa.vault.service.location.s3.domain;
 
-import com.github.bottomlessarchive.loa.compression.domain.DocumentCompression;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -50,7 +49,7 @@ class S3VaultLocationTest {
 
     @BeforeEach
     void setup() {
-        underTest = new S3VaultLocation(BUCKET_NAME, FILE_NAME, CONTENT_TYPE, s3Client, DocumentCompression.NONE);
+        underTest = new S3VaultLocation(BUCKET_NAME, FILE_NAME, CONTENT_TYPE, s3Client);
     }
 
     @Test

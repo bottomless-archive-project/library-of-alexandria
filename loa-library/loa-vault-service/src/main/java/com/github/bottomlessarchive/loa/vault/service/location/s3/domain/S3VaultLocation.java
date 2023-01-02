@@ -1,6 +1,5 @@
 package com.github.bottomlessarchive.loa.vault.service.location.s3.domain;
 
-import com.github.bottomlessarchive.loa.compression.domain.DocumentCompression;
 import com.github.bottomlessarchive.loa.vault.service.location.VaultLocation;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
@@ -15,7 +14,6 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.StorageClass;
 
 import java.io.InputStream;
-import java.util.Optional;
 
 /**
  * A {@link VaultLocation} implementation that stores the document contents in an S3 compatible location on the network. The contents are
@@ -29,7 +27,6 @@ public class S3VaultLocation implements VaultLocation {
     private final String fileName;
     private final String contentType;
     private final S3Client s3Client;
-    private final DocumentCompression documentCompression;
 
     /**
      * {@inheritDoc}
@@ -89,10 +86,5 @@ public class S3VaultLocation implements VaultLocation {
                 .build();
 
         s3Client.deleteObject(deleteObjectRequest);
-    }
-
-    @Override
-    public Optional<DocumentCompression> getCompression() {
-        return Optional.ofNullable(documentCompression);
     }
 }

@@ -1,6 +1,5 @@
 package com.github.bottomlessarchive.loa.stage.service;
 
-import com.github.bottomlessarchive.loa.file.FileManipulatorService;
 import com.github.bottomlessarchive.loa.stage.configuration.StageConfigurationProperties;
 import com.github.bottomlessarchive.loa.stage.service.domain.StageLocation;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +16,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class StageLocationFactory {
 
-    private final FileManipulatorService fileManipulatorService;
     private final StageConfigurationProperties stageConfigurationProperties;
 
     /**
@@ -27,7 +25,7 @@ public class StageLocationFactory {
      * @return the location created in the staging area
      */
     public StageLocation getLocation(final UUID documentId) {
-        final Path path = fileManipulatorService.newFile(stageConfigurationProperties.location(), buildFileName(documentId));
+        final Path path = stageConfigurationProperties.location().resolve(buildFileName(documentId));
 
         return StageLocation.builder()
                 .path(path)
@@ -35,7 +33,7 @@ public class StageLocationFactory {
     }
 
     public boolean hasSpace(final long requiredSpaceInBytes) {
-        return fileManipulatorService.newFile(stageConfigurationProperties.location()).toFile().getFreeSpace() > requiredSpaceInBytes;
+        return stageConfigurationProperties.location().toFile().getFreeSpace() > requiredSpaceInBytes;
     }
 
     private String buildFileName(final UUID documentId) {

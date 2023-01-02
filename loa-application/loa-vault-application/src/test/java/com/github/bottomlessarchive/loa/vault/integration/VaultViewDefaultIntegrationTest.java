@@ -6,16 +6,17 @@ import com.github.bottomlessarchive.loa.document.service.domain.DocumentEntity;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentStatus;
 import com.github.bottomlessarchive.loa.document.service.entity.factory.DocumentEntityFactory;
 import com.github.bottomlessarchive.loa.document.service.entity.factory.domain.DocumentCreationContext;
-import com.github.bottomlessarchive.loa.file.FileManipulatorService;
+import com.github.bottomlessarchive.loa.stage.configuration.StageConfigurationProperties;
 import com.github.bottomlessarchive.loa.stage.service.StageLocationFactory;
 import com.github.bottomlessarchive.loa.type.domain.DocumentType;
+import com.github.bottomlessarchive.loa.vault.service.location.file.configuration.FileConfigurationProperties;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import com.google.common.jimfs.Configuration;
 import com.google.common.jimfs.Jimfs;
 import com.thomaskasene.wiremock.junit.WireMockStubs;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,8 +25,10 @@ import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.containers.GenericContainer;
@@ -33,8 +36,10 @@ import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import wiremock.org.apache.commons.io.file.PathUtils;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -45,11 +50,7 @@ import java.util.UUID;
 import static com.github.bottomlessarchive.loa.conductor.service.ConductorClientTestUtility.expectQueryServiceCall;
 import static com.github.bottomlessarchive.loa.conductor.service.ConductorClientTestUtility.expectRegisterServiceCall;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
@@ -85,10 +86,7 @@ class VaultViewDefaultIntegrationTest {
     @Autowired
     private DocumentEntityFactory documentEntityFactory;
 
-    @MockBean
-    private FileManipulatorService fileManipulatorService;
-
-    private FileSystem fileSystem;
+    private static final FileSystem FILE_SYSTEM = Jimfs.newFileSystem(Configuration.unix());
 
     //TODO: Why does the application connect to the queue even if loa.vault.archiving is disabled?
     @Container
@@ -106,22 +104,42 @@ class VaultViewDefaultIntegrationTest {
             .withStartupTimeout(Duration.ofMinutes(5))
             .withLogConsumer(new Slf4jLogConsumer(log).withPrefix("MONGO-LOG"));
 
+    @TestConfiguration
+    public static class ReplacementConfiguration {
+
+        @Bean
+        @Primary
+        public FileConfigurationProperties fileConfigurationProperties() throws IOException {
+            Files.createDirectories(FILE_SYSTEM.getPath("/vault"));
+
+            return new FileConfigurationProperties(FILE_SYSTEM.getPath("/vault"));
+        }
+
+        @Bean
+        @Primary
+        public StageConfigurationProperties stageConfigurationProperties() throws IOException {
+            Files.createDirectories(FILE_SYSTEM.getPath("/stage"));
+
+            return new StageConfigurationProperties(FILE_SYSTEM.getPath("/stage"));
+        }
+    }
+
     @BeforeAll
     static void setup() {
         expectStartupServiceCalls();
     }
 
-    @BeforeEach
-    public void setupEach() {
-        expectNonStartupServiceCalls();
-
-        fileSystem = Jimfs.newFileSystem(Configuration.unix());
+    @AfterAll
+    static void teardown() throws IOException {
+        FILE_SYSTEM.close();
     }
 
-    @AfterEach
-    @SneakyThrows
-    public void teardownEach() {
-        fileSystem.close();
+    @BeforeEach
+    public void setupEach() throws IOException {
+        PathUtils.cleanDirectory(FILE_SYSTEM.getPath("/stage"));
+        PathUtils.cleanDirectory(FILE_SYSTEM.getPath("/vault"));
+
+        expectNonStartupServiceCalls();
     }
 
     @Test
@@ -165,9 +183,7 @@ class VaultViewDefaultIntegrationTest {
                         .build()
         );
 
-        final Path fakeDocumentPath = setupFakeFile("/vault/" + documentId + ".pdf", new byte[]{1, 2, 3, 4});
-        when(fileManipulatorService.newFile("/vault/", documentId + ".pdf"))
-                .thenReturn(fakeDocumentPath);
+        setupFakeFile("/vault/" + documentId + ".pdf", new byte[]{1, 2, 3, 4});
 
         mockMvc.perform(get("/document/" + documentId))
                 .andExpect(status().isOk())
@@ -193,10 +209,7 @@ class VaultViewDefaultIntegrationTest {
                         .build()
         );
 
-        final Path fakeDocumentPath = setupFakeFile("/vault/" + documentId + ".pdf.br",
-                new byte[]{-117, 1, -128, 1, 2, 3, 4, 3});
-        when(fileManipulatorService.newFile("/vault/", documentId + ".pdf.br"))
-                .thenReturn(fakeDocumentPath);
+        setupFakeFile("/vault/" + documentId + ".pdf.br", new byte[]{-117, 1, -128, 1, 2, 3, 4, 3});
 
         mockMvc.perform(get("/document/" + documentId))
                 .andExpect(status().isOk())
@@ -266,8 +279,6 @@ class VaultViewDefaultIntegrationTest {
         );
 
         final Path fakeDocumentPath = setupFakeFile("/vault/" + documentId + ".pdf", new byte[]{1, 2, 3, 4});
-        when(fileManipulatorService.newFile("/vault/", documentId + ".pdf"))
-                .thenReturn(fakeDocumentPath);
 
         mockMvc.perform(delete("/document/" + documentId))
                 .andExpect(status().isOk());
@@ -310,15 +321,8 @@ class VaultViewDefaultIntegrationTest {
         );
 
         final Path fakeDocumentPath = setupFakeFile("/vault/" + documentId + ".pdf", new byte[]{1, 2, 3, 4});
-        when(fileManipulatorService.newFile("/vault/", documentId + ".pdf"))
-                .thenReturn(fakeDocumentPath);
 
-        final Path resultDocumentPath = createFakePath("/vault/" + documentId + ".pdf.gz");
-        when(fileManipulatorService.newFile("/vault/", documentId + ".pdf.gz"))
-                .thenReturn(resultDocumentPath);
-
-        when(fileManipulatorService.newFile(eq("/stage/"), any()))
-                .thenAnswer(i -> createFakePath("/stage/" + i.getArgument(1)));
+        final Path resultDocumentPath = FILE_SYSTEM.getPath("/vault/" + documentId + ".pdf.gz");
 
         mockMvc.perform(
                         put("/document/" + documentId + "/recompress")
@@ -331,9 +335,9 @@ class VaultViewDefaultIntegrationTest {
                 .getLocation(uuidArgumentCaptor.capture());
         assertThat(uuidArgumentCaptor.getAllValues())
                 .hasSize(1);
-        assertThat(createFakePath("/stage/" + uuidArgumentCaptor.getValue()))
+        assertThat(FILE_SYSTEM.getPath("/stage/" + uuidArgumentCaptor.getValue()))
                 .doesNotExist();
-        assertThat(createFakePath("/stage/" + uuidArgumentCaptor.getValue() + ".gz"))
+        assertThat(FILE_SYSTEM.getPath("/stage/" + uuidArgumentCaptor.getValue() + ".gz"))
                 .doesNotExist();
 
         assertThat(fakeDocumentPath)
@@ -382,15 +386,8 @@ class VaultViewDefaultIntegrationTest {
 
         final Path fakeDocumentPath = setupFakeFile("/vault/" + documentId + ".pdf.gz", new byte[]{
                 31, -117, 8, 0, 0, 0, 0, 0, 0, -1, 99, 100, 98, 102, 1, 0, -51, -5, 60, -74, 4, 0, 0, 0});
-        when(fileManipulatorService.newFile("/vault/", documentId + ".pdf.gz"))
-                .thenReturn(fakeDocumentPath);
 
-        final Path resultDocumentPath = createFakePath("/vault/" + documentId + ".pdf.br");
-        when(fileManipulatorService.newFile("/vault/", documentId + ".pdf.br"))
-                .thenReturn(resultDocumentPath);
-
-        when(fileManipulatorService.newFile(eq("/stage/"), any()))
-                .thenAnswer(i -> createFakePath("/stage/" + i.getArgument(1)));
+        final Path resultDocumentPath = FILE_SYSTEM.getPath("/vault/" + documentId + ".pdf.br");
 
         mockMvc.perform(
                         put("/document/" + documentId + "/recompress")
@@ -403,9 +400,9 @@ class VaultViewDefaultIntegrationTest {
                 .getLocation(uuidArgumentCaptor.capture());
         assertThat(uuidArgumentCaptor.getAllValues())
                 .hasSize(1);
-        assertThat(createFakePath("/stage/" + uuidArgumentCaptor.getValue()))
+        assertThat(FILE_SYSTEM.getPath("/stage/" + uuidArgumentCaptor.getValue()))
                 .doesNotExist();
-        assertThat(createFakePath("/stage/" + uuidArgumentCaptor.getValue() + ".br"))
+        assertThat(FILE_SYSTEM.getPath("/stage/" + uuidArgumentCaptor.getValue() + ".br"))
                 .doesNotExist();
 
         assertThat(fakeDocumentPath)
@@ -454,15 +451,8 @@ class VaultViewDefaultIntegrationTest {
 
         final Path fakeDocumentPath = setupFakeFile("/vault/" + documentId + ".pdf.gz", new byte[]{
                 31, -117, 8, 0, 0, 0, 0, 0, 0, -1, 99, 100, 98, 102, 1, 0, -51, -5, 60, -74, 4, 0, 0, 0});
-        when(fileManipulatorService.newFile("/vault/", documentId + ".pdf.gz"))
-                .thenReturn(fakeDocumentPath);
 
-        final Path resultDocumentPath = createFakePath("/vault/" + documentId + ".pdf");
-        when(fileManipulatorService.newFile("/vault/", documentId + ".pdf"))
-                .thenReturn(resultDocumentPath);
-
-        when(fileManipulatorService.newFile(eq("/stage/"), any()))
-                .thenAnswer(i -> createFakePath("/stage/" + i.getArgument(1)));
+        final Path resultDocumentPath = FILE_SYSTEM.getPath("/vault/" + documentId + ".pdf");
 
         mockMvc.perform(
                         put("/document/" + documentId + "/recompress")
@@ -475,7 +465,7 @@ class VaultViewDefaultIntegrationTest {
                 .getLocation(uuidArgumentCaptor.capture());
         assertThat(uuidArgumentCaptor.getAllValues())
                 .hasSize(1);
-        assertThat(createFakePath("/stage/" + uuidArgumentCaptor.getValue()))
+        assertThat(FILE_SYSTEM.getPath("/stage/" + uuidArgumentCaptor.getValue()))
                 .doesNotExist();
 
         assertThat(fakeDocumentPath)
@@ -528,10 +518,6 @@ class VaultViewDefaultIntegrationTest {
                                 .content("{\"compression\": \"GZIP\"}")
                 )
                 .andExpect(status().isOk());
-
-        // The application should return before even doing anything
-        verify(fileManipulatorService, never())
-                .newFile(any());
     }
 
     @Test
@@ -584,9 +570,7 @@ class VaultViewDefaultIntegrationTest {
                         .build()
         );
 
-        final Path fakeDocumentPath = setupFakeFile("/vault/" + documentId + ".pdf", new byte[]{1, 2, 3, 4});
-        when(fileManipulatorService.newFile("/vault/", documentId + ".pdf"))
-                .thenReturn(fakeDocumentPath);
+        setupFakeFile("/vault/" + documentId + ".pdf", new byte[]{1, 2, 3, 4});
 
         mockMvc.perform(get("/document/" + documentId + "/exists"))
                 .andExpect(status().isOk())
@@ -664,8 +648,6 @@ class VaultViewDefaultIntegrationTest {
         );
 
         final Path fakeDocumentPath = setupFakeFile("/vault/" + documentId + ".pdf", new byte[]{1, 2, 3, 4});
-        when(fileManipulatorService.newFile("/vault/", documentId + ".pdf"))
-                .thenReturn(fakeDocumentPath);
 
         final MockMultipartFile mockMultipartFile = new MockMultipartFile("replacementFile", "dummy.pdf",
                 "application/pdf", new byte[]{4, 3, 2, 1});
@@ -706,18 +688,9 @@ class VaultViewDefaultIntegrationTest {
 
     @SneakyThrows
     private Path setupFakeFile(final String fileNameAndPath, final byte[] testFileContent) {
-        final Path testFilePath = createFakePath(fileNameAndPath);
+        final Path testFilePath = FILE_SYSTEM.getPath(fileNameAndPath);
 
         Files.copy(new ByteArrayInputStream(testFileContent), testFilePath);
-
-        return testFilePath;
-    }
-
-    @SneakyThrows
-    private Path createFakePath(final String fileNameAndPath) {
-        final Path testFilePath = fileSystem.getPath(fileNameAndPath);
-
-        Files.createDirectories(testFilePath.getParent());
 
         return testFilePath;
     }

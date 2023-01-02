@@ -1,11 +1,10 @@
 package com.github.bottomlessarchive.loa.stage.service;
 
-import com.github.bottomlessarchive.loa.file.FileManipulatorService;
 import com.github.bottomlessarchive.loa.stage.configuration.StageConfigurationProperties;
 import com.github.bottomlessarchive.loa.stage.service.domain.StageLocation;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -21,21 +20,22 @@ class StageLocationFactoryTest {
 
     private static final UUID TEST_DOCUMENT_ID = UUID.fromString("123e4567-e89b-42d3-a456-556642440000");
 
-    @InjectMocks
     private StageLocationFactory underTest;
 
     @Mock
-    private FileManipulatorService fileManipulatorService;
+    private Path stageLocation;
 
-    @Mock
-    private StageConfigurationProperties stageConfigurationProperties;
+    @BeforeEach
+    void setup() {
+        underTest = new StageLocationFactory(
+                new StageConfigurationProperties(stageLocation)
+        );
+    }
 
     @Test
     void testGetLocation() {
-        when(stageConfigurationProperties.location())
-                .thenReturn("testlocation");
         final Path mockPath = mock(Path.class);
-        when(fileManipulatorService.newFile("testlocation", "123e4567-e89b-42d3-a456-556642440000"))
+        when(stageLocation.resolve("123e4567-e89b-42d3-a456-556642440000"))
                 .thenReturn(mockPath);
 
         final StageLocation result = underTest.getLocation(TEST_DOCUMENT_ID);
