@@ -24,10 +24,6 @@ public class FileManipulatorService {
         Files.delete(path);
     }
 
-    public void deleteIfExists(final Path path) throws IOException {
-        Files.deleteIfExists(path);
-    }
-
     public long size(final Path path) throws IOException {
         return Files.size(path);
     }
@@ -46,9 +42,5 @@ public class FileManipulatorService {
 
     public Path newFile(final String filePath, final String fileName) {
         return Path.of(filePath, fileName);
-    }
-
-    public Path newFile(final String filePath) {
-        return Path.of(filePath);
     }
 }

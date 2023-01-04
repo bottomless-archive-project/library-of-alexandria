@@ -5,8 +5,7 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.nio.file.Path;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class FileManipulatorServiceTest {
 
@@ -16,6 +15,7 @@ class FileManipulatorServiceTest {
     void testNewFile() {
         final Path result = underTest.newFile("testpath", "testname.zip");
 
-        assertThat(result.toString(), is("testpath" + File.separator + "testname.zip"));
+        assertThat(result.toString())
+                .isEqualTo("testpath" + File.separator + "testname.zip");
     }
 }
