@@ -10,12 +10,10 @@ import org.apache.commons.io.file.PathUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.ByteArrayResource;
@@ -35,16 +33,18 @@ import static com.github.bottomlessarchive.loa.conductor.service.ConductorClient
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(
+        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         properties = {
                 "loa.conductor.port=2000",
                 "loa.staging.location=/stage/"
         }
 )
 @WireMockTest(httpPort = 2000)
-@AutoConfigureWebTestClient
 class StageViewIntegrationTest {
 
-    @Autowired
+    @LocalServerPort
+    private Integer serverPort;
+
     private WebTestClient webTestClient;
 
     private static final FileSystem FILE_SYSTEM = Jimfs.newFileSystem(Configuration.unix());
@@ -74,6 +74,13 @@ class StageViewIntegrationTest {
     @BeforeEach
     void setupEach() throws IOException {
         PathUtils.cleanDirectory(FILE_SYSTEM.getPath("/stage"));
+
+        // It is being done like this because the "normal/default" WebTestClient doesn't support the ZeroCopy message in the serve document
+        // test case.
+        webTestClient = WebTestClient
+                .bindToServer()
+                .baseUrl("http://localhost:" + serverPort)
+                .build();
     }
 
     @Test
@@ -107,8 +114,6 @@ class StageViewIntegrationTest {
     }
 
     @Test
-    // See: https://stackoverflow.com/questions/74964892/how-to-do-integration-tests-for-endpoints-that-use-zerocopyhttpoutputmessage
-    @Disabled
     void testServeDocument() {
         final UUID documentId = UUID.randomUUID();
         final byte[] content = {1, 2, 3, 4};
