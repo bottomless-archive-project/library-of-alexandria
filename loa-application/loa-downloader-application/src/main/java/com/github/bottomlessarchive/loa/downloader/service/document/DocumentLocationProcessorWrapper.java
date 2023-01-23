@@ -30,6 +30,7 @@ public class DocumentLocationProcessorWrapper {
     }
 
     public void processDocumentLocation(final DocumentLocation documentLocation, final Runnable callback) {
+        // TODO: This should be somehow synchronized otherwise we might run out of space while processing documents in parallel.
         verifyEnoughStageSpaceIsAvailable();
 
         blockingExecutor.execute(documentLocationProcessorTaskFactory.newDocumentLocationProcessorTask(documentLocation, callback));
