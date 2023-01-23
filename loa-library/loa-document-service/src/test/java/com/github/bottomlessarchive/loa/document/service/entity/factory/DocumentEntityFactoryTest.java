@@ -74,27 +74,27 @@ class DocumentEntityFactoryTest {
 
         verify(documentRepository).insertDocument(documentDatabaseEntityArgumentCaptor.capture());
         final DocumentDatabaseEntity insertedDocumentDatabaseEntity = documentDatabaseEntityArgumentCaptor.getValue();
-        assertThat(insertedDocumentDatabaseEntity.getId())
+        assertThat(insertedDocumentDatabaseEntity.id())
                 .isEqualTo(documentId);
-        assertThat(insertedDocumentDatabaseEntity.getVault())
+        assertThat(insertedDocumentDatabaseEntity.vault())
                 .isEqualTo("test-vault");
-        assertThat(insertedDocumentDatabaseEntity.getType())
+        assertThat(insertedDocumentDatabaseEntity.type())
                 .isEqualTo("PDF");
-        assertThat(insertedDocumentDatabaseEntity.getStatus())
+        assertThat(insertedDocumentDatabaseEntity.status())
                 .isEqualTo("CORRUPT");
-        assertThat(insertedDocumentDatabaseEntity.getChecksum())
+        assertThat(insertedDocumentDatabaseEntity.checksum())
                 .isEqualTo(new byte[]{5, 6, 7});
-        assertThat(insertedDocumentDatabaseEntity.getFileSize())
+        assertThat(insertedDocumentDatabaseEntity.fileSize())
                 .isEqualTo(200);
-        assertThat(insertedDocumentDatabaseEntity.getDownloaderVersion())
+        assertThat(insertedDocumentDatabaseEntity.downloaderVersion())
                 .isEqualTo(5);
-        assertThat(insertedDocumentDatabaseEntity.getCompression())
+        assertThat(insertedDocumentDatabaseEntity.compression())
                 .isEqualTo("GZIP");
-        assertThat(insertedDocumentDatabaseEntity.getSource())
+        assertThat(insertedDocumentDatabaseEntity.source())
                 .isEqualTo("test-source");
-        assertThat(insertedDocumentDatabaseEntity.getSourceLocations().size())
+        assertThat(insertedDocumentDatabaseEntity.sourceLocations().size())
                 .isEqualTo(1);
-        assertThat(new ArrayList<>(insertedDocumentDatabaseEntity.getSourceLocations()).get(0))
+        assertThat(new ArrayList<>(insertedDocumentDatabaseEntity.sourceLocations()).get(0))
                 .isEqualTo(new byte[]{7, 8, 9});
     }
 
@@ -125,7 +125,7 @@ class DocumentEntityFactoryTest {
 
         verify(documentRepository).insertDocument(documentDatabaseEntityArgumentCaptor.capture());
         final DocumentDatabaseEntity insertedDocumentDatabaseEntity = documentDatabaseEntityArgumentCaptor.getValue();
-        assertThat(insertedDocumentDatabaseEntity.getSourceLocations().size())
+        assertThat(insertedDocumentDatabaseEntity.sourceLocations().size())
                 .isEqualTo(0);
     }
 }

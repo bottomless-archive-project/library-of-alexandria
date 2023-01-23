@@ -130,32 +130,31 @@ public class DocumentEntityFactory {
      * @return the freshly created document
      */
     public DocumentEntity newDocumentEntity(final DocumentCreationContext documentCreationContext) {
-        final DocumentDatabaseEntity documentDatabaseEntity = new DocumentDatabaseEntity();
+        final Set<byte[]> sourceLocations = documentCreationContext.sourceLocationId()
+                .map(value -> Set.of(hexConverter.decode(value)))
+                .orElse(Collections.emptySet());
 
-        documentDatabaseEntity.setId(documentCreationContext.id());
-        documentDatabaseEntity.setVault(documentCreationContext.vault());
-        documentDatabaseEntity.setType(documentCreationContext.type().toString());
-        documentDatabaseEntity.setStatus(documentCreationContext.status().toString());
-        documentDatabaseEntity.setChecksum(hexConverter.decode(documentCreationContext.checksum()));
-        documentDatabaseEntity.setFileSize(documentCreationContext.fileSize());
-        documentDatabaseEntity.setDownloaderVersion(documentCreationContext.versionNumber());
-        documentDatabaseEntity.setCompression(documentCreationContext.compression().name());
-        documentDatabaseEntity.setDownloadDate(Instant.now());
-        documentDatabaseEntity.setSource(documentCreationContext.source());
-        documentDatabaseEntity.setBeacon(documentDatabaseEntity.getBeacon());
-
-        documentCreationContext.sourceLocationId()
-                .ifPresentOrElse(
-                        sourceLocationId -> documentDatabaseEntity.setSourceLocations(Set.of(hexConverter.decode(sourceLocationId))),
-                        () -> documentDatabaseEntity.setSourceLocations(Collections.emptySet())
-                );
+        final DocumentDatabaseEntity documentDatabaseEntity = DocumentDatabaseEntity.builder()
+                .id(documentCreationContext.id())
+                .vault(documentCreationContext.vault())
+                .type(documentCreationContext.type().toString())
+                .status(documentCreationContext.status().toString())
+                .compression(documentCreationContext.compression().name())
+                .source(documentCreationContext.source())
+                .beacon(documentCreationContext.beacon())
+                .sourceLocations(sourceLocations)
+                .checksum(hexConverter.decode(documentCreationContext.checksum()))
+                .fileSize(documentCreationContext.fileSize())
+                .downloaderVersion(documentCreationContext.versionNumber())
+                .downloadDate(Instant.now())
+                .build();
 
         try {
             documentRepository.insertDocument(documentDatabaseEntity);
         } catch (final MongoWriteException e) {
             if (e.getError().getCode() == DUPLICATE_DOCUMENT_ID_ERROR_CODE) {
-                throw new DuplicateDocumentException("Document with id: " + documentDatabaseEntity.getId() + " and checksum: "
-                        + new String(documentDatabaseEntity.getChecksum()) + " is a duplicate!", e);
+                throw new DuplicateDocumentException("Document with id: " + documentDatabaseEntity.id() + " and checksum: "
+                        + new String(documentDatabaseEntity.checksum()) + " is a duplicate!", e);
             }
 
             throw e;

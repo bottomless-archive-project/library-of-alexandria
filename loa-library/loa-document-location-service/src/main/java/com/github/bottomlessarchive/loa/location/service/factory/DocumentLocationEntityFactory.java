@@ -21,22 +21,23 @@ public class DocumentLocationEntityFactory {
     public Optional<DocumentLocation> getDocumentLocation(final String id) {
         return documentLocationRepository.getById(hexConverter.decode(id))
                 .map(documentLocationDatabaseEntity -> DocumentLocation.builder()
-                        .id(hexConverter.encode(documentLocationDatabaseEntity.getId()))
-                        .url(documentLocationDatabaseEntity.getUrl())
-                        .source(documentLocationDatabaseEntity.getSource())
-                        .downloaderVersion(documentLocationDatabaseEntity.getDownloaderVersion())
-                        .downloadResultCode(DocumentLocationResultType.valueOf(documentLocationDatabaseEntity.getDownloadResultCode()))
+                        .id(hexConverter.encode(documentLocationDatabaseEntity.id()))
+                        .url(documentLocationDatabaseEntity.url())
+                        .source(documentLocationDatabaseEntity.source())
+                        .downloaderVersion(documentLocationDatabaseEntity.downloaderVersion())
+                        .downloadResultCode(DocumentLocationResultType.valueOf(documentLocationDatabaseEntity.downloadResultCode()))
                         .build()
                 );
     }
 
-    public boolean isDocumentLocationExistsOrCreate(
-            final DocumentLocationCreationContext documentLocationCreationContext) {
-        final DocumentLocationDatabaseEntity documentLocationDatabaseEntity = new DocumentLocationDatabaseEntity();
-        documentLocationDatabaseEntity.setId(hexConverter.decode(documentLocationCreationContext.getId()));
-        documentLocationDatabaseEntity.setSource(documentLocationCreationContext.getSource());
-        documentLocationDatabaseEntity.setUrl(documentLocationCreationContext.getUrl());
-        documentLocationDatabaseEntity.setDownloaderVersion(documentLocationCreationContext.getDownloaderVersion());
+    public boolean isDocumentLocationExistsOrCreate(final DocumentLocationCreationContext documentLocationCreationContext) {
+        final DocumentLocationDatabaseEntity documentLocationDatabaseEntity = DocumentLocationDatabaseEntity.builder()
+                .id(hexConverter.decode(documentLocationCreationContext.getId()))
+                .url(documentLocationCreationContext.getUrl())
+                .source(documentLocationCreationContext.getSource())
+                .downloaderVersion(documentLocationCreationContext.getDownloaderVersion())
+                .downloadResultCode(DocumentLocationResultType.UNKNOWN.name())
+                .build();
 
         return documentLocationRepository.existsOrInsert(documentLocationDatabaseEntity);
     }
