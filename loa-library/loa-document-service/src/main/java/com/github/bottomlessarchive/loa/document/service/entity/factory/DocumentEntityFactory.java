@@ -134,24 +134,20 @@ public class DocumentEntityFactory {
                 .map(value -> Set.of(hexConverter.decode(value)))
                 .orElse(Collections.emptySet());
 
-        final DocumentDatabaseEntity documentDatabaseEntity = new DocumentDatabaseEntity(
-                documentCreationContext.id(),
-
-                documentCreationContext.vault(),
-                documentCreationContext.type().toString(),
-                documentCreationContext.status().toString(),
-                documentCreationContext.compression().name(),
-
-                documentCreationContext.source(),
-                documentCreationContext.beacon(),
-                sourceLocations,
-
-                hexConverter.decode(documentCreationContext.checksum()),
-                documentCreationContext.fileSize(),
-
-                documentCreationContext.versionNumber(),
-                Instant.now()
-        );
+        final DocumentDatabaseEntity documentDatabaseEntity = DocumentDatabaseEntity.builder()
+                .id(documentCreationContext.id())
+                .vault(documentCreationContext.vault())
+                .type(documentCreationContext.type().toString())
+                .status(documentCreationContext.status().toString())
+                .compression(documentCreationContext.compression().name())
+                .source(documentCreationContext.source())
+                .beacon(documentCreationContext.beacon())
+                .sourceLocations(sourceLocations)
+                .checksum(hexConverter.decode(documentCreationContext.checksum()))
+                .fileSize(documentCreationContext.fileSize())
+                .downloaderVersion(documentCreationContext.versionNumber())
+                .downloadDate(Instant.now())
+                .build();
 
         try {
             documentRepository.insertDocument(documentDatabaseEntity);

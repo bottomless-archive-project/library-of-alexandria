@@ -1,7 +1,9 @@
 package com.github.bottomlessarchive.loa.location.repository.domain;
 
-import org.bson.codecs.record.annotations.BsonId;
+import lombok.Builder;
+import org.bson.codecs.pojo.annotations.BsonId;
 
+@Builder
 public record DocumentLocationDatabaseEntity(
 
         @BsonId

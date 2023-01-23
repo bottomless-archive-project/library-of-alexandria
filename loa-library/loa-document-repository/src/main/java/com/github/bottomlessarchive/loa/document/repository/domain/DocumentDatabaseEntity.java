@@ -1,12 +1,14 @@
 package com.github.bottomlessarchive.loa.document.repository.domain;
 
-import org.bson.codecs.record.annotations.BsonId;
+import lombok.Builder;
+import org.bson.codecs.pojo.annotations.BsonId;
 
 import java.time.Instant;
 import java.util.Collections;
 import java.util.Set;
 import java.util.UUID;
 
+@Builder
 public record DocumentDatabaseEntity(
 
         @BsonId

@@ -30,15 +30,14 @@ public class DocumentLocationEntityFactory {
                 );
     }
 
-    public boolean isDocumentLocationExistsOrCreate(
-            final DocumentLocationCreationContext documentLocationCreationContext) {
-        final DocumentLocationDatabaseEntity documentLocationDatabaseEntity = new DocumentLocationDatabaseEntity(
-                hexConverter.decode(documentLocationCreationContext.getId()),
-                documentLocationCreationContext.getUrl(),
-                documentLocationCreationContext.getSource(),
-                documentLocationCreationContext.getDownloaderVersion(),
-                DocumentLocationResultType.UNKNOWN.name()
-        );
+    public boolean isDocumentLocationExistsOrCreate(final DocumentLocationCreationContext documentLocationCreationContext) {
+        final DocumentLocationDatabaseEntity documentLocationDatabaseEntity = DocumentLocationDatabaseEntity.builder()
+                .id(hexConverter.decode(documentLocationCreationContext.getId()))
+                .url(documentLocationCreationContext.getUrl())
+                .source(documentLocationCreationContext.getSource())
+                .downloaderVersion(documentLocationCreationContext.getDownloaderVersion())
+                .downloadResultCode(DocumentLocationResultType.UNKNOWN.name())
+                .build();
 
         return documentLocationRepository.existsOrInsert(documentLocationDatabaseEntity);
     }
