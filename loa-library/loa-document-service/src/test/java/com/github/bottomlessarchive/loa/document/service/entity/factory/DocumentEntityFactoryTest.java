@@ -5,10 +5,10 @@ import com.github.bottomlessarchive.loa.document.repository.DocumentRepository;
 import com.github.bottomlessarchive.loa.document.repository.domain.DocumentDatabaseEntity;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentEntity;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentStatus;
-import com.github.bottomlessarchive.loa.document.service.domain.DocumentType;
 import com.github.bottomlessarchive.loa.document.service.entity.factory.domain.DocumentCreationContext;
 import com.github.bottomlessarchive.loa.document.service.entity.transformer.DocumentEntityTransformer;
-import com.github.bottomlessarchive.loa.repository.service.HexConverter;
+import com.github.bottomlessarchive.loa.number.service.HexConverter;
+import com.github.bottomlessarchive.loa.type.domain.DocumentType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -18,6 +18,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -57,7 +58,7 @@ class DocumentEntityFactoryTest {
                 .versionNumber(5)
                 .compression(DocumentCompression.GZIP)
                 .source("test-source")
-                .sourceLocationId("test-location-id")
+                .sourceLocationId(Optional.of("test-location-id"))
                 .build();
         when(hexConverter.decode("12345"))
                 .thenReturn(new byte[]{5, 6, 7});
@@ -110,7 +111,7 @@ class DocumentEntityFactoryTest {
                 .versionNumber(5)
                 .compression(DocumentCompression.GZIP)
                 .source("test-source")
-                .sourceLocationId(null)
+                .sourceLocationId(Optional.empty())
                 .build();
         when(hexConverter.decode("12345"))
                 .thenReturn(new byte[]{5, 6, 7});

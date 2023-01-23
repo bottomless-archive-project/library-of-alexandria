@@ -1,6 +1,5 @@
 package com.github.bottomlessarchive.loa.vault.service.location.file.domain;
 
-import com.github.bottomlessarchive.loa.compression.domain.DocumentCompression;
 import com.github.bottomlessarchive.loa.vault.domain.exception.StorageAccessException;
 import com.google.common.jimfs.Configuration;
 import com.google.common.jimfs.Jimfs;
@@ -44,7 +43,7 @@ class FileVaultLocationTest {
 
         Files.copy(new ByteArrayInputStream(testFileContent), testFilePath);
 
-        final FileVaultLocation underTest = new FileVaultLocation(testFilePath, DocumentCompression.NONE);
+        final FileVaultLocation underTest = new FileVaultLocation(testFilePath);
 
         final byte[] result = underTest.download().readAllBytes();
 
@@ -53,7 +52,7 @@ class FileVaultLocationTest {
 
     @Test
     void testDownloadWhenExceptionThrown() {
-        final FileVaultLocation underTest = new FileVaultLocation(fileSystem.getPath("/test"), DocumentCompression.NONE);
+        final FileVaultLocation underTest = new FileVaultLocation(fileSystem.getPath("/test"));
 
         // The message should be the same as used in the VaultClientService class!
         assertThrows(StorageAccessException.class, underTest::download, "Unable to get document content on a vault location!");

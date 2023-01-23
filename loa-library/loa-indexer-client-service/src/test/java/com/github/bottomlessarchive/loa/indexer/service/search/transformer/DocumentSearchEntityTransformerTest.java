@@ -2,9 +2,9 @@ package com.github.bottomlessarchive.loa.indexer.service.search.transformer;
 
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.elasticsearch.core.search.HitsMetadata;
-import com.github.bottomlessarchive.loa.document.service.domain.DocumentType;
 import com.github.bottomlessarchive.loa.indexer.service.search.domain.DocumentSearchEntity;
 import com.github.bottomlessarchive.loa.indexer.service.search.domain.SearchDatabaseEntity;
+import com.github.bottomlessarchive.loa.type.domain.DocumentType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

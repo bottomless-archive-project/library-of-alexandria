@@ -1,0 +1,34 @@
+apply plugin: 'org.springframework.boot'
+
+bootJar {
+    manifest {
+        attributes(
+                'Implementation-Title': 'Library of Alexandria - Staging Application',
+                'Implementation-Version': archiveVersion
+        )
+    }
+}
+
+bootBuildImage {
+    imageName = "bottomlessarchive/loa-staging-application:${rootProject.version.toString()}"
+    publish = true
+    docker {
+        publishRegistry {
+            username = dockerUser
+            password = dockerPassword
+            email = dockerEmail
+            url = "https://index.docker.io/v2/"
+        }
+    }
+}
+
+dependencies {
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-webflux'
+
+    implementation project(':loa-library:loa-conductor-client-service')
+
+    testImplementation project(':loa-library:loa-conductor-client-test')
+
+    testImplementation group: 'com.google.jimfs', name: 'jimfs', version: '1.2'
+    testImplementation group: 'commons-io', name: 'commons-io', version: '2.11.0'
+}

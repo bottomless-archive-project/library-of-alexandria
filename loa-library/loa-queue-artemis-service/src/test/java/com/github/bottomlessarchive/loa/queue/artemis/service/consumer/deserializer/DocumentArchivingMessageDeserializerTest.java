@@ -5,21 +5,15 @@ import org.apache.activemq.artemis.api.core.ActiveMQBuffer;
 import org.apache.activemq.artemis.api.core.client.ClientMessage;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class DocumentArchivingMessageDeserializerTest {
-
-    @Captor
-    private ArgumentCaptor<byte[]> byteArgumentCaptor;
 
     @InjectMocks
     private DocumentArchivingMessageDeserializer underTest;
@@ -34,28 +28,21 @@ class DocumentArchivingMessageDeserializerTest {
                 .thenReturn("id", "type", "source", "sourceLocationId");
         when(activeMQBuffer.readBoolean())
                 .thenReturn(true);
-        when(activeMQBuffer.readInt())
-                .thenReturn(5);
+        when(activeMQBuffer.readLong())
+                .thenReturn(5L);
 
         final DocumentArchivingMessage result = underTest.deserialize(clientMessage);
 
-        assertThat(result.getId())
+        assertThat(result.id())
                 .isEqualTo("id");
-        assertThat(result.getType())
+        assertThat(result.type())
                 .isEqualTo("type");
-        assertThat(result.getSource())
+        assertThat(result.source())
                 .isEqualTo("source");
-        assertThat(result.getSourceLocationId().isPresent())
-                .isTrue();
-        assertThat(result.getSourceLocationId().get())
-                .isEqualTo("sourceLocationId");
-        assertThat(result.getContentLength())
-                .isEqualTo(5);
-        verify(activeMQBuffer).readBytes(byteArgumentCaptor.capture());
-        final byte[] content = byteArgumentCaptor.getValue();
-        assertThat(result.getContent())
-                .isEqualTo(content);
-        assertThat(content.length)
+        assertThat(result.sourceLocationId())
+                .isPresent()
+                .hasValue("sourceLocationId");
+        assertThat(result.contentLength())
                 .isEqualTo(5);
     }
 
@@ -69,26 +56,20 @@ class DocumentArchivingMessageDeserializerTest {
                 .thenReturn("id", "type", "source");
         when(activeMQBuffer.readBoolean())
                 .thenReturn(false);
-        when(activeMQBuffer.readInt())
-                .thenReturn(5);
+        when(activeMQBuffer.readLong())
+                .thenReturn(5L);
 
         final DocumentArchivingMessage result = underTest.deserialize(clientMessage);
 
-        assertThat(result.getId())
+        assertThat(result.id())
                 .isEqualTo("id");
-        assertThat(result.getType())
+        assertThat(result.type())
                 .isEqualTo("type");
-        assertThat(result.getSource())
+        assertThat(result.source())
                 .isEqualTo("source");
-        assertThat(result.getSourceLocationId().isPresent())
-                .isFalse();
-        assertThat(result.getContentLength())
-                .isEqualTo(5);
-        verify(activeMQBuffer).readBytes(byteArgumentCaptor.capture());
-        final byte[] content = byteArgumentCaptor.getValue();
-        assertThat(result.getContent())
-                .isEqualTo(content);
-        assertThat(content.length)
+        assertThat(result.sourceLocationId())
+                .isEmpty();
+        assertThat(result.contentLength())
                 .isEqualTo(5);
     }
 }

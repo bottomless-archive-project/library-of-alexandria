@@ -1,5 +1,6 @@
 package com.github.bottomlessarchive.loa.administrator.command.compressor;
 
+import com.github.bottomlessarchive.loa.administrator.command.compressor.configuration.SilentCompressorConfigurationProperties;
 import com.github.bottomlessarchive.loa.document.service.entity.factory.DocumentEntityFactory;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentEntity;
 import com.github.bottomlessarchive.loa.vault.client.service.VaultClientService;
@@ -22,7 +23,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-@ConditionalOnProperty("silent-compressor")
+@ConditionalOnProperty(name = "loa.command", havingValue = "silent-compressor")
 public class SilentCompressorCommand implements CommandLineRunner {
 
     private final DocumentEntityFactory documentEntityFactory;

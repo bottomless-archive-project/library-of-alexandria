@@ -21,7 +21,7 @@ public class IndexerCommand implements CommandLineRunner {
     private final IndexerConfigurationProperties indexerConfigurationProperties;
 
     @Override
-    public void run(final String... args) {
+    public void run(final String... args) throws InterruptedException {
         if (!documentSearchClient.isSearchEngineInitialized()) {
             log.info("Initializing the search engine!");
 
@@ -30,8 +30,14 @@ public class IndexerCommand implements CommandLineRunner {
 
         log.info("Start document indexing.");
 
-        documentEntityFactory.getDocumentEntity(DocumentStatus.DOWNLOADED, indexerConfigurationProperties.batchSize())
-                .forEach(documentEntityIndexer::processDocumentEntity);
+        while (true) {
+            documentEntityFactory.getDocumentEntity(DocumentStatus.DOWNLOADED, indexerConfigurationProperties.batchSize())
+                    .forEach(documentEntityIndexer::processDocumentEntity);
+
+            log.info("Finished indexing a batch of documents. Waiting five second before looking for new ones.");
+
+            Thread.sleep(5000);
+        }
     }
 
 }

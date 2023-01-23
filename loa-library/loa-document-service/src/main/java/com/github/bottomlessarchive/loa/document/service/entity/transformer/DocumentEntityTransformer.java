@@ -1,11 +1,11 @@
 package com.github.bottomlessarchive.loa.document.service.entity.transformer;
 
 import com.github.bottomlessarchive.loa.compression.domain.DocumentCompression;
-import com.github.bottomlessarchive.loa.repository.service.HexConverter;
+import com.github.bottomlessarchive.loa.number.service.HexConverter;
 import com.github.bottomlessarchive.loa.document.repository.domain.DocumentDatabaseEntity;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentEntity;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentStatus;
-import com.github.bottomlessarchive.loa.document.service.domain.DocumentType;
+import com.github.bottomlessarchive.loa.type.domain.DocumentType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +29,7 @@ public class DocumentEntityTransformer {
                 .downloaderVersion(documentDatabaseEntity.downloaderVersion())
                 .compression(DocumentCompression.valueOf(documentDatabaseEntity.compression()))
                 .source(documentDatabaseEntity.source())
+                .beacon(documentDatabaseEntity.beacon())
                 .sourceLocations(documentDatabaseEntity.sourceLocations().stream()
                         .map(hexConverter::encode)
                         .collect(Collectors.toSet())

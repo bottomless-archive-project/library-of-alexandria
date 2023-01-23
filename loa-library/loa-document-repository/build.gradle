@@ -1,3 +1,5 @@
 dependencies {
     api project(':loa-library:loa-repository')
+
+    implementation project(':loa-library:loa-number-service')
 }

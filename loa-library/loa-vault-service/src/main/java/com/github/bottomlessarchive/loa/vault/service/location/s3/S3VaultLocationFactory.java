@@ -20,11 +20,6 @@ public class S3VaultLocationFactory implements VaultLocationFactory {
     private final S3ConfigurationProperties s3ConfigurationProperties;
 
     @Override
-    public VaultLocation getLocation(final DocumentEntity documentEntity) {
-        return getLocation(documentEntity, documentEntity.getCompression());
-    }
-
-    @Override
     public VaultLocation getLocation(final DocumentEntity documentEntity, final DocumentCompression compression) {
         final String fileName = compression == DocumentCompression.NONE
                 ? documentEntity.getId() + "." + documentEntity.getType().getFileExtension()
@@ -34,7 +29,7 @@ public class S3VaultLocationFactory implements VaultLocationFactory {
                 ? documentEntity.getType().getMimeType()
                 : compression.getMimeType();
 
-        return new S3VaultLocation(s3ConfigurationProperties.bucketName(), fileName, contentType, s3Client, compression);
+        return new S3VaultLocation(s3ConfigurationProperties.bucketName(), fileName, contentType, s3Client);
     }
 
     /**

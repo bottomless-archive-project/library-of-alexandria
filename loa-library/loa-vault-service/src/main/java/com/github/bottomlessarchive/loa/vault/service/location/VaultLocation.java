@@ -1,10 +1,8 @@
 package com.github.bottomlessarchive.loa.vault.service.location;
 
-import com.github.bottomlessarchive.loa.compression.domain.DocumentCompression;
 import com.github.bottomlessarchive.loa.vault.domain.exception.StorageAccessException;
 
 import java.io.InputStream;
-import java.util.Optional;
 
 /**
  * A location on the storage media where a document's contents are stored.
@@ -17,7 +15,7 @@ public interface VaultLocation {
      *
      * @throws StorageAccessException when unable to create the destination file
      */
-    void upload(byte[] documentContents);
+    void upload(InputStream documentContents, long contentLength);
 
     /**
      * Return the content of the document in the vault.
@@ -38,11 +36,4 @@ public interface VaultLocation {
      * Removes any previously stored data from the document.
      */
     void clear();
-
-    /**
-     * Return the compression of the document on the location.
-     *
-     * @return the compression of the document on the location
-     */
-    Optional<DocumentCompression> getCompression();
 }

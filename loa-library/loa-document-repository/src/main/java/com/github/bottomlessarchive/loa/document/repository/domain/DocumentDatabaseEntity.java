@@ -18,6 +18,7 @@ public record DocumentDatabaseEntity(
         String compression,
 
         String source,
+        String beacon,
         Set<byte[]> sourceLocations,
 
         byte[] checksum,

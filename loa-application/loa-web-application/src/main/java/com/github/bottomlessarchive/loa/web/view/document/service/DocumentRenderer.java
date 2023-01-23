@@ -16,6 +16,7 @@ import java.io.InputStream;
 @RequiredArgsConstructor
 public class DocumentRenderer {
 
+    //TODO: This should be moved into its own module!
     public byte[] renderFirstPage(final InputStream documentContent) {
         try (PDDocument document = PDDocument.load(documentContent); documentContent) {
             final PDFRenderer pdfRenderer = new PDFRenderer(document);

@@ -1,7 +1,7 @@
 package com.github.bottomlessarchive.loa.parser.configuration;
 
-import com.github.bottomlessarchive.loa.document.service.domain.DocumentType;
 import com.github.bottomlessarchive.loa.parser.service.parser.ExceptionParser;
+import com.github.bottomlessarchive.loa.type.domain.DocumentType;
 import com.github.pemistahl.lingua.api.LanguageDetector;
 import com.github.pemistahl.lingua.api.LanguageDetectorBuilder;
 import org.apache.tika.mime.MediaType;
@@ -14,6 +14,8 @@ import org.apache.tika.parser.microsoft.OfficeParser;
 import org.apache.tika.parser.microsoft.ooxml.OOXMLParser;
 import org.apache.tika.parser.microsoft.rtf.RTFParser;
 import org.apache.tika.parser.pdf.PDFParser;
+import org.apache.tika.parser.txt.TXTParser;
+import org.apache.tika.parser.xml.FictionBookParser;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -43,6 +45,12 @@ public class DocumentParserConfiguration {
                         MediaType.parse(DocumentType.DOCX.getMimeType()),
                         MediaType.parse(DocumentType.PPTX.getMimeType()),
                         MediaType.parse(DocumentType.XLSX.getMimeType())
+                )),
+                ParserDecorator.withTypes(new FictionBookParser(), Set.of(
+                        MediaType.parse(DocumentType.FB2.getMimeType())
+                )),
+                ParserDecorator.withTypes(new TXTParser(), Set.of(
+                        MediaType.parse(DocumentType.TXT.getMimeType())
                 ))
         );
 

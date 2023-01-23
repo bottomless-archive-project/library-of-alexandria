@@ -3,6 +3,7 @@ package com.github.bottomlessarchive.loa.conductor.service.domain;
 import com.github.bottomlessarchive.loa.application.domain.ApplicationType;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.Instant;
@@ -15,6 +16,7 @@ import java.util.UUID;
 @Slf4j
 @Getter
 @Builder
+@ToString
 public class ServiceInstanceEntity {
 
     private final UUID id;
@@ -63,5 +65,9 @@ public class ServiceInstanceEntity {
         return lastHeartbeat.plus(2, ChronoUnit.MINUTES).isAfter(Instant.now())
                 || applicationType.equals(ApplicationType.DOCUMENT_DATABASE)
                 || applicationType.equals(ApplicationType.DOCUMENT_INDEX);
+    }
+
+    public String getAsHttpLocation() {
+        return "http://" + location + ":" + port;
     }
 }

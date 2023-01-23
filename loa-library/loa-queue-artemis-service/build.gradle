@@ -2,12 +2,6 @@ dependencies {
     api project(':loa-library:loa-queue-service')
     implementation project(':loa-library:loa-conductor-client-service')
 
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
-
-    implementation group: 'javax.json', name: 'javax.json-api', version: '1.1.4'
-
-    implementation group: 'com.github.chrisvest', name: 'stormpot', version: '3.1'
-
     implementation group: 'org.apache.activemq', name: 'artemis-core-client'
     compileOnly group: 'org.apache.activemq', name: 'artemis-server'
 }

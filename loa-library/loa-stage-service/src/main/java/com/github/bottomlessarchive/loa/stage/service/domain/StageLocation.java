@@ -65,4 +65,17 @@ public class StageLocation {
             throw new StageAccessException("Unable to delete staged document!", e);
         }
     }
+
+    /**
+     * Moves the content of the stage location to the provided path.
+     *
+     * @param newPath the new path to move the content to
+     */
+    public void moveTo(final Path newPath) {
+        try {
+            Files.move(path, newPath);
+        } catch (IOException e) {
+            throw new StageAccessException("Unable to move staged document!", e);
+        }
+    }
 }

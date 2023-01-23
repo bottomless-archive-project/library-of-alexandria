@@ -1,4 +1,6 @@
 dependencies {
+    implementation project(':loa-library:loa-url-service')
+    implementation project(':loa-library:loa-number-service')
     implementation project(':loa-library:loa-document-service')
     implementation project(':loa-library:loa-document-location-repository')
 

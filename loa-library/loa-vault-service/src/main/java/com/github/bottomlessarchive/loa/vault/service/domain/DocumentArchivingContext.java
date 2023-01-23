@@ -1,26 +1,40 @@
 package com.github.bottomlessarchive.loa.vault.service.domain;
 
-import com.github.bottomlessarchive.loa.document.service.domain.DocumentType;
+import com.github.bottomlessarchive.loa.compression.domain.DocumentCompression;
+import com.github.bottomlessarchive.loa.type.domain.DocumentType;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.NonNull;
 
 import java.util.Optional;
 import java.util.UUID;
 
-@Getter
 @Builder
-public class DocumentArchivingContext {
+public record DocumentArchivingContext(
 
-    private final UUID id;
-    private final String vault;
-    private final DocumentType type;
-    private final String source;
-    private final String sourceLocationId;
-    private final int contentLength;
-    private final byte[] content;
-    private final int versionNumber;
+        @NonNull
+        UUID id,
 
-    public Optional<String> getSourceLocationId() {
-        return Optional.ofNullable(sourceLocationId);
-    }
+        @NonNull
+        String vault,
+
+        @NonNull
+        DocumentType type,
+
+        @NonNull
+        String source,
+
+        @NonNull
+        Optional<String> sourceLocationId,
+
+        @NonNull
+        String checksum,
+
+        @NonNull
+        DocumentCompression compression,
+
+        boolean fromBeacon,
+        long contentLength,
+        long originalContentLength,
+        int versionNumber
+) {
 }

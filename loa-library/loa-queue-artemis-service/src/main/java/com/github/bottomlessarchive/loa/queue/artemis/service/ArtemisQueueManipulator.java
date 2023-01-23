@@ -1,9 +1,9 @@
 package com.github.bottomlessarchive.loa.queue.artemis.service;
 
 import com.github.bottomlessarchive.loa.queue.artemis.configuration.QueueServerConfiguration;
-import com.github.bottomlessarchive.loa.queue.artemis.service.consumer.ClientConsumerExecutor;
 import com.github.bottomlessarchive.loa.queue.artemis.service.consumer.deserializer.MessageDeserializerProvider;
-import com.github.bottomlessarchive.loa.queue.artemis.service.producer.ClientProducerExecutor;
+import com.github.bottomlessarchive.loa.queue.artemis.service.consumer.pool.QueueConsumerProvider;
+import com.github.bottomlessarchive.loa.queue.artemis.service.producer.pool.QueueProducerProvider;
 import com.github.bottomlessarchive.loa.queue.artemis.service.producer.serializer.MessageSerializer;
 import com.github.bottomlessarchive.loa.queue.artemis.service.producer.serializer.MessageSerializerProvider;
 import com.github.bottomlessarchive.loa.queue.service.QueueManipulator;
@@ -12,7 +12,6 @@ import com.github.bottomlessarchive.loa.queue.service.domain.QueueException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.artemis.api.core.ActiveMQException;
-import org.apache.activemq.artemis.api.core.ActiveMQLargeMessageInterruptedException;
 import org.apache.activemq.artemis.api.core.QueueConfiguration;
 import org.apache.activemq.artemis.api.core.RoutingType;
 import org.apache.activemq.artemis.api.core.SimpleString;
@@ -21,6 +20,8 @@ import org.apache.activemq.artemis.api.core.client.ClientSession;
 import org.apache.activemq.artemis.api.core.client.ClientSessionFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 /**
  * A {@link QueueManipulator} implementation for Apache Artemis.
@@ -34,10 +35,24 @@ import org.springframework.stereotype.Service;
 public class ArtemisQueueManipulator implements QueueManipulator {
 
     private final ClientSessionFactory clientSessionFactory;
-    private final ClientConsumerExecutor clientConsumerExecutor;
-    private final ClientProducerExecutor clientProducerExecutor;
+    private final QueueConsumerProvider queueConsumerProvider;
+    private final QueueProducerProvider queueProducerProvider;
     private final MessageSerializerProvider messageSerializerProvider;
     private final MessageDeserializerProvider messageDeserializerProvider;
+
+    /**
+     * Initialize the queues in the Queue Application if it does not exist. If one of the queues already exist it does nothing for that
+     * queue.
+     *
+     * @param queues the queues to initialize
+     * @throws QueueException when an error happens while trying to create the queue
+     */
+    @Override
+    public void silentlyInitializeQueues(final Queue... queues) {
+        for (final Queue queue : queues) {
+            silentlyInitializeQueue(queue);
+        }
+    }
 
     /**
      * Initialize the queue in the Queue Application if it doesn't exist. If the queue already exist it does nothing.
@@ -54,6 +69,9 @@ public class ArtemisQueueManipulator implements QueueManipulator {
             if (!queueQuery.isExists()) {
                 initializeQueue(queue);
             }
+
+            log.info("Initialized queue processing! There are {} messages available in the {} queue!", getMessageCount(queue),
+                    queue.getName());
         } catch (final ActiveMQException e) {
             throw new QueueException("Unable to initialize the " + queue.getName() + " queue!", e);
         }
@@ -117,13 +135,15 @@ public class ArtemisQueueManipulator implements QueueManipulator {
 
         final ClientMessage clientMessage = messageSerializer.serialize(message);
 
-        clientProducerExecutor.invokeProducer(queue, clientProducer -> {
-            try {
-                clientProducer.send(clientMessage);
-            } catch (final ActiveMQException e) {
-                throw new QueueException("Unable to send message to the " + queue.getName() + " queue!", e);
+        try {
+            synchronized (this) {
+                queueProducerProvider.getProducer(queue)
+                        .getClientProducer()
+                        .send(clientMessage);
             }
-        });
+        } catch (final ActiveMQException e) {
+            throw new QueueException("Unable to send message to the " + queue.getName() + " queue!", e);
+        }
     }
 
     /**
@@ -136,27 +156,23 @@ public class ArtemisQueueManipulator implements QueueManipulator {
      */
     @Override
     @SuppressWarnings("unchecked")
-    public <T> T readMessage(final Queue queue, final Class<T> resultType) {
-        return clientConsumerExecutor.invokeConsumer(queue, clientConsumer -> {
-            try {
-                final ClientMessage clientMessage = clientConsumer.receive();
+    public <T> Optional<T> readMessage(final Queue queue, final Class<T> resultType) {
+        try {
+            final ClientMessage clientMessage = queueConsumerProvider.getConsumer(queue)
+                    .getClientConsumer()
+                    .receive(100);
 
-                // The deserialization should be done inside the invocation because the message is only readable while the consumer is
-                // locked (and doesn't read a new message for another thread).
-                return (T) messageDeserializerProvider.getDeserializer(queue)
-                        .orElseThrow(() -> new QueueException("No deserializer found for queue: " + queue.getName() + "!"))
-                        .deserialize(clientMessage);
-            } catch (final ActiveMQException e) {
-                throw new QueueException("Unable to read message from the " + queue.getName() + " queue!", e);
-            } catch (final RuntimeException e) {
-                // Artemis sometimes throws a RuntimeException that wraps a named exception, even after a named exception happened
-                // inside the artemis client. See: https://issues.apache.org/jira/browse/ARTEMIS-3588
-                if (e.getCause() instanceof ActiveMQLargeMessageInterruptedException) {
-                    throw new QueueException("Unrecoverable error happened when reading a large message.", e);
-                } else {
-                    throw e;
-                }
+            if (clientMessage == null) {
+                return Optional.empty();
             }
-        });
+
+            final T deserializedClientMessage = (T) messageDeserializerProvider.getDeserializer(queue)
+                    .orElseThrow(() -> new QueueException("No deserializer found for queue: " + queue.getName() + "!"))
+                    .deserialize(clientMessage);
+
+            return Optional.of(deserializedClientMessage);
+        } catch (final ActiveMQException e) {
+            throw new QueueException("Unable to read message from the " + queue.getName() + " queue!", e);
+        }
     }
 }

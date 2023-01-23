@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-@ConditionalOnProperty("recollect-corrupt-documents")
+@ConditionalOnProperty(name = "loa.command", havingValue = "recollect-corrupt-documents")
 public class RecollectCorruptDocumentsCommand implements CommandLineRunner {
 
     private final DocumentEntityFactory documentEntityFactory;

@@ -1,10 +1,11 @@
 package com.github.bottomlessarchive.loa.administrator.command.recollect;
 
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentEntity;
-import com.github.bottomlessarchive.loa.document.service.domain.DocumentType;
+import com.github.bottomlessarchive.loa.io.service.downloader.FileDownloadManager;
+import com.github.bottomlessarchive.loa.location.service.factory.domain.DocumentLocation;
 import com.github.bottomlessarchive.loa.stage.service.StageLocationFactory;
 import com.github.bottomlessarchive.loa.stage.service.domain.StageLocation;
-import com.github.bottomlessarchive.loa.url.service.downloader.FileDownloadManager;
+import com.github.bottomlessarchive.loa.type.domain.DocumentType;
 import com.github.bottomlessarchive.loa.validator.service.DocumentFileValidator;
 import com.github.bottomlessarchive.loa.vault.client.service.VaultClientService;
 import org.junit.jupiter.api.Test;
@@ -44,30 +45,33 @@ class SourceLocationRecrawlerServiceTest {
 
     @Test
     void testRecrawlSourceLocationWhenSourceIsDownloadabe() throws MalformedURLException {
-        final URL sourceLocation = new URL("http://example.com/");
+        final DocumentLocation documentLocation = DocumentLocation.builder()
+                .id("test-id")
+                .url("http://example.com/")
+                .build();
         final DocumentEntity documentEntity = DocumentEntity.builder()
                 .type(DocumentType.PDF)
                 .build();
 
         final StageLocation stageLocation = mock(StageLocation.class);
-        when(stageLocationFactory.getLocation(any(), eq(DocumentType.PDF)))
+        when(stageLocationFactory.getLocation(any()))
                 .thenReturn(stageLocation);
 
         final Path mockPath = mock(Path.class);
         when(stageLocation.getPath())
                 .thenReturn(mockPath);
 
-        when(documentFileValidator.isValidDocument(any(), eq(DocumentType.PDF)))
+        when(documentFileValidator.isValidDocument(any(), eq(stageLocation), eq(DocumentType.PDF)))
                 .thenReturn(true);
 
         final byte[] content = {1, 2, 3};
         when(stageLocation.openStream())
                 .thenReturn(new ByteArrayInputStream(content));
 
-        underTest.recrawlSourceLocation(sourceLocation, documentEntity);
+        underTest.recrawlSourceLocation(documentLocation, documentEntity);
 
         verify(stageLocation).cleanup();
-        verify(fileDownloadManager).downloadFile(sourceLocation, mockPath);
+        verify(fileDownloadManager).downloadFile(eq(new URL("http://example.com/")), eq(mockPath));
         verify(vaultClientService).replaceCorruptDocument(documentEntity, content);
     }
 }

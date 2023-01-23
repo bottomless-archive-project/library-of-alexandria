@@ -1,8 +1,4 @@
 dependencies {
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter'
-
-    implementation group: 'com.squareup.okhttp3', name: 'okhttp'
-    implementation group: 'com.github.davidmoten', name: 'io-extras', version: '0.1.4'
-
-    implementation group: 'io.mola.galimatias', name: 'galimatias', version: '0.2.1'
+    api project(':loa-library:loa-file-service')
+    api project(':loa-library:loa-document-type-service')
 }

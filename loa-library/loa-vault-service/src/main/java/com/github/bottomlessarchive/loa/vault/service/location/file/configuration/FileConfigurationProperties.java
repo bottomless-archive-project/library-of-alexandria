@@ -3,6 +3,8 @@ package com.github.bottomlessarchive.loa.vault.service.location.file.configurati
 import com.github.bottomlessarchive.loa.vault.domain.VaultType;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import java.nio.file.Path;
+
 /**
  * A {@link ConfigurationProperties} class that contains the configuration of the vault location if the vault type
  * property is {@link VaultType#FILE} at runtime.
@@ -12,6 +14,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties("loa.vault.location.file")
 public record FileConfigurationProperties(
 
-        String path
+        Path path
 ) {
 }

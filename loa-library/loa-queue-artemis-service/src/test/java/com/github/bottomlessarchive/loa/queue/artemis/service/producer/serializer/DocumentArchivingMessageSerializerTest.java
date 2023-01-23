@@ -12,6 +12,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Optional;
+
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -36,9 +38,11 @@ class DocumentArchivingMessageSerializerTest {
                 .id("id")
                 .type("type")
                 .source("source")
-                .sourceLocationId("sourceLocationId")
+                .sourceLocationId(Optional.of("sourceLocationId"))
                 .contentLength(5)
-                .content(new byte[]{1, 2, 3})
+                .originalContentLength(8)
+                .checksum("checksum")
+                .compression("compression")
                 .build();
 
         underTest.serialize(documentArchivingMessage);
@@ -50,8 +54,10 @@ class DocumentArchivingMessageSerializerTest {
         inOrder.verify(bodyBuffer).writeString("source");
         inOrder.verify(bodyBuffer).writeBoolean(true);
         inOrder.verify(bodyBuffer).writeString("sourceLocationId");
-        inOrder.verify(bodyBuffer).writeInt(5);
-        inOrder.verify(bodyBuffer).writeBytes(new byte[]{1, 2, 3});
+        inOrder.verify(bodyBuffer).writeLong(5);
+        inOrder.verify(bodyBuffer).writeLong(8);
+        inOrder.verify(bodyBuffer).writeString("checksum");
+        inOrder.verify(bodyBuffer).writeString("compression");
         inOrder.verifyNoMoreInteractions();
     }
 
@@ -67,9 +73,11 @@ class DocumentArchivingMessageSerializerTest {
                 .id("id")
                 .type("type")
                 .source("source")
-                .sourceLocationId(null)
+                .sourceLocationId(Optional.empty())
                 .contentLength(5)
-                .content(new byte[]{1, 2, 3})
+                .originalContentLength(8)
+                .checksum("checksum")
+                .compression("compression")
                 .build();
 
         underTest.serialize(documentArchivingMessage);
@@ -80,8 +88,10 @@ class DocumentArchivingMessageSerializerTest {
         inOrder.verify(bodyBuffer).writeString("type");
         inOrder.verify(bodyBuffer).writeString("source");
         inOrder.verify(bodyBuffer).writeBoolean(false);
-        inOrder.verify(bodyBuffer).writeInt(5);
-        inOrder.verify(bodyBuffer).writeBytes(new byte[]{1, 2, 3});
+        inOrder.verify(bodyBuffer).writeLong(5);
+        inOrder.verify(bodyBuffer).writeLong(8);
+        inOrder.verify(bodyBuffer).writeString("checksum");
+        inOrder.verify(bodyBuffer).writeString("compression");
         inOrder.verifyNoMoreInteractions();
     }
 }

@@ -35,15 +35,22 @@ public class DocumentArchivingMessageSerializer implements MessageSerializer<Doc
             final ClientMessage clientMessage) {
         final ActiveMQBuffer bodyBuffer = clientMessage.getBodyBuffer();
 
-        bodyBuffer.writeString(documentArchivingMessage.getId());
-        bodyBuffer.writeString(documentArchivingMessage.getType());
-        bodyBuffer.writeString(documentArchivingMessage.getSource());
-        bodyBuffer.writeBoolean(documentArchivingMessage.hasSourceLocationId());
-        if (documentArchivingMessage.hasSourceLocationId()) {
-            documentArchivingMessage.getSourceLocationId()
-                    .ifPresent(bodyBuffer::writeString);
-        }
-        bodyBuffer.writeInt(documentArchivingMessage.getContentLength());
-        bodyBuffer.writeBytes(documentArchivingMessage.getContent());
+        bodyBuffer.writeString(documentArchivingMessage.id());
+        bodyBuffer.writeBoolean(documentArchivingMessage.fromBeacon());
+        bodyBuffer.writeString(documentArchivingMessage.type());
+        bodyBuffer.writeString(documentArchivingMessage.source());
+        documentArchivingMessage.sourceLocationId()
+                .ifPresentOrElse(
+                        value -> {
+                            bodyBuffer.writeBoolean(true);
+                            bodyBuffer.writeString(value);
+                        },
+                        () -> bodyBuffer.writeBoolean(false)
+                );
+
+        bodyBuffer.writeLong(documentArchivingMessage.contentLength());
+        bodyBuffer.writeLong(documentArchivingMessage.originalContentLength());
+        bodyBuffer.writeString(documentArchivingMessage.checksum());
+        bodyBuffer.writeString(documentArchivingMessage.compression());
     }
 }

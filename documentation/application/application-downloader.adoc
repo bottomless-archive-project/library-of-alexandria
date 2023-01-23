@@ -1,8 +1,21 @@
+:application-type: DOWNLOADER_APPLICATION
+:application-name: Downloader Application
+
 = Downloader Application
+
+This application grabs the document locations from the <<Queue Application>> and downloads the documents from those locations.
 
 == Workflow
 
-This application is responsible for reading out the document locations from the <<Queue Application>> and downloading its contents.
+The <<Downloader Application>> connects to the <<Queue Application>>, grabs document locations from the document location queue.
+
+Then the documents are validated and the valid documents being sent to the <<Staging Application>>. If compression is enabled, then the documents are compressed before being uploaded.
+
+Some document metadata is also put into the document queue on the <<Queue Application>>.
+
+The metadata is necessary, so the <<Vault Application>> will be able to download the document from the <<Staging Application>> and archive it.
+
+The <<Downloader Application>> is scalable so if one machine is working at full capacity (either it's at 100% CPU or RAM), but the network is still not saturated, a new application can be started on a different machine.
 
 .Parameters
 |===
@@ -14,10 +27,7 @@ include::../service/conductor/conductor-configuration.adoc[]
 | The location where the document files are first downloaded. After some validation and occasionally modification (compression etc) it is moved to the vault. *(Default value: temp folder)*
 
 | **loa.downloader.version-number**
-| The version number that should be saved as the downloader version to the database when a new document is inserted. Can be used for debugging, cleanups and so on. *(Default value: 2)*
-
-| **loa.downloader.maximum-archive-size**
-| If a document's size in bytes is bigger than the provided value, then the archiving step will be skipped. Too big documents can use up way too much space, compared to how useful they are. This parameter could be used to defend against this problem. *(Default value: 8589934592 bytes aka 8 GB)*
+| The version number that should be saved as the downloader version to the database when a new document is inserted. Can be used for debugging, cleanups and so on. *(Default value: 6)*
 
 | **loa.downloader.source**
 | Two types of document sources are supported by the downloader application. One of this is the `QUEUE` source, where the application get the possible locations of documents (URLs), and download them from there, then sends them for archiving. The other one is `FOLDER`, where the application load document files from a provided folder on the filesystem, and sends them for archiving. *(Default value: QUEUE)*
@@ -31,13 +41,16 @@ include::../service/conductor/conductor-configuration.adoc[]
 | **loa.downloader.source.folder.should-remove**
 | When the source is set to `FOLDER`, should the application remove the files after processing from the folder. Useful when there are a lot of entries in the directory and can't be processed with one go. *(Default value: false)*
 
+| **loa.validation.maximum-archive-size**
+| If a document's size in bytes is bigger than the provided value, then the archiving step will be skipped. Too big documents can use up way too much space, compared to how useful they are. This parameter could be used to defend against this problem. Also, if the disk space on the stage location is lower than this value, the processing will stop to guard against filling the disk fully and breaking the processing algorithm. *(Default value: 8589934592 bytes aka 8 GB)*
+
 | **loa.source.name**
 | The name of the source location. This name will be saved to the database for every crawled document. It could be helpful for statistics collection or in identifying bugs and errors with specific sources. Only used when the `loa.downloader.source` is set to `FOLDER`. When `QUEUE` is specified, then the value that is saved to the database will be sent by the <<Generator Application>>. *(Default value: unknown)*
 
-| **loa.queue.producer-pool-size**
-| The number of consumer connections to the <<Queue Application>>.*(Default value: 10)*
+| **loa.compression.algorithm**
+| This property describes what compression algorithm should be used while saving documents to the vault. The available values are `lzma`, `gzip`, `none`. https://en.wikipedia.org/wiki/Lempel%E2%80%93Ziv%E2%80%93Markov_chain_algorithm[LZMA] has the best compression ratios while being quite CPU resource-intensive, https://en.wikipedia.org/wiki/Gzip[GZIP] is better than no compression, but a little worse than LZMA while having minimal CPU footprint while `none` is saving the documents without compression. *(Default value: gzip)*
 
-| **loa.queue.consumer-pool-size**
-| The number of producer connections to the <<Queue Application>>.*(Default value: 10)*
+| **loa.checksum.type**
+| The type of the hashing algorithm used to create the document's checksum. At the moment only `SHA256` is available for this purpose. *(Default value: sha256)*
 
 |===

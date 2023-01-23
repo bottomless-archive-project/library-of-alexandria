@@ -13,6 +13,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @param archiving           If this vault should archive new documents.
  * @param versionNumber       This version number will be saved to the database for every document that has been archived. It will be used
  *                            later on if it's necessary to run cleanup or fixing tasks that are specific to a given version.
+ * @param parallelism         The number of documents that should be saved in parallel at the same time.
  */
 @ConfigurationProperties("loa.vault")
 public record VaultConfigurationProperties(
@@ -20,6 +21,7 @@ public record VaultConfigurationProperties(
         String name,
         boolean modificationEnabled,
         boolean archiving,
-        int versionNumber
+        int versionNumber,
+        int parallelism
 ) {
 }

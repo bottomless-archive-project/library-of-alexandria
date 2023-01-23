@@ -1,8 +1,8 @@
 package com.github.bottomlessarchive.loa.web.view.document.controller;
 
-import com.github.bottomlessarchive.loa.document.service.domain.DocumentType;
 import com.github.bottomlessarchive.loa.document.service.entity.factory.DocumentEntityFactory;
 import com.github.bottomlessarchive.loa.document.view.service.MediaTypeCalculator;
+import com.github.bottomlessarchive.loa.type.domain.DocumentType;
 import com.github.bottomlessarchive.loa.vault.client.service.VaultClientService;
 import com.github.bottomlessarchive.loa.web.view.document.service.DocumentRenderer;
 import lombok.RequiredArgsConstructor;

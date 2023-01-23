@@ -8,6 +8,7 @@ public record DocumentLocationDatabaseEntity(
         byte[] id,
         String url,
         String source,
-        int downloaderVersion
+        int downloaderVersion,
+        String downloadResultCode
 ) {
 }

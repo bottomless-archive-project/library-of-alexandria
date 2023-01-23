@@ -1,12 +1,17 @@
+:application-type: GENERATOR_APPLICATION
+:application-name: Generator Application
+
 = Generator Application
 
-This application's goal is to fill the <<Queue Application>> with downloadable document locations (links).
+This application's goal is to fill the <<Queue Application>> with downloadable document locations (links/urls).
 
 == Workflow
 
 The Generator Application connects to the <<Queue Application>> and send URLs to be checked and downloaded by the <<Downloader Application>>.
 
-These URLs could come from various sources, the most common is a local file.
+These URLs can come from a file that is either encrypted (with GZIP) or plain text. The file is read line by line. Each line should represent a document location.
+
+The URLs are validated by the <<Generator Application>>. So if an url doesn't end with one of the supported file types (ie.: .pdf, .doc, .docx, etc) then it is not going to be added to the document location queue. Also, other illegal or invalid urls will be filtered out too.
 
 NOTE: If you do not have a lot of URLs ready at hand, take a look into the https://github.com/bottomless-archive-project/url-collector[url-collector] project or into the https://github.com/bottomless-archive-project/document-location-database[document-location-database]. These projects are also curated by the _Bottomless Archive Project_ and are created for the specific purpose to give easy access for LoA users to a lot of possible document locations.
 
@@ -20,17 +25,14 @@ include::../service/conductor/conductor-configuration.adoc[]
 | The name of the source location. This name will be saved to the database for every crawled document. It could be helpful for statistics collection or in identifying bugs and errors with specific sources. *(Default value: unknown)*
 
 | **loa.source.type**
-| Describes the type of the source. The only one supported at the moment is `file`. If the value is file then the location data will be loaded from a local file. *(Default value: file)*
+| Describes the type of the source. The only one supported at the moment is `file`. If the value is file then the location data will be loaded from a local file. A location is represented as one line inside the file. *(Default value: file)*
 
 | **loa.source.file.location**
 | Used only when `loa.source.type` is set to `file`. The location of the source file on the disk. It's not a problem if it contains non-pdf files.
 
 | **loa.source.file.encoding**
-| Used only when `loa.source.type` is set to `file`. It can be set to `none` or gzip. If it's set to `none` then the file will be read as a non-compressed file. If it's set to `gzip` then it will be red as a gzipped file, being unzipped on the fly. *(Default value: none)*
+| Used only when `loa.source.type` is set to `file`. It can be set to `none` or gzip. If it's set to `none` then the file will be read as a non-compressed file. If it's set to `gzip` then it will be read as a gzipped file, being unzipped on the fly. *(Default value: none)*
 
 | **loa.source.file.skip-lines**
 | Skip the number of lines before starting to process the document locations in the file. Can be used to quickly get back to the last processed line if the application is restarted for any reason. *(Default value: 0)*
-
-| **loa.queue.producer-pool-size**
-| The number of consumer connections to the <<Queue Application>>.*(Default value: 10)*
 |===

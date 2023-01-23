@@ -136,5 +136,7 @@
       }
     }
   },
-  "defaultProject": "loa-frontend"
+  "cli": {
+    "analytics": false
+  }
 }

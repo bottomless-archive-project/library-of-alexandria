@@ -1,3 +1,6 @@
+:application-type: WEB_APPLICATION
+:application-name: Web Application
+
 = Web Application
 
 The Web Application provides access to the users to the indexed documents.

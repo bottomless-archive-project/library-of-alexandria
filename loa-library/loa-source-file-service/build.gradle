@@ -1,8 +1,7 @@
 dependencies {
     api project(':loa-library:loa-source-service')
-    implementation project(':loa-library:loa-io-service')
     implementation project(':loa-library:loa-file-service')
     implementation project(':loa-library:loa-logging-service')
 
-    testImplementation group: 'org.apache.commons', name: 'commons-compress', version: '1.21'
+    testImplementation group: 'org.apache.commons', name: 'commons-compress', version: '1.22'
 }

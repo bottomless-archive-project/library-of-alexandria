@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-@ConditionalOnProperty("document-validator")
+@ConditionalOnProperty(name = "loa.command", havingValue = "document-validator")
 public class DocumentValidatorCommand implements CommandLineRunner {
 
     private final DocumentDataParser documentDataParser;

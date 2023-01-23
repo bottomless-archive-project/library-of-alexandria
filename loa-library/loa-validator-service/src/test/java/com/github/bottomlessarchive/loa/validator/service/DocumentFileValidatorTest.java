@@ -1,10 +1,9 @@
 package com.github.bottomlessarchive.loa.validator.service;
 
-import com.github.bottomlessarchive.loa.document.service.domain.DocumentType;
 import com.github.bottomlessarchive.loa.parser.domain.ParsingResult;
 import com.github.bottomlessarchive.loa.parser.service.DocumentDataParser;
-import com.github.bottomlessarchive.loa.stage.service.StageLocationFactory;
 import com.github.bottomlessarchive.loa.stage.service.domain.StageLocation;
+import com.github.bottomlessarchive.loa.type.domain.DocumentType;
 import com.github.bottomlessarchive.loa.validator.configuration.FileValidationConfigurationProperties;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,9 +32,6 @@ class DocumentFileValidatorTest {
     @Mock
     private DocumentDataParser documentDataParser;
 
-    @Mock
-    private StageLocationFactory stageLocationFactory;
-
     @InjectMocks
     private DocumentFileValidator underTest;
 
@@ -43,14 +39,12 @@ class DocumentFileValidatorTest {
     void testIsValidDocumentWhenDocumentIsTooSmall() {
         final StageLocation stageLocation = mock(StageLocation.class);
 
-        when(stageLocationFactory.getLocation(DOCUMENT_ID.toString(), DOCUMENT_TYPE))
-                .thenReturn(stageLocation);
         when(stageLocation.exists())
                 .thenReturn(true);
         when(stageLocation.size())
                 .thenReturn(0L);
 
-        final boolean result = underTest.isValidDocument(DOCUMENT_ID.toString(), DOCUMENT_TYPE);
+        final boolean result = underTest.isValidDocument(DOCUMENT_ID, stageLocation, DOCUMENT_TYPE);
 
         assertThat(result).isFalse();
     }
@@ -59,8 +53,6 @@ class DocumentFileValidatorTest {
     void testIsValidDocumentWhenDocumentIsTooBig() {
         final StageLocation stageLocation = mock(StageLocation.class);
 
-        when(stageLocationFactory.getLocation(DOCUMENT_ID.toString(), DOCUMENT_TYPE))
-                .thenReturn(stageLocation);
         when(stageLocation.exists())
                 .thenReturn(true);
         when(stageLocation.size())
@@ -68,7 +60,7 @@ class DocumentFileValidatorTest {
         when(fileValidationConfigurationProperties.maximumArchiveSize())
                 .thenReturn(MAX_FILE_SIZE_IN_BYTES);
 
-        final boolean result = underTest.isValidDocument(DOCUMENT_ID.toString(), DOCUMENT_TYPE);
+        final boolean result = underTest.isValidDocument(DOCUMENT_ID, stageLocation, DOCUMENT_TYPE);
 
         assertThat(result).isFalse();
     }
@@ -77,8 +69,6 @@ class DocumentFileValidatorTest {
     void testIsValidDocumentWhenDocumentIsntParsable() {
         final StageLocation stageLocation = mock(StageLocation.class);
 
-        when(stageLocationFactory.getLocation(DOCUMENT_ID.toString(), DOCUMENT_TYPE))
-                .thenReturn(stageLocation);
         when(stageLocation.exists())
                 .thenReturn(true);
         when(stageLocation.size())
@@ -91,7 +81,7 @@ class DocumentFileValidatorTest {
         when(documentDataParser.parseDocumentMetadata(DOCUMENT_ID, DOCUMENT_TYPE, documentInputStream))
                 .thenThrow(new RuntimeException("Some error!"));
 
-        final boolean result = underTest.isValidDocument(DOCUMENT_ID.toString(), DOCUMENT_TYPE);
+        final boolean result = underTest.isValidDocument(DOCUMENT_ID, stageLocation, DOCUMENT_TYPE);
 
         assertThat(result).isFalse();
         verify(documentDataParser).parseDocumentMetadata(DOCUMENT_ID, DOCUMENT_TYPE, documentInputStream);
@@ -101,8 +91,6 @@ class DocumentFileValidatorTest {
     void testIsValidDocumentWhenDocumentIsValid() {
         final StageLocation stageLocation = mock(StageLocation.class);
 
-        when(stageLocationFactory.getLocation(DOCUMENT_ID.toString(), DOCUMENT_TYPE))
-                .thenReturn(stageLocation);
         when(stageLocation.exists())
                 .thenReturn(true);
         when(stageLocation.size())
@@ -118,7 +106,7 @@ class DocumentFileValidatorTest {
                                 .build()
                 );
 
-        final boolean result = underTest.isValidDocument(DOCUMENT_ID.toString(), DOCUMENT_TYPE);
+        final boolean result = underTest.isValidDocument(DOCUMENT_ID, stageLocation, DOCUMENT_TYPE);
 
         assertThat(result).isTrue();
     }

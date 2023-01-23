@@ -1,15 +1,17 @@
+:application-type: VAULT_APPLICATION
+:application-name: Vault Application
+
 = Vault Application
 
 Responsible for storing documents and making them available via web endpoints.
 
 == Workflow
 
-The Vault Application connects to the <<Queue Application>>, asks for new documents that should be archived (these were inserted by the Downloader Application to the queue previously).
+The Vault Application connects to the <<Queue Application>>, asks for the metadata of new documents that should be archived (these were inserted by the <<Downloader Application>> to the queue previously).
 
-Once a new document is acquired then it will be moved into a staging area.
-A checksum will be generated from the staging copy and checked for duplicates using the data available in the MongoDB database.
+When a metadata entry is acquired, the application will look up if the document is a duplicate. If it is, then it updates the document's entry in the database to contain the new source for the document, then asks the <<Staging Application>> to remove the document's content from the staging area. If it is not a duplicate, then it saves the new document entity to the database, then downloads the document's content from the <<Staging Application>> into a vault location that is available either on local disk or in an AWS S3 compatible storage.
 
-If the application is not a duplicate then the staging file's contents will be moved to the archive, and a new entry will be created for the document in the database.
+The Vault Application is scalable so more than one instance can run at the same time. This is necessary to support more than one storage machines. Each instance of the application has an unique name. When a document is stored, then the vault's name that is holding the document's content is also saved to the document's metadata in the database. This way it is easy to track which vault instance has which document.
 
 .Parameters
 |===
@@ -23,14 +25,14 @@ include::../service/conductor/conductor-configuration.adoc[]
 | **loa.vault.location.file.path**
 | Used only when `loa.vault.location.type` is set to `file`. Path to the location of the vault on the filesystem.
 
-| **loa.stage.location**
-| The location where the document files are first moved. After the checksum calculation and duplicate detection, they are moved to the vault.
-
 | **server.port**
 | The port where the vault should publish its web endpoints.
 
 | **loa.vault.name**
 | The unique name of the vault. This name will be saved when archiving new documents and will be used to identify the vault that holds a given document. Do not change this after creating the vault because the documents previously archived by this vault are not going to be accessible.
+
+| **loa.vault.parallelism**
+| The number of documents that should be saved in parallel at the same time. If the value is set to 4, then the application tries to archive 4 documents at the same time. *(Default value: 20)*
 
 | **loa.vault.modification-enabled**
 | If this vault should be able to modify documents (eg. remove) after they are archived. If your vault is available publicly on the internet then set this to false! *(Default value: true)*
@@ -39,14 +41,5 @@ include::../service/conductor/conductor-configuration.adoc[]
 | If this vault should archive new documents. *(Default value: true)*
 
 | **loa.vault.version-number**
-| This version number will be saved to the database for every document that has been archived. It will be used later on if its necessary to run cleanup or fixing tasks that are specific to a given version. This way it will be easier to fix bugs or database inconsistencies introduced by a specific application version. Please do not change this, otherwise the official migration/fixer utilities are not going to be usable.
-
-| **loa.compression.algorithm**
-| This property describes what compression algorithm should be used while saving documents to the vault. The available values are `lzma`, `gzip`, `none`. https://en.wikipedia.org/wiki/Lempel%E2%80%93Ziv%E2%80%93Markov_chain_algorithm[LZMA] has the best compression ratios while being quite CPU resource-intensive, https://en.wikipedia.org/wiki/Gzip[GZIP] is better than no compression, but a little worse than LZMA while having minimal CPU footprint while `none` is saving the documents without compression. *(Default value: none)*
-
-| **loa.checksum.type**
-| The type of the hashing algorithm used to create the document's checksum. At the moment only `SHA-256` is available for this purpose. *(Default value: sha-256)*
-
-| **loa.queue.consumer-pool-size**
-| The port open for the MongoDB database server. *(Default value: 10)*
+| This version number will be saved to the database for every document that has been archived. It will be used later on if it is necessary to run cleanup or fixing tasks that are specific to a given version. This way it will be easier to fix bugs or database inconsistencies introduced by a specific application version. Please do not change this, otherwise the official migration/fixer utilities are not going to be usable. *(Default value: 6)*
 |===

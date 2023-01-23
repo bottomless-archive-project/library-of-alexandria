@@ -1,10 +1,10 @@
 package com.github.bottomlessarchive.loa.web.view.document.controller;
 
-import com.github.bottomlessarchive.loa.document.service.domain.DocumentType;
 import com.github.bottomlessarchive.loa.indexer.service.search.DocumentSearchClient;
 import com.github.bottomlessarchive.loa.indexer.service.search.domain.DocumentLength;
 import com.github.bottomlessarchive.loa.indexer.service.search.domain.DocumentSearchResult;
 import com.github.bottomlessarchive.loa.indexer.service.search.domain.SearchContext;
+import com.github.bottomlessarchive.loa.type.domain.DocumentType;
 import com.github.bottomlessarchive.loa.web.view.document.response.DocumentSearchResponse;
 import com.github.bottomlessarchive.loa.web.view.document.service.SearchDocumentEntityResponseTransformer;
 import lombok.RequiredArgsConstructor;

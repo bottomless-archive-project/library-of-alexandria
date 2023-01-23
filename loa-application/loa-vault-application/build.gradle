@@ -28,6 +28,15 @@ dependencies {
 
     implementation project(':loa-library:loa-vault-service')
     implementation project(':loa-library:loa-document-view')
+    implementation project(':loa-library:loa-threading-service')
     implementation project(':loa-library:loa-queue-artemis-service')
+    implementation project(':loa-library:loa-staging-client-service')
     implementation project(':loa-library:loa-conductor-client-service')
+
+    testImplementation project(':loa-library:loa-file-service')
+    testImplementation project(':loa-library:loa-stage-service')
+    testImplementation project(':loa-library:loa-conductor-client-test')
+
+    testImplementation group: 'com.google.jimfs', name: 'jimfs', version: '1.2'
+    testImplementation group: 'org.testcontainers', name: 'mongodb', version: '1.17.6'
 }

@@ -2,9 +2,9 @@ import org.springframework.boot.gradle.plugin.SpringBootPlugin
 
 buildscript {
     ext {
-        set('artemis.version', '2.22.0')
-        set('mongodb.version', '4.6.0')
-        set('okhttp3.version', '4.9.3')
+        set('artemis.version', '2.27.1')
+        set('mongodb.version', '4.8.2')
+        set('okhttp.version', '4.10.0')
     }
     repositories {
         mavenCentral()
@@ -13,29 +13,59 @@ buildscript {
         }
     }
     dependencies {
-        classpath('org.springframework.boot:spring-boot-gradle-plugin:2.6.7')
+        classpath('org.springframework.boot:spring-boot-gradle-plugin:3.0.2')
         classpath('com.adarshr:gradle-test-logger-plugin:2.0.0')
         classpath('com.github.ben-manes:gradle-versions-plugin:0.29.0')
         classpath('com.palantir.gradle.docker:gradle-docker:0.25.0')
     }
 }
 
-configure(subprojects.findAll {it.name != 'loa-frontend'}) {
+configure(subprojects.findAll { it.name != 'loa-frontend' }) {
     apply plugin: 'java'
 
     java {
+        modularity.inferModulePath = true
         toolchain {
-            languageVersion = JavaLanguageVersion.of(18)
+            languageVersion = JavaLanguageVersion.of(19)
+        }
+    }
+
+    repositories {
+        mavenCentral()
+        flatDir {
+            dirs "$rootProject.projectDir/libs"
         }
     }
 
     compileJava.dependsOn(processResources)
     compileJava {
         options.encoding = "UTF-8"
+        doFirst {
+            options.compilerArgs += [
+                    '--enable-preview', '--add-modules', 'jdk.incubator.concurrent', '-parameters'
+            ]
+        }
     }
     compileTestJava {
         options.encoding = "UTF-8"
+        doFirst {
+            options.compilerArgs += [
+                    '--enable-preview', '--add-modules', 'jdk.incubator.concurrent'
+            ]
+        }
     }
+
+    /*tasks.withType(Test).tap {
+        configureEach {
+            jvmArgs += "--enable-preview"
+        }
+    }
+
+    tasks.withType(JavaExec).tap {
+        configureEach {
+            jvmArgs += '--enable-preview'
+        }
+    }*/
 
     apply plugin: 'io.spring.dependency-management'
 
@@ -46,9 +76,9 @@ configure(subprojects.findAll {it.name != 'loa-frontend'}) {
     }
 
     test {
-        useJUnitPlatform {
-            includeEngines 'junit-jupiter'
-        }
+        jvmArgs(['--enable-preview'])
+
+        useJUnitPlatform()
     }
 
     apply plugin: 'com.adarshr.test-logger'
@@ -72,11 +102,11 @@ configure(subprojects.findAll {it.name != 'loa-frontend'}) {
         compileOnly group: 'org.springframework.boot', name: 'spring-boot-configuration-processor'
         annotationProcessor group: 'org.springframework.boot', name: 'spring-boot-configuration-processor'
 
-        // Lombok
-        compileOnly group: 'org.projectlombok', name: 'lombok'
-        annotationProcessor group: 'org.projectlombok', name: 'lombok'
-        testCompileOnly group: 'org.projectlombok', name: 'lombok'
-        testAnnotationProcessor group: 'org.projectlombok', name: 'lombok'
+        // A forked version of Lombok because the official one doesn't support Java 19 yet
+        compileOnly name: 'lombok-jdk19-20221010'
+        annotationProcessor name: 'lombok-jdk19-20221010'
+        testCompileOnly name: 'lombok-jdk19-20221010'
+        testAnnotationProcessor name: 'lombok-jdk19-20221010'
 
         // Testing
         testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'

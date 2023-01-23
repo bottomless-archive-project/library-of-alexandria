@@ -4,7 +4,8 @@ import com.github.bottomlessarchive.loa.document.repository.domain.DocumentDatab
 import com.github.bottomlessarchive.loa.document.repository.domain.DocumentStatusAggregateEntity;
 import com.github.bottomlessarchive.loa.document.repository.domain.DocumentTypeAggregateEntity;
 import com.github.bottomlessarchive.loa.repository.configuration.RepositoryMetadataContainer;
-import com.github.bottomlessarchive.loa.repository.service.HexConverter;
+import com.github.bottomlessarchive.loa.number.service.HexConverter;
+import com.mongodb.client.AggregateIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
@@ -24,7 +25,9 @@ import static com.mongodb.client.model.Accumulators.sum;
 import static com.mongodb.client.model.Aggregates.group;
 import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Updates.combine;
 import static com.mongodb.client.model.Updates.set;
+import static com.mongodb.client.model.Updates.unset;
 
 @Component
 @RequiredArgsConstructor
@@ -74,6 +77,20 @@ public class DocumentRepository {
         documentDatabaseEntityMongoCollection.updateOne(eq("_id", documentId), set("status", status));
     }
 
+    public void updateFileSize(final UUID documentId, final long newFileSize) {
+        documentDatabaseEntityMongoCollection.updateOne(eq("_id", documentId), set("fileSize", newFileSize));
+    }
+
+    public void updateDocumentWhenMovedFromVault(final UUID documentId, final String vault, final String compression) {
+        documentDatabaseEntityMongoCollection.updateOne(eq("_id", documentId),
+                combine(
+                        unset("beacon"),
+                        set("vault", vault),
+                        set("compression", compression)
+                )
+        );
+    }
+
     /**
      * Returns a {@link Iterable} that will emit all the documents that have the provided status in the database.
      *
@@ -100,23 +117,44 @@ public class DocumentRepository {
                 .noCursorTimeout(repositoryMetadataContainer.isNoCursorTimeout());
     }
 
+    /**
+     * Return an approximate count of the documents in the database.
+     *
+     * @return approximate count of the documents
+     */
     public long estimateCount() {
         return documentDatabaseEntityMongoCollection.estimatedDocumentCount();
     }
 
+    /**
+     * Return the document count in the database for each document type.
+     *
+     * @return document count for each document type
+     */
     public Map<String, Integer> countByType() {
         final List<Bson> countByStatusAggregate = Collections.singletonList(group("$type", sum("count", 1L)));
 
-        return StreamSupport.stream(documentDatabaseEntityMongoCollection.aggregate(countByStatusAggregate,
-                        DocumentTypeAggregateEntity.class).spliterator(), false)
+        final AggregateIterable<DocumentTypeAggregateEntity> documentTypeAggregates = documentDatabaseEntityMongoCollection
+                .aggregate(countByStatusAggregate, DocumentTypeAggregateEntity.class)
+                .hintString("type_index");
+
+        return StreamSupport.stream(documentTypeAggregates.spliterator(), false)
                 .collect(Collectors.toMap(DocumentTypeAggregateEntity::getId, DocumentTypeAggregateEntity::getCount));
     }
 
+    /**
+     * Return the document count in the database for each document status.
+     *
+     * @return document count for each document status
+     */
     public Map<String, Integer> countByStatus() {
         final List<Bson> countByStatusAggregate = Collections.singletonList(group("$status", sum("count", 1L)));
 
-        return StreamSupport.stream(documentDatabaseEntityMongoCollection.aggregate(countByStatusAggregate,
-                        DocumentStatusAggregateEntity.class).spliterator(), false)
+        final AggregateIterable<DocumentStatusAggregateEntity> documentStatusAggregates = documentDatabaseEntityMongoCollection
+                .aggregate(countByStatusAggregate, DocumentStatusAggregateEntity.class)
+                .hintString("status_index");
+
+        return StreamSupport.stream(documentStatusAggregates.spliterator(), false)
                 .collect(Collectors.toMap(DocumentStatusAggregateEntity::getId, DocumentStatusAggregateEntity::getCount));
     }
 }

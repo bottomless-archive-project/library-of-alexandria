@@ -1,7 +1,5 @@
 package com.github.bottomlessarchive.loa.vault.service.archive;
 
-import com.github.bottomlessarchive.loa.checksum.service.ChecksumProvider;
-import com.github.bottomlessarchive.loa.compression.configuration.CompressionConfigurationProperties;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentStatus;
 import com.github.bottomlessarchive.loa.document.service.entity.factory.domain.DocumentCreationContext;
 import com.github.bottomlessarchive.loa.vault.service.domain.DocumentArchivingContext;
@@ -12,24 +10,18 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class DocumentCreationContextFactory {
 
-    private final ChecksumProvider checksumProvider;
-    private final CompressionConfigurationProperties compressionConfigurationProperties;
-
     public DocumentCreationContext newContext(final DocumentArchivingContext documentArchivingContext) {
-        final String checksum = checksumProvider.checksum(documentArchivingContext.getContent());
-
         return DocumentCreationContext.builder()
-                .id(documentArchivingContext.getId())
-                .vault(documentArchivingContext.getVault())
-                .type(documentArchivingContext.getType())
-                .status(DocumentStatus.DOWNLOADED)
-                .source(documentArchivingContext.getSource())
-                .sourceLocationId(documentArchivingContext.getSourceLocationId()
-                        .orElse(null))
-                .versionNumber(documentArchivingContext.getVersionNumber())
-                .compression(compressionConfigurationProperties.algorithm())
-                .checksum(checksum)
-                .fileSize(documentArchivingContext.getContentLength())
+                .id(documentArchivingContext.id())
+                .vault(documentArchivingContext.vault())
+                .type(documentArchivingContext.type())
+                .status(DocumentStatus.CREATED)
+                .source(documentArchivingContext.source())
+                .sourceLocationId(documentArchivingContext.sourceLocationId())
+                .versionNumber(documentArchivingContext.versionNumber())
+                .compression(documentArchivingContext.compression())
+                .checksum(documentArchivingContext.checksum())
+                .fileSize(documentArchivingContext.originalContentLength())
                 .build();
     }
 }

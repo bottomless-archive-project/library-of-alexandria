@@ -1,13 +1,15 @@
 package com.github.bottomlessarchive.loa.document.service.entity.factory;
 
 import com.github.bottomlessarchive.loa.document.repository.DocumentRepository;
+import com.github.bottomlessarchive.loa.document.service.domain.DuplicateDocumentException;
 import com.github.bottomlessarchive.loa.document.service.entity.factory.domain.DocumentCreationContext;
-import com.github.bottomlessarchive.loa.repository.service.HexConverter;
+import com.github.bottomlessarchive.loa.number.service.HexConverter;
 import com.github.bottomlessarchive.loa.document.repository.domain.DocumentDatabaseEntity;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentEntity;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentStatus;
-import com.github.bottomlessarchive.loa.document.service.domain.DocumentType;
 import com.github.bottomlessarchive.loa.document.service.entity.transformer.DocumentEntityTransformer;
+import com.github.bottomlessarchive.loa.type.domain.DocumentType;
+import com.mongodb.MongoWriteException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +26,8 @@ import java.util.stream.StreamSupport;
 @Service
 @RequiredArgsConstructor
 public class DocumentEntityFactory {
+
+    private static final int DUPLICATE_DOCUMENT_ID_ERROR_CODE = 11000;
 
     private final HexConverter hexConverter;
     private final DocumentRepository documentRepository;
@@ -89,7 +93,7 @@ public class DocumentEntityFactory {
     /**
      * Return the number of documents available in the database grouped by status.
      *
-     * @return the count of documents grouped by status
+     * @return the map of the document count grouped by status
      */
     public Map<DocumentStatus, Integer> getCountByStatus() {
         return documentRepository.countByStatus().entrySet().stream()
@@ -99,7 +103,7 @@ public class DocumentEntityFactory {
     /**
      * Return the number of documents available in the database grouped by type.
      *
-     * @return the count of documents grouped by type
+     * @return the map of the document count grouped by type
      */
     public Map<DocumentType, Integer> getCountByType() {
         return documentRepository.countByType().entrySet().stream()
@@ -126,29 +130,39 @@ public class DocumentEntityFactory {
      * @return the freshly created document
      */
     public DocumentEntity newDocumentEntity(final DocumentCreationContext documentCreationContext) {
-        final Set<byte[]> sourceLocations = documentCreationContext.getSourceLocationId().isPresent()
-                ? Set.of(hexConverter.decode(documentCreationContext.getSourceLocationId().get()))
-                : Collections.emptySet();
+        final Set<byte[]> sourceLocations = documentCreationContext.sourceLocationId()
+                .map(value -> Set.of(hexConverter.decode(value)))
+                .orElse(Collections.emptySet());
 
         final DocumentDatabaseEntity documentDatabaseEntity = new DocumentDatabaseEntity(
-                documentCreationContext.getId(),
+                documentCreationContext.id(),
 
-                documentCreationContext.getVault(),
-                documentCreationContext.getType().toString(),
-                documentCreationContext.getStatus().toString(),
-                documentCreationContext.getCompression().name(),
+                documentCreationContext.vault(),
+                documentCreationContext.type().toString(),
+                documentCreationContext.status().toString(),
+                documentCreationContext.compression().name(),
 
-                documentCreationContext.getSource(),
+                documentCreationContext.source(),
+                documentCreationContext.beacon(),
                 sourceLocations,
 
-                hexConverter.decode(documentCreationContext.getChecksum()),
-                documentCreationContext.getFileSize(),
+                hexConverter.decode(documentCreationContext.checksum()),
+                documentCreationContext.fileSize(),
 
-                documentCreationContext.getVersionNumber(),
+                documentCreationContext.versionNumber(),
                 Instant.now()
         );
 
-        documentRepository.insertDocument(documentDatabaseEntity);
+        try {
+            documentRepository.insertDocument(documentDatabaseEntity);
+        } catch (final MongoWriteException e) {
+            if (e.getError().getCode() == DUPLICATE_DOCUMENT_ID_ERROR_CODE) {
+                throw new DuplicateDocumentException("Document with id: " + documentDatabaseEntity.id() + " and checksum: "
+                        + new String(documentDatabaseEntity.checksum()) + " is a duplicate!", e);
+            }
+
+            throw e;
+        }
 
         return documentEntityTransformer.transform(documentDatabaseEntity);
     }

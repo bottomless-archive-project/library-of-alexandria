@@ -1,11 +1,13 @@
 package com.github.bottomlessarchive.loa.document.service.domain;
 
 import com.github.bottomlessarchive.loa.compression.domain.DocumentCompression;
+import com.github.bottomlessarchive.loa.type.domain.DocumentType;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
 
 import java.time.Instant;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -29,6 +31,7 @@ public class DocumentEntity {
     @ToString.Include
     private final DocumentCompression compression;
     private final String source;
+    private final String beacon;
     @ToString.Include
     private final Set<String> sourceLocations;
 
@@ -58,6 +61,10 @@ public class DocumentEntity {
      */
     public boolean isCompressed() {
         return compression != DocumentCompression.NONE;
+    }
+
+    public Optional<String> getBeacon() {
+        return Optional.ofNullable(beacon);
     }
 
     public boolean isInVault(final String vault) {

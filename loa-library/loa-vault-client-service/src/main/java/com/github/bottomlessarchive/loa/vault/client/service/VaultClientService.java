@@ -6,12 +6,12 @@ import com.github.bottomlessarchive.loa.document.service.domain.DocumentEntity;
 import com.github.bottomlessarchive.loa.vault.client.service.domain.VaultAccessException;
 import com.github.bottomlessarchive.loa.vault.client.service.domain.VaultLocation;
 import com.github.bottomlessarchive.loa.vault.client.service.request.RecompressDocumentRequest;
-import com.github.bottomlessarchive.loa.vault.client.service.request.ReplaceCorruptDocumentRequest;
 import com.github.bottomlessarchive.loa.vault.client.service.response.DocumentExistsResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Map;
 
 @Slf4j
 @Service
@@ -30,21 +29,20 @@ public class VaultClientService {
 
     private final OkHttpClient vaultOkHttpClient;
     private final ObjectMapper objectMapper;
-    private final Map<String, VaultLocation> vaultLocations;
+    private final VaultLocationContainer vaultLocationContainer;
 
     /**
      * Requests and returns the content of a document. If the document is not found or an error happened while doing
      * the request, an {@link VaultAccessException} will be thrown.
+     * <p>
+     * The returned {@link InputStream} should be closed after processed to avoid leaking resources.
      *
      * @param documentEntity the document entity to get the content for
      * @return the content of the document
      */
     public InputStream queryDocument(final DocumentEntity documentEntity) {
-        if (!vaultLocations.containsKey(documentEntity.getVault())) {
-            throw new VaultAccessException("Vault " + documentEntity.getVault() + " is not found!");
-        }
-
-        final VaultLocation vaultLocation = vaultLocations.get(documentEntity.getVault());
+        final VaultLocation vaultLocation = vaultLocationContainer.getVaultLocation(documentEntity.getVault())
+                .orElseThrow(() -> new VaultAccessException("Vault " + documentEntity.getVault() + " is not found!"));
 
         final Request request = new Request.Builder()
                 .url("http://" + vaultLocation.getLocation() + ":" + vaultLocation.getPort() + "/document/" + documentEntity.getId())
@@ -67,11 +65,8 @@ public class VaultClientService {
      * @param documentEntity the document to be deleted
      */
     public void deleteDocument(final DocumentEntity documentEntity) {
-        if (!vaultLocations.containsKey(documentEntity.getVault())) {
-            throw new IllegalStateException("Vault " + documentEntity.getVault() + " is not found!");
-        }
-
-        final VaultLocation vaultLocation = vaultLocations.get(documentEntity.getVault());
+        final VaultLocation vaultLocation = vaultLocationContainer.getVaultLocation(documentEntity.getVault())
+                .orElseThrow(() -> new VaultAccessException("Vault " + documentEntity.getVault() + " is not found!"));
 
         final Request request = new Request.Builder()
                 .url("http://" + vaultLocation.getLocation() + ":" + vaultLocation.getPort() + "/document/" + documentEntity.getId())
@@ -89,11 +84,8 @@ public class VaultClientService {
 
     @SneakyThrows
     public void recompressDocument(final DocumentEntity documentEntity, final DocumentCompression documentCompression) {
-        if (!vaultLocations.containsKey(documentEntity.getVault())) {
-            throw new IllegalStateException("Vault " + documentEntity.getVault() + " is not found!");
-        }
-
-        final VaultLocation vaultLocation = vaultLocations.get(documentEntity.getVault());
+        final VaultLocation vaultLocation = vaultLocationContainer.getVaultLocation(documentEntity.getVault())
+                .orElseThrow(() -> new VaultAccessException("Vault " + documentEntity.getVault() + " is not found!"));
 
         final Request request = new Request.Builder()
                 .url("http://" + vaultLocation.getLocation() + ":" + vaultLocation.getPort() + "/document/"
@@ -120,11 +112,8 @@ public class VaultClientService {
     }
 
     public boolean documentExists(final DocumentEntity documentEntity) {
-        if (!vaultLocations.containsKey(documentEntity.getVault())) {
-            throw new IllegalStateException("Vault " + documentEntity.getVault() + " is not found!");
-        }
-
-        final VaultLocation vaultLocation = vaultLocations.get(documentEntity.getVault());
+        final VaultLocation vaultLocation = vaultLocationContainer.getVaultLocation(documentEntity.getVault())
+                .orElseThrow(() -> new VaultAccessException("Vault " + documentEntity.getVault() + " is not found!"));
 
         final Request request = new Request.Builder()
                 .url("http://" + vaultLocation.getLocation() + ":" + vaultLocation.getPort() + "/document/"
@@ -147,23 +136,18 @@ public class VaultClientService {
 
     @SneakyThrows
     public void replaceCorruptDocument(final DocumentEntity documentEntity, final byte[] content) {
-        if (!vaultLocations.containsKey(documentEntity.getVault())) {
-            throw new IllegalStateException("Vault " + documentEntity.getVault() + " is not found!");
-        }
-
-        final VaultLocation vaultLocation = vaultLocations.get(documentEntity.getVault());
+        final VaultLocation vaultLocation = vaultLocationContainer.getVaultLocation(documentEntity.getVault())
+                .orElseThrow(() -> new VaultAccessException("Vault " + documentEntity.getVault() + " is not found!"));
 
         final Request request = new Request.Builder()
                 .url("http://" + vaultLocation.getLocation() + ":" + vaultLocation.getPort() + "/document/"
                         + documentEntity.getId() + "/replace")
                 .put(
-                        RequestBody.create(
-                                objectMapper.writeValueAsBytes(
-                                        ReplaceCorruptDocumentRequest.builder()
-                                                .content(content)
-                                                .build()
-                                )
-                        )
+                        new MultipartBody.Builder()
+                                .setType(MultipartBody.FORM)
+                                .addFormDataPart("replacementFile", documentEntity.getId().toString(),
+                                        RequestBody.create(content, MediaType.parse("application/octet-stream")))
+                                .build()
                 )
                 .build();
 

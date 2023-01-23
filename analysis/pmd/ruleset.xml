@@ -9,7 +9,7 @@
 
     <rule ref="category/java/performance.xml">
         <!-- Too many false positives. -->
-        <exclude name="AvoidInstantiatingObjectsInLoops" />
+        <exclude name="AvoidInstantiatingObjectsInLoops"/>
     </rule>
 
     <rule ref="category/java/multithreading.xml">
@@ -27,12 +27,19 @@
     <rule ref="category/java/design.xml/TooManyMethods">
         <properties>
             <property name="maxmethods" value="20"/>
+            <property name="violationSuppressXPath" value="//ClassOrInterfaceDeclaration['.*Test']"/>
         </properties>
     </rule>
 
     <rule ref="category/java/design.xml/UseUtilityClass">
         <properties>
             <property name="violationSuppressXPath" value="//ClassOrInterfaceDeclaration['.*Application']"/>
+        </properties>
+    </rule>
+
+    <rule ref="category/java/design.xml/AvoidThrowingRawExceptionTypes">
+        <properties>
+            <property name="violationSuppressXPath" value="//ClassOrInterfaceDeclaration['.*Test']"/>
         </properties>
     </rule>
 
@@ -113,6 +120,21 @@
         <exclude name="AvoidUsingHardCodedIP"/>
     </rule>
 
+    <!-- Makes no sense in configuration classes. -->
+    <rule ref="category/java/bestpractices.xml/UseVarargs">
+        <properties>
+            <property name="violationSuppressXPath" value="//ClassOrInterfaceDeclaration['.*Configuration']"/>
+        </properties>
+    </rule>
+
+    <!-- This only happens because the used version of PMD doesn't fully support Java 18. -->
+    <rule ref="category/java/bestpractices.xml/SwitchStmtsShouldHaveDefault">
+        <properties>
+            <property name="violationSuppressXPath"
+                      value="//ClassOrInterfaceDeclaration['com.github.bottomlessarchive.loa.url.service.downloader.DocumentLocationResultCalculator']"/>
+        </properties>
+    </rule>
+
     <rule ref="category/java/errorprone.xml">
         <!-- This would ask us to create a serialVersionUid on every Exception. -->
         <exclude name="MissingSerialVersionUID"/>
@@ -133,11 +155,15 @@
     <!-- These classes were checked on a case by case basis. -->
     <rule ref="category/java/errorprone.xml/CloseResource">
         <properties>
-            <property name="violationSuppressXPath"
-                      value="//ClassOrInterfaceDeclaration['com.github.bottomlessarchive.loa.queue.artemis.service.consumer.pool.QueueConsumerFactory']"/>
-            <property name="violationSuppressXPath"
-                      value="//ClassOrInterfaceDeclaration['com.github.bottomlessarchive.loa.queue.artemis.service.producer.pool.QueueProducerFactory']"/>
             <property name="violationSuppressXPath" value="//ClassOrInterfaceDeclaration['.*Test']"/>
+        </properties>
+    </rule>
+
+    <!-- The used solution is a lot less error-prone and a lot easier to understand that the one suggested by PMD. -->
+    <rule ref="category/java/errorprone.xml/AvoidInstanceofChecksInCatchClause">
+        <properties>
+            <property name="violationSuppressXPath"
+                      value="//ClassOrInterfaceDeclaration['com.github.bottomlessarchive.loa.io.service.downloader.FileDownloadManager']"/>
         </properties>
     </rule>
 </ruleset>

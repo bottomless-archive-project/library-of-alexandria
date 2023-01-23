@@ -1,7 +1,7 @@
 package com.github.bottomlessarchive.loa.indexer.service.indexer;
 
-import com.github.bottomlessarchive.loa.document.service.domain.DocumentType;
 import com.github.bottomlessarchive.loa.indexer.service.indexer.domain.IndexingContext;
+import com.github.bottomlessarchive.loa.type.domain.DocumentType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
