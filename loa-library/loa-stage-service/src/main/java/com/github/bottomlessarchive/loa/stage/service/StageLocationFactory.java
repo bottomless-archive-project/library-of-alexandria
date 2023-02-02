@@ -48,18 +48,19 @@ public class StageLocationFactory {
     }
 
     private Path buildPath(final UUID documentId) {
-        if (!Files.exists(stageConfigurationProperties.location())) {
-            try {
-                log.info("Stage folder doesn't exists! Creating new stage folder on path: {}.", stageConfigurationProperties.location());
+        final Path stageFolderPath = stageConfigurationProperties.location();
 
-                Files.createDirectories(stageConfigurationProperties.location());
+        if (!Files.exists(stageFolderPath)) {
+            try {
+                log.info("Stage folder doesn't exists! Creating new stage folder on path: {}.", stageFolderPath);
+
+                Files.createDirectories(stageFolderPath);
             } catch (final IOException e) {
                 throw new StageAccessException("Unable to create non-existing stage folder!", e);
             }
         }
 
-        return stageConfigurationProperties.location()
-                .resolve(buildFileName(documentId));
+        return stageFolderPath.resolve(buildFileName(documentId));
     }
 
     private String buildFileName(final UUID documentId) {

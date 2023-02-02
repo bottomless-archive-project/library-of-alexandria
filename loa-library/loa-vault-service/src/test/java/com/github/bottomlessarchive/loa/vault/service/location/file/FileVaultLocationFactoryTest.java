@@ -6,6 +6,9 @@ import com.github.bottomlessarchive.loa.type.domain.DocumentType;
 import com.github.bottomlessarchive.loa.vault.service.location.VaultLocation;
 import com.github.bottomlessarchive.loa.vault.service.location.file.configuration.FileConfigurationProperties;
 import com.github.bottomlessarchive.loa.vault.service.location.file.domain.FileVaultLocation;
+import com.google.common.jimfs.Configuration;
+import com.google.common.jimfs.Jimfs;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,6 +17,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.io.IOException;
+import java.nio.file.FileSystem;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.UUID;
 
@@ -35,54 +41,61 @@ class FileVaultLocationFactoryTest {
     @Mock
     private Path testFolderPath;
 
-    @Mock
-    private Path testFilePath;
-
     @InjectMocks
     private FileVaultLocationFactory underTest;
 
+    private FileSystem fileSystem;
+
     @BeforeEach
-    void setup() {
+    void setup() throws IOException {
+        fileSystem = Jimfs.newFileSystem(Configuration.unix());
+
+        testFolderPath = fileSystem.getPath("/vault/location");
+
+        Files.createDirectories(testFolderPath);
+
         when(fileConfigurationProperties.path())
                 .thenReturn(testFolderPath);
     }
 
+    @AfterEach
+    void teardown() throws IOException {
+        fileSystem.close();
+    }
+
     @Test
-    void testGetLocationWhenNoCompression() {
-        when(testFolderPath.resolve("123e4567-e89b-12d3-a456-556642440000.epub"))
-                .thenReturn(testFilePath);
+    void testGetLocationWhenNoCompression() throws IOException {
+        final Path testFile = Files.createFile(testFolderPath.resolve("123e4567-e89b-12d3-a456-556642440000.epub"));
 
         final VaultLocation result = underTest.getLocation(DOCUMENT_ENTITY, DocumentCompression.NONE);
 
         assertThat(result)
                 .isInstanceOf(FileVaultLocation.class);
         assertThat(ReflectionTestUtils.getField(result, null, "vaultLocation"))
-                .isSameAs(testFilePath);
+                .isEqualTo(testFile);
     }
 
     @Test
-    void testGetLocationWhenCompressionAreProvided() {
-        when(testFolderPath.resolve("123e4567-e89b-12d3-a456-556642440000.epub.gz"))
-                .thenReturn(testFilePath);
+    void testGetLocationWhenCompressionAreProvided() throws IOException {
+        final Path testFile = Files.createFile(testFolderPath.resolve("123e4567-e89b-12d3-a456-556642440000.epub.gz"));
 
         final VaultLocation result = underTest.getLocation(DOCUMENT_ENTITY, DocumentCompression.GZIP);
 
         assertThat(result)
                 .isInstanceOf(FileVaultLocation.class);
         assertThat(ReflectionTestUtils.getField(result, null, "vaultLocation"))
-                .isSameAs(testFilePath);
+                .isEqualTo(testFile);
     }
 
     @Test
-    void testGetLocationWhenDocumentEntityProvidesTheCompression() {
-        when(testFolderPath.resolve("123e4567-e89b-12d3-a456-556642440000.epub.lzma"))
-                .thenReturn(testFilePath);
+    void testGetLocationWhenDocumentEntityProvidesTheCompression() throws IOException {
+        final Path testFile = Files.createFile(testFolderPath.resolve("123e4567-e89b-12d3-a456-556642440000.epub.lzma"));
 
         final VaultLocation result = underTest.getLocation(DOCUMENT_ENTITY);
 
         assertThat(result)
                 .isInstanceOf(FileVaultLocation.class);
         assertThat(ReflectionTestUtils.getField(result, null, "vaultLocation"))
-                .isSameAs(testFilePath);
+                .isEqualTo(testFile);
     }
 }
