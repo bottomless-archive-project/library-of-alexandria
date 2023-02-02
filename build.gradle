@@ -55,18 +55,6 @@ configure(subprojects.findAll { it.name != 'loa-frontend' }) {
         }
     }
 
-    /*tasks.withType(Test).tap {
-        configureEach {
-            jvmArgs += "--enable-preview"
-        }
-    }
-
-    tasks.withType(JavaExec).tap {
-        configureEach {
-            jvmArgs += '--enable-preview'
-        }
-    }*/
-
     apply plugin: 'io.spring.dependency-management'
 
     dependencyManagement {

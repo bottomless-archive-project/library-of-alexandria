@@ -1,6 +1,6 @@
 dependencies {
     implementation group: 'commons-io', name: 'commons-io', version: '2.11.0'
-    implementation group: 'software.amazon.awssdk', name: 's3', version: '2.19.19'
+    implementation group: 'software.amazon.awssdk', name: 's3', version: '2.19.29'
 
     implementation project(':loa-library:loa-file-service')
     implementation project(':loa-library:loa-stage-service')
