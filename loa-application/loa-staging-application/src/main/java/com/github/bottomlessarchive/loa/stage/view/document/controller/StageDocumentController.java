@@ -1,6 +1,7 @@
 package com.github.bottomlessarchive.loa.stage.view.document.controller;
 
-import com.github.bottomlessarchive.loa.stage.configuration.StagingConfigurationProperties;
+import com.github.bottomlessarchive.loa.stage.service.StageLocationFactory;
+import com.github.bottomlessarchive.loa.stage.service.location.StageLocation;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +18,6 @@ import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 
 /**
  * This class is responsible to serve the web-related functionality of the Staging Application.
@@ -32,14 +32,14 @@ import java.nio.file.Path;
 @RequiredArgsConstructor
 public class StageDocumentController {
 
-    private final StagingConfigurationProperties stagingConfigurationProperties;
+    private final StageLocationFactory stageLocationFactory;
 
     @SneakyThrows
     @PostMapping("/document/{documentId}")
     public Mono<Void> persistDocument(@PathVariable final String documentId, @RequestPart("file") final Mono<FilePart> file) {
-        final Path documentLocation = stagingConfigurationProperties.location().resolve(documentId);
+        final StageLocation documentLocation = stageLocationFactory.getStageLocation(documentId);
 
-        return file.flatMap(p -> p.transferTo(documentLocation)
+        return file.flatMap(p -> p.transferTo(documentLocation.location())
                 .then(p.delete())
         );
     }
@@ -47,26 +47,26 @@ public class StageDocumentController {
     @SneakyThrows
     @GetMapping("/document/{documentId}")
     public Mono<Void> serveDocument(@PathVariable final String documentId, final ServerHttpResponse response) {
-        final Path documentLocation = stagingConfigurationProperties.location().resolve(documentId);
+        final StageLocation documentLocation = stageLocationFactory.getStageLocation(documentId);
 
         return ((ZeroCopyHttpOutputMessage) response)
-                .writeWith(documentLocation, 0, Files.size(documentLocation))
+                .writeWith(documentLocation.location(), 0, Files.size(documentLocation.location()))
                 .then(deleteIfExists(documentLocation));
     }
 
     @DeleteMapping("/document/{documentId}")
     public Mono<Void> deleteDocument(@PathVariable final String documentId) {
-        final Path documentLocation = stagingConfigurationProperties.location().resolve(documentId);
+        final StageLocation documentLocation = stageLocationFactory.getStageLocation(documentId);
 
         return deleteIfExists(documentLocation);
     }
 
-    private Mono<Void> deleteIfExists(final Path file) {
+    private Mono<Void> deleteIfExists(final StageLocation file) {
         return Mono.fromRunnable(() -> {
             try {
-                Files.deleteIfExists(file);
+                Files.deleteIfExists(file.location());
             } catch (IOException e) {
-                log.error("Failed to delete staging file at: {}!", file);
+                log.error("Failed to delete staging file at: {}!", file.location());
             }
         });
     }
