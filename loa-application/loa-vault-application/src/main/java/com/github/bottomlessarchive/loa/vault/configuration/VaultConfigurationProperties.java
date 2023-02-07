@@ -2,6 +2,8 @@ package com.github.bottomlessarchive.loa.vault.configuration;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import java.nio.file.Path;
+
 /**
  * Holds the configuration properties to the vault.
  *
@@ -22,6 +24,7 @@ public record VaultConfigurationProperties(
         boolean modificationEnabled,
         boolean archiving,
         int versionNumber,
-        int parallelism
+        int parallelism,
+        Path stagingDirectory
 ) {
 }
