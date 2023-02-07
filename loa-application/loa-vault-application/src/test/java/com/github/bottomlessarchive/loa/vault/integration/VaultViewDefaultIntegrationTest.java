@@ -6,7 +6,6 @@ import com.github.bottomlessarchive.loa.document.service.domain.DocumentEntity;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentStatus;
 import com.github.bottomlessarchive.loa.document.service.entity.factory.DocumentEntityFactory;
 import com.github.bottomlessarchive.loa.document.service.entity.factory.domain.DocumentCreationContext;
-import com.github.bottomlessarchive.loa.stage.configuration.StageConfigurationProperties;
 import com.github.bottomlessarchive.loa.stage.service.StageLocationFactory;
 import com.github.bottomlessarchive.loa.type.domain.DocumentType;
 import com.github.bottomlessarchive.loa.vault.service.location.file.configuration.FileConfigurationProperties;
@@ -65,8 +64,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(
         properties = {
                 "loa.conductor.port=2002",
-                "loa.stage.location=/stage/",
                 "loa.vault.archiving=false",
+                "loa.vault.staging-directory=/stage/",
                 "loa.vault.location.file.path=/vault/"
         }
 )
@@ -114,18 +113,12 @@ class VaultViewDefaultIntegrationTest {
 
             return new FileConfigurationProperties(FILE_SYSTEM.getPath("/vault"));
         }
-
-        @Bean
-        @Primary
-        public StageConfigurationProperties stageConfigurationProperties() throws IOException {
-            Files.createDirectories(FILE_SYSTEM.getPath("/stage"));
-
-            return new StageConfigurationProperties(FILE_SYSTEM.getPath("/stage"));
-        }
     }
 
     @BeforeAll
-    static void setup() {
+    static void setup() throws IOException {
+        Files.createDirectories(FILE_SYSTEM.getPath("/stage"));
+
         expectStartupServiceCalls();
     }
 

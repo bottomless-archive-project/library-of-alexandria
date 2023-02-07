@@ -2,7 +2,7 @@ package com.github.bottomlessarchive.loa.downloader.integration;
 
 import com.github.bottomlessarchive.loa.application.domain.ApplicationType;
 import com.github.bottomlessarchive.loa.downloader.service.source.queue.QueueMessageHandler;
-import com.github.bottomlessarchive.loa.stage.configuration.StageConfigurationProperties;
+import com.github.bottomlessarchive.loa.stage.service.StageLocationFactory;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import com.google.common.jimfs.Configuration;
 import com.google.common.jimfs.Jimfs;
@@ -74,10 +74,10 @@ class QueueSourceIntegrationTest {
 
         @Bean
         @Primary
-        public StageConfigurationProperties stageConfigurationProperties() throws IOException {
+        public StageLocationFactory stageLocationFactory() throws IOException {
             Files.createDirectories(FILE_SYSTEM.getPath("/stage"));
 
-            return new StageConfigurationProperties(FILE_SYSTEM.getPath("/stage"));
+            return new StageLocationFactory(FILE_SYSTEM.getPath("/stage"));
         }
     }
 

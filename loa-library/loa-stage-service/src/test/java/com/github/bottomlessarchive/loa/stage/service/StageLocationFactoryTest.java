@@ -1,6 +1,5 @@
 package com.github.bottomlessarchive.loa.stage.service;
 
-import com.github.bottomlessarchive.loa.stage.configuration.StageConfigurationProperties;
 import com.github.bottomlessarchive.loa.stage.service.domain.StageLocation;
 import com.google.common.jimfs.Configuration;
 import com.google.common.jimfs.Jimfs;
@@ -33,9 +32,7 @@ class StageLocationFactoryTest {
 
         stageLocation = fileSystem.getPath("/stage/location");
 
-        underTest = new StageLocationFactory(
-                new StageConfigurationProperties(stageLocation)
-        );
+        underTest = new StageLocationFactory(stageLocation);
     }
 
     @AfterEach

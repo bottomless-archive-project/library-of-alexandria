@@ -23,7 +23,7 @@ The <<Downloader Application>> is scalable so if one machine is working at full 
 
 include::../service/conductor/conductor-configuration.adoc[]
 
-| **loa.stage.location**
+| **loa.downloader.staging-directory**
 | The location where the document files are first downloaded. After some validation and occasionally modification (compression etc) it is moved to the vault. *(Default value: temp folder)*
 
 | **loa.downloader.version-number**

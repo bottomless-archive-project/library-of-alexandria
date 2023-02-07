@@ -2,6 +2,8 @@ package com.github.bottomlessarchive.loa.downloader.configuration;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import java.nio.file.Path;
+
 @ConfigurationProperties("loa.downloader")
 public record DownloaderConfigurationProperties(
 
@@ -14,6 +16,7 @@ public record DownloaderConfigurationProperties(
          */
         int versionNumber,
         SourceLocation source,
-        int parallelism
+        int parallelism,
+        Path stagingDirectory
 ) {
 }

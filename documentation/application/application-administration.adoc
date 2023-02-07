@@ -24,7 +24,7 @@ include::../service/conductor/conductor-configuration.adoc[]
 | **loa.indexer.database.port**
 | The port of the Elasticsearch database.
 
-| **loa.stage.location**
+| **loa.administrator.staging-directory**
 | Required only for the `recollect-corrupt-documents` command. The location where the document files are first downloaded. After some validation and occasionally modification (compression etc) it is moved to the vault. *(Default value: temp folder)*
 |===
 

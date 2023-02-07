@@ -2,8 +2,12 @@ package com.github.bottomlessarchive.loa.beacon.configuration;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import java.nio.file.Path;
+
 @ConfigurationProperties("loa.beacon")
 public record BeaconConfigurationProperties(
-        String storagePath
+
+        String storagePath, // TODO: storageDirectory and it should be a Path
+        Path stagingDirectory
 ) {
 }
