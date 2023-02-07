@@ -1,0 +1,16 @@
+= Disc usage patterns
+
+Because of it's distributed nature, the application might show some unusual disc usage patterns.
+For example, every document is written 3 times to various media.
+It _might_ be important to put these folders on different physical discs for performance or durability reasons.
+
+This part of the documentation exists so users have a better understanding of what usage patterns they might expect for different applications/folders.
+
+== Queue Data Directory
+
+The *loa.queue.data-directory* is usually small is size.
+The files in this folder are usually memory-mapped so any kind of generic SSD might work for this folder.
+It stores the intermittent messaging between the applications.
+This usually consist of the URLs to download, adn the metadata of the documents until they are moved into the vault.
+Even when processing large amount of URLs or documents, the size of this folder should be under 50-100 GB.
+For example, 200 million URLs in the downloader queue takes up around 30 GB of disk space.
