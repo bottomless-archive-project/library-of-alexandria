@@ -8,6 +8,7 @@ import com.github.bottomlessarchive.loa.document.service.entity.factory.Document
 import com.github.bottomlessarchive.loa.document.service.entity.factory.domain.DocumentCreationContext;
 import com.github.bottomlessarchive.loa.stage.service.StageLocationFactory;
 import com.github.bottomlessarchive.loa.type.domain.DocumentType;
+import com.github.bottomlessarchive.loa.vault.service.VaultFreeSpaceInstancePropertyExtensionProvider;
 import com.github.bottomlessarchive.loa.vault.service.location.file.configuration.FileConfigurationProperties;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import com.google.common.jimfs.Configuration;
@@ -25,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
@@ -78,6 +80,10 @@ class VaultViewDefaultIntegrationTest {
 
     @Captor
     private ArgumentCaptor<UUID> uuidArgumentCaptor;
+
+    // Replacing this bean with a dummy implementation, so it doesn't cause anz timing issues with the filesystem mocking.
+    @MockBean
+    private VaultFreeSpaceInstancePropertyExtensionProvider vaultFreeSpaceInstancePropertyExtensionProvider;
 
     @SpyBean
     private StageLocationFactory stageLocationFactory;

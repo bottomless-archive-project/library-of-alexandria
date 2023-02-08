@@ -68,7 +68,7 @@ public class FileVaultLocationFactory implements VaultLocationFactory {
 
         if (!Files.exists(vaultFolderPath)) {
             try {
-                log.info("Vault folder doesn't exists! Creating new stage folder on path: {}.", vaultFolderPath);
+                log.info("Vault folder doesn't exists! Creating new vault folder on path: {}.", vaultFolderPath);
 
                 Files.createDirectories(vaultFolderPath);
             } catch (final IOException e) {
