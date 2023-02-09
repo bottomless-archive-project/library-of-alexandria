@@ -8,6 +8,7 @@ import com.github.bottomlessarchive.loa.document.service.entity.factory.Document
 import com.github.bottomlessarchive.loa.document.service.entity.factory.domain.DocumentCreationContext;
 import com.github.bottomlessarchive.loa.stage.service.StageLocationFactory;
 import com.github.bottomlessarchive.loa.type.domain.DocumentType;
+import com.github.bottomlessarchive.loa.vault.service.conductor.VaultInstancePropertyExtensionProvider;
 import com.github.bottomlessarchive.loa.vault.service.location.file.configuration.FileConfigurationProperties;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import com.google.common.jimfs.Configuration;
