@@ -10,10 +10,10 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class VaultInstancePropertyExtensionProvider implements InstancePropertyExtensionProvider {
 
-    private final VaultLocationFactory vaultDocumentManager;
+    private final VaultLocationFactory vaultLocationFactory;
 
     @Override
     public void extendInstanceWithProperty(final InstanceExtensionContext instanceExtensionContext) {
-        instanceExtensionContext.setProperty("freeSpace", String.valueOf(vaultDocumentManager.getAvailableSpace()));
+        instanceExtensionContext.setProperty("freeSpace", String.valueOf(vaultLocationFactory.getAvailableSpace()));
     }
 }
