@@ -9,6 +9,7 @@ import com.github.bottomlessarchive.loa.document.service.entity.factory.Document
 import com.github.bottomlessarchive.loa.document.service.entity.factory.domain.DocumentCreationContext;
 import com.github.bottomlessarchive.loa.stage.service.StageLocationFactory;
 import com.github.bottomlessarchive.loa.type.domain.DocumentType;
+import com.github.bottomlessarchive.loa.vault.configuration.VaultConfigurationProperties;
 import com.github.bottomlessarchive.loa.vault.service.location.file.configuration.FileConfigurationProperties;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import com.google.common.jimfs.Configuration;
@@ -66,10 +67,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Testcontainers
 @SpringBootTest(
         properties = {
-                "loa.conductor.port=2002",
-                "loa.vault.archiving=false",
-                "loa.vault.staging-directory=/stage/",
-                "loa.vault.location.file.path=/vault/"
+                "loa.conductor.port=2002"
         }
 )
 @DirtiesContext
@@ -117,6 +115,12 @@ class VaultViewDefaultIntegrationTest {
             Files.createDirectories(FILE_SYSTEM.getPath("/vault"));
 
             return new FileConfigurationProperties(FILE_SYSTEM.getPath("/vault"));
+        }
+
+        @Bean
+        @Primary
+        public VaultConfigurationProperties vaultConfigurationProperties() {
+            return new VaultConfigurationProperties("default", true, false, 1, 1, FILE_SYSTEM.getPath("/stage"));
         }
     }
 
