@@ -9,7 +9,7 @@ import com.github.bottomlessarchive.loa.document.service.entity.factory.Document
 import com.github.bottomlessarchive.loa.document.service.entity.factory.domain.DocumentCreationContext;
 import com.github.bottomlessarchive.loa.stage.service.StageLocationFactory;
 import com.github.bottomlessarchive.loa.type.domain.DocumentType;
-import com.github.bottomlessarchive.loa.vault.service.conductor.VaultInstancePropertyExtensionProvider;
+import com.github.bottomlessarchive.loa.vault.configuration.VaultConfigurationProperties;
 import com.github.bottomlessarchive.loa.vault.service.location.file.configuration.FileConfigurationProperties;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import com.google.common.jimfs.Configuration;
@@ -32,6 +32,7 @@ import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.MongoDBContainer;
@@ -66,15 +67,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Testcontainers
 @SpringBootTest(
         properties = {
-                "loa.conductor.port=2002",
-                "loa.vault.archiving=false",
-                "loa.vault.staging-directory=/stage/",
-                "loa.vault.location.file.path=/vault/"
+                "loa.conductor.port=2002"
         }
 )
+@DirtiesContext
 @AutoConfigureMockMvc
-@WireMockTest(httpPort = 2002)
 @MockBean(InstanceRefreshSchedulerService.class)
+@WireMockTest(httpPort = 2002)
 class VaultViewDefaultIntegrationTest {
 
     @Autowired
@@ -82,10 +81,6 @@ class VaultViewDefaultIntegrationTest {
 
     @Captor
     private ArgumentCaptor<UUID> uuidArgumentCaptor;
-
-    // Replacing this bean with a dummy implementation, so it doesn't cause anz timing issues with the filesystem mocking.
-    @MockBean
-    private VaultInstancePropertyExtensionProvider vaultInstancePropertyExtensionProvider;
 
     @SpyBean
     private StageLocationFactory stageLocationFactory;
@@ -120,6 +115,12 @@ class VaultViewDefaultIntegrationTest {
             Files.createDirectories(FILE_SYSTEM.getPath("/vault"));
 
             return new FileConfigurationProperties(FILE_SYSTEM.getPath("/vault"));
+        }
+
+        @Bean
+        @Primary
+        public VaultConfigurationProperties vaultConfigurationProperties() {
+            return new VaultConfigurationProperties("default", true, false, 1, 1, FILE_SYSTEM.getPath("/stage"));
         }
     }
 
