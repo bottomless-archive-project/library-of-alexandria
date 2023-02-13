@@ -2,6 +2,7 @@ package com.github.bottomlessarchive.loa.vault.integration;
 
 import com.github.bottomlessarchive.loa.application.domain.ApplicationType;
 import com.github.bottomlessarchive.loa.compression.domain.DocumentCompression;
+import com.github.bottomlessarchive.loa.conductor.service.InstanceRefreshSchedulerService;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentEntity;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentStatus;
 import com.github.bottomlessarchive.loa.document.service.entity.factory.DocumentEntityFactory;
@@ -25,10 +26,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.MongoDBContainer;
@@ -69,7 +72,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 "loa.vault.location.file.path=/vault/"
         }
 )
+@DirtiesContext
 @AutoConfigureMockMvc
+@MockBean(InstanceRefreshSchedulerService.class)
 @WireMockTest(httpPort = 2002)
 class VaultViewDefaultIntegrationTest {
 

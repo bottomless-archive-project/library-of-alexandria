@@ -19,7 +19,7 @@ public class InstanceRefreshSchedulerService {
 
     private UUID instanceId;
 
-    @Scheduled(fixedRate = 60, timeUnit = TimeUnit.SECONDS, initialDelay = 10)
+    @Scheduled(fixedRate = 60, timeUnit = TimeUnit.SECONDS)
     public void refreshInstance() {
         if (instanceId == null) {
             instanceId = conductorClient.registerInstance(conductorClientConfigurationProperties.applicationType());
