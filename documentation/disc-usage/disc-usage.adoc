@@ -15,11 +15,10 @@ This usually consist of the URLs to download, adn the metadata of the documents 
 Even when processing large amount of URLs or documents, the size of this folder should be under 50-100 GB.
 For example, 200 million URLs in the downloader queue takes up around 30 GB of disk space.
 
-== Temporary Download Folder
+== Temporary Stage Folders
 
-The *Downloader Application's* *loa.stage.location* is where files are downloaded before they are getting verified and validated.
-It exists because we don't want to store every document that is under processing by the Downloader in the memory.
+The *Downloader Application, Vault Application, Beacon Application and Administrator Application* has its own stage directory, where files are downloaded temporarily, before they are getting verified and validated or processed further in any way.
+It exists because we don't want to store every document that is under processing by the respective application in the memory.
 For some documents, the app downloads 500 MBs, but it fails to validate in the first few bytes (PDFs are parsed from the end of the file).
 In this case it is pointless and very wasteful to hold the whole document in memory.
 Because of this, the files in this folder are very short-lived. They are deleted almost immediately after the downloading is finished.
-It is important to know that the loa.staging.path parameter is NOT the same as this folder, and both paths should point to different folders.
