@@ -2,14 +2,13 @@ package com.github.bottomlessarchive.loa.vault.integration;
 
 import com.github.bottomlessarchive.loa.application.domain.ApplicationType;
 import com.github.bottomlessarchive.loa.compression.domain.DocumentCompression;
-import com.github.bottomlessarchive.loa.conductor.service.InstanceRefreshSchedulerService;
+import com.github.bottomlessarchive.loa.conductor.service.client.configuration.ConductorClientConfiguration;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentEntity;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentStatus;
 import com.github.bottomlessarchive.loa.document.service.entity.factory.DocumentEntityFactory;
 import com.github.bottomlessarchive.loa.document.service.entity.factory.domain.DocumentCreationContext;
 import com.github.bottomlessarchive.loa.stage.service.StageLocationFactory;
 import com.github.bottomlessarchive.loa.type.domain.DocumentType;
-import com.github.bottomlessarchive.loa.vault.service.conductor.VaultInstancePropertyExtensionProvider;
 import com.github.bottomlessarchive.loa.vault.service.location.file.configuration.FileConfigurationProperties;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import com.google.common.jimfs.Configuration;
@@ -74,7 +73,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 )
 @AutoConfigureMockMvc
 @WireMockTest(httpPort = 2002)
-@MockBean(InstanceRefreshSchedulerService.class)
+@MockBean(ConductorClientConfiguration.class)
 class VaultViewDefaultIntegrationTest {
 
     @Autowired
@@ -82,10 +81,6 @@ class VaultViewDefaultIntegrationTest {
 
     @Captor
     private ArgumentCaptor<UUID> uuidArgumentCaptor;
-
-    // Replacing this bean with a dummy implementation, so it doesn't cause anz timing issues with the filesystem mocking.
-    @MockBean
-    private VaultInstancePropertyExtensionProvider vaultInstancePropertyExtensionProvider;
 
     @SpyBean
     private StageLocationFactory stageLocationFactory;
