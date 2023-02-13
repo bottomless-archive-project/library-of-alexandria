@@ -11,7 +11,6 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 @Service
-@Profile("!integration-test")
 @RequiredArgsConstructor
 public class InstanceRefreshSchedulerService {
 
@@ -20,7 +19,7 @@ public class InstanceRefreshSchedulerService {
 
     private UUID instanceId;
 
-    @Scheduled(fixedRate = 60, timeUnit = TimeUnit.SECONDS)
+    @Scheduled(fixedRate = 60, timeUnit = TimeUnit.SECONDS, initialDelay = 10)
     public void refreshInstance() {
         if (instanceId == null) {
             instanceId = conductorClient.registerInstance(conductorClientConfigurationProperties.applicationType());
