@@ -2,6 +2,7 @@ package com.github.bottomlessarchive.loa.vault.integration;
 
 import com.github.bottomlessarchive.loa.application.domain.ApplicationType;
 import com.github.bottomlessarchive.loa.compression.domain.DocumentCompression;
+import com.github.bottomlessarchive.loa.conductor.service.InstanceRefreshSchedulerService;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentEntity;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentStatus;
 import com.github.bottomlessarchive.loa.document.service.entity.factory.DocumentEntityFactory;
@@ -71,8 +72,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 "loa.vault.location.file.path=/vault/"
         }
 )
-@WireMockTest(httpPort = 2002)
 @AutoConfigureMockMvc
+@WireMockTest(httpPort = 2002)
+@MockBean(InstanceRefreshSchedulerService.class)
 class VaultViewDefaultIntegrationTest {
 
     @Autowired
