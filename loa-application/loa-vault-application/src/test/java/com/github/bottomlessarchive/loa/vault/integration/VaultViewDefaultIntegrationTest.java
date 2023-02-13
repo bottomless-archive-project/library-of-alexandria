@@ -68,7 +68,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 "loa.conductor.port=2002",
                 "loa.vault.archiving=false",
                 "loa.vault.staging-directory=/stage/",
-                "loa.vault.location.file.path=/vault/"
+                "loa.vault.location.file.path=/vault/",
+                "spring.autoconfigure.exclude=com.github.bottomlessarchive.loa.conductor.service.client.configuration.ConductorClientConfiguration"
         }
 )
 @AutoConfigureMockMvc
