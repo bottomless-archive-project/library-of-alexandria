@@ -30,6 +30,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Profile;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.containers.GenericContainer;
@@ -68,11 +69,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 "loa.conductor.port=2002",
                 "loa.vault.archiving=false",
                 "loa.vault.staging-directory=/stage/",
-                "loa.vault.location.file.path=/vault/",
-                "spring.autoconfigure.exclude="
-                        + "com.github.bottomlessarchive.loa.conductor.service.client.configuration.ConductorClientConfiguration"
+                "loa.vault.location.file.path=/vault/"
         }
 )
+@Profile("integration-test")
 @AutoConfigureMockMvc
 @WireMockTest(httpPort = 2002)
 @MockBean(ConductorClientConfiguration.class)
