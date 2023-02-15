@@ -1,7 +1,7 @@
 = Disc usage patterns
 
 Because of it's distributed nature, the application might show some unusual disc usage patterns.
-For example, every document is written 3 times to various media.
+For example, every document is written 4 times to various media.
 It _might_ be important to put these folders on different physical discs for performance or durability reasons.
 
 This part of the documentation exists so users have a better understanding of what usage patterns they might expect for different applications/folders.
