@@ -1,25 +1,38 @@
 = Disc usage patterns
 
 Because of it's distributed nature, the application might show some unusual disc usage patterns.
-For example, every document is written 3 times to various media.
+For example, every document is written 4 times to various media.
 It _might_ be important to put these folders on different physical discs for performance or durability reasons.
 
 This part of the documentation exists so users have a better understanding of what usage patterns they might expect for different applications/folders.
 
 == Queue Data Directory
 
-The *Queue Application's* *loa.queue.data-directory* is usually small is size.
+The *Queue Application's* *loa.queue.data-directory* is usually small in size.
 The files in this folder are usually memory-mapped so any kind of generic SSD might work for this folder.
 It stores the intermittent messaging between the applications.
 This usually consist of the URLs to download, adn the metadata of the documents until they are moved into the vault.
 Even when processing large amount of URLs or documents, the size of this folder should be under 50-100 GB.
 For example, 200 million URLs in the downloader queue takes up around 30 GB of disk space.
 
-== Temporary Download Folder
+== Temporary Stage Folders
 
-The *Downloader Application's* *loa.stage.location* is where files are downloaded before they are getting verified and validated.
-It exists because we don't want to store every document that is under processing by the Downloader in the memory.
+The *Downloader Application, Vault Application, Beacon Application and Administrator Application* has its own stage directory, where files are downloaded temporarily, before they are getting verified and validated or processed further in any way.
+It exists because we don't want to store every document that is under processing by the respective application in the memory.
 For some documents, the app downloads 500 MBs, but it fails to validate in the first few bytes (PDFs are parsed from the end of the file).
 In this case it is pointless and very wasteful to hold the whole document in memory.
-Because of this, the files in this folder are very short-lived. They are deleted almost immediately after the downloading is finished.
-It is important to know that the loa.staging.path parameter is NOT the same as this folder, and both paths should point to different folders.
+Because of this, the files in this folder are very short-lived.
+They are deleted almost immediately after the downloading is finished.
+
+== Staging Data Directory
+
+The *Staging Application's* *loa.staging.path* folder is used as a temporary location for documents, before they are permanently moved into a vault.
+When the Downloader Application download the file, and it appears to be a valid document, then the Downloader sends its content to the Staging Application.
+The Staging Application stores the content of the documents in this folder.
+As soon as a Vault Application stores the document in its vault (grabbing the document's content from the Staging Application in the process), the file belonging to that document will be removed from this folder.
+The only time when documents can pile up in this folder, is if when no vaults running (and archiving), but the Downloader still downloads new documents.
+Under normal operation, this folder should never grow out of hand.
+
+== Vault Data Directory
+
+The *Vault Application's* *loa.vault.location.file.path* is a permanent folder. This is where every document will end up if the vault's backed is `FILE`.
