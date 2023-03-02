@@ -16,8 +16,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class DocumentDebugController {
 
-    private final DocumentDebugResponseFactory documentDebugResponseFactory;
     private final DocumentEntityFactory documentEntityFactory;
+    private final DocumentDebugResponseFactory documentDebugResponseFactory;
 
     @GetMapping("/document/{documentId}/debug")
     public DocumentDebugResponse getDocumentById(@PathVariable final String documentId) {
