@@ -22,7 +22,7 @@ public class DocumentSearchController {
     private final DocumentSearchClient documentSearchClient;
     private final SearchDocumentEntityResponseTransformer documentEntityResponseTransformer;
 
-    @GetMapping("/document/find-by/keyword/{keyword}")
+    @GetMapping("/document/find-by/keyword/{keyword}/")
     public DocumentSearchResponse queryDocuments(@PathVariable final String keyword,
             @RequestParam(defaultValue = "0") final int pageNumber,
             @RequestParam(defaultValue = "10") final int resultSize,
