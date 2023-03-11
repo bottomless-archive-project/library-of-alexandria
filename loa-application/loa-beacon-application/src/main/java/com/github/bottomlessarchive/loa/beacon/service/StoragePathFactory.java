@@ -14,7 +14,7 @@ public class StoragePathFactory {
     private final BeaconConfigurationProperties beaconConfigurationProperties;
 
     public Path buildStoragePath(final UUID documentId) {
-        return Path.of(beaconConfigurationProperties.storagePath())
+        return beaconConfigurationProperties.storageDirectory()
                 .resolve(documentId.toString());
     }
 }

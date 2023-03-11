@@ -7,7 +7,7 @@ import java.nio.file.Path;
 @ConfigurationProperties("loa.beacon")
 public record BeaconConfigurationProperties(
 
-        String storagePath, // TODO: storageDirectory and it should be a Path
+        Path storageDirectory,
         Path stagingDirectory
 ) {
 }
