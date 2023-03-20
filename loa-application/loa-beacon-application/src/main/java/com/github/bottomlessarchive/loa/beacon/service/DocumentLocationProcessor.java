@@ -1,6 +1,7 @@
 package com.github.bottomlessarchive.loa.beacon.service;
 
 import com.github.bottomlessarchive.loa.beacon.service.domain.DocumentLocation;
+import com.github.bottomlessarchive.loa.beacon.service.domain.DocumentLocationProcessingException;
 import com.github.bottomlessarchive.loa.beacon.service.domain.DocumentLocationResult;
 import jdk.incubator.concurrent.StructuredTaskScope;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +32,7 @@ public class DocumentLocationProcessor {
                     .map(Future::resultNow)
                     .toList();
         } catch (ExecutionException | InterruptedException e) {
-            throw new RuntimeException(e); //TODO
+            throw new DocumentLocationProcessingException("Failed to process locations!", e);
         }
     }
 
