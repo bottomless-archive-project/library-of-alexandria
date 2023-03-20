@@ -1,0 +1,4 @@
+dependencies {
+    implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: '2.0.27'
+    implementation group: 'net.coobird', name: 'thumbnailator', version: '0.4.19'
+}

@@ -1,9 +1,9 @@
 package com.github.bottomlessarchive.loa.web.view.document.controller;
 
 import com.github.bottomlessarchive.loa.document.service.entity.factory.DocumentEntityFactory;
+import com.github.bottomlessarchive.loa.renderer.service.DocumentRenderer;
 import com.github.bottomlessarchive.loa.type.domain.DocumentType;
 import com.github.bottomlessarchive.loa.vault.client.service.VaultClientService;
-import com.github.bottomlessarchive.loa.web.view.document.service.DocumentRenderer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;

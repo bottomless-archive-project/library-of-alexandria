@@ -1,6 +1,6 @@
-package com.github.bottomlessarchive.loa.web.view.document.service;
+package com.github.bottomlessarchive.loa.renderer.service;
 
-import com.github.bottomlessarchive.loa.web.view.document.service.domain.ImageRenderingException;
+import com.github.bottomlessarchive.loa.renderer.service.domain.ImageRenderingException;
 import lombok.RequiredArgsConstructor;
 import net.coobird.thumbnailator.Thumbnails;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -16,7 +16,6 @@ import java.io.InputStream;
 @RequiredArgsConstructor
 public class DocumentRenderer {
 
-    //TODO: This should be moved into its own module!
     public byte[] renderFirstPage(final InputStream documentContent) {
         try (PDDocument document = PDDocument.load(documentContent); documentContent) {
             final PDFRenderer pdfRenderer = new PDFRenderer(document);
