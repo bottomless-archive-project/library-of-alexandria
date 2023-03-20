@@ -7,7 +7,6 @@ import java.nio.file.Path;
 @ConfigurationProperties("loa.downloader.beacon")
 public record BeaconDownloaderConfigurationProperties(
 
-        //TODO: Support more than one beacons!
         String activeBeacon,
         int requestSize,
         Path location
