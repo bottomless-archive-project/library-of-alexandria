@@ -47,7 +47,6 @@ public class BeaconLoadocDocumentLoader implements CommandLineRunner {
         log.info("Started processing documents at folder: {}.", sourceFolder);
 
         try (Stream<Path> files = Files.list(sourceFolder)) {
-            //TODO: Instead of raw archive, the file should be specially loaded. First the metadata then the content.
             files.forEach(beaconDocumentArchiver::archiveOfflineCollectedFile);
         }
 
