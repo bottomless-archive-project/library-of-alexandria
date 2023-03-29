@@ -1,6 +1,5 @@
 package com.github.bottomlessarchive.loa.downloader.service.source.beacon.loadocloader;
 
-import com.github.bottomlessarchive.loa.downloader.service.source.beacon.configuration.BeaconDownloaderConfigurationProperties;
 import com.github.bottomlessarchive.loa.downloader.service.source.beacon.loader.BeaconDocumentArchiver;
 import com.github.bottomlessarchive.loa.downloader.service.source.beacon.loadocloader.configuration.LoadocLoaderBeaconConfigurationProperties;
 import com.github.bottomlessarchive.loa.logging.service.MetricLogger;
@@ -41,7 +40,7 @@ public class BeaconLoadocDocumentLoader implements CommandLineRunner {
     private final Counter archivedDocumentCount;
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(final String... args) throws Exception {
         final Path sourceFolder = loadocLoaderBeaconConfigurationProperties.location();
 
         log.info("Started processing documents at folder: {}.", sourceFolder);

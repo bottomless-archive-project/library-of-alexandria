@@ -30,7 +30,7 @@ public class OfflineBeaconDownloader implements CommandLineRunner {
     private final OfflineBeaconDownloaderConfigurationProperties offlineBeaconDownloaderConfigurationProperties;
 
     @Override
-    public void run(String... args) throws IOException {
+    public void run(final String... args) throws IOException {
         queueManipulator.silentlyInitializeQueues(Queue.DOCUMENT_LOCATION_QUEUE, Queue.DOCUMENT_ARCHIVING_QUEUE);
 
         final List<DocumentLocation> documentLocationMessages = documentLocationCollector.collectDocumentsToProcess(
