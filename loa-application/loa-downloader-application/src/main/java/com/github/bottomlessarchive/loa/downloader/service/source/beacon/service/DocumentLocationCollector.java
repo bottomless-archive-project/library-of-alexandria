@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,8 +24,8 @@ public class DocumentLocationCollector {
     private final QueueManipulator queueManipulator;
     private final DocumentLocationEvaluator documentLocationEvaluator;
 
-    public List<DocumentLocation> collectDocumentsToProcess(final int documentCountToCollect) {
-        final List<DocumentLocation> documentLocationMessages = new ArrayList<>(documentCountToCollect);
+    public List<DocumentLocation> collectDocumentsToProcess(final long documentCountToCollect) {
+        final List<DocumentLocation> documentLocationMessages = new LinkedList<>();
 
         while (documentLocationMessages.size() != documentCountToCollect) {
             final Optional<DocumentLocationMessage> documentLocationMessage =

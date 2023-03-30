@@ -1,9 +1,9 @@
 package com.github.bottomlessarchive.loa.web.view.document.controller;
 
 import com.github.bottomlessarchive.loa.document.service.entity.factory.DocumentEntityFactory;
+import com.github.bottomlessarchive.loa.renderer.service.DocumentRendererService;
 import com.github.bottomlessarchive.loa.type.domain.DocumentType;
 import com.github.bottomlessarchive.loa.vault.client.service.VaultClientService;
-import com.github.bottomlessarchive.loa.web.view.document.service.DocumentRenderer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,7 +22,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class DocumentImageController {
 
-    private final DocumentRenderer documentRenderer;
+    private final DocumentRendererService documentRendererService;
     private final VaultClientService vaultClientService;
     private final DocumentEntityFactory documentEntityFactory;
 
@@ -42,7 +42,7 @@ public class DocumentImageController {
                     }
 
                     try (InputStream documentContent = vaultClientService.queryDocument(documentEntity)) {
-                        return documentRenderer.renderFirstPage(documentContent);
+                        return documentRendererService.renderFirstPage(documentContent);
                     } catch (IOException e) {
                         throw new IllegalStateException("Failed to query document from vault!", e);
                     }

@@ -1,4 +1,4 @@
-package com.github.bottomlessarchive.loa.web.view.document.service.domain;
+package com.github.bottomlessarchive.loa.renderer.service.domain;
 
 import lombok.experimental.StandardException;
 

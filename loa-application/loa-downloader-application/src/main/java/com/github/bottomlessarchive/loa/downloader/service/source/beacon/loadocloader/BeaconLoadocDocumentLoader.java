@@ -1,6 +1,7 @@
-package com.github.bottomlessarchive.loa.downloader.service.source.beacon.loader;
+package com.github.bottomlessarchive.loa.downloader.service.source.beacon.loadocloader;
 
-import com.github.bottomlessarchive.loa.downloader.service.source.beacon.configuration.BeaconDownloaderConfigurationProperties;
+import com.github.bottomlessarchive.loa.downloader.service.source.beacon.loader.BeaconDocumentArchiver;
+import com.github.bottomlessarchive.loa.downloader.service.source.beacon.loadocloader.configuration.LoadocLoaderBeaconConfigurationProperties;
 import com.github.bottomlessarchive.loa.logging.service.MetricLogger;
 import io.micrometer.core.instrument.Counter;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +13,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.ExecutorService;
@@ -22,13 +22,13 @@ import java.util.stream.Stream;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@ConditionalOnProperty(value = "loa.downloader.source", havingValue = "beacon-loader")
-public class BeaconDocumentLoader implements CommandLineRunner {
+@ConditionalOnProperty(value = "loa.downloader.source", havingValue = "loadoc-loader")
+public class BeaconLoadocDocumentLoader implements CommandLineRunner {
 
     private final MetricLogger metricLogger;
     private final ApplicationContext applicationContext;
     private final BeaconDocumentArchiver beaconDocumentArchiver;
-    private final BeaconDownloaderConfigurationProperties beaconDownloaderConfigurationProperties;
+    private final LoadocLoaderBeaconConfigurationProperties loadocLoaderBeaconConfigurationProperties;
 
     @Qualifier("downloaderExecutorService")
     private final ExecutorService downloaderExecutorService;
@@ -40,13 +40,13 @@ public class BeaconDocumentLoader implements CommandLineRunner {
     private final Counter archivedDocumentCount;
 
     @Override
-    public void run(final String... args) throws IOException {
-        final Path sourceFolder = beaconDownloaderConfigurationProperties.location();
+    public void run(final String... args) throws Exception {
+        final Path sourceFolder = loadocLoaderBeaconConfigurationProperties.location();
 
         log.info("Started processing documents at folder: {}.", sourceFolder);
 
         try (Stream<Path> files = Files.list(sourceFolder)) {
-            files.forEach(beaconDocumentArchiver::archiveFile);
+            files.forEach(beaconDocumentArchiver::archiveOfflineCollectedFile);
         }
 
         awaitTasksToFinish();
