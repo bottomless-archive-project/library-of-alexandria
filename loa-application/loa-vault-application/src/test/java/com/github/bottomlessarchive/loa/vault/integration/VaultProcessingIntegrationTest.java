@@ -101,7 +101,7 @@ class VaultProcessingIntegrationTest {
                         .build()
         );
 
-        Thread.sleep(5000); // So the message is actually processed
+        Thread.sleep(Duration.ofSeconds(5)); // So the message is actually processed
 
         final Optional<DocumentEntity> documentEntity = documentEntityFactory.getDocumentEntity(documentId);
 
@@ -176,7 +176,7 @@ class VaultProcessingIntegrationTest {
                         .build()
         );
 
-        Thread.sleep(5000); // So the message is actually processed
+        Thread.sleep(Duration.ofSeconds(5)); // So the message is actually processed
 
         final Optional<DocumentEntity> documentEntity = documentEntityFactory.getDocumentEntity(documentId);
 
@@ -259,7 +259,7 @@ class VaultProcessingIntegrationTest {
                         .build()
         );
 
-        Thread.sleep(5000); // So the message is actually processed
+        Thread.sleep(Duration.ofSeconds(5)); // So the message is actually processed
 
         final Optional<DocumentEntity> documentEntity = documentEntityFactory.getDocumentEntity(documentId);
 

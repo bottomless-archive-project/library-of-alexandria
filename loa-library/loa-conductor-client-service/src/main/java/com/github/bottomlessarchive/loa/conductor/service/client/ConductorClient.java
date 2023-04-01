@@ -30,6 +30,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -59,7 +60,7 @@ public class ConductorClient {
 
             if (instance.isEmpty()) {
                 try {
-                    Thread.sleep(62000);
+                    Thread.sleep(Duration.ofSeconds(62));
                 } catch (InterruptedException e) {
                     throw new ConductorClientException("Error while querying the Conductor Application!", e);
                 }

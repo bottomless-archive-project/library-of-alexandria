@@ -17,6 +17,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClas
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.time.Duration;
 import java.util.Map;
 import java.util.Optional;
 
@@ -70,7 +71,7 @@ public class QueueClientConfiguration {
             } else {
                 log.info("Failed to acquire connection to a Queue Application. Will retry in 5 seconds.");
 
-                Thread.sleep(5000L);
+                Thread.sleep(Duration.ofSeconds(5));
             }
         }
 

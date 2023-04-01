@@ -100,7 +100,7 @@ class QueueSourceIntegrationTest {
 
     @Test
     void testNoMessage() throws InterruptedException {
-        Thread.sleep(1000);
+        Thread.sleep(Duration.ofSeconds(1));
 
         verify(queueMessageHandler, never())
                 .handleMessage(any());

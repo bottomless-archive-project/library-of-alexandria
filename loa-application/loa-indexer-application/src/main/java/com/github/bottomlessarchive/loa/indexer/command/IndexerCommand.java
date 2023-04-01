@@ -10,6 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import java.time.Duration;
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -36,7 +38,7 @@ public class IndexerCommand implements CommandLineRunner {
 
             log.info("Finished indexing a batch of documents. Waiting five second before looking for new ones.");
 
-            Thread.sleep(5000);
+            Thread.sleep(Duration.ofSeconds(5));
         }
     }
 
