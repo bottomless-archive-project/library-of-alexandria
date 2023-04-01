@@ -16,7 +16,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.ByteArrayInputStream;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.nio.file.Path;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -47,7 +46,7 @@ class SourceLocationRecrawlerServiceTest {
     void testRecrawlSourceLocationWhenSourceIsDownloadabe() throws MalformedURLException {
         final DocumentLocation documentLocation = DocumentLocation.builder()
                 .id("test-id")
-                .url("http://example.com/")
+                .url("https://example.com/")
                 .build();
         final DocumentEntity documentEntity = DocumentEntity.builder()
                 .type(DocumentType.PDF)
@@ -71,7 +70,7 @@ class SourceLocationRecrawlerServiceTest {
         underTest.recrawlSourceLocation(documentLocation, documentEntity);
 
         verify(stageLocation).close();
-        verify(fileDownloadManager).downloadFile(eq(new URL("http://example.com/")), eq(mockPath));
+        verify(fileDownloadManager).downloadFile(eq("https://example.com/"), eq(mockPath));
         verify(vaultClientService).replaceCorruptDocument(documentEntity, content);
     }
 }

@@ -16,7 +16,7 @@ import java.net.UnknownHostException;
 @RequiredArgsConstructor
 public class DocumentLocationResultCalculator {
 
-    public DownloadResult calculateResultBasedOnResponseCode(final URL downloadTarget, final int responseCode) {
+    public DownloadResult calculateResultBasedOnResponseCode(final String downloadTarget, final int responseCode) {
         switch (responseCode) {
             case 200 -> {
                 return DownloadResult.OK;

@@ -19,8 +19,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
@@ -114,12 +112,8 @@ public class BeaconClient {
     //TODO: Retry and such
     public DownloadResult downloadDocumentFromBeacon(final String beaconId, final UUID documentId, final Path resultPath) {
         //TODO: Authentication!
-        try {
-            return fileDownloadManager.downloadFile(new URL("http://" + beaconApplicationMap.get(beaconId) + "/document/" + documentId),
-                    resultPath);
-        } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
-        }
+        return fileDownloadManager.downloadFile("http://" + beaconApplicationMap.get(beaconId) + "/document/" + documentId,
+                resultPath);
     }
 
     private RequestBody createJsonBody(final Object requestBody) throws JsonProcessingException {

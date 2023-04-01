@@ -14,8 +14,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.UUID;
 
 @Slf4j
@@ -37,7 +35,7 @@ public class SourceLocationRecrawlerService {
         }
 
         try (StageLocation stageLocation = stageLocationFactory.getLocation(documentRecrawlId)) {
-            fileDownloadManager.downloadFile(convertToURL(documentLocation), stageLocation.getPath());
+            fileDownloadManager.downloadFile(documentLocation.getUrl(), stageLocation.getPath());
 
             final boolean isValidDocument = documentFileValidator.isValidDocument(
                     documentRecrawlId, stageLocation, documentEntity.getType());
@@ -49,14 +47,6 @@ public class SourceLocationRecrawlerService {
                     throw new IllegalStateException("Failed to replace document!", e);
                 }
             }
-        }
-    }
-
-    private URL convertToURL(final DocumentLocation sourceLocation) {
-        try {
-            return new URL(sourceLocation.getUrl());
-        } catch (MalformedURLException e) {
-            throw new IllegalStateException("Illegal URL: " + sourceLocation + "!", e);
         }
     }
 }

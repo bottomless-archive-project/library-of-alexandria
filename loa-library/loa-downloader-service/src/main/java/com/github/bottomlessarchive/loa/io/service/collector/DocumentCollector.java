@@ -25,6 +25,7 @@ public class DocumentCollector {
     private final FileManipulatorService fileManipulatorService;
     private final ZipFileManipulatorService zipFileManipulatorService;
 
+    //TODO: Why file location is an URL?
     public DownloadResult acquireDocument(final URL fileLocation, final Path resultLocation, final DocumentType documentType) {
         try {
             final String protocol = fileLocation.getProtocol();
@@ -32,7 +33,7 @@ public class DocumentCollector {
             DownloadResult documentLocationResultType = DownloadResult.UNKNOWN;
 
             if ("http".equals(protocol) || "https".equals(protocol)) {
-                documentLocationResultType = fileDownloadManager.downloadFile(fileLocation, resultLocation);
+                documentLocationResultType = fileDownloadManager.downloadFile(fileLocation.toString(), resultLocation);
             } else if ("file".equals(protocol)) {
                 fileManipulatorService.copy(fileLocation.toURI(), resultLocation);
             }

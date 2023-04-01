@@ -13,7 +13,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -36,7 +35,7 @@ public class FileDownloadManager {
      * @param downloadTarget the url to download the file from
      * @param resultLocation the location to download the file to
      */
-    public DownloadResult downloadFile(final URL downloadTarget, final Path resultLocation) {
+    public DownloadResult downloadFile(final String downloadTarget, final Path resultLocation) {
         final Request request = new Request.Builder()
                 .get()
                 .url(downloadTarget)

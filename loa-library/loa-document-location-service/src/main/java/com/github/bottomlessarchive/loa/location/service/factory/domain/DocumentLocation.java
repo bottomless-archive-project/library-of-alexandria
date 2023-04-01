@@ -4,6 +4,7 @@ import com.github.bottomlessarchive.loa.location.domain.DocumentLocationResultTy
 import lombok.Builder;
 import lombok.Getter;
 
+//TODO: Make this a record
 @Getter
 @Builder
 public class DocumentLocation {

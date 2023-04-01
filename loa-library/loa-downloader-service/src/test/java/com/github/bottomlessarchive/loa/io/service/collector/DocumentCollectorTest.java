@@ -42,9 +42,9 @@ class DocumentCollectorTest {
 
     @Test
     void testWhenHttpLocationIsVisited() throws MalformedURLException {
-        final URL testLocation = new URL("http://localhost/test.pdf");
+        final String testLocation = "http://localhost/test.pdf";
 
-        underTest.acquireDocument(testLocation, TEST_PATH, DocumentType.PDF);
+        underTest.acquireDocument(new URL(testLocation), TEST_PATH, DocumentType.PDF);
 
         verify(fileDownloadManager)
                 .downloadFile(testLocation, TEST_PATH);
@@ -52,9 +52,9 @@ class DocumentCollectorTest {
 
     @Test
     void testWhenHttpsLocationIsVisited() throws MalformedURLException {
-        final URL testLocation = new URL("http://localhost/test.pdf");
+        final String testLocation = "http://localhost/test.pdf";
 
-        underTest.acquireDocument(testLocation, TEST_PATH, DocumentType.PDF);
+        underTest.acquireDocument(new URL(testLocation), TEST_PATH, DocumentType.PDF);
 
         verify(fileDownloadManager)
                 .downloadFile(testLocation, TEST_PATH);
@@ -72,12 +72,12 @@ class DocumentCollectorTest {
 
     @Test
     void testWhenFB2ArchiveIsAcquired() throws IOException {
-        final URL testLocation = new URL("http://localhost/test.fb2.zip");
+        final String testLocation = "http://localhost/test.fb2.zip";
 
         when(zipFileManipulatorService.isZipArchive(any()))
                 .thenReturn(true);
 
-        underTest.acquireDocument(testLocation, TEST_PATH, DocumentType.FB2);
+        underTest.acquireDocument(new URL(testLocation), TEST_PATH, DocumentType.FB2);
 
         verify(fileDownloadManager)
                 .downloadFile(testLocation, TEST_PATH);
