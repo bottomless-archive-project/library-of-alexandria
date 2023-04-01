@@ -36,21 +36,20 @@ public class SourceLocationRecrawlerService {
             log.info("Downloading the recrawl target for document: {} with new staging id: {}.", documentEntity.getId(), documentRecrawlId);
         }
 
-        final StageLocation stageLocation = stageLocationFactory.getLocation(documentRecrawlId);
+        try (StageLocation stageLocation = stageLocationFactory.getLocation(documentRecrawlId)) {
+            fileDownloadManager.downloadFile(convertToURL(documentLocation), stageLocation.getPath());
 
-        fileDownloadManager.downloadFile(convertToURL(documentLocation), stageLocation.getPath());
+            final boolean isValidDocument = documentFileValidator.isValidDocument(
+                    documentRecrawlId, stageLocation, documentEntity.getType());
 
-        final boolean isValidDocument = documentFileValidator.isValidDocument(documentRecrawlId, stageLocation, documentEntity.getType());
-
-        if (isValidDocument) {
-            try (InputStream content = stageLocation.openStream()) {
-                vaultClientService.replaceCorruptDocument(documentEntity, content.readAllBytes());
-            } catch (IOException e) {
-                throw new IllegalStateException("Failed to replace document!", e);
+            if (isValidDocument) {
+                try (InputStream content = stageLocation.openStream()) {
+                    vaultClientService.replaceCorruptDocument(documentEntity, content.readAllBytes());
+                } catch (IOException e) {
+                    throw new IllegalStateException("Failed to replace document!", e);
+                }
             }
         }
-
-        stageLocation.cleanup();
     }
 
     private URL convertToURL(final DocumentLocation sourceLocation) {

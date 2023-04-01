@@ -39,9 +39,7 @@ public class DocumentLocationVisitor {
             final Consumer<PersistenceEntity> persistingCallback) {
         final UUID documentId = UUID.randomUUID();
 
-        final StageLocation stageLocation = stageLocationFactory.getLocation(documentId);
-
-        try {
+        try (StageLocation stageLocation = stageLocationFactory.getLocation(documentId)) {
             final URL documentLocationURL = new URL(documentLocation.getLocation());
 
             final DownloadResult documentLocationResultType = documentCollector.acquireDocument(documentLocationURL,
@@ -89,10 +87,6 @@ public class DocumentLocationVisitor {
                     .size(-1)
                     .resultType(documentLocationResultCalculator.transformExceptionToDownloadResult(e))
                     .build();
-        } finally {
-            if (stageLocation.exists()) {
-                stageLocation.cleanup();
-            }
         }
     }
 

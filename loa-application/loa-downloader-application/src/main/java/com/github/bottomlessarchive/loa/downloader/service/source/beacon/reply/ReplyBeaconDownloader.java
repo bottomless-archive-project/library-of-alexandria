@@ -97,9 +97,7 @@ public class ReplyBeaconDownloader implements CommandLineRunner {
                 return;
             }
 
-            final StageLocation stageLocation = stageLocationFactory.getLocation(documentId);
-
-            try {
+            try (StageLocation stageLocation = stageLocationFactory.getLocation(documentId)) {
                 log.info("Downloading document from beacon: {}.", beaconDownloaderConfigurationProperties.activeBeacon());
 
                 beaconClient.downloadDocumentFromBeacon(beaconDownloaderConfigurationProperties.activeBeacon(),
@@ -116,10 +114,6 @@ public class ReplyBeaconDownloader implements CommandLineRunner {
                 documentArchiver.archiveDocument(documentArchivingContext);
             } catch (final Exception e) {
                 log.info("Error downloading a document: {}!", e.getMessage());
-            } finally {
-                if (stageLocation.exists()) {
-                    stageLocation.cleanup();
-                }
             }
         }
     }

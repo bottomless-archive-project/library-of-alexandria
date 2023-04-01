@@ -17,7 +17,7 @@ import java.nio.file.Path;
 @Slf4j
 @Getter
 @Builder
-public class StageLocation {
+public class StageLocation implements AutoCloseable {
 
     private final Path path;
 
@@ -90,6 +90,13 @@ public class StageLocation {
             inputStream.transferTo(outputStream);
         } catch (IOException e) {
             throw new StageAccessException("Unable to move staged document!", e);
+        }
+    }
+
+    @Override
+    public void close() {
+        if (exists()) {
+            cleanup();
         }
     }
 }

@@ -39,9 +39,7 @@ public class DocumentLocationProcessingExecutor {
 
         final UUID documentId = documentIdFactory.newDocumentId();
 
-        final StageLocation stageLocation = stageLocationFactory.getLocation(documentId);
-
-        try {
+        try (StageLocation stageLocation = stageLocationFactory.getLocation(documentId)) {
             final DocumentLocationResultType documentLocationResultType = DocumentLocationResultType.valueOf(
                     documentCollector.acquireDocument(documentLocation.getLocation(), stageLocation.getPath(),
                             documentLocation.getType()).name());
@@ -80,10 +78,6 @@ public class DocumentLocationProcessingExecutor {
             }
         } catch (final Exception e) {
             log.info("Error downloading a document: {}!", e.getMessage());
-        } finally {
-            if (stageLocation.exists()) {
-                stageLocation.cleanup();
-            }
         }
     }
 }
