@@ -7,7 +7,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -32,7 +32,7 @@ class DocumentTypeCalculatorTest {
             "http://localhost/123.txt,TXT"
     })
     void testCalculateForVariousTypes(final String url, final String expectedDocumentType) throws MalformedURLException {
-        final Optional<DocumentType> result = underTest.calculate(new URL(url));
+        final Optional<DocumentType> result = underTest.calculate(URI.create(url).toURL());
 
         assertThat(result)
                 .isPresent()
@@ -41,7 +41,7 @@ class DocumentTypeCalculatorTest {
 
     @Test
     void testCalculateForUppercaseUrl() throws MalformedURLException {
-        final Optional<DocumentType> result = underTest.calculate(new URL("http://localhost/123.PDF"));
+        final Optional<DocumentType> result = underTest.calculate(URI.create("http://localhost/123.PDF").toURL());
 
         assertThat(result)
                 .isPresent()
@@ -50,7 +50,7 @@ class DocumentTypeCalculatorTest {
 
     @Test
     void testCalculateForZippedFB2() throws MalformedURLException {
-        final Optional<DocumentType> result = underTest.calculate(new URL("http://localhost/123.fb2.zip"));
+        final Optional<DocumentType> result = underTest.calculate(URI.create("http://localhost/123.fb2.zip").toURL());
 
         assertThat(result)
                 .isPresent()
@@ -59,7 +59,7 @@ class DocumentTypeCalculatorTest {
 
     @Test
     void testCalculateForUppercaseZippedFB2Url() throws MalformedURLException {
-        final Optional<DocumentType> result = underTest.calculate(new URL("http://localhost/123.FB2.zip"));
+        final Optional<DocumentType> result = underTest.calculate(URI.create("http://localhost/123.FB2.zip").toURL());
 
         assertThat(result)
                 .isPresent()
@@ -73,7 +73,7 @@ class DocumentTypeCalculatorTest {
             "http://localhost/123.exe"
     })
     void testCalculateForVariousTypes(final String url) throws MalformedURLException {
-        final Optional<DocumentType> result = underTest.calculate(new URL(url));
+        final Optional<DocumentType> result = underTest.calculate(URI.create(url).toURL());
 
         assertThat(result)
                 .isEmpty();
