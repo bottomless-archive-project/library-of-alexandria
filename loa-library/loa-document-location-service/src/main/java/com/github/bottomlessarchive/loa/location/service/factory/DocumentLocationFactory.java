@@ -31,7 +31,7 @@ public class DocumentLocationFactory {
                         .map(type ->
                                 DocumentLocation.builder()
                                         .id(documentLocationIdFactory.newDocumentLocationId(url))
-                                        .location(url)
+                                        .location(url.toString())
                                         .sourceName(sourceName)
                                         .type(type)
                                         .build()

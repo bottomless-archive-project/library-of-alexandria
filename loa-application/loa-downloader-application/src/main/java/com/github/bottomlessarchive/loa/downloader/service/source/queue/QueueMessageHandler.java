@@ -10,8 +10,6 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.net.URL;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -37,7 +35,7 @@ public class QueueMessageHandler {
         return DocumentLocation.builder()
                 .id(documentLocationMessage.getId())
                 .type(DocumentType.valueOf(documentLocationMessage.getType()))
-                .location(new URL(documentLocationMessage.getDocumentLocation()))
+                .location(documentLocationMessage.getDocumentLocation())
                 .sourceName(documentLocationMessage.getSourceName())
                 .build();
     }

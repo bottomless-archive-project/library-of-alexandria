@@ -77,7 +77,7 @@ public class DocumentFolderReader implements CommandLineRunner {
         log.debug("Starting to parse document at location: {}.", file);
 
         return DocumentLocation.builder()
-                .location(file.toUri().toURL())
+                .location(file.toUri().toString())
                 .sourceName(documentSourceConfiguration.getName())
                 .build();
     }

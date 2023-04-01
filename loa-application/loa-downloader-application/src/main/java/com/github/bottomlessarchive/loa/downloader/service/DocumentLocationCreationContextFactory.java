@@ -6,8 +6,6 @@ import com.github.bottomlessarchive.loa.location.service.factory.domain.Document
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.net.URL;
-
 @Service
 @RequiredArgsConstructor
 public class DocumentLocationCreationContextFactory {
@@ -15,11 +13,9 @@ public class DocumentLocationCreationContextFactory {
     private final DownloaderConfigurationProperties downloaderConfigurationProperties;
 
     public DocumentLocationCreationContext newCreatingContext(final DocumentLocation documentLocation) {
-        final URL documentLocationURL = documentLocation.getLocation();
-
         return DocumentLocationCreationContext.builder()
                 .id(documentLocation.getId())
-                .url(documentLocationURL.toString())
+                .url(documentLocation.getLocation())
                 .source(documentLocation.getSourceName())
                 .downloaderVersion(downloaderConfigurationProperties.versionNumber())
                 .build();

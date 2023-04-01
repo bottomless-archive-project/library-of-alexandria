@@ -13,9 +13,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
+import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
@@ -41,33 +39,33 @@ class DocumentCollectorTest {
     private DocumentCollector underTest;
 
     @Test
-    void testWhenHttpLocationIsVisited() throws MalformedURLException {
+    void testWhenHttpLocationIsVisited() {
         final String testLocation = "http://localhost/test.pdf";
 
-        underTest.acquireDocument(new URL(testLocation), TEST_PATH, DocumentType.PDF);
+        underTest.acquireDocument(testLocation, TEST_PATH, DocumentType.PDF);
 
         verify(fileDownloadManager)
                 .downloadFile(testLocation, TEST_PATH);
     }
 
     @Test
-    void testWhenHttpsLocationIsVisited() throws MalformedURLException {
+    void testWhenHttpsLocationIsVisited() {
         final String testLocation = "http://localhost/test.pdf";
 
-        underTest.acquireDocument(new URL(testLocation), TEST_PATH, DocumentType.PDF);
+        underTest.acquireDocument(testLocation, TEST_PATH, DocumentType.PDF);
 
         verify(fileDownloadManager)
                 .downloadFile(testLocation, TEST_PATH);
     }
 
     @Test
-    void testWhenFileLocationIsVisited() throws IOException, URISyntaxException {
-        final URL testLocation = new URL("file:" + System.getProperty("java.io.tmpdir") + "//test.pdf");
+    void testWhenFileLocationIsVisited() throws IOException {
+        final String testLocation = Path.of(System.getProperty("java.io.tmpdir")).resolve("test.pdf").toUri().toString();
 
         underTest.acquireDocument(testLocation, TEST_PATH, DocumentType.PDF);
 
         verify(fileManipulatorService)
-                .copy(testLocation.toURI(), TEST_PATH);
+                .copy(URI.create(testLocation), TEST_PATH);
     }
 
     @Test
@@ -77,7 +75,7 @@ class DocumentCollectorTest {
         when(zipFileManipulatorService.isZipArchive(any()))
                 .thenReturn(true);
 
-        underTest.acquireDocument(new URL(testLocation), TEST_PATH, DocumentType.FB2);
+        underTest.acquireDocument(testLocation, TEST_PATH, DocumentType.FB2);
 
         verify(fileDownloadManager)
                 .downloadFile(testLocation, TEST_PATH);

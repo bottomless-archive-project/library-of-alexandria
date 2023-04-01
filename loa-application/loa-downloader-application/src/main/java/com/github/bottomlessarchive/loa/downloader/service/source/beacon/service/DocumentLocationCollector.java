@@ -10,8 +10,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -35,23 +33,19 @@ public class DocumentLocationCollector {
                 continue;
             }
 
-            try {
-                final DocumentLocation documentLocation = DocumentLocation.builder()
-                        .id(documentLocationMessage.get().getId())
-                        .location(new URL(documentLocationMessage.get().getDocumentLocation()))
-                        .type(DocumentType.valueOf(documentLocationMessage.get().getType()))
-                        .sourceName(documentLocationMessage.get().getSourceName())
-                        .build();
+            final DocumentLocation documentLocation = DocumentLocation.builder()
+                    .id(documentLocationMessage.get().getId())
+                    .location(documentLocationMessage.get().getDocumentLocation())
+                    .type(DocumentType.valueOf(documentLocationMessage.get().getType()))
+                    .sourceName(documentLocationMessage.get().getSourceName())
+                    .build();
 
-                log.info("Processing location.");
+            log.info("Processing location.");
 
-                if (documentLocationEvaluator.shouldProcessDocumentLocation(documentLocation)) {
-                    documentLocationMessages.add(documentLocation);
-                } else {
-                    log.info("Document location is a duplicate.");
-                }
-            } catch (MalformedURLException e) {
-                log.error("Incorrect document location! This shouldn't happen!", e);
+            if (documentLocationEvaluator.shouldProcessDocumentLocation(documentLocation)) {
+                documentLocationMessages.add(documentLocation);
+            } else {
+                log.info("Document location is a duplicate.");
             }
         }
 

@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import java.net.NoRouteToHostException;
 import java.net.ProtocolException;
 import java.net.SocketTimeoutException;
-import java.net.URL;
 import java.net.UnknownHostException;
 
 @Slf4j
@@ -45,8 +44,8 @@ public class DocumentLocationResultCalculator {
             return DownloadResult.TIMEOUT;
         } else if (e instanceof ProtocolException && e.getMessage().contains("unexpected end of stream")) {
             return DownloadResult.CONNECTION_ERROR;
-        } else {
-            return DownloadResult.UNKNOWN;
         }
+
+        return DownloadResult.UNKNOWN;
     }
 }

@@ -55,7 +55,7 @@ public class BeaconClient {
                                                                     DocumentLocationPartialRequest.builder()
                                                                             .id(location.getId())
                                                                             .type(location.getType())
-                                                                            .location(location.getLocation().toString())
+                                                                            .location(location.getLocation())
                                                                             .sourceName(location.getSourceName())
                                                                             .build()
                                                             )

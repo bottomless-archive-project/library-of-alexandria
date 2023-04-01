@@ -14,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
-import java.net.URL;
 import java.nio.file.Path;
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -40,9 +39,7 @@ public class DocumentLocationVisitor {
         final UUID documentId = UUID.randomUUID();
 
         try (StageLocation stageLocation = stageLocationFactory.getLocation(documentId)) {
-            final URL documentLocationURL = new URL(documentLocation.getLocation());
-
-            final DownloadResult documentLocationResultType = documentCollector.acquireDocument(documentLocationURL,
+            final DownloadResult documentLocationResultType = documentCollector.acquireDocument(documentLocation.getLocation(),
                     stageLocation.getPath(), documentLocation.getType());
 
             if (documentFileValidator.isValidDocument(documentId, stageLocation, documentLocation.getType())) {

@@ -9,9 +9,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
@@ -25,11 +22,11 @@ class DocumentLocationCreationContextFactoryTest {
     private DocumentLocationCreationContextFactory documentLocationCreationContextFactory;
 
     @Test
-    void testNewCreatingContext() throws MalformedURLException {
+    void testNewCreatingContext() {
         final DocumentLocation documentLocation = DocumentLocation.builder()
                 .id("test-id")
                 .sourceName("test-source")
-                .location(new URL("http://test-url/"))
+                .location("http://test-url/")
                 .build();
         when(downloaderConfigurationProperties.versionNumber())
                 .thenReturn(5);

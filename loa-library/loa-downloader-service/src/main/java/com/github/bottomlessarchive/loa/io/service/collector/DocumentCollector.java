@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -25,17 +26,17 @@ public class DocumentCollector {
     private final FileManipulatorService fileManipulatorService;
     private final ZipFileManipulatorService zipFileManipulatorService;
 
-    //TODO: Why file location is an URL?
-    public DownloadResult acquireDocument(final URL fileLocation, final Path resultLocation, final DocumentType documentType) {
+    public DownloadResult acquireDocument(final String fileLocation, final Path resultLocation, final DocumentType documentType) {
         try {
-            final String protocol = fileLocation.getProtocol();
+            final URI documentLocationUri = URI.create(fileLocation);
+            final String protocol = documentLocationUri.getScheme();
 
             DownloadResult documentLocationResultType = DownloadResult.UNKNOWN;
 
             if ("http".equals(protocol) || "https".equals(protocol)) {
-                documentLocationResultType = fileDownloadManager.downloadFile(fileLocation.toString(), resultLocation);
+                documentLocationResultType = fileDownloadManager.downloadFile(fileLocation, resultLocation);
             } else if ("file".equals(protocol)) {
-                fileManipulatorService.copy(fileLocation.toURI(), resultLocation);
+                fileManipulatorService.copy(documentLocationUri, resultLocation);
             }
 
             if (DocumentType.FB2.equals(documentType) && zipFileManipulatorService.isZipArchive(resultLocation)) {
