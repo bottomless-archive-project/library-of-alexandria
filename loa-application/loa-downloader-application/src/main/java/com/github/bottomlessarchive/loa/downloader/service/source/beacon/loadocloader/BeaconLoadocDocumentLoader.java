@@ -1,6 +1,5 @@
 package com.github.bottomlessarchive.loa.downloader.service.source.beacon.loadocloader;
 
-import com.github.bottomlessarchive.loa.downloader.service.source.beacon.loader.BeaconDocumentArchiver;
 import com.github.bottomlessarchive.loa.downloader.service.source.beacon.loadocloader.configuration.LoadocLoaderBeaconConfigurationProperties;
 import com.github.bottomlessarchive.loa.logging.service.MetricLogger;
 import io.micrometer.core.instrument.Counter;
@@ -27,7 +26,7 @@ public class BeaconLoadocDocumentLoader implements CommandLineRunner {
 
     private final MetricLogger metricLogger;
     private final ApplicationContext applicationContext;
-    private final BeaconDocumentArchiver beaconDocumentArchiver;
+    private final BeaconLoadocDocumentArchiver beaconLoadocDocumentArchiver;
     private final LoadocLoaderBeaconConfigurationProperties loadocLoaderBeaconConfigurationProperties;
 
     @Qualifier("downloaderExecutorService")
@@ -46,7 +45,7 @@ public class BeaconLoadocDocumentLoader implements CommandLineRunner {
         log.info("Started processing documents at folder: {}.", sourceFolder);
 
         try (Stream<Path> files = Files.list(sourceFolder)) {
-            files.forEach(beaconDocumentArchiver::archiveOfflineCollectedFile);
+            files.forEach(beaconLoadocDocumentArchiver::archiveLoadocFile);
         }
 
         awaitTasksToFinish();

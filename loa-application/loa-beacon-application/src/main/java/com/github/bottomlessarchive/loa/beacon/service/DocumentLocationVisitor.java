@@ -9,12 +9,15 @@ import com.github.bottomlessarchive.loa.stage.service.domain.StageLocation;
 import com.github.bottomlessarchive.loa.url.service.downloader.DocumentLocationResultCalculator;
 import com.github.bottomlessarchive.loa.url.service.downloader.domain.DownloadResult;
 import com.github.bottomlessarchive.loa.validator.service.DocumentFileValidator;
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +31,12 @@ public class DocumentLocationVisitor {
     private final DocumentLocationResultCalculator documentLocationResultCalculator;
 
     public DocumentLocationResult visitDocumentLocation(final DocumentLocation documentLocation) {
+        return visitDocumentLocation(documentLocation, persistenceEntity -> persistenceEntity.stageLocation()
+                .moveTo(persistenceEntity.storagePath()));
+    }
+
+    public DocumentLocationResult visitDocumentLocation(final DocumentLocation documentLocation,
+            final Consumer<PersistenceEntity> persistingCallback) {
         final UUID documentId = UUID.randomUUID();
 
         final StageLocation stageLocation = stageLocationFactory.getLocation(documentId);
@@ -44,7 +53,7 @@ public class DocumentLocationVisitor {
                 try (InputStream inputStream = stageLocation.openStream()) {
                     final String checksum = checksumProvider.checksum(inputStream);
 
-                    return DocumentLocationResult.builder()
+                    final DocumentLocationResult documentLocationResult = DocumentLocationResult.builder()
                             .id(documentLocation.getId())
                             .documentId(documentId)
                             .resultType(documentLocationResultType)
@@ -53,8 +62,19 @@ public class DocumentLocationVisitor {
                             .sourceName(documentLocation.getSourceName())
                             .type(documentLocation.getType())
                             .build();
-                } finally {
-                    stageLocation.moveTo(storagePathFactory.buildStoragePath(documentId));
+
+                    try {
+                        return documentLocationResult;
+                    } finally {
+                        persistingCallback.accept(
+                                PersistenceEntity.builder()
+                                        .documentLocation(documentLocation)
+                                        .documentLocationResult(documentLocationResult)
+                                        .stageLocation(stageLocation)
+                                        .storagePath(storagePathFactory.buildStoragePath(documentId))
+                                        .build()
+                        );
+                    }
                 }
             } else {
                 return DocumentLocationResult.builder()
@@ -74,5 +94,15 @@ public class DocumentLocationVisitor {
                 stageLocation.cleanup();
             }
         }
+    }
+
+    @Builder
+    public record PersistenceEntity(
+
+            DocumentLocation documentLocation,
+            DocumentLocationResult documentLocationResult,
+            StageLocation stageLocation,
+            Path storagePath
+    ) {
     }
 }

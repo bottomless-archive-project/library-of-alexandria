@@ -58,4 +58,4 @@ include 'loa-library:loa-conductor-client-service'
 include 'loa-library:loa-conductor-client-test'
 include 'loa-library:loa-staging-client-service'
 include 'loa-library:loa-threading-service'
-
+include 'loa-library:loa-loadoc-domain'

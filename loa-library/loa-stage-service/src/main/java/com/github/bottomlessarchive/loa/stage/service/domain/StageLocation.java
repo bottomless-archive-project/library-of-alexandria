@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -67,13 +68,26 @@ public class StageLocation {
     }
 
     /**
-     * Moves the content of the stage location to the provided path.
+     * Moves the content of the stage location to the provided {@link Path}.
      *
      * @param newPath the new path to move the content to
      */
     public void moveTo(final Path newPath) {
         try {
             Files.move(path, newPath);
+        } catch (IOException e) {
+            throw new StageAccessException("Unable to move staged document!", e);
+        }
+    }
+
+    /**
+     * Moves the content of the stage location to the provided {@link OutputStream}.
+     *
+     * @param outputStream the output stream to move the content to
+     */
+    public void moveTo(final OutputStream outputStream) {
+        try (InputStream inputStream = openStream()) {
+            inputStream.transferTo(outputStream);
         } catch (IOException e) {
             throw new StageAccessException("Unable to move staged document!", e);
         }
