@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ExtendWith(MockitoExtension.class)
 class DocumentLocationResultCalculatorTest {
 
-    private static final String TEST_URL = "http://test-url.com/";
+    private static final String TEST_URL = "https://test-url.com/";
 
     @InjectMocks
     private DocumentLocationResultCalculator underTest;
