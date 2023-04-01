@@ -1,97 +1,95 @@
 package com.github.bottomlessarchive.loa.url.service.downloader;
 
+import com.github.bottomlessarchive.loa.url.service.downloader.domain.DownloadResult;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.net.NoRouteToHostException;
+import java.net.ProtocolException;
+import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
 class DocumentLocationResultCalculatorTest {
-/*
-    private static final String DOCUMENT_LOCATION_ID = "test-location";
-    private static final URL TEST_URL;
 
-    static {
-        try {
-            TEST_URL = new URL("http://test-url.com/");
-        } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Mock
-    private DocumentLocationManipulator documentLocationManipulator;
+    private static final String TEST_URL = "http://test-url.com/";
 
     @InjectMocks
     private DocumentLocationResultCalculator underTest;
 
     @Test
-    void testUpdateResultToEmptyBody() {
-        underTest.updateResultToEmptyBody(DOCUMENT_LOCATION_ID);
+    void testTransformExceptionWhenExceptionIsNoRouteToHostException() {
+        final DownloadResult result = underTest.transformExceptionToDownloadResult(new NoRouteToHostException());
 
-        verify(documentLocationManipulator)
-                .updateDownloadResultCode(DOCUMENT_LOCATION_ID, DocumentLocationResultType.EMPTY_BODY);
+        assertThat(result)
+                .isEqualTo(DownloadResult.ORIGIN_NOT_FOUND);
     }
 
     @Test
-    void testUpdateResultToOriginNotFound() {
-        underTest.updateResultToOriginNotFound(DOCUMENT_LOCATION_ID);
+    void testTransformExceptionWhenExceptionIsUnknownHostException() {
+        final DownloadResult result = underTest.transformExceptionToDownloadResult(new UnknownHostException());
 
-        verify(documentLocationManipulator)
-                .updateDownloadResultCode(DOCUMENT_LOCATION_ID, DocumentLocationResultType.ORIGIN_NOT_FOUND);
+        assertThat(result)
+                .isEqualTo(DownloadResult.ORIGIN_NOT_FOUND);
     }
 
     @Test
-    void testUpdateResultToTimeout() {
-        underTest.updateResultToTimeout(DOCUMENT_LOCATION_ID);
+    void testTransformExceptionWhenExceptionIsSocketTimeoutException() {
+        final DownloadResult result = underTest.transformExceptionToDownloadResult(new SocketTimeoutException());
 
-        verify(documentLocationManipulator)
-                .updateDownloadResultCode(DOCUMENT_LOCATION_ID, DocumentLocationResultType.TIMEOUT);
+        assertThat(result)
+                .isEqualTo(DownloadResult.TIMEOUT);
     }
 
     @Test
-    void testUpdateResultToConnectionError() {
-        underTest.updateResultToConnectionError(DOCUMENT_LOCATION_ID);
+    void testTransformExceptionWhenExceptionIsProtocolException() {
+        final DownloadResult result = underTest.transformExceptionToDownloadResult(new ProtocolException("unexpected end of stream"));
 
-        verify(documentLocationManipulator)
-                .updateDownloadResultCode(DOCUMENT_LOCATION_ID, DocumentLocationResultType.CONNECTION_ERROR);
+        assertThat(result)
+                .isEqualTo(DownloadResult.CONNECTION_ERROR);
     }
 
     @Test
-    void testUpdateResultBasedOnResponseCodeWhenResponseCode200() {
-        underTest.calculateResultBasedOnResponseCode(DOCUMENT_LOCATION_ID, TEST_URL, 200);
+    void testCalculateResultBasedOnResponseCodeWhenResponseCode200() {
+        final DownloadResult result = underTest.calculateResultBasedOnResponseCode(TEST_URL, 200);
 
-        verify(documentLocationManipulator)
-                .updateDownloadResultCode(DOCUMENT_LOCATION_ID, DocumentLocationResultType.OK);
+        assertThat(result)
+                .isEqualTo(DownloadResult.OK);
     }
 
     @Test
-    void testUpdateResultBasedOnResponseCodeWhenResponseCode404() {
-        underTest.calculateResultBasedOnResponseCode(DOCUMENT_LOCATION_ID, TEST_URL, 404);
+    void testCalculateResultBasedOnResponseCodeWhenResponseCode404() {
+        final DownloadResult result = underTest.calculateResultBasedOnResponseCode(TEST_URL, 404);
 
-        verify(documentLocationManipulator)
-                .updateDownloadResultCode(DOCUMENT_LOCATION_ID, DocumentLocationResultType.NOT_FOUND);
+        assertThat(result)
+                .isEqualTo(DownloadResult.NOT_FOUND);
     }
 
     @Test
-    void testUpdateResultBasedOnResponseCodeWhenResponseCode403() {
-        underTest.calculateResultBasedOnResponseCode(DOCUMENT_LOCATION_ID, TEST_URL, 403);
+    void testCalculateResultBasedOnResponseCodeWhenResponseCode403() {
+        final DownloadResult result = underTest.calculateResultBasedOnResponseCode(TEST_URL, 403);
 
-        verify(documentLocationManipulator)
-                .updateDownloadResultCode(DOCUMENT_LOCATION_ID, DocumentLocationResultType.FORBIDDEN);
+        assertThat(result)
+                .isEqualTo(DownloadResult.FORBIDDEN);
     }
 
     @Test
-    void testUpdateResultBasedOnResponseCodeWhenResponseCode400() {
-        underTest.calculateResultBasedOnResponseCode(DOCUMENT_LOCATION_ID, TEST_URL, 400);
+    void testCalculateResultBasedOnResponseCodeWhenResponseCode400() {
+        final DownloadResult result = underTest.calculateResultBasedOnResponseCode(TEST_URL, 400);
 
-        verify(documentLocationManipulator)
-                .updateDownloadResultCode(DOCUMENT_LOCATION_ID, DocumentLocationResultType.SERVER_ERROR);
+        assertThat(result)
+                .isEqualTo(DownloadResult.SERVER_ERROR);
     }
 
     @Test
-    void testUpdateResultBasedOnResponseCodeWhenResponseCodeIsUnknown() {
-        underTest.calculateResultBasedOnResponseCode(DOCUMENT_LOCATION_ID, TEST_URL, -1);
+    void testCalculateResultBasedOnResponseCodeWhenResponseCodeIsUnknown() {
+        final DownloadResult result = underTest.calculateResultBasedOnResponseCode(TEST_URL, -1);
 
-        verify(documentLocationManipulator)
-                .updateDownloadResultCode(DOCUMENT_LOCATION_ID, DocumentLocationResultType.UNKNOWN);
-    }*/
+        assertThat(result)
+                .isEqualTo(DownloadResult.UNKNOWN);
+    }
 }
