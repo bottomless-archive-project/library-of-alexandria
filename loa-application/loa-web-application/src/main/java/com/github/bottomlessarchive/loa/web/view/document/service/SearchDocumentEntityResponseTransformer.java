@@ -49,7 +49,7 @@ public class SearchDocumentEntityResponseTransformer {
                         documentEntity.getSourceLocations().stream()
                                 .map(documentLocationEntityFactory::getDocumentLocation)
                                 .flatMap(Optional::stream)
-                                .map(DocumentLocation::getUrl)
+                                .map(DocumentLocation::url)
                                 .collect(Collectors.toSet())
                 )
                 .build();

@@ -26,7 +26,7 @@ public class DocumentDebugResponseFactory {
 
         final List<String> documentLocations = documentEntity.getSourceLocations().stream()
                 .flatMap(id -> documentLocationEntityFactory.getDocumentLocation(id).stream())
-                .map(DocumentLocation::getUrl)
+                .map(DocumentLocation::url)
                 .toList();
 
         return DocumentDebugResponse.builder()

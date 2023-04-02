@@ -2,16 +2,14 @@ package com.github.bottomlessarchive.loa.location.service.factory.domain;
 
 import com.github.bottomlessarchive.loa.location.domain.DocumentLocationResultType;
 import lombok.Builder;
-import lombok.Getter;
 
-//TODO: Make this a record
-@Getter
 @Builder
-public class DocumentLocation {
+public record DocumentLocation(
 
-    private final String id;
-    private final String url;
-    private final String source;
-    private final int downloaderVersion;
-    private final DocumentLocationResultType downloadResultCode;
+        String id,
+        String url,
+        String source,
+        int downloaderVersion,
+        DocumentLocationResultType downloadResultCode
+) {
 }

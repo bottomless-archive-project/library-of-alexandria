@@ -35,7 +35,7 @@ public class SourceLocationRecrawlerService {
         }
 
         try (StageLocation stageLocation = stageLocationFactory.getLocation(documentRecrawlId)) {
-            fileDownloadManager.downloadFile(documentLocation.getUrl(), stageLocation.getPath());
+            fileDownloadManager.downloadFile(documentLocation.url(), stageLocation.getPath());
 
             final boolean isValidDocument = documentFileValidator.isValidDocument(
                     documentRecrawlId, stageLocation, documentEntity.getType());

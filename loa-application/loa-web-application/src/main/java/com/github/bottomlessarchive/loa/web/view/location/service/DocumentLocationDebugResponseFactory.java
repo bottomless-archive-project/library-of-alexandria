@@ -9,11 +9,11 @@ public class DocumentLocationDebugResponseFactory {
 
     public DocumentLocationDebugResponse newDocumentLocationDebugResponse(final DocumentLocation documentLocation) {
         return DocumentLocationDebugResponse.builder()
-                .id(documentLocation.getId())
-                .url(documentLocation.getUrl())
-                .source(documentLocation.getSource())
-                .downloaderVersion(documentLocation.getDownloaderVersion())
-                .downloadResultCode(documentLocation.getDownloadResultCode())
+                .id(documentLocation.id())
+                .url(documentLocation.url())
+                .source(documentLocation.source())
+                .downloaderVersion(documentLocation.downloaderVersion())
+                .downloadResultCode(documentLocation.downloadResultCode())
                 .build();
     }
 }
