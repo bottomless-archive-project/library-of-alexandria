@@ -34,18 +34,14 @@ public class BeaconClient {
     private final ObjectMapper objectMapper;
     private final FileDownloadManager fileDownloadManager;
 
-    //TODO: This is temporarily
-    private final Map<String, String> beaconApplicationMap = Map.of(
-            "beacon-1", "localhost:9996"
-    );
 
-    public List<BeaconDocumentLocationResult> visitDocumentLocations(final String beaconId,
+    public List<BeaconDocumentLocationResult> visitDocumentLocations(final String beaconHost, final int beaconPort,
             final List<BeaconDocumentLocation> documentLocations) {
 
         try {
             //TODO: Authentication!
             final Request request = new Request.Builder()
-                    .url("http://" + beaconApplicationMap.get(beaconId) + "/beacon/visit-document-locations")
+                    .url("http://" + beaconHost + ":" + beaconPort + "/beacon/visit-document-locations")
                     .post(
                             createJsonBody(
                                     VisitDocumentLocationsRequest.builder()
@@ -93,11 +89,11 @@ public class BeaconClient {
         }
     }
 
-    public void deleteDocumentFromBeacon(final String beaconId, final UUID documentId) {
+    public void deleteDocumentFromBeacon(final String beaconHost, final int beaconPort, final UUID documentId) {
         try {
             //TODO: Authentication!
             final Request request = new Request.Builder()
-                    .url("http://" + beaconApplicationMap.get(beaconId) + "/document/" + documentId)
+                    .url("http://" + beaconHost + ":" + beaconPort + "/document/" + documentId)
                     .delete()
                     .build();
 
@@ -110,9 +106,10 @@ public class BeaconClient {
     }
 
     //TODO: Retry and such
-    public DownloadResult downloadDocumentFromBeacon(final String beaconId, final UUID documentId, final Path resultPath) {
+    public DownloadResult downloadDocumentFromBeacon(final String beaconHost, final int beaconPort, final UUID documentId,
+            final Path resultPath) {
         //TODO: Authentication!
-        return fileDownloadManager.downloadFile("http://" + beaconApplicationMap.get(beaconId) + "/document/" + documentId,
+        return fileDownloadManager.downloadFile("http://" + beaconHost + ":" + beaconPort + "/document/" + documentId,
                 resultPath);
     }
 

@@ -52,13 +52,13 @@ public class ReplyBeaconDownloader implements CommandLineRunner {
                     beaconDownloaderConfigurationProperties.requestSize());
 
             log.info("Sending {} locations for processing to the beacon with name: {}.", documentLocationMessages.size(),
-                    beaconDownloaderConfigurationProperties.activeBeacon());
+                    beaconDownloaderConfigurationProperties.activeBeaconName());
 
             final List<BeaconDocumentLocationResult> beaconDocumentLocationResults =
                     processDocumentLocationsByBeacon(documentLocationMessages);
 
             log.info("Got back {} location results from beacon with name: {}.", beaconDocumentLocationResults.size(),
-                    beaconDownloaderConfigurationProperties.activeBeacon());
+                    beaconDownloaderConfigurationProperties.activeBeaconName());
 
             beaconDocumentLocationResults.forEach(this::processBeaconDocumentLocationResult);
         }
@@ -69,7 +69,8 @@ public class ReplyBeaconDownloader implements CommandLineRunner {
                 .map(beaconDocumentLocationFactory::newBeaconDocumentLocation)
                 .toList();
 
-        return beaconClient.visitDocumentLocations(beaconDownloaderConfigurationProperties.activeBeacon(), beaconDocumentLocations);
+        return beaconClient.visitDocumentLocations(beaconDownloaderConfigurationProperties.activeBeaconHost(),
+                beaconDownloaderConfigurationProperties.activeBeaconPort(), beaconDocumentLocations);
     }
 
     private void processBeaconDocumentLocationResult(final BeaconDocumentLocationResult beaconDocumentLocationResult) {
@@ -91,17 +92,17 @@ public class ReplyBeaconDownloader implements CommandLineRunner {
 
                 documentEntityFactory.addSourceLocation(documentEntityOptional.get().getId(), documentId.toString());
 
-                beaconClient.deleteDocumentFromBeacon(beaconDownloaderConfigurationProperties.activeBeacon(),
-                        documentEntityOptional.get().getId());
+                beaconClient.deleteDocumentFromBeacon(beaconDownloaderConfigurationProperties.activeBeaconHost(),
+                        beaconDownloaderConfigurationProperties.activeBeaconPort(), documentEntityOptional.get().getId());
 
                 return;
             }
 
             try (StageLocation stageLocation = stageLocationFactory.getLocation(documentId)) {
-                log.info("Downloading document from beacon: {}.", beaconDownloaderConfigurationProperties.activeBeacon());
+                log.info("Downloading document from beacon: {}.", beaconDownloaderConfigurationProperties.activeBeaconName());
 
-                beaconClient.downloadDocumentFromBeacon(beaconDownloaderConfigurationProperties.activeBeacon(),
-                        documentId, stageLocation.getPath());
+                beaconClient.downloadDocumentFromBeacon(beaconDownloaderConfigurationProperties.activeBeaconHost(),
+                        beaconDownloaderConfigurationProperties.activeBeaconPort(), documentId, stageLocation.getPath());
 
                 final DocumentArchivingContext documentArchivingContext = DocumentArchivingContext.builder()
                         .id(documentId)
