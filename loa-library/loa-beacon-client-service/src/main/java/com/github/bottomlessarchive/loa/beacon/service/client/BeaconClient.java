@@ -23,7 +23,6 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -41,7 +40,6 @@ public class BeaconClient {
             final List<BeaconDocumentLocation> documentLocations) {
 
         try {
-            //TODO: Authentication!
             final Request request = new Request.Builder()
                     .url("http://" + beaconHost + ":" + beaconPort + "/beacon/visit-document-locations")
                     .post(
@@ -93,7 +91,6 @@ public class BeaconClient {
 
     public void deleteDocumentFromBeacon(final String beaconHost, final int beaconPort, final UUID documentId) {
         try {
-            //TODO: Authentication!
             final Request request = new Request.Builder()
                     .url("http://" + beaconHost + ":" + beaconPort + "/document/" + documentId)
                     .delete()
@@ -110,7 +107,6 @@ public class BeaconClient {
     @Retryable(maxAttempts = Integer.MAX_VALUE, backoff = @Backoff(delay = 60000))
     public DownloadResult downloadDocumentFromBeacon(final String beaconHost, final int beaconPort, final UUID documentId,
             final Path resultPath) {
-        //TODO: Authentication!
         return fileDownloadManager.downloadFile("http://" + beaconHost + ":" + beaconPort + "/document/" + documentId,
                 resultPath);
     }
