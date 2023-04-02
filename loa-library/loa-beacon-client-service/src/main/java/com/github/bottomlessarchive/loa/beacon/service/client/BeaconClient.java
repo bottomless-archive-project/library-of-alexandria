@@ -16,6 +16,8 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -105,7 +107,7 @@ public class BeaconClient {
         }
     }
 
-    //TODO: Retry and such
+    @Retryable(maxAttempts = Integer.MAX_VALUE, backoff = @Backoff(delay = 60000))
     public DownloadResult downloadDocumentFromBeacon(final String beaconHost, final int beaconPort, final UUID documentId,
             final Path resultPath) {
         //TODO: Authentication!

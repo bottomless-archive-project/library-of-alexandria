@@ -17,6 +17,7 @@ import com.github.bottomlessarchive.loa.queue.service.QueueManipulator;
 import com.github.bottomlessarchive.loa.queue.service.domain.Queue;
 import com.github.bottomlessarchive.loa.stage.service.StageLocationFactory;
 import com.github.bottomlessarchive.loa.stage.service.domain.StageLocation;
+import com.github.bottomlessarchive.loa.url.service.downloader.domain.DownloadResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
@@ -101,8 +102,13 @@ public class ReplyBeaconDownloader implements CommandLineRunner {
             try (StageLocation stageLocation = stageLocationFactory.getLocation(documentId)) {
                 log.info("Downloading document from beacon: {}.", beaconDownloaderConfigurationProperties.activeBeaconName());
 
-                beaconClient.downloadDocumentFromBeacon(beaconDownloaderConfigurationProperties.activeBeaconHost(),
-                        beaconDownloaderConfigurationProperties.activeBeaconPort(), documentId, stageLocation.getPath());
+                // Download as long as it is not successful
+                DownloadResult beaconDownloadResult = null;
+                while (beaconDownloadResult != DownloadResult.OK) {
+                    beaconDownloadResult = beaconClient.downloadDocumentFromBeacon(
+                            beaconDownloaderConfigurationProperties.activeBeaconHost(),
+                            beaconDownloaderConfigurationProperties.activeBeaconPort(), documentId, stageLocation.getPath());
+                }
 
                 final DocumentArchivingContext documentArchivingContext = DocumentArchivingContext.builder()
                         .id(documentId)
