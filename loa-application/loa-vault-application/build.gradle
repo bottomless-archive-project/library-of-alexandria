@@ -23,8 +23,10 @@ bootBuildImage {
 }
 
 dependencies {
-    implementation group: 'org.mongodb', name: 'mongodb-driver-core'
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
+
+    implementation group: 'org.mongodb', name: 'mongodb-driver-core'
 
     implementation project(':loa-library:loa-vault-service')
     implementation project(':loa-library:loa-document-view')

@@ -78,7 +78,7 @@ public class DocumentFolderReader implements CommandLineRunner {
 
         return DocumentLocation.builder()
                 .location(file.toUri().toString())
-                .sourceName(documentSourceConfiguration.getName())
+                .sourceName(documentSourceConfiguration.name())
                 .build();
     }
 

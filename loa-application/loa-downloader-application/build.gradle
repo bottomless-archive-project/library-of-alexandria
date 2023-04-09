@@ -24,6 +24,7 @@ bootBuildImage {
 
 dependencies {
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-json'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
 
     implementation group: 'org.springframework.retry', name: 'spring-retry', version: '2.0.1'
 

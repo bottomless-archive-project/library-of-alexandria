@@ -1,6 +1,9 @@
 package com.github.bottomlessarchive.loa.vault.configuration;
 
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.validation.annotation.Validated;
 
 import java.nio.file.Path;
 
@@ -17,14 +20,23 @@ import java.nio.file.Path;
  *                            later on if it's necessary to run cleanup or fixing tasks that are specific to a given version.
  * @param parallelism         The number of documents that should be saved in parallel at the same time.
  */
+@Validated
 @ConfigurationProperties("loa.vault")
 public record VaultConfigurationProperties(
 
+        @NotNull
         String name,
+
         boolean modificationEnabled,
         boolean archiving,
+
+        @Min(1)
         int versionNumber,
+
+        @Min(1)
         int parallelism,
+
+        @NotNull
         Path stagingDirectory
 ) {
 }

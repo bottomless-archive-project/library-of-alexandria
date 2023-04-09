@@ -1,6 +1,5 @@
 package com.github.bottomlessarchive.loa.queue.artemis.configuration;
 
-import com.github.bottomlessarchive.loa.queue.configuration.QueueServerConfigurationProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.artemis.api.core.TransportConfiguration;

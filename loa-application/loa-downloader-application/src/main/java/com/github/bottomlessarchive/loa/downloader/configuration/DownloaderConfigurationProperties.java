@@ -1,9 +1,13 @@
 package com.github.bottomlessarchive.loa.downloader.configuration;
 
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.validation.annotation.Validated;
 
 import java.nio.file.Path;
 
+@Validated
 @ConfigurationProperties("loa.downloader")
 public record DownloaderConfigurationProperties(
 
@@ -14,9 +18,16 @@ public record DownloaderConfigurationProperties(
          * 4 = Skipped
          * 5 = 1.5.1-release -> Updated because the URL encoding logic was changed in the Generator Application.
          */
+        @Min(1)
         int versionNumber,
+
+        @NotNull
         SourceLocation source,
+
+        @Min(1)
         int parallelism,
+
+        @NotNull
         Path stagingDirectory
 ) {
 }

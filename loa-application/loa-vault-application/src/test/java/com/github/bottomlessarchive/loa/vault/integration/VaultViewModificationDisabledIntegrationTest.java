@@ -35,7 +35,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 "loa.conductor.port=2002",
                 "loa.vault.archiving=false",
                 "loa.vault.location.file.path=/vault/",
-                "loa.vault.modification-enabled=false"
+                "loa.vault.modification-enabled=false",
+                "loa.compression.algorithm=NONE"
         }
 )
 @WireMockTest(httpPort = 2002)

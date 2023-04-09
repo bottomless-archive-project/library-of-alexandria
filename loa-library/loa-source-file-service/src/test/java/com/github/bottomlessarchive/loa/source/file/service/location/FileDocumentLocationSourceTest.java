@@ -57,7 +57,7 @@ class FileDocumentLocationSourceTest {
     void testWhenSkipLinesAreSet() {
         when(fileDocumentSourceConfigurationProperties.skipLines())
                 .thenReturn(3L);
-        when(documentSourceConfiguration.getName())
+        when(documentSourceConfiguration.name())
                 .thenReturn("test-source");
         when(fileSourceFactory.newSourceReader())
                 .thenReturn(
@@ -109,7 +109,7 @@ class FileDocumentLocationSourceTest {
                                 )
                         )
                 );
-        when(documentSourceConfiguration.getName())
+        when(documentSourceConfiguration.name())
                 .thenReturn("test-source");
         final DocumentLocation firstDocumentLocation = DocumentLocation.builder()
                 .build();

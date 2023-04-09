@@ -36,7 +36,8 @@ import static org.assertj.core.api.Assertions.assertThat;
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         properties = {
                 "loa.conductor.port=2000",
-                "loa.staging.location=/stage/"
+                "loa.staging.location=/stage/",
+                "loa.conductor.application-port=8099"
         }
 )
 @WireMockTest(httpPort = 2000)

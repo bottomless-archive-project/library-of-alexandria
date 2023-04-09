@@ -44,6 +44,6 @@ public class FileDocumentLocationSource implements DocumentLocationSource {
                 .lines()
                 .skip(fileDocumentSourceConfigurationProperties.skipLines())
                 .peek(url -> processedDocumentLocationCount.increment())
-                .flatMap(url -> documentLocationFactory.newDocumentLocation(url, documentSourceConfiguration.getName()).stream());
+                .flatMap(url -> documentLocationFactory.newDocumentLocation(url, documentSourceConfiguration.name()).stream());
     }
 }

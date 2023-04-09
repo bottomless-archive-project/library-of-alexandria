@@ -1,26 +1,25 @@
 package com.github.bottomlessarchive.loa.source.configuration;
 
 import com.github.bottomlessarchive.loa.source.domain.DocumentSourceType;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.validation.annotation.Validated;
 
 /**
  * Contains the configurations that could be set from the property files regarding the document location source processing.
+ *
+ * @param name The name of the source. Will be inserted for every document and document location that crawled from the provided source.
+ *             The default value is unknown.
+ * @param type The type of the source to use when generating new document locations.
  */
-@Getter
-@RequiredArgsConstructor
+@Validated
 @ConfigurationProperties("loa.source")
-public class DocumentSourceConfiguration {
+public record DocumentSourceConfiguration(
 
-    /**
-     * The name of the source. Will be inserted for every document and document location that crawled from the provided source.
-     * The default value is unknown.
-     */
-    private final String name;
+        @NotNull
+        String name,
 
-    /**
-     * The type of the source to use when generating new document locations.
-     */
-    private final DocumentSourceType type;
+        @NotNull
+        DocumentSourceType type
+) {
 }
