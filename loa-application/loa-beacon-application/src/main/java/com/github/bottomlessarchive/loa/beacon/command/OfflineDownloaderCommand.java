@@ -6,6 +6,7 @@ import com.github.bottomlessarchive.loa.beacon.command.configuration.OfflineDown
 import com.github.bottomlessarchive.loa.beacon.service.DocumentLocationVisitor;
 import com.github.bottomlessarchive.loa.beacon.service.domain.DocumentLocation;
 import com.github.bottomlessarchive.loa.loadoc.domain.LoadocMetadata;
+import com.github.bottomlessarchive.loa.stage.service.domain.StageLocation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -34,7 +35,7 @@ public class OfflineDownloaderCommand implements CommandLineRunner {
                         try {
                             return objectMapper.readValue(line, DocumentLocation.class);
                         } catch (JsonProcessingException e) {
-                            throw new RuntimeException(e); //TODO: Do something with this!
+                            throw new IllegalStateException("Failed to parse document location!", e);
                         }
                     })
                     .forEach(documentLocation ->
@@ -54,7 +55,9 @@ public class OfflineDownloaderCommand implements CommandLineRunner {
                                         outputStream.write(loadocMetadataData.length);
                                         outputStream.write(loadocMetadataData);
 
-                                        persistenceEntity.stageLocation().moveTo(outputStream);
+                                        try (StageLocation stageLocation = persistenceEntity.stageLocation()) {
+                                            stageLocation.moveTo(outputStream);
+                                        }
                                     }
                                 } catch (IOException e) {
                                     throw new RuntimeException(e);
