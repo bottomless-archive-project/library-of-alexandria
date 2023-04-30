@@ -23,6 +23,7 @@ bootBuildImage {
 }
 
 dependencies {
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-json'
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
 
