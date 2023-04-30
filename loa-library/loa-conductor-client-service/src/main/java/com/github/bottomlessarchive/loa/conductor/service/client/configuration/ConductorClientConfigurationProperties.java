@@ -21,7 +21,7 @@ public record ConductorClientConfigurationProperties(
         @NotNull
         ApplicationType applicationType,
 
-        @Min(1)
+        @Min(0)
         @Max(65535)
         int applicationPort
 ) {
