@@ -1,7 +1,7 @@
 package com.github.bottomlessarchive.loa.source.file.service.location;
 
 import com.github.bottomlessarchive.loa.location.service.factory.DocumentLocationFactory;
-import com.github.bottomlessarchive.loa.source.configuration.DocumentSourceConfiguration;
+import com.github.bottomlessarchive.loa.source.configuration.DocumentSourceConfigurationProperties;
 import com.github.bottomlessarchive.loa.source.source.DocumentLocationSource;
 import com.github.bottomlessarchive.loa.location.domain.DocumentLocation;
 import com.github.bottomlessarchive.loa.source.file.configuration.FileDocumentSourceConfigurationProperties;
@@ -23,7 +23,7 @@ public class FileDocumentLocationSource implements DocumentLocationSource {
 
     private final FileSourceFactory fileSourceFactory;
     private final DocumentLocationFactory documentLocationFactory;
-    private final DocumentSourceConfiguration documentSourceConfiguration;
+    private final DocumentSourceConfigurationProperties documentSourceConfigurationProperties;
     private final FileDocumentSourceConfigurationProperties fileDocumentSourceConfigurationProperties;
 
     @Qualifier("processedDocumentLocationCount")
@@ -44,6 +44,6 @@ public class FileDocumentLocationSource implements DocumentLocationSource {
                 .lines()
                 .skip(fileDocumentSourceConfigurationProperties.skipLines())
                 .peek(url -> processedDocumentLocationCount.increment())
-                .flatMap(url -> documentLocationFactory.newDocumentLocation(url, documentSourceConfiguration.name()).stream());
+                .flatMap(url -> documentLocationFactory.newDocumentLocation(url, documentSourceConfigurationProperties.name()).stream());
     }
 }

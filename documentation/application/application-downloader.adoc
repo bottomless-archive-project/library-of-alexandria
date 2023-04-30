@@ -41,11 +41,11 @@ include::../service/conductor/conductor-configuration.adoc[]
 | **loa.downloader.source.folder.should-remove**
 | When the source is set to `FOLDER`, should the application remove the files after processing from the folder. Useful when there are a lot of entries in the directory and can't be processed with one go. *(Default value: false)*
 
+| **loa.downloader.source.source-name**
+| The name of the source location. This name will be saved to the database for every crawled document in case of the source set to `FOLDER`. It could be helpful for statistics collection or in identifying bugs and errors with specific sources. For non-folder sources, this value is provided by the <<Generator Application>>. *(Default value: unknown)*
+
 | **loa.validation.maximum-archive-size**
 | If a document's size in bytes is bigger than the provided value, then the archiving step will be skipped. Too big documents can use up way too much space, compared to how useful they are. This parameter could be used to defend against this problem. Also, if the disk space on the stage location is lower than this value, the processing will stop to guard against filling the disk fully and breaking the processing algorithm. *(Default value: 8589934592 bytes aka 8 GB)*
-
-| **loa.source.name**
-| The name of the source location. This name will be saved to the database for every crawled document. It could be helpful for statistics collection or in identifying bugs and errors with specific sources. Only used when the `loa.downloader.source` is set to `FOLDER`. When `QUEUE` is specified, then the value that is saved to the database will be sent by the <<Generator Application>>. *(Default value: unknown)*
 
 | **loa.compression.algorithm**
 | This property describes what compression algorithm should be used while saving documents to the vault. The available values are `lzma`, `gzip`, `none`. https://en.wikipedia.org/wiki/Lempel%E2%80%93Ziv%E2%80%93Markov_chain_algorithm[LZMA] has the best compression ratios while being quite CPU resource-intensive, https://en.wikipedia.org/wiki/Gzip[GZIP] is better than no compression, but a little worse than LZMA while having minimal CPU footprint while `none` is saving the documents without compression. *(Default value: gzip)*

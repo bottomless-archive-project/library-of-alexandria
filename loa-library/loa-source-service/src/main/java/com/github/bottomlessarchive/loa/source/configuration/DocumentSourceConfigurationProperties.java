@@ -14,7 +14,7 @@ import org.springframework.validation.annotation.Validated;
  */
 @Validated
 @ConfigurationProperties("loa.source")
-public record DocumentSourceConfiguration(
+public record DocumentSourceConfigurationProperties(
 
         @NotNull
         String name,

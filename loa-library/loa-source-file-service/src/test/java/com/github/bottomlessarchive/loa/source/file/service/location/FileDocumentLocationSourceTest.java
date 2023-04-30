@@ -2,7 +2,7 @@ package com.github.bottomlessarchive.loa.source.file.service.location;
 
 import com.github.bottomlessarchive.loa.location.domain.DocumentLocation;
 import com.github.bottomlessarchive.loa.location.service.factory.DocumentLocationFactory;
-import com.github.bottomlessarchive.loa.source.configuration.DocumentSourceConfiguration;
+import com.github.bottomlessarchive.loa.source.configuration.DocumentSourceConfigurationProperties;
 import com.github.bottomlessarchive.loa.source.file.configuration.FileDocumentSourceConfigurationProperties;
 import com.github.bottomlessarchive.loa.source.file.service.FileSourceFactory;
 import io.micrometer.core.instrument.Counter;
@@ -40,7 +40,7 @@ class FileDocumentLocationSourceTest {
     private Counter processedDocumentLocationCount;
 
     @Mock
-    private DocumentSourceConfiguration documentSourceConfiguration;
+    private DocumentSourceConfigurationProperties documentSourceConfigurationProperties;
 
     @InjectMocks
     private FileDocumentLocationSource underTest;
@@ -57,7 +57,7 @@ class FileDocumentLocationSourceTest {
     void testWhenSkipLinesAreSet() {
         when(fileDocumentSourceConfigurationProperties.skipLines())
                 .thenReturn(3L);
-        when(documentSourceConfiguration.name())
+        when(documentSourceConfigurationProperties.name())
                 .thenReturn("test-source");
         when(fileSourceFactory.newSourceReader())
                 .thenReturn(
@@ -109,7 +109,7 @@ class FileDocumentLocationSourceTest {
                                 )
                         )
                 );
-        when(documentSourceConfiguration.name())
+        when(documentSourceConfigurationProperties.name())
                 .thenReturn("test-source");
         final DocumentLocation firstDocumentLocation = DocumentLocation.builder()
                 .build();

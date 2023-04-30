@@ -1,10 +1,9 @@
 package com.github.bottomlessarchive.loa.downloader.service.source.folder;
 
 import com.github.bottomlessarchive.loa.downloader.service.document.DocumentLocationProcessorWrapper;
-import com.github.bottomlessarchive.loa.downloader.service.source.configuration.DownloaderFolderSourceConfiguration;
+import com.github.bottomlessarchive.loa.downloader.service.source.configuration.DownloaderFolderSourceConfigurationProperties;
 import com.github.bottomlessarchive.loa.location.domain.DocumentLocation;
 import com.github.bottomlessarchive.loa.logging.service.MetricLogger;
-import com.github.bottomlessarchive.loa.source.configuration.DocumentSourceConfiguration;
 import io.micrometer.core.instrument.Counter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -29,9 +28,8 @@ import java.util.stream.Stream;
 @ConditionalOnProperty(value = "loa.downloader.source", havingValue = "folder")
 public class DocumentFolderReader implements CommandLineRunner {
 
-    private final DownloaderFolderSourceConfiguration downloaderFolderSourceConfiguration;
+    private final DownloaderFolderSourceConfigurationProperties downloaderFolderSourceConfigurationProperties;
     private final DocumentLocationProcessorWrapper documentLocationProcessorWrapper;
-    private final DocumentSourceConfiguration documentSourceConfiguration;
     @Qualifier("downloaderExecutorService")
     private final ExecutorService downloaderExecutorService;
     private final ApplicationContext applicationContext;
@@ -47,13 +45,13 @@ public class DocumentFolderReader implements CommandLineRunner {
     @Override
     @SneakyThrows
     public void run(final String... args) {
-        final Path sourceFolder = Path.of(downloaderFolderSourceConfiguration.location());
+        final Path sourceFolder = Path.of(downloaderFolderSourceConfigurationProperties.location());
 
         log.info("Started processing documents at folder: {}.", sourceFolder);
 
         try (Stream<Path> files = Files.list(sourceFolder)) {
             files.forEach(path -> documentLocationProcessorWrapper.processDocumentLocation(buildDocumentSourceItem(path), () -> {
-                                if (downloaderFolderSourceConfiguration.shouldRemove()) {
+                                if (downloaderFolderSourceConfigurationProperties.shouldRemove()) {
                                     try {
                                         log.debug("Deleting file at: {}.", path);
 
@@ -78,7 +76,7 @@ public class DocumentFolderReader implements CommandLineRunner {
 
         return DocumentLocation.builder()
                 .location(file.toUri().toString())
-                .sourceName(documentSourceConfiguration.name())
+                .sourceName(downloaderFolderSourceConfigurationProperties.sourceName())
                 .build();
     }
 
