@@ -39,9 +39,7 @@ public class StageDocumentController {
     public Mono<Void> persistDocument(@PathVariable final String documentId, @RequestPart("file") final Mono<FilePart> file) {
         final StageLocation documentLocation = stageLocationFactory.getStageLocation(documentId);
 
-        return file.flatMap(p -> p.transferTo(documentLocation.location())
-                .then(p.delete())
-        );
+        return file.flatMap(p -> p.transferTo(documentLocation.location()));
     }
 
     @SneakyThrows
