@@ -6,6 +6,7 @@ import com.github.bottomlessarchive.loa.checksum.service.ChecksumProvider;
 import com.github.bottomlessarchive.loa.io.service.collector.DocumentCollector;
 import com.github.bottomlessarchive.loa.stage.service.StageLocationFactory;
 import com.github.bottomlessarchive.loa.stage.service.domain.StageLocation;
+import com.github.bottomlessarchive.loa.stage.service.domain.exception.StageAccessException;
 import com.github.bottomlessarchive.loa.url.service.downloader.DocumentLocationResultCalculator;
 import com.github.bottomlessarchive.loa.url.service.downloader.domain.DownloadResult;
 import com.github.bottomlessarchive.loa.validator.service.DocumentFileValidator;
@@ -78,6 +79,10 @@ public class DocumentLocationVisitor {
                         .resultType(DownloadResult.INVALID)
                         .build();
             }
+        } catch (StageAccessException e) {
+            // We rethrow this because we want the app to fail if either the staging or the storage folder is incorrectly
+            // configured or unavailable
+            throw e;
         } catch (Exception e) {
             return DocumentLocationResult.builder()
                     .id(documentLocation.getId())

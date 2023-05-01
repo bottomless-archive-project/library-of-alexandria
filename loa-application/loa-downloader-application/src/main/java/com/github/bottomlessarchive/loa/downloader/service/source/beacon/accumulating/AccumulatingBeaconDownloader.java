@@ -50,13 +50,13 @@ public class AccumulatingBeaconDownloader implements CommandLineRunner {
                     beaconDownloaderConfigurationProperties.requestSize());
 
             log.info("Sending {} locations for processing to the beacon with name: {}.", documentLocationMessages.size(),
-                    beaconDownloaderConfigurationProperties.activeBeaconName());
+                    beaconDownloaderConfigurationProperties.name());
 
             final List<BeaconDocumentLocationResult> beaconDocumentLocationResults =
                     processDocumentLocationsByBeacon(documentLocationMessages);
 
             log.info("Got back {} location results from beacon with name: {}.", beaconDocumentLocationResults.size(),
-                    beaconDownloaderConfigurationProperties.activeBeaconName());
+                    beaconDownloaderConfigurationProperties.name());
 
             beaconDocumentLocationResults.forEach(this::processBeaconDocumentLocationResult);
         }
@@ -67,8 +67,8 @@ public class AccumulatingBeaconDownloader implements CommandLineRunner {
                 .map(beaconDocumentLocationFactory::newBeaconDocumentLocation)
                 .toList();
 
-        return beaconClient.visitDocumentLocations(beaconDownloaderConfigurationProperties.activeBeaconHost(),
-                beaconDownloaderConfigurationProperties.activeBeaconPort(), beaconDocumentLocations);
+        return beaconClient.visitDocumentLocations(beaconDownloaderConfigurationProperties.host(),
+                beaconDownloaderConfigurationProperties.port(), beaconDocumentLocations);
     }
 
     private void processBeaconDocumentLocationResult(final BeaconDocumentLocationResult beaconDocumentLocationResult) {
@@ -90,8 +90,8 @@ public class AccumulatingBeaconDownloader implements CommandLineRunner {
 
                 documentEntityFactory.addSourceLocation(documentEntityOptional.get().getId(), documentId.toString());
 
-                beaconClient.deleteDocumentFromBeacon(beaconDownloaderConfigurationProperties.activeBeaconHost(),
-                        beaconDownloaderConfigurationProperties.activeBeaconPort(), documentEntityOptional.get().getId());
+                beaconClient.deleteDocumentFromBeacon(beaconDownloaderConfigurationProperties.host(),
+                        beaconDownloaderConfigurationProperties.port(), documentEntityOptional.get().getId());
 
                 return;
             }
@@ -101,7 +101,7 @@ public class AccumulatingBeaconDownloader implements CommandLineRunner {
                             .id(beaconDocumentLocationResult.getDocumentId().get())
                             .type(beaconDocumentLocationResult.getType())
                             .status(DocumentStatus.ON_BEACON)
-                            .beacon(beaconDownloaderConfigurationProperties.activeBeaconName())
+                            .beacon(beaconDownloaderConfigurationProperties.name())
                             .source(beaconDocumentLocationResult.getSourceName())
                             .sourceLocationId(Optional.of(beaconDocumentLocationResult.getId()))
                             .versionNumber(downloaderConfigurationProperties.versionNumber())

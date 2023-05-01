@@ -7,10 +7,10 @@ import java.nio.file.Path;
 @ConfigurationProperties("loa.downloader.beacon")
 public record BeaconDownloaderConfigurationProperties(
 
-        String activeBeaconName,
-        String activeBeaconHost,
-        int activeBeaconPort,
+        String name,
+        String host,
+        int port,
         int requestSize,
-        Path location
+        Path location //TODO: This should be loader.location in a different prop config
 ) {
 }
