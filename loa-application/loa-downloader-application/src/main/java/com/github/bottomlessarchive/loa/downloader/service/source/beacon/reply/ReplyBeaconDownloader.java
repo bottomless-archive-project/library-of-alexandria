@@ -91,10 +91,10 @@ public class ReplyBeaconDownloader implements CommandLineRunner {
             if (documentEntityOptional.isPresent()) {
                 log.info("Document with id: {} is a duplicate.", documentId);
 
-                documentEntityFactory.addSourceLocation(documentEntityOptional.get().getId(), documentId.toString());
+                documentEntityFactory.addSourceLocation(documentEntityOptional.get().getId(), beaconDocumentLocationResult.getId());
 
                 beaconClient.deleteDocumentFromBeacon(beaconDownloaderConfigurationProperties.host(),
-                        beaconDownloaderConfigurationProperties.port(), documentEntityOptional.get().getId());
+                        beaconDownloaderConfigurationProperties.port(), documentId);
 
                 return;
             }
@@ -119,6 +119,9 @@ public class ReplyBeaconDownloader implements CommandLineRunner {
                         .build();
 
                 documentArchiver.archiveDocument(documentArchivingContext);
+
+                beaconClient.deleteDocumentFromBeacon(beaconDownloaderConfigurationProperties.host(),
+                        beaconDownloaderConfigurationProperties.port(), documentId);
             } catch (final Exception e) {
                 log.info("Error downloading a document: {}!", e.getMessage());
             }

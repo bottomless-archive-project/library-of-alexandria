@@ -92,7 +92,7 @@ public class BeaconClient {
     public void deleteDocumentFromBeacon(final String beaconHost, final int beaconPort, final UUID documentId) {
         try {
             final Request request = new Request.Builder()
-                    .url("http://" + beaconHost + ":" + beaconPort + "/document/" + documentId)
+                    .url("http://" + beaconHost + ":" + beaconPort + "/beacon/document/" + documentId)
                     .delete()
                     .build();
 
@@ -107,7 +107,7 @@ public class BeaconClient {
     @Retryable(maxAttempts = Integer.MAX_VALUE, backoff = @Backoff(delay = 60000))
     public DownloadResult downloadDocumentFromBeacon(final String beaconHost, final int beaconPort, final UUID documentId,
             final Path resultPath) {
-        return fileDownloadManager.downloadFile("http://" + beaconHost + ":" + beaconPort + "/document/" + documentId,
+        return fileDownloadManager.downloadFile("http://" + beaconHost + ":" + beaconPort + "/beacon/document/" + documentId,
                 resultPath);
     }
 

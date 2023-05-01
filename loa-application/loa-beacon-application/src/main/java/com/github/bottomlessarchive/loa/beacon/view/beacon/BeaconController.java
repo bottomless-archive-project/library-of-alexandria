@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -71,7 +72,7 @@ public class BeaconController {
                 .build();
     }
 
-    @PostMapping("/document/{documentId}")
+    @GetMapping("/document/{documentId}")
     public Resource returnDownloadedDocument(@PathVariable final UUID documentId) {
         return new FileSystemResource(storagePathFactory.buildStoragePath(documentId));
     }
