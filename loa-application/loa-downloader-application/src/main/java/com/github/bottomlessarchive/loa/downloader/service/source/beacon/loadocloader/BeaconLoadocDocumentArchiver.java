@@ -77,7 +77,6 @@ public class BeaconLoadocDocumentArchiver {
 
             final DocumentArchivingContext documentArchivingContext = DocumentArchivingContext.builder()
                     .id(documentId)
-                    .fromBeacon(true)
                     .type(DocumentType.valueOf(loadocMetadata.type()))
                     .source(loadocMetadata.sourceName())
                     .contents(path)
