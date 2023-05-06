@@ -6,6 +6,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 
 /**
  * This {@link Executor} is allowing a certain level of parallelism (tasks running at the same time) with a queue that blocks the producers
@@ -34,5 +35,17 @@ public class BlockingExecutor implements Executor {
                 semaphore.release();
             }
         });
+    }
+
+    public void awaitTasksToFinish() {
+        executorService.shutdown();
+
+        try {
+            if (!executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS)) {
+                executorService.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            executorService.shutdownNow();
+        }
     }
 }

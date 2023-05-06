@@ -11,6 +11,8 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -26,6 +28,7 @@ public class OfflineBeaconDownloader implements CommandLineRunner {
 
     private final ObjectMapper objectMapper;
     private final QueueManipulator queueManipulator;
+    private final ApplicationContext applicationContext;
     private final DocumentLocationCollector documentLocationCollector;
     private final OfflineBeaconDownloaderConfigurationProperties offlineBeaconDownloaderConfigurationProperties;
 
@@ -39,11 +42,17 @@ public class OfflineBeaconDownloader implements CommandLineRunner {
         try (OutputStream outputStream = Files.newOutputStream(offlineBeaconDownloaderConfigurationProperties.resultLocation())) {
             documentLocationMessages.forEach(location -> writeLocation(location, outputStream));
         }
+
+        shutdownApplication();
     }
 
     @SneakyThrows
     private void writeLocation(final DocumentLocation documentLocation, final OutputStream outputStream) {
         outputStream.write(objectMapper.writeValueAsBytes(documentLocation));
         outputStream.write((byte) '\n');
+    }
+
+    private void shutdownApplication() {
+        ((ConfigurableApplicationContext) applicationContext).close();
     }
 }

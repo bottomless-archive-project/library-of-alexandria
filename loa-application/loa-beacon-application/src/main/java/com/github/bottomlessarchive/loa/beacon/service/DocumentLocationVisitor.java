@@ -31,12 +31,15 @@ public class DocumentLocationVisitor {
     private final DocumentLocationResultCalculator documentLocationResultCalculator;
 
     public DocumentLocationResult visitDocumentLocation(final DocumentLocation documentLocation) {
-        return visitDocumentLocation(documentLocation, persistenceEntity -> persistenceEntity.stageLocation()
-                .moveTo(persistenceEntity.storagePath()));
+        return visitDocumentLocation(documentLocation,
+                persistenceEntity -> persistenceEntity.stageLocation().moveTo(persistenceEntity.storagePath()),
+                __ -> {
+                }
+        );
     }
 
     public DocumentLocationResult visitDocumentLocation(final DocumentLocation documentLocation,
-            final Consumer<PersistenceEntity> persistingCallback) {
+            final Consumer<PersistenceEntity> persistingCallback, final Consumer<FailureEntity> failureCallback) {
         final UUID documentId = UUID.randomUUID();
 
         try (StageLocation stageLocation = stageLocationFactory.getLocation(documentId)) {
@@ -50,7 +53,7 @@ public class DocumentLocationVisitor {
                     final String checksum = checksumProvider.checksum(inputStream);
 
                     final DocumentLocationResult documentLocationResult = DocumentLocationResult.builder()
-                            .id(documentLocation.getId())
+                            .id(documentId.toString())
                             .documentId(documentId)
                             .resultType(documentLocationResultType)
                             .size(size)
@@ -73,22 +76,42 @@ public class DocumentLocationVisitor {
                     }
                 }
             } else {
-                return DocumentLocationResult.builder()
-                        .id(documentLocation.getId())
-                        .size(-1)
-                        .resultType(DownloadResult.INVALID)
-                        .build();
+                try {
+                    return DocumentLocationResult.builder()
+                            .id(documentLocation.getId())
+                            .size(-1)
+                            .resultType(DownloadResult.INVALID)
+                            .build();
+                } finally {
+                    failureCallback.accept(
+                            FailureEntity.builder()
+                                    .downloadResult(DownloadResult.INVALID)
+                                    .documentLocation(documentLocation)
+                                    .build()
+                    );
+                }
             }
         } catch (StageAccessException e) {
             // We rethrow this because we want the app to fail if either the staging or the storage folder is incorrectly
             // configured or unavailable
             throw e;
         } catch (Exception e) {
-            return DocumentLocationResult.builder()
-                    .id(documentLocation.getId())
-                    .size(-1)
-                    .resultType(documentLocationResultCalculator.transformExceptionToDownloadResult(e))
-                    .build();
+            final DownloadResult downloadResult = documentLocationResultCalculator.transformExceptionToDownloadResult(e);
+
+            try {
+                return DocumentLocationResult.builder()
+                        .id(documentLocation.getId())
+                        .size(-1)
+                        .resultType(downloadResult)
+                        .build();
+            } finally {
+                failureCallback.accept(
+                        FailureEntity.builder()
+                                .downloadResult(downloadResult)
+                                .documentLocation(documentLocation)
+                                .build()
+                );
+            }
         }
     }
 
@@ -100,5 +123,14 @@ public class DocumentLocationVisitor {
             StageLocation stageLocation,
             Path storagePath
     ) {
+    }
+
+    @Builder
+    public record FailureEntity(
+
+            DownloadResult downloadResult,
+            DocumentLocation documentLocation
+    ) {
+
     }
 }

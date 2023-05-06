@@ -4,5 +4,7 @@ public enum SourceLocation {
 
     QUEUE,
     FOLDER,
-    BEACON_REPLY
+    BEACON_REPLY,
+    BEACON_OFFLINE,
+    LOADOC_LOADER
 }

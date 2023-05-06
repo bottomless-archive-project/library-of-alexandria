@@ -2,6 +2,7 @@ package com.github.bottomlessarchive.loa.downloader.service.source.beacon.loadoc
 
 import com.github.bottomlessarchive.loa.downloader.service.source.beacon.loadocloader.configuration.LoadocLoaderBeaconConfigurationProperties;
 import com.github.bottomlessarchive.loa.logging.service.MetricLogger;
+import com.github.bottomlessarchive.loa.threading.executor.BlockingExecutor;
 import io.micrometer.core.instrument.Counter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,8 +15,6 @@ import org.springframework.stereotype.Service;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 @Slf4j
@@ -30,7 +29,7 @@ public class BeaconLoadocDocumentLoader implements CommandLineRunner {
     private final LoadocLoaderBeaconConfigurationProperties loadocLoaderBeaconConfigurationProperties;
 
     @Qualifier("downloaderExecutorService")
-    private final ExecutorService downloaderExecutorService;
+    private final BlockingExecutor downloaderExecutorService;
 
     @Qualifier("processedDocumentCount")
     private final Counter processedDocumentCount;
@@ -48,7 +47,8 @@ public class BeaconLoadocDocumentLoader implements CommandLineRunner {
             files.forEach(beaconLoadocDocumentArchiver::archiveLoadocFile);
         }
 
-        awaitTasksToFinish();
+        downloaderExecutorService.awaitTasksToFinish();
+
         logFinalStatistics();
         shutdownApplication();
 
@@ -57,18 +57,6 @@ public class BeaconLoadocDocumentLoader implements CommandLineRunner {
 
     private void logFinalStatistics() {
         metricLogger.logCounters(archivedDocumentCount, processedDocumentCount);
-    }
-
-    private void awaitTasksToFinish() {
-        downloaderExecutorService.shutdown();
-
-        try {
-            if (!downloaderExecutorService.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS)) {
-                downloaderExecutorService.shutdownNow();
-            }
-        } catch (InterruptedException e) {
-            downloaderExecutorService.shutdownNow();
-        }
     }
 
     private void shutdownApplication() {

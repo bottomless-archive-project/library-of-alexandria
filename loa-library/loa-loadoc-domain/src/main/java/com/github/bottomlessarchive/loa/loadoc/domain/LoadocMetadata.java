@@ -8,7 +8,7 @@ public record LoadocMetadata(
         String id,
         String type,
         String sourceName,
-        String documentLocationId,
+        String documentId,
         String downloadResultCode
 ) {
 }
