@@ -17,6 +17,8 @@ public record DownloaderConfigurationProperties(
          * 3 = 1.0.0-release -> Updated to have a clean slate for the first "real" release.
          * 4 = Skipped
          * 5 = 1.5.1-release -> Updated because the URL encoding logic was changed in the Generator Application.
+         * 6 = 1.8.1-release -> Updated because of various small bugfixes.
+         * 7 = 2.0.0-release -> Updated to distinguish documents crawled after the introduction of the Beacon Application.
          */
         @Min(1)
         int versionNumber,
