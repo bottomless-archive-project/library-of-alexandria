@@ -15,18 +15,13 @@ import java.nio.file.Path;
 public class LZMACompressorService implements CompressorService {
 
     @Override
-    public Path compress(final Path documentLocation) {
-        final Path outputPath = documentLocation.getParent().resolve(documentLocation.getFileName() + ".lzma");
-
-
-        try (InputStream documentContent = Files.newInputStream(documentLocation);
-             LZMACompressorOutputStream lzmaOutputStream = new LZMACompressorOutputStream(Files.newOutputStream(outputPath))) {
+    public void compress(final Path originalLocation, final Path compressedLocation) {
+        try (InputStream documentContent = Files.newInputStream(originalLocation);
+             LZMACompressorOutputStream lzmaOutputStream = new LZMACompressorOutputStream(Files.newOutputStream(compressedLocation))) {
             IOUtils.copy(documentContent, lzmaOutputStream);
         } catch (final IOException e) {
             throw new CompressionException("Error while compressing document!", e);
         }
-
-        return outputPath;
     }
 
     @Override

@@ -15,17 +15,13 @@ import java.nio.file.Path;
 public class GZIPCompressorService implements CompressorService {
 
     @Override
-    public Path compress(final Path documentLocation) {
-        final Path outputPath = documentLocation.getParent().resolve(documentLocation.getFileName() + ".gz");
-
-        try (InputStream documentContent = Files.newInputStream(documentLocation);
-             GzipCompressorOutputStream gzipOutputStream = new GzipCompressorOutputStream(Files.newOutputStream(outputPath))) {
+    public void compress(final Path originalLocation, final Path compressedLocation) {
+        try (InputStream documentContent = Files.newInputStream(originalLocation);
+             GzipCompressorOutputStream gzipOutputStream = new GzipCompressorOutputStream(Files.newOutputStream(compressedLocation))) {
             IOUtils.copy(documentContent, gzipOutputStream);
         } catch (final IOException e) {
             throw new CompressionException("Error while compressing document!", e);
         }
-
-        return outputPath;
     }
 
     @Override

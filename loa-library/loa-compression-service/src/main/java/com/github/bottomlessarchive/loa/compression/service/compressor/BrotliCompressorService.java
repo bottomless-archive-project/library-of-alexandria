@@ -22,17 +22,13 @@ public class BrotliCompressorService implements CompressorService {
     }
 
     @Override
-    public Path compress(final Path documentLocation) {
-        final Path outputPath = documentLocation.getParent().resolve(documentLocation.getFileName() + ".br");
-
-        try (InputStream documentContent = Files.newInputStream(documentLocation);
-             BrotliOutputStream brotliOutputStream = new BrotliOutputStream(Files.newOutputStream(outputPath))) {
+    public void compress(final Path originalLocation, final Path compressedLocation) {
+        try (InputStream documentContent = Files.newInputStream(originalLocation);
+             BrotliOutputStream brotliOutputStream = new BrotliOutputStream(Files.newOutputStream(compressedLocation))) {
             IOUtils.copy(documentContent, brotliOutputStream);
         } catch (final IOException e) {
             throw new CompressionException("Error while compressing document!", e);
         }
-
-        return outputPath;
     }
 
     @Override
