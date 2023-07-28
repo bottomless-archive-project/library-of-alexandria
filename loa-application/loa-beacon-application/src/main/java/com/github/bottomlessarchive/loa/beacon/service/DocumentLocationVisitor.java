@@ -33,7 +33,7 @@ public class DocumentLocationVisitor {
     public DocumentLocationResult visitDocumentLocation(final DocumentLocation documentLocation) {
         return visitDocumentLocation(documentLocation,
                 persistenceEntity -> persistenceEntity.stageLocation().moveTo(persistenceEntity.storagePath()),
-                __ -> {
+                unused -> {
                 }
         );
     }
@@ -91,11 +91,13 @@ public class DocumentLocationVisitor {
                     );
                 }
             }
-        } catch (StageAccessException e) {
-            // We rethrow this because we want the app to fail if either the staging or the storage folder is incorrectly
-            // configured or unavailable
-            throw e;
         } catch (Exception e) {
+            if (e instanceof StageAccessException stageAccessException) {
+                // We rethrow this because we want the app to fail if either the staging or the storage folder is incorrectly
+                // configured or unavailable
+                throw stageAccessException;
+            }
+
             final DownloadResult downloadResult = documentLocationResultCalculator.transformExceptionToDownloadResult(e);
 
             try {

@@ -57,7 +57,7 @@ public class BeaconLoadocDocumentArchiver {
             documentLocationManipulator.updateDownloadResultCode(loadocMetadata.id(), DocumentLocationResultType.valueOf(
                     loadocMetadata.downloadResultCode()));
 
-            if (!loadocMetadata.downloadResultCode().equals("OK")) {
+            if (!"OK".equals(loadocMetadata.downloadResultCode())) {
                 return;
             }
 

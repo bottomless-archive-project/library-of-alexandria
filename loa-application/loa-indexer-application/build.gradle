@@ -25,7 +25,7 @@ bootBuildImage {
 dependencies {
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
 
-    implementation group: 'jakarta.json', name: 'jakarta.json-api', version: '2.1.1'
+    implementation group: 'jakarta.json', name: 'jakarta.json-api', version: '2.1.2'
 
     implementation project(':loa-library:loa-document-service')
     implementation project(':loa-library:loa-vault-client-service')

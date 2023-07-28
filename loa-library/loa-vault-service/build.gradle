@@ -1,8 +1,8 @@
 dependencies {
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
 
-    implementation group: 'commons-io', name: 'commons-io', version: '2.11.0'
-    implementation group: 'software.amazon.awssdk', name: 's3', version: '2.20.48'
+    implementation group: 'commons-io', name: 'commons-io', version: '2.13.0'
+    implementation group: 'software.amazon.awssdk', name: 's3', version: '2.20.114'
 
     implementation project(':loa-library:loa-file-service')
     implementation project(':loa-library:loa-stage-service')
@@ -10,5 +10,5 @@ dependencies {
     implementation project(':loa-library:loa-document-service')
     implementation project(':loa-library:loa-staging-client-service')
 
-    testImplementation group: 'com.google.jimfs', name: 'jimfs', version: '1.2'
+    testImplementation group: 'com.google.jimfs', name: 'jimfs', version: '1.3.0'
 }

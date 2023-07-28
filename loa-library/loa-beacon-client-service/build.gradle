@@ -1,7 +1,7 @@
 dependencies {
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-json'
 
-    implementation group: 'org.springframework.retry', name: 'spring-retry', version: '2.0.1'
+    implementation group: 'org.springframework.retry', name: 'spring-retry', version: '2.0.2'
 
     implementation group: 'com.squareup.okhttp3', name: 'okhttp'
 
