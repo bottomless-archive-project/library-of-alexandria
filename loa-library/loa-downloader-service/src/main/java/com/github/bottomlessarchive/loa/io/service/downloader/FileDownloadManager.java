@@ -46,12 +46,14 @@ public class FileDownloadManager {
         //TODO: Re-add the retry logic when the response is HttpStatus.TOO_MANY_REQUESTS
         try (Response response = downloaderClient.newCall(request).execute()) {
             try (ResponseBody responseBody = response.body()) {
-                documentLocationResultType = documentLocationResultCalculator.calculateResultBasedOnResponseCode(
-                        downloadTarget, response.code());
+                documentLocationResultType = documentLocationResultCalculator.calculateResultBasedOnResponseCode(response.code());
+
+                if (documentLocationResultType == DownloadResult.UNKNOWN) {
+                    log.info("Unknown response code: {} on location: {}.", response.code(), downloadTarget);
+                }
 
                 if (responseBody == null) {
-                    return documentLocationResultType == DownloadResult.OK
-                            ? DownloadResult.EMPTY_BODY : documentLocationResultType;
+                    return documentLocationResultType == DownloadResult.OK ? DownloadResult.EMPTY_BODY : documentLocationResultType;
                 }
 
                 Files.copy(responseBody.byteStream(), resultLocation);

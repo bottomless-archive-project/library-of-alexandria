@@ -16,8 +16,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ExtendWith(MockitoExtension.class)
 class DocumentLocationResultCalculatorTest {
 
-    private static final String TEST_URL = "https://test-url.com/";
-
     @InjectMocks
     private DocumentLocationResultCalculator underTest;
 
@@ -55,7 +53,7 @@ class DocumentLocationResultCalculatorTest {
 
     @Test
     void testCalculateResultBasedOnResponseCodeWhenResponseCode200() {
-        final DownloadResult result = underTest.calculateResultBasedOnResponseCode(TEST_URL, 200);
+        final DownloadResult result = underTest.calculateResultBasedOnResponseCode(200);
 
         assertThat(result)
                 .isEqualTo(DownloadResult.OK);
@@ -63,7 +61,7 @@ class DocumentLocationResultCalculatorTest {
 
     @Test
     void testCalculateResultBasedOnResponseCodeWhenResponseCode404() {
-        final DownloadResult result = underTest.calculateResultBasedOnResponseCode(TEST_URL, 404);
+        final DownloadResult result = underTest.calculateResultBasedOnResponseCode(404);
 
         assertThat(result)
                 .isEqualTo(DownloadResult.NOT_FOUND);
@@ -71,7 +69,7 @@ class DocumentLocationResultCalculatorTest {
 
     @Test
     void testCalculateResultBasedOnResponseCodeWhenResponseCode403() {
-        final DownloadResult result = underTest.calculateResultBasedOnResponseCode(TEST_URL, 403);
+        final DownloadResult result = underTest.calculateResultBasedOnResponseCode(403);
 
         assertThat(result)
                 .isEqualTo(DownloadResult.FORBIDDEN);
@@ -79,7 +77,7 @@ class DocumentLocationResultCalculatorTest {
 
     @Test
     void testCalculateResultBasedOnResponseCodeWhenResponseCode400() {
-        final DownloadResult result = underTest.calculateResultBasedOnResponseCode(TEST_URL, 400);
+        final DownloadResult result = underTest.calculateResultBasedOnResponseCode(400);
 
         assertThat(result)
                 .isEqualTo(DownloadResult.SERVER_ERROR);
@@ -87,7 +85,7 @@ class DocumentLocationResultCalculatorTest {
 
     @Test
     void testCalculateResultBasedOnResponseCodeWhenResponseCodeIsUnknown() {
-        final DownloadResult result = underTest.calculateResultBasedOnResponseCode(TEST_URL, -1);
+        final DownloadResult result = underTest.calculateResultBasedOnResponseCode(-1);
 
         assertThat(result)
                 .isEqualTo(DownloadResult.UNKNOWN);

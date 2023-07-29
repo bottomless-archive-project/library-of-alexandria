@@ -15,26 +15,14 @@ import java.net.UnknownHostException;
 @RequiredArgsConstructor
 public class DocumentLocationResultCalculator {
 
-    public DownloadResult calculateResultBasedOnResponseCode(final String downloadTarget, final int responseCode) {
-        switch (responseCode) {
-            case 200 -> {
-                return DownloadResult.OK;
-            }
-            case 404 -> {
-                return DownloadResult.NOT_FOUND;
-            }
-            case 403 -> {
-                return DownloadResult.FORBIDDEN;
-            }
-            case 400 -> {
-                return DownloadResult.SERVER_ERROR;
-            }
-            default -> {
-                log.info("Unknown response code: {} on location: {}.", responseCode, downloadTarget);
-
-                return DownloadResult.UNKNOWN;
-            }
-        }
+    public DownloadResult calculateResultBasedOnResponseCode(final int responseCode) {
+        return switch (responseCode) {
+            case 200 -> DownloadResult.OK;
+            case 404 -> DownloadResult.NOT_FOUND;
+            case 403 -> DownloadResult.FORBIDDEN;
+            case 400 -> DownloadResult.SERVER_ERROR;
+            default -> DownloadResult.UNKNOWN;
+        };
     }
 
     public DownloadResult transformExceptionToDownloadResult(final Exception e) {
