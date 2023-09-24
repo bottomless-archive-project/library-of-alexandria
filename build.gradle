@@ -26,7 +26,7 @@ configure(subprojects.findAll { it.name != 'loa-frontend' }) {
     java {
         modularity.inferModulePath = true
         toolchain {
-            languageVersion = JavaLanguageVersion.of(20)
+            languageVersion = JavaLanguageVersion.of(21)
         }
     }
 
@@ -42,7 +42,7 @@ configure(subprojects.findAll { it.name != 'loa-frontend' }) {
         options.encoding = "UTF-8"
         doFirst {
             options.compilerArgs += [
-                    '--enable-preview', '--add-modules', 'jdk.incubator.concurrent', '-parameters'
+                    '--enable-preview', '-parameters'
             ]
         }
     }
@@ -50,7 +50,7 @@ configure(subprojects.findAll { it.name != 'loa-frontend' }) {
         options.encoding = "UTF-8"
         doFirst {
             options.compilerArgs += [
-                    '--enable-preview', '--add-modules', 'jdk.incubator.concurrent'
+                    '--enable-preview'
             ]
         }
     }
@@ -64,8 +64,6 @@ configure(subprojects.findAll { it.name != 'loa-frontend' }) {
     }
 
     test {
-        jvmArgs(['--enable-preview'])
-
         useJUnitPlatform()
     }
 
@@ -91,10 +89,10 @@ configure(subprojects.findAll { it.name != 'loa-frontend' }) {
         annotationProcessor group: 'org.springframework.boot', name: 'spring-boot-configuration-processor'
 
         // Lombok
-        compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.28'
-        annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.28'
-        testCompileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.28'
-        testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.28'
+        compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.30'
+        annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.30'
+        testCompileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.30'
+        testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.30'
 
         // Testing
         testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
