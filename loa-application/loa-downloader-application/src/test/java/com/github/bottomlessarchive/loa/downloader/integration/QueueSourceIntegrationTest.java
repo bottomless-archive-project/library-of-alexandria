@@ -6,7 +6,6 @@ import com.github.bottomlessarchive.loa.stage.service.StageLocationFactory;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import com.google.common.jimfs.Configuration;
 import com.google.common.jimfs.Jimfs;
-import com.thomaskasene.wiremock.junit.WireMockStubs;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -38,7 +37,6 @@ import static org.mockito.Mockito.verify;
 
 @Disabled // TODO: This test always ends up with an outofmemory error, further investigation is needed!
 @Slf4j
-@WireMockStubs
 @Testcontainers
 @SpringBootTest(
         properties = {

@@ -14,7 +14,6 @@ import com.github.bottomlessarchive.loa.vault.service.location.file.configuratio
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import com.google.common.jimfs.Configuration;
 import com.google.common.jimfs.Jimfs;
-import com.thomaskasene.wiremock.junit.WireMockStubs;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterAll;
@@ -63,7 +62,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Slf4j
-@WireMockStubs
 @Testcontainers
 @SpringBootTest(
         properties = {

@@ -2,7 +2,6 @@ package com.github.bottomlessarchive.loa.vault.integration;
 
 import com.github.bottomlessarchive.loa.application.domain.ApplicationType;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
-import com.thomaskasene.wiremock.junit.WireMockStubs;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -28,7 +27,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Slf4j
-@WireMockStubs
 @Testcontainers
 @SpringBootTest(
         properties = {

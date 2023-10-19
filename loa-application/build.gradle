@@ -1,9 +1,8 @@
 subprojects {
     dependencies {
-        testImplementation group: 'org.testcontainers', name: 'junit-jupiter', version: '1.18.3'
-        testImplementation group: 'org.testcontainers', name: 'testcontainers', version: '1.18.3'
+        testImplementation group: 'org.testcontainers', name: 'junit-jupiter', version: '1.19.1'
+        testImplementation group: 'org.testcontainers', name: 'testcontainers', version: '1.19.1'
 
-        testImplementation group: 'com.github.tomakehurst', name: 'wiremock-jre8-standalone', version: '3.0.1'
-        testImplementation group: 'com.thomaskasene.wiremock', name: 'wiremock-junit-extension', version: '1.0.2.RELEASE'
+        testImplementation group: 'org.wiremock', name: 'wiremock-standalone', version: '3.2.0'
     }
 }
