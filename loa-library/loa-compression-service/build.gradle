@@ -1,15 +1,15 @@
 dependencies {
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
 
-    implementation group: 'commons-io', name: 'commons-io', version: '2.14.0'
-    implementation group: 'org.apache.commons', name: 'commons-compress', version: '1.24.0'
+    implementation group: 'commons-io', name: 'commons-io', version: '2.15.0'
+    implementation group: 'org.apache.commons', name: 'commons-compress', version: '1.25.0'
     implementation group: 'org.tukaani', name: 'xz', version: '1.9'
 
-    implementation group: 'com.aayushatharva.brotli4j', name: 'brotli4j', version: '1.12.0'
-    implementation group: 'com.aayushatharva.brotli4j', name: 'native-osx-x86_64', version: '1.12.0'
-    implementation group: 'com.aayushatharva.brotli4j', name: 'native-osx-aarch64', version: '1.12.0'
-    implementation group: 'com.aayushatharva.brotli4j', name: 'native-linux-armv7', version: '1.12.0'
-    implementation group: 'com.aayushatharva.brotli4j', name: 'native-linux-x86_64', version: '1.12.0'
-    implementation group: 'com.aayushatharva.brotli4j', name: 'native-linux-aarch64', version: '1.12.0'
-    implementation group: 'com.aayushatharva.brotli4j', name: 'native-windows-x86_64', version: '1.12.0'
+    implementation group: 'com.aayushatharva.brotli4j', name: 'brotli4j', version: '1.13.0'
+    implementation group: 'com.aayushatharva.brotli4j', name: 'native-osx-x86_64', version: '1.13.0'
+    implementation group: 'com.aayushatharva.brotli4j', name: 'native-osx-aarch64', version: '1.13.0'
+    implementation group: 'com.aayushatharva.brotli4j', name: 'native-linux-armv7', version: '1.13.0'
+    implementation group: 'com.aayushatharva.brotli4j', name: 'native-linux-x86_64', version: '1.13.0'
+    implementation group: 'com.aayushatharva.brotli4j', name: 'native-linux-aarch64', version: '1.13.0'
+    implementation group: 'com.aayushatharva.brotli4j', name: 'native-windows-x86_64', version: '1.13.0'
 }
