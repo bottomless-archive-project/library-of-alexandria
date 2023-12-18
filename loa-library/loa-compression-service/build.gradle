@@ -1,7 +1,7 @@
 dependencies {
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
 
-    implementation group: 'commons-io', name: 'commons-io', version: '2.15.0'
+    implementation group: 'commons-io', name: 'commons-io', version: '2.15.1'
     implementation group: 'org.apache.commons', name: 'commons-compress', version: '1.25.0'
     implementation group: 'org.tukaani', name: 'xz', version: '1.9'
 
