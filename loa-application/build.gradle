@@ -1,7 +1,7 @@
 subprojects {
     dependencies {
-        testImplementation group: 'org.testcontainers', name: 'junit-jupiter', version: '1.19.2'
-        testImplementation group: 'org.testcontainers', name: 'testcontainers', version: '1.19.2'
+        testImplementation group: 'org.testcontainers', name: 'junit-jupiter', version: '1.19.3'
+        testImplementation group: 'org.testcontainers', name: 'testcontainers', version: '1.19.3'
 
         testImplementation group: 'org.wiremock', name: 'wiremock-standalone', version: '3.3.1'
     }
