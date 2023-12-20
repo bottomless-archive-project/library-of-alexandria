@@ -77,18 +77,18 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "loa-frontend:build"
+            "buildTarget": "loa-frontend:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "loa-frontend:build:production"
+              "buildTarget": "loa-frontend:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "loa-frontend:build"
+            "buildTarget": "loa-frontend:build"
           }
         },
         "test": {
