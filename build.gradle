@@ -32,9 +32,6 @@ configure(subprojects.findAll { it.name != 'loa-frontend' }) {
 
     repositories {
         mavenCentral()
-        flatDir {
-            dirs "$rootProject.projectDir/libs"
-        }
     }
 
     compileJava.dependsOn(processResources)
