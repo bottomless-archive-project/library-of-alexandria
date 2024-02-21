@@ -4,5 +4,5 @@ dependencies {
     implementation project(':loa-library:loa-document-type-service')
     implementation project(':loa-library:loa-document-location-repository')
 
-    implementation group: 'commons-codec', name: 'commons-codec', version: '1.16.0'
+    implementation group: 'commons-codec', name: 'commons-codec', version: '1.16.1'
 }
