@@ -5,5 +5,5 @@ dependencies {
     implementation project(':loa-library:loa-file-service')
     implementation project(':loa-library:loa-logging-service')
 
-    testImplementation group: 'org.apache.commons', name: 'commons-compress', version: '1.26.0'
+    testImplementation group: 'org.apache.commons', name: 'commons-compress', version: '1.26.1'
 }
