@@ -3,6 +3,6 @@ subprojects {
         testImplementation group: 'org.testcontainers', name: 'junit-jupiter', version: '1.19.7'
         testImplementation group: 'org.testcontainers', name: 'testcontainers', version: '1.19.7'
 
-        testImplementation group: 'org.wiremock', name: 'wiremock-standalone', version: '3.4.2'
+        testImplementation group: 'org.wiremock', name: 'wiremock-standalone', version: '3.5.2'
     }
 }

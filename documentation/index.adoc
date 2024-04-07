@@ -1,6 +1,7 @@
 :toc: left
 :icons: font
 :imagesdir: assets/images
+:doctype: book
 
 = Library of Alexandria
 
