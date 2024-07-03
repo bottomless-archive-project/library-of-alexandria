@@ -1,10 +1,17 @@
 package com.github.bottomlessarchive.loa.stage.view.document.controller;
 
+import blue.strategic.parquet.ParquetWriter;
+import com.github.bottomlessarchive.loa.batch.service.domain.BatchEntity;
+import com.github.bottomlessarchive.loa.batch.service.entity.factory.BatchEntityFactory;
+import com.github.bottomlessarchive.loa.stage.configuration.StagingConfigurationProperties;
 import com.github.bottomlessarchive.loa.stage.service.StageLocationFactory;
 import com.github.bottomlessarchive.loa.stage.service.location.StageLocation;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.parquet.schema.LogicalTypeAnnotation;
+import org.apache.parquet.schema.MessageType;
+import org.apache.parquet.schema.Types;
 import org.springframework.http.ZeroCopyHttpOutputMessage;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.http.server.reactive.ServerHttpResponse;
@@ -18,6 +25,9 @@ import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
+
+import static org.apache.parquet.schema.PrimitiveType.PrimitiveTypeName.BINARY;
 
 /**
  * This class is responsible to serve the web-related functionality of the Staging Application.
@@ -32,7 +42,18 @@ import java.nio.file.Files;
 @RequiredArgsConstructor
 public class StageDocumentController {
 
+    private final BatchEntityFactory batchEntityFactory;
     private final StageLocationFactory stageLocationFactory;
+    private final StagingConfigurationProperties stagingConfigurationProperties;
+
+    //TODO: Move this to somewhere else
+    private final static MessageType DOCUMENT_PARQUET_SCHEMA = new MessageType("documents",
+            Types.required(BINARY)
+                    .as(LogicalTypeAnnotation.stringType())
+                    .named("documentId"),
+            Types.required(BINARY)
+                    .named("documentContent")
+    );
 
     @SneakyThrows
     @PostMapping("/document/{documentId}")
@@ -42,6 +63,23 @@ public class StageDocumentController {
         return file.flatMap(p -> p.transferTo(documentLocation.location()));
     }
 
+    @GetMapping("/document/next-batch")
+    public Mono<Void> nextBatch() {
+        //TODO: Create the parquet file and return it
+
+        //TODO: Move this logic into the service layer after the parquet saving is done
+        final BatchEntity nextBatchEntity = batchEntityFactory.getNextBatch()
+                .orElseGet(batchEntityFactory::newBatchEntity);
+
+        final Path nextBatchPath = stagingConfigurationProperties.location()
+                .resolve(nextBatchEntity.id() + ".parquet");
+
+        try (ParquetWriter parquetWriter = ParquetWriter.writeFile()) {
+
+        }
+    }
+
+    //TODO: Replace these with the batch based downloads
     @SneakyThrows
     @GetMapping("/document/{documentId}")
     public Mono<Void> serveDocument(@PathVariable final String documentId, final ServerHttpResponse response) {
@@ -58,6 +96,7 @@ public class StageDocumentController {
 
         return deleteIfExists(documentLocation);
     }
+    //TODO: End
 
     private Mono<Void> deleteIfExists(final StageLocation file) {
         return Mono.fromRunnable(() -> {

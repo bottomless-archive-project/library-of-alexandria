@@ -22,6 +22,8 @@ include 'loa-application:loa-generator-application'
 include 'loa-application:loa-queue-application'
 include 'loa-application:loa-conductor-application'
 
+include 'loa-library:loa-batch-service'
+include 'loa-library:loa-batch-repository'
 include 'loa-library:loa-document-service'
 include 'loa-library:loa-document-repository'
 include 'loa-library:loa-document-view'
