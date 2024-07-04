@@ -64,7 +64,7 @@ public class ArtemisQueueManipulator implements QueueManipulator {
     public void silentlyInitializeQueue(final Queue queue) {
         try (ClientSession clientSession = clientSessionFactory.createSession()) {
             final ClientSession.QueueQuery queueQuery = clientSession.queueQuery(
-                    SimpleString.toSimpleString(queue.getName()));
+                    SimpleString.of(queue.getName()));
 
             if (!queueQuery.isExists()) {
                 initializeQueue(queue);
@@ -91,7 +91,7 @@ public class ArtemisQueueManipulator implements QueueManipulator {
 
         try (ClientSession clientSession = clientSessionFactory.createSession()) {
             clientSession.createQueue(
-                    new QueueConfiguration(queue.getName())
+                    QueueConfiguration.of(queue.getName())
                             .setAddress(queue.getAddress())
                             .setRoutingType(RoutingType.ANYCAST)
                             .setDurable(true)
@@ -112,7 +112,7 @@ public class ArtemisQueueManipulator implements QueueManipulator {
     public long getMessageCount(final Queue queue) {
         try (ClientSession clientSession = clientSessionFactory.createSession()) {
             final ClientSession.QueueQuery queueQuery = clientSession.queueQuery(
-                    SimpleString.toSimpleString(queue.getName()));
+                    SimpleString.of(queue.getName()));
 
             return queueQuery.getMessageCount();
         } catch (final ActiveMQException e) {
