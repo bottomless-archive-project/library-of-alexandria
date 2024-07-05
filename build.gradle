@@ -2,8 +2,8 @@ import org.springframework.boot.gradle.plugin.SpringBootPlugin
 
 buildscript {
     ext {
-        set('artemis.version', '2.33.0')
-        set('mongodb.version', '5.0.1')
+        set('artemis.version', '2.35.0')
+        set('mongodb.version', '5.1.1')
         set('okhttp.version', '4.12.0')
     }
     repositories {
@@ -13,7 +13,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath('org.springframework.boot:spring-boot-gradle-plugin:3.2.4')
+        classpath('org.springframework.boot:spring-boot-gradle-plugin:3.3.1')
         classpath('com.adarshr:gradle-test-logger-plugin:2.0.0')
         classpath('com.github.ben-manes:gradle-versions-plugin:0.46.0')
         classpath('com.palantir.gradle.docker:gradle-docker:0.25.0')
@@ -86,10 +86,10 @@ configure(subprojects.findAll { it.name != 'loa-frontend' }) {
         annotationProcessor group: 'org.springframework.boot', name: 'spring-boot-configuration-processor'
 
         // Lombok
-        compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.32'
-        annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.32'
-        testCompileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.32'
-        testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.32'
+        compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.34'
+        annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.34'
+        testCompileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.34'
+        testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.34'
 
         // Testing
         testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'

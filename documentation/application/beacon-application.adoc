@@ -1,0 +1,6 @@
+:application-type: BEACON_APPLICATION
+:application-name: Beacon Application
+
+= Beacon Application
+
+The Beacon Application is experimental and should not be used in production.
