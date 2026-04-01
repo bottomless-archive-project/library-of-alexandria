@@ -34,6 +34,7 @@ public class DocumentEntityTransformer {
                         .map(hexConverter::encode)
                         .collect(Collectors.toSet())
                 )
+                .vaultFile(documentDatabaseEntity.vaultFile())
                 .build();
     }
 }

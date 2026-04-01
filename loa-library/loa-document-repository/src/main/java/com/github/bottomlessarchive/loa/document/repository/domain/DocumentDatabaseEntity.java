@@ -27,7 +27,8 @@ public record DocumentDatabaseEntity(
         long fileSize,
 
         int downloaderVersion,
-        Instant downloadDate
+        Instant downloadDate,
+        int vaultFile
 ) {
 
 

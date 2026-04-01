@@ -34,6 +34,7 @@ public class DocumentEntity {
     private final String beacon;
     @ToString.Include
     private final Set<String> sourceLocations;
+    private final int vaultFile;
 
     /**
      * Returns true if the document is saved to the vault.

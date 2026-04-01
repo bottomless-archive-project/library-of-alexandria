@@ -3,9 +3,9 @@ package com.github.bottomlessarchive.loa.vault.domain;
 public enum VaultType {
 
     /**
-     * The vault location is directly on the disks.
+     * The vault location is backed by SQLite databases.
      */
-    FILE,
+    SQLITE,
 
     /**
      * An AWS S3 compatible backend.

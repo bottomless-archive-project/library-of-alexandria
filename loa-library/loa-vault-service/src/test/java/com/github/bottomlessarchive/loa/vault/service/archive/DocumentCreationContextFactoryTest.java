@@ -5,9 +5,11 @@ import com.github.bottomlessarchive.loa.document.service.domain.DocumentStatus;
 import com.github.bottomlessarchive.loa.document.service.entity.factory.domain.DocumentCreationContext;
 import com.github.bottomlessarchive.loa.type.domain.DocumentType;
 import com.github.bottomlessarchive.loa.vault.service.domain.DocumentArchivingContext;
+import com.github.bottomlessarchive.loa.vault.service.location.VaultLocationFactory;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
@@ -15,9 +17,13 @@ import java.util.UUID;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class DocumentCreationContextFactoryTest {
+
+    @Mock
+    private VaultLocationFactory vaultLocationFactory;
 
     @InjectMocks
     private DocumentCreationContextFactory underTest;
@@ -38,6 +44,9 @@ class DocumentCreationContextFactoryTest {
                 .sourceLocationId(Optional.of("locationId"))
                 .build();
 
+        when(vaultLocationFactory.getActiveVaultFileNumber())
+                .thenReturn(5);
+
         final DocumentCreationContext result = underTest.newContext(documentArchivingContext);
 
         assertThat(result.id(), is(id));
@@ -51,5 +60,6 @@ class DocumentCreationContextFactoryTest {
         assertThat(result.status(), is(DocumentStatus.CREATED));
         assertThat(result.sourceLocationId().isPresent(), is(true));
         assertThat(result.sourceLocationId().get(), is("locationId"));
+        assertThat(result.vaultFile(), is(5));
     }
 }

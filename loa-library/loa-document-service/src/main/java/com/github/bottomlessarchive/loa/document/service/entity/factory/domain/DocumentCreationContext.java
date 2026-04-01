@@ -38,6 +38,7 @@ public record DocumentCreationContext(
 
         String beacon,
         long fileSize,
-        int versionNumber
+        int versionNumber,
+        int vaultFile
 ) {
 }

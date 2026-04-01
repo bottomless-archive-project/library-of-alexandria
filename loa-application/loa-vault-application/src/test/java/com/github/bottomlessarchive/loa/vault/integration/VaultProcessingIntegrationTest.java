@@ -10,6 +10,7 @@ import com.github.bottomlessarchive.loa.queue.service.QueueManipulator;
 import com.github.bottomlessarchive.loa.queue.service.domain.Queue;
 import com.github.bottomlessarchive.loa.queue.service.domain.message.DocumentArchivingMessage;
 import com.github.bottomlessarchive.loa.type.domain.DocumentType;
+import com.github.bottomlessarchive.loa.vault.service.location.sqlite.service.SqliteConnectionManager;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeAll;
@@ -23,7 +24,6 @@ import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import java.io.File;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -42,7 +42,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(
         properties = {
                 "loa.conductor.port=2000",
-                "loa.vault.location.file.path=./build/"
+                "loa.vault.location.type=sqlite",
+                "loa.vault.location.sqlite.path=./build/vault-test/",
+                "loa.vault.location.sqlite.batch-size=100000"
         }
 )
 @WireMockTest(httpPort = 2000)
@@ -53,6 +55,9 @@ class VaultProcessingIntegrationTest {
 
     @Autowired
     private DocumentEntityFactory documentEntityFactory;
+
+    @Autowired
+    private SqliteConnectionManager sqliteConnectionManager;
 
     @Container
     private static final GenericContainer<?> ARTEMIS_CONTAINER = new GenericContainer<>("vromero/activemq-artemis")
@@ -80,7 +85,7 @@ class VaultProcessingIntegrationTest {
     }
 
     @Test
-    void testDocumentArchival() throws InterruptedException {
+    void testDocumentArchival() throws Exception {
         final UUID documentId = UUID.randomUUID();
 
         expectStagingGetDocumentCall(documentId, new byte[]{1, 2, 3, 4, 5});
@@ -130,14 +135,16 @@ class VaultProcessingIntegrationTest {
                             .isEmpty();
                 });
 
-        assertThat(new File("./build/" + documentId + ".pdf"))
-                .exists()
-                .binaryContent()
+        final DocumentEntity document = documentEntity.get();
+        assertThat(sqliteConnectionManager.documentExists(
+                document.getVaultFile(), documentId.toString())).isTrue();
+        assertThat(sqliteConnectionManager.readDocument(
+                document.getVaultFile(), documentId.toString()).readAllBytes())
                 .isEqualTo(new byte[]{1, 2, 3, 4, 5});
     }
 
     @Test
-    void testDocumentArchivalWhenDocumentIsDuplicate() throws InterruptedException {
+    void testDocumentArchivalWhenDocumentIsDuplicate() throws Exception {
         final UUID documentId = UUID.randomUUID();
 
         expectStagingGetDocumentCall(documentId, new byte[]{1, 2, 3, 4, 5});
@@ -206,9 +213,11 @@ class VaultProcessingIntegrationTest {
                             .contains("123456bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad");
                 });
 
-        assertThat(new File("./build/" + documentId + ".pdf"))
-                .exists()
-                .binaryContent()
+        final DocumentEntity doc = documentEntity.get();
+        assertThat(sqliteConnectionManager.documentExists(
+                doc.getVaultFile(), documentId.toString())).isTrue();
+        assertThat(sqliteConnectionManager.readDocument(
+                doc.getVaultFile(), documentId.toString()).readAllBytes())
                 .isEqualTo(new byte[]{1, 2, 3, 4, 5});
 
         final Optional<DocumentEntity> duplicateDocumentEntity = documentEntityFactory.getDocumentEntity(duplicateDocumentId);
@@ -216,12 +225,12 @@ class VaultProcessingIntegrationTest {
         assertThat(duplicateDocumentEntity)
                 .isEmpty();
 
-        assertThat(new File("./build/" + duplicateDocumentId + ".pdf"))
-                .doesNotExist();
+        assertThat(sqliteConnectionManager.documentExists(
+                doc.getVaultFile(), duplicateDocumentId.toString())).isFalse();
     }
 
     @Test
-    void testDocumentArchivalWhenDocumentIsLoadedFromBeacon() throws InterruptedException {
+    void testDocumentArchivalWhenDocumentIsLoadedFromBeacon() throws Exception {
         final UUID documentId = UUID.randomUUID();
 
         expectStagingGetDocumentCall(documentId, new byte[]{1, 2, 3, 4, 5});
@@ -291,9 +300,11 @@ class VaultProcessingIntegrationTest {
                             .contains("543216bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad");
                 });
 
-        assertThat(new File("./build/" + documentId + ".pdf"))
-                .exists()
-                .binaryContent()
+        final DocumentEntity beaconDoc = documentEntity.get();
+        assertThat(sqliteConnectionManager.documentExists(
+                beaconDoc.getVaultFile(), documentId.toString())).isTrue();
+        assertThat(sqliteConnectionManager.readDocument(
+                beaconDoc.getVaultFile(), documentId.toString()).readAllBytes())
                 .isEqualTo(new byte[]{1, 2, 3, 4, 5});
     }
 

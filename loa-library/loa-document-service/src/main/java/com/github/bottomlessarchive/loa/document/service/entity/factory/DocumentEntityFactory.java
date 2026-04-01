@@ -147,6 +147,7 @@ public class DocumentEntityFactory {
                 .fileSize(documentCreationContext.fileSize())
                 .downloaderVersion(documentCreationContext.versionNumber())
                 .downloadDate(Instant.now())
+                .vaultFile(documentCreationContext.vaultFile())
                 .build();
 
         try {

@@ -9,14 +9,9 @@ import com.github.bottomlessarchive.loa.document.service.entity.factory.Document
 import com.github.bottomlessarchive.loa.document.service.entity.factory.domain.DocumentCreationContext;
 import com.github.bottomlessarchive.loa.stage.service.StageLocationFactory;
 import com.github.bottomlessarchive.loa.type.domain.DocumentType;
-import com.github.bottomlessarchive.loa.vault.configuration.VaultConfigurationProperties;
-import com.github.bottomlessarchive.loa.vault.service.location.file.configuration.FileConfigurationProperties;
+import com.github.bottomlessarchive.loa.vault.service.location.sqlite.service.SqliteConnectionManager;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
-import com.google.common.jimfs.Configuration;
-import com.google.common.jimfs.Jimfs;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,11 +20,8 @@ import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Primary;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
@@ -38,13 +30,9 @@ import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import wiremock.org.apache.commons.io.file.PathUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.nio.file.FileSystem;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Optional;
 import java.util.UUID;
@@ -65,7 +53,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Testcontainers
 @SpringBootTest(
         properties = {
-                "loa.conductor.port=2002"
+                "loa.conductor.port=2002",
+                "loa.vault.location.type=sqlite",
+                "loa.vault.location.sqlite.path=./build/vault-view-test/",
+                "loa.vault.location.sqlite.batch-size=100000"
         }
 )
 @DirtiesContext
@@ -86,7 +77,8 @@ class VaultViewDefaultIntegrationTest {
     @Autowired
     private DocumentEntityFactory documentEntityFactory;
 
-    private static final FileSystem FILE_SYSTEM = Jimfs.newFileSystem(Configuration.unix());
+    @Autowired
+    private SqliteConnectionManager sqliteConnectionManager;
 
     //TODO: Why does the application connect to the queue even if loa.vault.archiving is disabled?
     @Container
@@ -104,41 +96,13 @@ class VaultViewDefaultIntegrationTest {
             .withStartupTimeout(Duration.ofMinutes(5))
             .withLogConsumer(new Slf4jLogConsumer(log).withPrefix("MONGO-LOG"));
 
-    @TestConfiguration
-    public static class ReplacementConfiguration {
-
-        @Bean
-        @Primary
-        public FileConfigurationProperties fileConfigurationProperties() throws IOException {
-            Files.createDirectories(FILE_SYSTEM.getPath("/vault"));
-
-            return new FileConfigurationProperties(FILE_SYSTEM.getPath("/vault"));
-        }
-
-        @Bean
-        @Primary
-        public VaultConfigurationProperties vaultConfigurationProperties() {
-            return new VaultConfigurationProperties("default", true, false, 1, 1, FILE_SYSTEM.getPath("/stage"));
-        }
-    }
-
     @BeforeAll
     static void setup() throws IOException {
-        Files.createDirectories(FILE_SYSTEM.getPath("/stage"));
-
         expectStartupServiceCalls();
     }
 
-    @AfterAll
-    static void teardown() throws IOException {
-        FILE_SYSTEM.close();
-    }
-
     @BeforeEach
-    public void setupEach() throws IOException {
-        PathUtils.cleanDirectory(FILE_SYSTEM.getPath("/stage"));
-        PathUtils.cleanDirectory(FILE_SYSTEM.getPath("/vault"));
-
+    public void setupEach() {
         expectNonStartupServiceCalls();
     }
 
@@ -168,6 +132,7 @@ class VaultViewDefaultIntegrationTest {
     @Test
     void testQueryDocumentWhenDocumentIsInVault() throws Exception {
         final UUID documentId = UUID.randomUUID();
+        final int vaultFileNumber = sqliteConnectionManager.getActiveVaultFileNumber();
 
         documentEntityFactory.newDocumentEntity(
                 DocumentCreationContext.builder()
@@ -180,10 +145,12 @@ class VaultViewDefaultIntegrationTest {
                         .fileSize(123)
                         .source("test-source")
                         .sourceLocationId(Optional.empty())
+                        .vaultFile(vaultFileNumber)
                         .build()
         );
 
-        setupFakeFile("/vault/" + documentId + ".pdf", new byte[]{1, 2, 3, 4});
+        sqliteConnectionManager.insertDocument(documentId.toString(),
+                new ByteArrayInputStream(new byte[]{1, 2, 3, 4}));
 
         mockMvc.perform(get("/document/" + documentId))
                 .andExpect(status().isOk())
@@ -194,6 +161,7 @@ class VaultViewDefaultIntegrationTest {
     @Test
     void testQueryDocumentWhenDocumentIsInVaultAndCompressedWithBrotli() throws Exception {
         final UUID documentId = UUID.randomUUID();
+        final int vaultFileNumber = sqliteConnectionManager.getActiveVaultFileNumber();
 
         documentEntityFactory.newDocumentEntity(
                 DocumentCreationContext.builder()
@@ -206,10 +174,13 @@ class VaultViewDefaultIntegrationTest {
                         .fileSize(123)
                         .source("test-source")
                         .sourceLocationId(Optional.empty())
+                        .vaultFile(vaultFileNumber)
                         .build()
         );
 
-        setupFakeFile("/vault/" + documentId + ".pdf.br", new byte[]{-117, 1, -128, 1, 2, 3, 4, 3});
+        final byte[] brotliContent = {-117, 1, -128, 1, 2, 3, 4, 3};
+        sqliteConnectionManager.insertDocument(documentId.toString(),
+                new ByteArrayInputStream(brotliContent));
 
         mockMvc.perform(get("/document/" + documentId))
                 .andExpect(status().isOk())
@@ -263,6 +234,7 @@ class VaultViewDefaultIntegrationTest {
     @Test
     void testDeleteDocumentWhenDocumentIsInVault() throws Exception {
         final UUID documentId = UUID.randomUUID();
+        final int vaultFileNumber = sqliteConnectionManager.getActiveVaultFileNumber();
 
         documentEntityFactory.newDocumentEntity(
                 DocumentCreationContext.builder()
@@ -275,16 +247,18 @@ class VaultViewDefaultIntegrationTest {
                         .fileSize(123)
                         .source("test-source")
                         .sourceLocationId(Optional.empty())
+                        .vaultFile(vaultFileNumber)
                         .build()
         );
 
-        final Path fakeDocumentPath = setupFakeFile("/vault/" + documentId + ".pdf", new byte[]{1, 2, 3, 4});
+        sqliteConnectionManager.insertDocument(documentId.toString(),
+                new ByteArrayInputStream(new byte[]{1, 2, 3, 4}));
 
         mockMvc.perform(delete("/document/" + documentId))
                 .andExpect(status().isOk());
 
-        assertThat(fakeDocumentPath)
-                .doesNotExist();
+        assertThat(sqliteConnectionManager.documentExists(vaultFileNumber, documentId.toString()))
+                .isFalse();
         assertThat(documentEntityFactory.getDocumentEntity(documentId))
                 .isEmpty();
     }
@@ -305,6 +279,7 @@ class VaultViewDefaultIntegrationTest {
     @Test
     void testRecompressDocumentWhenDocumentIsUncompressedAndTargetIsGzip() throws Exception {
         final UUID documentId = UUID.randomUUID();
+        final int vaultFileNumber = sqliteConnectionManager.getActiveVaultFileNumber();
 
         documentEntityFactory.newDocumentEntity(
                 DocumentCreationContext.builder()
@@ -317,12 +292,12 @@ class VaultViewDefaultIntegrationTest {
                         .fileSize(123)
                         .source("test-source")
                         .sourceLocationId(Optional.empty())
+                        .vaultFile(vaultFileNumber)
                         .build()
         );
 
-        final Path fakeDocumentPath = setupFakeFile("/vault/" + documentId + ".pdf", new byte[]{1, 2, 3, 4});
-
-        final Path resultDocumentPath = FILE_SYSTEM.getPath("/vault/" + documentId + ".pdf.gz");
+        sqliteConnectionManager.insertDocument(documentId.toString(),
+                new ByteArrayInputStream(new byte[]{1, 2, 3, 4}));
 
         mockMvc.perform(
                         put("/document/" + documentId + "/recompress")
@@ -335,16 +310,10 @@ class VaultViewDefaultIntegrationTest {
                 .getLocation(uuidArgumentCaptor.capture());
         assertThat(uuidArgumentCaptor.getAllValues())
                 .hasSize(1);
-        assertThat(FILE_SYSTEM.getPath("/stage/" + uuidArgumentCaptor.getValue()))
-                .doesNotExist();
-        assertThat(FILE_SYSTEM.getPath("/stage/" + uuidArgumentCaptor.getValue() + ".gz"))
-                .doesNotExist();
 
-        assertThat(fakeDocumentPath)
-                .doesNotExist();
-        assertThat(resultDocumentPath)
-                .binaryContent()
-                .isEqualTo(new byte[]{31, -117, 8, 0, 0, 0, 0, 0, 0, -1, 99, 100, 98, 102, 1, 0, -51, -5, 60, -74, 4, 0, 0, 0});
+        // Verify the document is now compressed in the vault
+        assertThat(sqliteConnectionManager.documentExists(vaultFileNumber, documentId.toString()))
+                .isTrue();
 
         final Optional<DocumentEntity> documentInDatabase = documentEntityFactory.getDocumentEntity(documentId);
 
@@ -369,6 +338,7 @@ class VaultViewDefaultIntegrationTest {
     @Test
     void testRecompressDocumentWhenDocumentIsGzipAndTargetIsBrotli() throws Exception {
         final UUID documentId = UUID.randomUUID();
+        final int vaultFileNumber = sqliteConnectionManager.getActiveVaultFileNumber();
 
         documentEntityFactory.newDocumentEntity(
                 DocumentCreationContext.builder()
@@ -381,13 +351,13 @@ class VaultViewDefaultIntegrationTest {
                         .fileSize(123)
                         .source("test-source")
                         .sourceLocationId(Optional.empty())
+                        .vaultFile(vaultFileNumber)
                         .build()
         );
 
-        final Path fakeDocumentPath = setupFakeFile("/vault/" + documentId + ".pdf.gz", new byte[]{
-                31, -117, 8, 0, 0, 0, 0, 0, 0, -1, 99, 100, 98, 102, 1, 0, -51, -5, 60, -74, 4, 0, 0, 0});
-
-        final Path resultDocumentPath = FILE_SYSTEM.getPath("/vault/" + documentId + ".pdf.br");
+        final byte[] gzipContent = {31, -117, 8, 0, 0, 0, 0, 0, 0, -1, 99, 100, 98, 102, 1, 0, -51, -5, 60, -74, 4, 0, 0, 0};
+        sqliteConnectionManager.insertDocument(documentId.toString(),
+                new ByteArrayInputStream(gzipContent));
 
         mockMvc.perform(
                         put("/document/" + documentId + "/recompress")
@@ -400,16 +370,9 @@ class VaultViewDefaultIntegrationTest {
                 .getLocation(uuidArgumentCaptor.capture());
         assertThat(uuidArgumentCaptor.getAllValues())
                 .hasSize(1);
-        assertThat(FILE_SYSTEM.getPath("/stage/" + uuidArgumentCaptor.getValue()))
-                .doesNotExist();
-        assertThat(FILE_SYSTEM.getPath("/stage/" + uuidArgumentCaptor.getValue() + ".br"))
-                .doesNotExist();
 
-        assertThat(fakeDocumentPath)
-                .doesNotExist();
-        assertThat(resultDocumentPath)
-                .binaryContent()
-                .isEqualTo(new byte[]{-117, 1, -128, 1, 2, 3, 4, 3});
+        assertThat(sqliteConnectionManager.documentExists(vaultFileNumber, documentId.toString()))
+                .isTrue();
 
         final Optional<DocumentEntity> documentInDatabase = documentEntityFactory.getDocumentEntity(documentId);
 
@@ -434,6 +397,7 @@ class VaultViewDefaultIntegrationTest {
     @Test
     void testRecompressDocumentWhenDocumentIsGzipAndTargetIsNone() throws Exception {
         final UUID documentId = UUID.randomUUID();
+        final int vaultFileNumber = sqliteConnectionManager.getActiveVaultFileNumber();
 
         documentEntityFactory.newDocumentEntity(
                 DocumentCreationContext.builder()
@@ -446,13 +410,13 @@ class VaultViewDefaultIntegrationTest {
                         .fileSize(123)
                         .source("test-source")
                         .sourceLocationId(Optional.empty())
+                        .vaultFile(vaultFileNumber)
                         .build()
         );
 
-        final Path fakeDocumentPath = setupFakeFile("/vault/" + documentId + ".pdf.gz", new byte[]{
-                31, -117, 8, 0, 0, 0, 0, 0, 0, -1, 99, 100, 98, 102, 1, 0, -51, -5, 60, -74, 4, 0, 0, 0});
-
-        final Path resultDocumentPath = FILE_SYSTEM.getPath("/vault/" + documentId + ".pdf");
+        final byte[] gzipContent = {31, -117, 8, 0, 0, 0, 0, 0, 0, -1, 99, 100, 98, 102, 1, 0, -51, -5, 60, -74, 4, 0, 0, 0};
+        sqliteConnectionManager.insertDocument(documentId.toString(),
+                new ByteArrayInputStream(gzipContent));
 
         mockMvc.perform(
                         put("/document/" + documentId + "/recompress")
@@ -465,14 +429,9 @@ class VaultViewDefaultIntegrationTest {
                 .getLocation(uuidArgumentCaptor.capture());
         assertThat(uuidArgumentCaptor.getAllValues())
                 .hasSize(1);
-        assertThat(FILE_SYSTEM.getPath("/stage/" + uuidArgumentCaptor.getValue()))
-                .doesNotExist();
 
-        assertThat(fakeDocumentPath)
-                .doesNotExist();
-        assertThat(resultDocumentPath)
-                .binaryContent()
-                .isEqualTo(new byte[]{1, 2, 3, 4});
+        assertThat(sqliteConnectionManager.documentExists(vaultFileNumber, documentId.toString()))
+                .isTrue();
 
         final Optional<DocumentEntity> documentInDatabase = documentEntityFactory.getDocumentEntity(documentId);
 
@@ -555,6 +514,7 @@ class VaultViewDefaultIntegrationTest {
     @Test
     void testDocumentExistsWhenDocumentIsInTheVault() throws Exception {
         final UUID documentId = UUID.randomUUID();
+        final int vaultFileNumber = sqliteConnectionManager.getActiveVaultFileNumber();
 
         documentEntityFactory.newDocumentEntity(
                 DocumentCreationContext.builder()
@@ -567,10 +527,12 @@ class VaultViewDefaultIntegrationTest {
                         .fileSize(123)
                         .source("test-source")
                         .sourceLocationId(Optional.empty())
+                        .vaultFile(vaultFileNumber)
                         .build()
         );
 
-        setupFakeFile("/vault/" + documentId + ".pdf", new byte[]{1, 2, 3, 4});
+        sqliteConnectionManager.insertDocument(documentId.toString(),
+                new ByteArrayInputStream(new byte[]{1, 2, 3, 4}));
 
         mockMvc.perform(get("/document/" + documentId + "/exists"))
                 .andExpect(status().isOk())
@@ -632,6 +594,7 @@ class VaultViewDefaultIntegrationTest {
     @Test
     void testReplaceDocumentWhenDocumentIsInVault() throws Exception {
         final UUID documentId = UUID.randomUUID();
+        final int vaultFileNumber = sqliteConnectionManager.getActiveVaultFileNumber();
 
         documentEntityFactory.newDocumentEntity(
                 DocumentCreationContext.builder()
@@ -644,10 +607,12 @@ class VaultViewDefaultIntegrationTest {
                         .fileSize(123)
                         .source("test-source")
                         .sourceLocationId(Optional.empty())
+                        .vaultFile(vaultFileNumber)
                         .build()
         );
 
-        final Path fakeDocumentPath = setupFakeFile("/vault/" + documentId + ".pdf", new byte[]{1, 2, 3, 4});
+        sqliteConnectionManager.insertDocument(documentId.toString(),
+                new ByteArrayInputStream(new byte[]{1, 2, 3, 4}));
 
         final MockMultipartFile mockMultipartFile = new MockMultipartFile("replacementFile", "dummy.pdf",
                 "application/pdf", new byte[]{4, 3, 2, 1});
@@ -662,8 +627,7 @@ class VaultViewDefaultIntegrationTest {
                 )
                 .andExpect(status().isOk());
 
-        assertThat(fakeDocumentPath)
-                .binaryContent()
+        assertThat(sqliteConnectionManager.readDocument(vaultFileNumber, documentId.toString()).readAllBytes())
                 .isEqualTo(new byte[]{4, 3, 2, 1});
 
         final Optional<DocumentEntity> documentInDatabase = documentEntityFactory.getDocumentEntity(documentId);
@@ -684,15 +648,6 @@ class VaultViewDefaultIntegrationTest {
                     assertThat(databaseEntity.getSourceLocations())
                             .isEmpty();
                 });
-    }
-
-    @SneakyThrows
-    private Path setupFakeFile(final String fileNameAndPath, final byte[] testFileContent) {
-        final Path testFilePath = FILE_SYSTEM.getPath(fileNameAndPath);
-
-        Files.copy(new ByteArrayInputStream(testFileContent), testFilePath);
-
-        return testFilePath;
     }
 
     private static void expectStartupServiceCalls() {
