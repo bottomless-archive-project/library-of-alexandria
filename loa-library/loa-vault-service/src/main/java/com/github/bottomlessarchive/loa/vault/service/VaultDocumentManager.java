@@ -3,10 +3,8 @@ package com.github.bottomlessarchive.loa.vault.service;
 import com.github.bottomlessarchive.loa.compression.service.compressor.provider.CompressorServiceProvider;
 import com.github.bottomlessarchive.loa.document.service.DocumentManipulator;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentEntity;
-import com.github.bottomlessarchive.loa.vault.service.backend.service.VaultDocumentStorage;
 import com.github.bottomlessarchive.loa.vault.service.domain.DocumentArchivingContext;
-import com.github.bottomlessarchive.loa.vault.service.location.VaultLocation;
-import com.github.bottomlessarchive.loa.vault.service.location.VaultLocationFactory;
+import com.github.bottomlessarchive.loa.vault.service.location.sqlite.service.SqliteConnectionManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.InputStreamResource;
@@ -24,9 +22,8 @@ import java.io.InputStream;
 public class VaultDocumentManager {
 
     private final DocumentManipulator documentManipulator;
-    private final VaultLocationFactory vaultLocationFactory;
+    private final SqliteConnectionManager sqliteConnectionManager;
     private final CompressorServiceProvider compressorServiceProvider;
-    private final VaultDocumentStorage vaultDocumentStorage;
 
     /**
      * Archives a document to the vault. The document will be saved to the vault's physical storage.
@@ -37,7 +34,8 @@ public class VaultDocumentManager {
             final InputStream documentContent) {
         log.info("Archiving document with id: {}.", documentArchivingContext.id());
 
-        vaultDocumentStorage.persistDocument(documentEntity, documentContent, documentArchivingContext.contentLength());
+        sqliteConnectionManager.insertDocument(documentEntity.getVaultFile(), documentArchivingContext.id().toString(),
+                documentContent);
     }
 
     /**
@@ -47,12 +45,9 @@ public class VaultDocumentManager {
      * @return the content of the document
      */
     public Resource readDocument(final DocumentEntity documentEntity) {
-        final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentEntity);
-
-        // The non-compressed entries will be served via a zero-copy response
-        // See: https://developer.ibm.com/articles/j-zerocopy/
         try {
-            final InputStream documentContentsInputStream = vaultLocation.download();
+            final InputStream documentContentsInputStream = sqliteConnectionManager.readDocument(
+                    documentEntity.getVaultFile(), documentEntity.getId().toString());
 
             if (documentEntity.isCompressed()) {
                 final InputStream decompressedInputStream = compressorServiceProvider.getCompressionService(
@@ -73,7 +68,7 @@ public class VaultDocumentManager {
     }
 
     public boolean documentExists(final DocumentEntity documentEntity) {
-        return vaultLocationFactory.getLocation(documentEntity).populated();
+        return sqliteConnectionManager.documentExists(documentEntity.getVaultFile(), documentEntity.getId().toString());
     }
 
     /**
@@ -82,10 +77,18 @@ public class VaultDocumentManager {
      * @param documentEntity the document to remove
      */
     public void removeDocument(final DocumentEntity documentEntity) {
-        final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentEntity);
-
-        if (vaultLocation.populated()) {
-            vaultLocation.clear();
+        if (sqliteConnectionManager.documentExists(documentEntity.getVaultFile(), documentEntity.getId().toString())) {
+            sqliteConnectionManager.deleteDocument(documentEntity.getVaultFile(), documentEntity.getId().toString());
         }
+    }
+
+    public long getAvailableSpace() {
+        return sqliteConnectionManager.getAvailableSpace();
+    }
+
+    public void replaceDocument(final DocumentEntity documentEntity, final InputStream documentContent) {
+        sqliteConnectionManager.deleteDocument(documentEntity.getVaultFile(), documentEntity.getId().toString());
+        sqliteConnectionManager.insertDocument(documentEntity.getVaultFile(), documentEntity.getId().toString(),
+                documentContent);
     }
 }

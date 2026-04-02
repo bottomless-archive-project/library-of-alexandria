@@ -32,7 +32,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         properties = {
                 "loa.conductor.port=2002",
                 "loa.vault.archiving=false",
-                "loa.vault.location.type=sqlite",
                 "loa.vault.location.sqlite.path=/vault/",
                 "loa.vault.modification-enabled=false",
                 "loa.compression.algorithm=NONE"

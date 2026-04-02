@@ -42,7 +42,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(
         properties = {
                 "loa.conductor.port=2000",
-                "loa.vault.location.type=sqlite",
                 "loa.vault.location.sqlite.path=./build/vault-test/",
                 "loa.vault.location.sqlite.batch-size=100000"
         }

@@ -10,14 +10,10 @@ import com.github.bottomlessarchive.loa.type.domain.DocumentType;
 import com.github.bottomlessarchive.loa.vault.configuration.VaultConfigurationProperties;
 import com.github.bottomlessarchive.loa.vault.service.RecompressorService;
 import com.github.bottomlessarchive.loa.vault.service.VaultDocumentManager;
-import com.github.bottomlessarchive.loa.vault.service.backend.service.VaultDocumentStorage;
-import com.github.bottomlessarchive.loa.vault.service.location.VaultLocation;
-import com.github.bottomlessarchive.loa.vault.service.location.VaultLocationFactory;
 import com.github.bottomlessarchive.loa.vault.view.request.domain.RecompressDocumentRequest;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -33,9 +29,8 @@ import java.io.InputStream;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -66,12 +61,6 @@ class VaultControllerTest {
 
     @MockBean
     private DocumentManipulator documentManipulator;
-
-    @MockBean
-    private VaultLocationFactory vaultLocationFactory;
-
-    @MockBean
-    private VaultDocumentStorage vaultDocumentStorage;
 
     @Test
     @SneakyThrows
@@ -340,12 +329,8 @@ class VaultControllerTest {
                 .build();
         when(documentEntityFactory.getDocumentEntity(UUID.fromString(TEST_DOCUMENT_ID)))
                 .thenReturn(Optional.of(documentEntity));
-        final VaultLocation vaultLocation = mock(VaultLocation.class);
-        when(vaultLocationFactory.getLocation(documentEntity))
-                .thenReturn(vaultLocation);
 
         final byte[] newDocumentContent = {1, 2, 3, 4};
-        final ArgumentCaptor<InputStream> inputStreamArgumentCaptor = ArgumentCaptor.forClass(InputStream.class);
 
         mockMvc.perform(
                         MockMvcRequestBuilders.multipart("/document/" + TEST_DOCUMENT_ID + "/replace")
@@ -357,10 +342,8 @@ class VaultControllerTest {
                 )
                 .andExpect(status().isOk());
 
-        verify(vaultDocumentStorage)
-                .persistDocument(eq(documentEntity), inputStreamArgumentCaptor.capture(), eq(vaultLocation), eq(4L));
-        assertThat(inputStreamArgumentCaptor.getValue().readAllBytes())
-                .isEqualTo(newDocumentContent);
+        verify(vaultDocumentManager)
+                .replaceDocument(eq(documentEntity), any(InputStream.class));
         verify(documentManipulator)
                 .markDownloaded(UUID.fromString(TEST_DOCUMENT_ID));
     }

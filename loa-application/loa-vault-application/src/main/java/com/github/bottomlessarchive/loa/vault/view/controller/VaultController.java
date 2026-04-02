@@ -7,9 +7,6 @@ import com.github.bottomlessarchive.loa.document.view.service.MediaTypeCalculato
 import com.github.bottomlessarchive.loa.vault.configuration.VaultConfigurationProperties;
 import com.github.bottomlessarchive.loa.vault.service.RecompressorService;
 import com.github.bottomlessarchive.loa.vault.service.VaultDocumentManager;
-import com.github.bottomlessarchive.loa.vault.service.backend.service.VaultDocumentStorage;
-import com.github.bottomlessarchive.loa.vault.service.location.VaultLocation;
-import com.github.bottomlessarchive.loa.vault.service.location.VaultLocationFactory;
 import com.github.bottomlessarchive.loa.vault.view.request.domain.RecompressDocumentRequest;
 import com.github.bottomlessarchive.loa.vault.view.response.domain.DocumentExistsResponse;
 import com.github.bottomlessarchive.loa.vault.view.domain.InvalidRequestException;
@@ -36,9 +33,7 @@ import java.util.UUID;
 public class VaultController {
 
     private final DocumentEntityFactory documentEntityFactory;
-    private final VaultLocationFactory vaultLocationFactory;
     private final VaultDocumentManager vaultDocumentManager;
-    private final VaultDocumentStorage vaultDocumentStorage;
     private final RecompressorService recompressorService;
     private final DocumentManipulator documentManipulator;
     private final MediaTypeCalculator mediaTypeCalculator;
@@ -144,13 +139,8 @@ public class VaultController {
                         throw new InvalidRequestException("Document with id " + documentId + " is available on a different vault!");
                     }
 
-                    vaultDocumentManager.removeDocument(documentEntity);
-
-                    final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentEntity);
-
                     try {
-                        vaultDocumentStorage.persistDocument(documentEntity, replacementFile.getInputStream(), vaultLocation,
-                                replacementFile.getSize());
+                        vaultDocumentManager.replaceDocument(documentEntity, replacementFile.getInputStream());
                     } catch (IOException e) {
                         throw new InvalidRequestException("Failed to save document!", e);
                     }

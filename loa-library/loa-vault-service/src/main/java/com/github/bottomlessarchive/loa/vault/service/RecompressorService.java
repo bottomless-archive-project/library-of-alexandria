@@ -7,9 +7,7 @@ import com.github.bottomlessarchive.loa.document.service.domain.DocumentEntity;
 import com.github.bottomlessarchive.loa.stage.service.StageLocationFactory;
 import com.github.bottomlessarchive.loa.stage.service.domain.StageLocation;
 import com.github.bottomlessarchive.loa.vault.domain.exception.StorageAccessException;
-import com.github.bottomlessarchive.loa.vault.service.backend.service.VaultDocumentStorage;
-import com.github.bottomlessarchive.loa.vault.service.location.VaultLocation;
-import com.github.bottomlessarchive.loa.vault.service.location.VaultLocationFactory;
+import com.github.bottomlessarchive.loa.vault.service.location.sqlite.service.SqliteConnectionManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -27,8 +25,7 @@ public class RecompressorService {
 
     private final VaultDocumentManager vaultDocumentManager;
     private final DocumentManipulator documentManipulator;
-    private final VaultLocationFactory vaultLocationFactory;
-    private final VaultDocumentStorage vaultDocumentStorage;
+    private final SqliteConnectionManager sqliteConnectionManager;
     private final StageLocationFactory stageLocationFactory;
     private final FileCompressionService fileCompressionService;
 
@@ -58,10 +55,8 @@ public class RecompressorService {
 
                 vaultDocumentManager.removeDocument(documentEntity);
 
-                final VaultLocation vaultLocation = vaultLocationFactory.getLocation(documentEntity, documentCompression);
-
-                vaultDocumentStorage.persistDocument(documentEntity, Files.newInputStream(compressedFilePath), vaultLocation,
-                        Files.size(compressedFilePath));
+                sqliteConnectionManager.insertDocument(documentEntity.getVaultFile(), documentEntity.getId().toString(),
+                        Files.newInputStream(compressedFilePath));
 
                 // In case when the compression target is NONE, then the path for the original content and the new content is the same
                 // the file will be deleted by the originalContent's close call.

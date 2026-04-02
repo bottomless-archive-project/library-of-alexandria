@@ -54,7 +54,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(
         properties = {
                 "loa.conductor.port=2002",
-                "loa.vault.location.type=sqlite",
                 "loa.vault.location.sqlite.path=./build/vault-view-test/",
                 "loa.vault.location.sqlite.batch-size=100000"
         }

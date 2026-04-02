@@ -3,20 +3,17 @@ package com.github.bottomlessarchive.loa.vault.service.archive;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentStatus;
 import com.github.bottomlessarchive.loa.document.service.entity.factory.domain.DocumentCreationContext;
 import com.github.bottomlessarchive.loa.vault.service.domain.DocumentArchivingContext;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import com.github.bottomlessarchive.loa.vault.service.location.sqlite.service.SqliteConnectionManager;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
-@ConditionalOnMissingBean(SqliteDocumentCreationContextFactory.class)
+@RequiredArgsConstructor
 public class DocumentCreationContextFactory {
 
-    public DocumentCreationContext newContext(final DocumentArchivingContext documentArchivingContext) {
-        return newContextBuilder(documentArchivingContext)
-                .build();
-    }
+    private final SqliteConnectionManager sqliteConnectionManager;
 
-    protected DocumentCreationContext.DocumentCreationContextBuilder newContextBuilder(
-            final DocumentArchivingContext documentArchivingContext) {
+    public DocumentCreationContext newContext(final DocumentArchivingContext documentArchivingContext) {
         return DocumentCreationContext.builder()
                 .id(documentArchivingContext.id())
                 .vault(documentArchivingContext.vault())
@@ -27,6 +24,8 @@ public class DocumentCreationContextFactory {
                 .versionNumber(documentArchivingContext.versionNumber())
                 .compression(documentArchivingContext.compression())
                 .checksum(documentArchivingContext.checksum())
-                .fileSize(documentArchivingContext.originalContentLength());
+                .fileSize(documentArchivingContext.originalContentLength())
+                .vaultFile(sqliteConnectionManager.assignVaultFileNumber(documentArchivingContext.id().toString()))
+                .build();
     }
 }
