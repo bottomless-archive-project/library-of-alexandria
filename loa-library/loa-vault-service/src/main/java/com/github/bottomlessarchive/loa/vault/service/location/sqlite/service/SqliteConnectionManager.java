@@ -7,6 +7,7 @@ import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
@@ -19,6 +20,9 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
@@ -30,13 +34,16 @@ import java.util.stream.Stream;
 @ConditionalOnProperty(value = "loa.vault.location.type", havingValue = "sqlite")
 public class SqliteConnectionManager {
 
+    private static final long IDLE_TIMEOUT_MINUTES = 3;
+
     private final SqliteConfigurationProperties sqliteConfigurationProperties;
 
+    private final ConcurrentHashMap<Integer, Connection> writeConnections = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Integer, Instant> lastWriteTime = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<Integer, Connection> readConnections = new ConcurrentHashMap<>();
-    private volatile Connection activeWriteConnection;
     private volatile int activeVaultFileNumber;
     private final AtomicInteger activeDocumentCount = new AtomicInteger();
-    private final ReentrantLock writeLock = new ReentrantLock();
+    private final ReentrantLock assignLock = new ReentrantLock();
 
     @PostConstruct
     public void initialize() {
@@ -80,40 +87,70 @@ public class SqliteConnectionManager {
         }
 
         activeVaultFileNumber = highestFileNumber;
-        activeWriteConnection = openWriteConnection(activeVaultFileNumber);
 
-        final int rowCount = countRows(activeWriteConnection);
+        final Connection writeConnection = openWriteConnection(activeVaultFileNumber);
+        writeConnections.put(activeVaultFileNumber, writeConnection);
+        lastWriteTime.put(activeVaultFileNumber, Instant.now());
+
+        final int rowCount = countRows(writeConnection);
         activeDocumentCount.set(rowCount);
 
         log.info("Initialized SQLite vault. Active file: vault-{}, document count: {}.",
                 String.format("%06d", activeVaultFileNumber), rowCount);
     }
 
-    public int getActiveVaultFileNumber() {
-        return activeVaultFileNumber;
-    }
-
-    public void insertDocument(final String docId, final InputStream content) {
-        writeLock.lock();
+    /**
+     * Assigns a vault file number for a document. This must be called before the document is persisted to MongoDB,
+     * so the file number is stored as part of the document metadata. The assignment is protected by a lock and
+     * triggers rotation when the batch size is reached.
+     *
+     * @param docId the document ID being assigned
+     * @return the vault file number the document should be written to
+     */
+    public int assignVaultFileNumber(final String docId) {
+        assignLock.lock();
         try {
-            try (PreparedStatement stmt = activeWriteConnection.prepareStatement(
-                    "INSERT INTO documents (id, content) VALUES (?, ?)")) {
-                stmt.setString(1, docId);
-                stmt.setBytes(2, content.readAllBytes());
-                stmt.executeUpdate();
-            } catch (final Exception e) {
-                throw new StorageAccessException("Unable to insert document into SQLite vault!", e);
+            if (activeDocumentCount.get() >= sqliteConfigurationProperties.batchSize()) {
+                rotate();
             }
 
+            final int assignedFileNumber = activeVaultFileNumber;
             activeDocumentCount.incrementAndGet();
-            rotateIfNeeded();
+
+            log.debug("Assigned document {} to vault file vault-{}.", docId,
+                    String.format("%06d", assignedFileNumber));
+
+            return assignedFileNumber;
         } finally {
-            writeLock.unlock();
+            assignLock.unlock();
         }
     }
 
+    /**
+     * Inserts a document into the specified vault file. The file number must have been previously obtained via
+     * {@link #assignVaultFileNumber(String)}.
+     *
+     * @param fileNumber the vault file to write to
+     * @param docId      the document ID
+     * @param content    the document content
+     */
+    public void insertDocument(final int fileNumber, final String docId, final InputStream content) {
+        final Connection connection = getOrOpenWriteConnection(fileNumber);
+
+        try (PreparedStatement stmt = connection.prepareStatement(
+                "INSERT INTO documents (id, content) VALUES (?, ?)")) {
+            stmt.setString(1, docId);
+            stmt.setBytes(2, content.readAllBytes());
+            stmt.executeUpdate();
+        } catch (final Exception e) {
+            throw new StorageAccessException("Unable to insert document into SQLite vault!", e);
+        }
+
+        lastWriteTime.put(fileNumber, Instant.now());
+    }
+
     public InputStream readDocument(final int fileNumber, final String docId) {
-        final Connection connection = getConnection(fileNumber);
+        final Connection connection = getReadConnection(fileNumber);
 
         try (PreparedStatement stmt = connection.prepareStatement(
                 "SELECT content FROM documents WHERE id = ?")) {
@@ -133,7 +170,7 @@ public class SqliteConnectionManager {
     }
 
     public boolean documentExists(final int fileNumber, final String docId) {
-        final Connection connection = getConnection(fileNumber);
+        final Connection connection = getReadConnection(fileNumber);
 
         try (PreparedStatement stmt = connection.prepareStatement(
                 "SELECT 1 FROM documents WHERE id = ?")) {
@@ -148,7 +185,7 @@ public class SqliteConnectionManager {
     }
 
     public void deleteDocument(final int fileNumber, final String docId) {
-        final Connection connection = getConnection(fileNumber);
+        final Connection connection = getOrOpenWriteConnection(fileNumber);
 
         try (PreparedStatement stmt = connection.prepareStatement(
                 "DELETE FROM documents WHERE id = ?")) {
@@ -157,6 +194,8 @@ public class SqliteConnectionManager {
         } catch (final SQLException e) {
             throw new StorageAccessException("Unable to delete document from SQLite vault!", e);
         }
+
+        lastWriteTime.put(fileNumber, Instant.now());
     }
 
     public long getAvailableSpace() {
@@ -167,15 +206,50 @@ public class SqliteConnectionManager {
         }
     }
 
-    @PreDestroy
-    public void close() {
-        if (activeWriteConnection != null) {
-            try {
-                activeWriteConnection.close();
-            } catch (final SQLException e) {
-                log.warn("Error closing active write connection.", e);
+    @Scheduled(fixedDelay = 60000)
+    public void closeIdleWriteConnections() {
+        final Instant cutoff = Instant.now().minus(IDLE_TIMEOUT_MINUTES, ChronoUnit.MINUTES);
+
+        for (final Map.Entry<Integer, Instant> entry : lastWriteTime.entrySet()) {
+            final int fileNumber = entry.getKey();
+
+            // Never close the active file's write connection
+            if (fileNumber == activeVaultFileNumber) {
+                continue;
+            }
+
+            if (entry.getValue().isBefore(cutoff)) {
+                final Connection connection = writeConnections.remove(fileNumber);
+
+                if (connection != null) {
+                    try {
+                        connection.close();
+                        log.info("Closed idle write connection for vault-{}.",
+                                String.format("%06d", fileNumber));
+                    } catch (final SQLException e) {
+                        log.warn("Error closing idle write connection for vault-{}.",
+                                String.format("%06d", fileNumber), e);
+                    }
+                }
+
+                lastWriteTime.remove(fileNumber);
             }
         }
+    }
+
+    @PreDestroy
+    public void close() {
+        for (final Map.Entry<Integer, Connection> entry : writeConnections.entrySet()) {
+            try {
+                entry.getValue().close();
+            } catch (final SQLException e) {
+                log.warn("Error closing write connection for vault-{}.",
+                        String.format("%06d", entry.getKey()), e);
+            }
+        }
+
+        writeConnections.clear();
+        lastWriteTime.clear();
 
         for (final Connection connection : readConnections.values()) {
             try {
@@ -186,6 +260,39 @@ public class SqliteConnectionManager {
         }
 
         readConnections.clear();
+    }
+
+    private void rotate() {
+        log.info("Rotating SQLite vault file. Current file vault-{} reached {} documents.",
+                String.format("%06d", activeVaultFileNumber), activeDocumentCount.get());
+
+        activeVaultFileNumber++;
+        activeDocumentCount.set(0);
+
+        final Connection writeConnection = openWriteConnection(activeVaultFileNumber);
+        writeConnections.put(activeVaultFileNumber, writeConnection);
+        lastWriteTime.put(activeVaultFileNumber, Instant.now());
+
+        log.info("Rotated to new SQLite vault file: vault-{}.",
+                String.format("%06d", activeVaultFileNumber));
+    }
+
+    private Connection getOrOpenWriteConnection(final int fileNumber) {
+        return writeConnections.computeIfAbsent(fileNumber, fn -> {
+            log.info("Reopening write connection for vault-{}.", String.format("%06d", fn));
+            return openWriteConnection(fn);
+        });
+    }
+
+    private Connection getReadConnection(final int fileNumber) {
+        // If a write connection is open for this file, use it for reads too
+        final Connection writeConn = writeConnections.get(fileNumber);
+
+        if (writeConn != null) {
+            return writeConn;
+        }
+
+        return readConnections.computeIfAbsent(fileNumber, this::openReadConnection);
     }
 
     private Connection openWriteConnection(final int fileNumber) {
@@ -236,36 +343,6 @@ public class SqliteConnectionManager {
         try (var stmt = connection.createStatement()) {
             stmt.execute("CREATE TABLE IF NOT EXISTS documents (id TEXT PRIMARY KEY, content BLOB NOT NULL)");
         }
-    }
-
-    private void rotateIfNeeded() {
-        if (activeDocumentCount.get() >= sqliteConfigurationProperties.batchSize()) {
-            log.info("Rotating SQLite vault file. Current file vault-{} reached {} documents.",
-                    String.format("%06d", activeVaultFileNumber), activeDocumentCount.get());
-
-            readConnections.put(activeVaultFileNumber, openReadConnection(activeVaultFileNumber));
-
-            try {
-                activeWriteConnection.close();
-            } catch (final SQLException e) {
-                log.warn("Error closing write connection during rotation.", e);
-            }
-
-            activeVaultFileNumber++;
-            activeWriteConnection = openWriteConnection(activeVaultFileNumber);
-            activeDocumentCount.set(0);
-
-            log.info("Rotated to new SQLite vault file: vault-{}.",
-                    String.format("%06d", activeVaultFileNumber));
-        }
-    }
-
-    private Connection getConnection(final int fileNumber) {
-        if (fileNumber == activeVaultFileNumber) {
-            return activeWriteConnection;
-        }
-
-        return readConnections.computeIfAbsent(fileNumber, this::openReadConnection);
     }
 
     private String vaultFilePath(final int fileNumber) {

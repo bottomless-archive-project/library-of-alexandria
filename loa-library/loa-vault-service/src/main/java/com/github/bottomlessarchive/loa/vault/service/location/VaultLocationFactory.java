@@ -34,12 +34,4 @@ public interface VaultLocationFactory {
      * @return the free bytes available
      */
     long getAvailableSpace();
-
-    /**
-     * Return the active vault file number for backends that use file rotation (e.g. SQLite).
-     * Returns 0 for backends that don't use file rotation.
-     *
-     * @return the active vault file number
-     */
-    int getActiveVaultFileNumber();
 }

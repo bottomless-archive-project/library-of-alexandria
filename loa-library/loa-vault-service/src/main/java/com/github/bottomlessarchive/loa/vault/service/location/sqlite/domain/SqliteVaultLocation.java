@@ -18,7 +18,7 @@ public class SqliteVaultLocation implements VaultLocation {
 
     @Override
     public void upload(final InputStream documentContents, final long contentLength) {
-        connectionManager.insertDocument(documentId, documentContents);
+        connectionManager.insertDocument(vaultFileNumber, documentId, documentContents);
     }
 
     @Override

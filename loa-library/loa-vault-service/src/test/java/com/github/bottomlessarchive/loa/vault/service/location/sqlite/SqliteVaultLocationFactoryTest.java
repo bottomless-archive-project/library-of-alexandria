@@ -27,7 +27,7 @@ class SqliteVaultLocationFactoryTest {
     private SqliteVaultLocationFactory underTest;
 
     @Test
-    void testGetLocationWhenDocumentHasVaultFile() {
+    void testGetLocationUsesVaultFileFromEntity() {
         final DocumentEntity documentEntity = DocumentEntity.builder()
                 .id(UUID.fromString("123e4567-e89b-12d3-a456-556642440000"))
                 .type(DocumentType.PDF)
@@ -41,32 +41,9 @@ class SqliteVaultLocationFactoryTest {
     }
 
     @Test
-    void testGetLocationWhenDocumentHasNoVaultFile() {
-        final DocumentEntity documentEntity = DocumentEntity.builder()
-                .id(UUID.fromString("123e4567-e89b-12d3-a456-556642440000"))
-                .type(DocumentType.PDF)
-                .compression(DocumentCompression.NONE)
-                .vaultFile(0)
-                .build();
-
-        when(connectionManager.getActiveVaultFileNumber()).thenReturn(3);
-
-        final VaultLocation result = underTest.getLocation(documentEntity, DocumentCompression.NONE);
-
-        assertThat(result).isInstanceOf(SqliteVaultLocation.class);
-    }
-
-    @Test
     void testGetAvailableSpace() {
         when(connectionManager.getAvailableSpace()).thenReturn(1000L);
 
         assertThat(underTest.getAvailableSpace()).isEqualTo(1000L);
-    }
-
-    @Test
-    void testGetActiveVaultFileNumber() {
-        when(connectionManager.getActiveVaultFileNumber()).thenReturn(7);
-
-        assertThat(underTest.getActiveVaultFileNumber()).isEqualTo(7);
     }
 }

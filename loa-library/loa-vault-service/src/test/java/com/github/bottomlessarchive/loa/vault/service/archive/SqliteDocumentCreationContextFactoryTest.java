@@ -5,18 +5,31 @@ import com.github.bottomlessarchive.loa.document.service.domain.DocumentStatus;
 import com.github.bottomlessarchive.loa.document.service.entity.factory.domain.DocumentCreationContext;
 import com.github.bottomlessarchive.loa.type.domain.DocumentType;
 import com.github.bottomlessarchive.loa.vault.service.domain.DocumentArchivingContext;
+import com.github.bottomlessarchive.loa.vault.service.location.sqlite.service.SqliteConnectionManager;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 import java.util.UUID;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Mockito.when;
 
-class DocumentCreationContextFactoryTest {
+@ExtendWith(MockitoExtension.class)
+class SqliteDocumentCreationContextFactoryTest {
+
+    @Mock
+    private SqliteConnectionManager sqliteConnectionManager;
+
+    @InjectMocks
+    private SqliteDocumentCreationContextFactory underTest;
 
     @Test
-    void testNewContext() {
+    void testNewContextAssignsVaultFileNumber() {
         final UUID id = UUID.randomUUID();
         final DocumentArchivingContext documentArchivingContext = DocumentArchivingContext.builder()
                 .id(id)
@@ -31,7 +44,8 @@ class DocumentCreationContextFactoryTest {
                 .sourceLocationId(Optional.of("locationId"))
                 .build();
 
-        final DocumentCreationContextFactory underTest = new DocumentCreationContextFactory();
+        when(sqliteConnectionManager.assignVaultFileNumber(id.toString()))
+                .thenReturn(5);
 
         final DocumentCreationContext result = underTest.newContext(documentArchivingContext);
 
@@ -46,6 +60,6 @@ class DocumentCreationContextFactoryTest {
         assertThat(result.status(), is(DocumentStatus.CREATED));
         assertThat(result.sourceLocationId().isPresent(), is(true));
         assertThat(result.sourceLocationId().get(), is("locationId"));
-        assertThat(result.vaultFile(), is(0));
+        assertThat(result.vaultFile(), is(5));
     }
 }

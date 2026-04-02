@@ -3,17 +3,20 @@ package com.github.bottomlessarchive.loa.vault.service.archive;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentStatus;
 import com.github.bottomlessarchive.loa.document.service.entity.factory.domain.DocumentCreationContext;
 import com.github.bottomlessarchive.loa.vault.service.domain.DocumentArchivingContext;
-import com.github.bottomlessarchive.loa.vault.service.location.VaultLocationFactory;
-import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
+@ConditionalOnMissingBean(SqliteDocumentCreationContextFactory.class)
 public class DocumentCreationContextFactory {
 
-    private final VaultLocationFactory vaultLocationFactory;
-
     public DocumentCreationContext newContext(final DocumentArchivingContext documentArchivingContext) {
+        return newContextBuilder(documentArchivingContext)
+                .build();
+    }
+
+    protected DocumentCreationContext.DocumentCreationContextBuilder newContextBuilder(
+            final DocumentArchivingContext documentArchivingContext) {
         return DocumentCreationContext.builder()
                 .id(documentArchivingContext.id())
                 .vault(documentArchivingContext.vault())
@@ -24,8 +27,6 @@ public class DocumentCreationContextFactory {
                 .versionNumber(documentArchivingContext.versionNumber())
                 .compression(documentArchivingContext.compression())
                 .checksum(documentArchivingContext.checksum())
-                .fileSize(documentArchivingContext.originalContentLength())
-                .vaultFile(vaultLocationFactory.getActiveVaultFileNumber())
-                .build();
+                .fileSize(documentArchivingContext.originalContentLength());
     }
 }

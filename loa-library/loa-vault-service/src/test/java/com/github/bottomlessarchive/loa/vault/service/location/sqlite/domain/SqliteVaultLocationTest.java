@@ -29,7 +29,7 @@ class SqliteVaultLocationTest {
 
         underTest.upload(content, 3L);
 
-        verify(connectionManager).insertDocument(DOCUMENT_ID, content);
+        verify(connectionManager).insertDocument(VAULT_FILE_NUMBER, DOCUMENT_ID, content);
     }
 
     @Test

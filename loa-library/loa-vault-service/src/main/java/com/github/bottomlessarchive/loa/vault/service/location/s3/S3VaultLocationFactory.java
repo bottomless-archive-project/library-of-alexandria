@@ -41,9 +41,4 @@ public class S3VaultLocationFactory implements VaultLocationFactory {
     public long getAvailableSpace() {
         return Long.MAX_VALUE;
     }
-
-    @Override
-    public int getActiveVaultFileNumber() {
-        return 0;
-    }
 }

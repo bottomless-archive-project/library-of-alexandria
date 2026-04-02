@@ -21,21 +21,14 @@ public class SqliteVaultLocationFactory implements VaultLocationFactory {
     private final SqliteConnectionManager connectionManager;
 
     @Override
-    public VaultLocation getLocation(final DocumentEntity documentEntity, final DocumentCompression compression) {
-        final int fileNumber = documentEntity.getVaultFile() > 0
-                ? documentEntity.getVaultFile()
-                : connectionManager.getActiveVaultFileNumber();
-
-        return new SqliteVaultLocation(fileNumber, documentEntity.getId().toString(), connectionManager);
+    public VaultLocation getLocation(final DocumentEntity documentEntity,
+            final DocumentCompression compression) {
+        return new SqliteVaultLocation(documentEntity.getVaultFile(),
+                documentEntity.getId().toString(), connectionManager);
     }
 
     @Override
     public long getAvailableSpace() {
         return connectionManager.getAvailableSpace();
-    }
-
-    @Override
-    public int getActiveVaultFileNumber() {
-        return connectionManager.getActiveVaultFileNumber();
     }
 }

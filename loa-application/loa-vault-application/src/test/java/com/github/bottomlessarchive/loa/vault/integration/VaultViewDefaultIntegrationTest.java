@@ -132,7 +132,7 @@ class VaultViewDefaultIntegrationTest {
     @Test
     void testQueryDocumentWhenDocumentIsInVault() throws Exception {
         final UUID documentId = UUID.randomUUID();
-        final int vaultFileNumber = sqliteConnectionManager.getActiveVaultFileNumber();
+        final int vaultFileNumber = sqliteConnectionManager.assignVaultFileNumber(documentId.toString());
 
         documentEntityFactory.newDocumentEntity(
                 DocumentCreationContext.builder()
@@ -149,7 +149,7 @@ class VaultViewDefaultIntegrationTest {
                         .build()
         );
 
-        sqliteConnectionManager.insertDocument(documentId.toString(),
+        sqliteConnectionManager.insertDocument(vaultFileNumber, documentId.toString(),
                 new ByteArrayInputStream(new byte[]{1, 2, 3, 4}));
 
         mockMvc.perform(get("/document/" + documentId))
@@ -161,7 +161,7 @@ class VaultViewDefaultIntegrationTest {
     @Test
     void testQueryDocumentWhenDocumentIsInVaultAndCompressedWithBrotli() throws Exception {
         final UUID documentId = UUID.randomUUID();
-        final int vaultFileNumber = sqliteConnectionManager.getActiveVaultFileNumber();
+        final int vaultFileNumber = sqliteConnectionManager.assignVaultFileNumber(documentId.toString());
 
         documentEntityFactory.newDocumentEntity(
                 DocumentCreationContext.builder()
@@ -179,7 +179,7 @@ class VaultViewDefaultIntegrationTest {
         );
 
         final byte[] brotliContent = {-117, 1, -128, 1, 2, 3, 4, 3};
-        sqliteConnectionManager.insertDocument(documentId.toString(),
+        sqliteConnectionManager.insertDocument(vaultFileNumber, documentId.toString(),
                 new ByteArrayInputStream(brotliContent));
 
         mockMvc.perform(get("/document/" + documentId))
@@ -234,7 +234,7 @@ class VaultViewDefaultIntegrationTest {
     @Test
     void testDeleteDocumentWhenDocumentIsInVault() throws Exception {
         final UUID documentId = UUID.randomUUID();
-        final int vaultFileNumber = sqliteConnectionManager.getActiveVaultFileNumber();
+        final int vaultFileNumber = sqliteConnectionManager.assignVaultFileNumber(documentId.toString());
 
         documentEntityFactory.newDocumentEntity(
                 DocumentCreationContext.builder()
@@ -251,7 +251,7 @@ class VaultViewDefaultIntegrationTest {
                         .build()
         );
 
-        sqliteConnectionManager.insertDocument(documentId.toString(),
+        sqliteConnectionManager.insertDocument(vaultFileNumber, documentId.toString(),
                 new ByteArrayInputStream(new byte[]{1, 2, 3, 4}));
 
         mockMvc.perform(delete("/document/" + documentId))
@@ -279,7 +279,7 @@ class VaultViewDefaultIntegrationTest {
     @Test
     void testRecompressDocumentWhenDocumentIsUncompressedAndTargetIsGzip() throws Exception {
         final UUID documentId = UUID.randomUUID();
-        final int vaultFileNumber = sqliteConnectionManager.getActiveVaultFileNumber();
+        final int vaultFileNumber = sqliteConnectionManager.assignVaultFileNumber(documentId.toString());
 
         documentEntityFactory.newDocumentEntity(
                 DocumentCreationContext.builder()
@@ -296,7 +296,7 @@ class VaultViewDefaultIntegrationTest {
                         .build()
         );
 
-        sqliteConnectionManager.insertDocument(documentId.toString(),
+        sqliteConnectionManager.insertDocument(vaultFileNumber, documentId.toString(),
                 new ByteArrayInputStream(new byte[]{1, 2, 3, 4}));
 
         mockMvc.perform(
@@ -338,7 +338,7 @@ class VaultViewDefaultIntegrationTest {
     @Test
     void testRecompressDocumentWhenDocumentIsGzipAndTargetIsBrotli() throws Exception {
         final UUID documentId = UUID.randomUUID();
-        final int vaultFileNumber = sqliteConnectionManager.getActiveVaultFileNumber();
+        final int vaultFileNumber = sqliteConnectionManager.assignVaultFileNumber(documentId.toString());
 
         documentEntityFactory.newDocumentEntity(
                 DocumentCreationContext.builder()
@@ -356,7 +356,7 @@ class VaultViewDefaultIntegrationTest {
         );
 
         final byte[] gzipContent = {31, -117, 8, 0, 0, 0, 0, 0, 0, -1, 99, 100, 98, 102, 1, 0, -51, -5, 60, -74, 4, 0, 0, 0};
-        sqliteConnectionManager.insertDocument(documentId.toString(),
+        sqliteConnectionManager.insertDocument(vaultFileNumber, documentId.toString(),
                 new ByteArrayInputStream(gzipContent));
 
         mockMvc.perform(
@@ -397,7 +397,7 @@ class VaultViewDefaultIntegrationTest {
     @Test
     void testRecompressDocumentWhenDocumentIsGzipAndTargetIsNone() throws Exception {
         final UUID documentId = UUID.randomUUID();
-        final int vaultFileNumber = sqliteConnectionManager.getActiveVaultFileNumber();
+        final int vaultFileNumber = sqliteConnectionManager.assignVaultFileNumber(documentId.toString());
 
         documentEntityFactory.newDocumentEntity(
                 DocumentCreationContext.builder()
@@ -415,7 +415,7 @@ class VaultViewDefaultIntegrationTest {
         );
 
         final byte[] gzipContent = {31, -117, 8, 0, 0, 0, 0, 0, 0, -1, 99, 100, 98, 102, 1, 0, -51, -5, 60, -74, 4, 0, 0, 0};
-        sqliteConnectionManager.insertDocument(documentId.toString(),
+        sqliteConnectionManager.insertDocument(vaultFileNumber, documentId.toString(),
                 new ByteArrayInputStream(gzipContent));
 
         mockMvc.perform(
@@ -514,7 +514,7 @@ class VaultViewDefaultIntegrationTest {
     @Test
     void testDocumentExistsWhenDocumentIsInTheVault() throws Exception {
         final UUID documentId = UUID.randomUUID();
-        final int vaultFileNumber = sqliteConnectionManager.getActiveVaultFileNumber();
+        final int vaultFileNumber = sqliteConnectionManager.assignVaultFileNumber(documentId.toString());
 
         documentEntityFactory.newDocumentEntity(
                 DocumentCreationContext.builder()
@@ -531,7 +531,7 @@ class VaultViewDefaultIntegrationTest {
                         .build()
         );
 
-        sqliteConnectionManager.insertDocument(documentId.toString(),
+        sqliteConnectionManager.insertDocument(vaultFileNumber, documentId.toString(),
                 new ByteArrayInputStream(new byte[]{1, 2, 3, 4}));
 
         mockMvc.perform(get("/document/" + documentId + "/exists"))
@@ -594,7 +594,7 @@ class VaultViewDefaultIntegrationTest {
     @Test
     void testReplaceDocumentWhenDocumentIsInVault() throws Exception {
         final UUID documentId = UUID.randomUUID();
-        final int vaultFileNumber = sqliteConnectionManager.getActiveVaultFileNumber();
+        final int vaultFileNumber = sqliteConnectionManager.assignVaultFileNumber(documentId.toString());
 
         documentEntityFactory.newDocumentEntity(
                 DocumentCreationContext.builder()
@@ -611,7 +611,7 @@ class VaultViewDefaultIntegrationTest {
                         .build()
         );
 
-        sqliteConnectionManager.insertDocument(documentId.toString(),
+        sqliteConnectionManager.insertDocument(vaultFileNumber, documentId.toString(),
                 new ByteArrayInputStream(new byte[]{1, 2, 3, 4}));
 
         final MockMultipartFile mockMultipartFile = new MockMultipartFile("replacementFile", "dummy.pdf",
