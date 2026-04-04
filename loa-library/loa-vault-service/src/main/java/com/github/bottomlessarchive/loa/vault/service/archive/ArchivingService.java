@@ -40,8 +40,7 @@ public class ArchivingService {
                         : documentEntityFactory.newDocumentEntity(documentCreationContext);
 
                 if (documentArchivingContext.fromBeacon()) {
-                    documentManipulator.updateDocumentWhenMovedFromVault(documentArchivingContext.id(), documentArchivingContext.vault(),
-                            documentArchivingContext.compression());
+                    documentManipulator.updateDocumentWhenMovedFromVault(documentArchivingContext.id(), documentArchivingContext.vault());
                 }
 
                 try (InputStream documentContent = stagingClient.grabFromStaging(documentArchivingContext.id())) {

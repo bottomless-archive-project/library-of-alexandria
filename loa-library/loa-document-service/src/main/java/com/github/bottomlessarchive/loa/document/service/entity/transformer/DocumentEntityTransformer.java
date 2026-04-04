@@ -1,6 +1,5 @@
 package com.github.bottomlessarchive.loa.document.service.entity.transformer;
 
-import com.github.bottomlessarchive.loa.compression.domain.DocumentCompression;
 import com.github.bottomlessarchive.loa.number.service.HexConverter;
 import com.github.bottomlessarchive.loa.document.repository.domain.DocumentDatabaseEntity;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentEntity;
@@ -27,7 +26,6 @@ public class DocumentEntityTransformer {
                 .fileSize(documentDatabaseEntity.fileSize())
                 .downloadDate(documentDatabaseEntity.downloadDate())
                 .downloaderVersion(documentDatabaseEntity.downloaderVersion())
-                .compression(DocumentCompression.valueOf(documentDatabaseEntity.compression()))
                 .source(documentDatabaseEntity.source())
                 .beacon(documentDatabaseEntity.beacon())
                 .sourceLocations(documentDatabaseEntity.sourceLocations().stream()

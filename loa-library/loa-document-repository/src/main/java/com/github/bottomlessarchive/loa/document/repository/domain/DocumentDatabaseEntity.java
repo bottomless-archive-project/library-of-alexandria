@@ -17,7 +17,6 @@ public record DocumentDatabaseEntity(
         String vault,
         String type,
         String status,
-        String compression,
 
         String source,
         String beacon,

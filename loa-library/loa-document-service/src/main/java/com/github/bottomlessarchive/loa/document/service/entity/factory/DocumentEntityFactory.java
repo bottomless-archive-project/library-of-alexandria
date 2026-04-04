@@ -139,7 +139,6 @@ public class DocumentEntityFactory {
                 .vault(documentCreationContext.vault())
                 .type(documentCreationContext.type().toString())
                 .status(documentCreationContext.status().toString())
-                .compression(documentCreationContext.compression().name())
                 .source(documentCreationContext.source())
                 .beacon(documentCreationContext.beacon())
                 .sourceLocations(sourceLocations)

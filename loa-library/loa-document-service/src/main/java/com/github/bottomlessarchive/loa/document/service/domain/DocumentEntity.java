@@ -1,6 +1,5 @@
 package com.github.bottomlessarchive.loa.document.service.domain;
 
-import com.github.bottomlessarchive.loa.compression.domain.DocumentCompression;
 import com.github.bottomlessarchive.loa.type.domain.DocumentType;
 import lombok.Builder;
 import lombok.Getter;
@@ -28,8 +27,6 @@ public class DocumentEntity {
     private final String checksum;
     private final long fileSize;
     private final int downloaderVersion;
-    @ToString.Include
-    private final DocumentCompression compression;
     private final String source;
     private final String beacon;
     @ToString.Include
@@ -53,15 +50,6 @@ public class DocumentEntity {
      */
     public boolean isCorrupt() {
         return status == DocumentStatus.CORRUPT;
-    }
-
-    /**
-     * Returns true if the document is compressed with a {@link DocumentCompression}.
-     *
-     * @return true if the document is compressed, false otherwise
-     */
-    public boolean isCompressed() {
-        return compression != DocumentCompression.NONE;
     }
 
     public Optional<String> getBeacon() {

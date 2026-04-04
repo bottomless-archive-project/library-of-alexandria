@@ -1,6 +1,5 @@
 package com.github.bottomlessarchive.loa.web.view.document.response;
 
-import com.github.bottomlessarchive.loa.compression.domain.DocumentCompression;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentStatus;
 import com.github.bottomlessarchive.loa.type.domain.DocumentType;
 import lombok.Builder;
@@ -18,7 +17,6 @@ public class DocumentDebugResponse {
     String vault;
     DocumentType type;
     DocumentStatus status;
-    DocumentCompression compression;
     String checksum;
     long fileSize;
     Instant downloadDate;

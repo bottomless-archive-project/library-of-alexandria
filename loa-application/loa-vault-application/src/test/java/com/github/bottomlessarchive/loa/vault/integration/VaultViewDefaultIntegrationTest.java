@@ -149,7 +149,7 @@ class VaultViewDefaultIntegrationTest {
         );
 
         sqliteConnectionManager.insertDocument(vaultFileNumber, documentId.toString(),
-                new ByteArrayInputStream(new byte[]{1, 2, 3, 4}));
+                new ByteArrayInputStream(new byte[]{1, 2, 3, 4}), DocumentCompression.NONE);
 
         mockMvc.perform(get("/document/" + documentId))
                 .andExpect(status().isOk())
@@ -179,7 +179,7 @@ class VaultViewDefaultIntegrationTest {
 
         final byte[] brotliContent = {-117, 1, -128, 1, 2, 3, 4, 3};
         sqliteConnectionManager.insertDocument(vaultFileNumber, documentId.toString(),
-                new ByteArrayInputStream(brotliContent));
+                new ByteArrayInputStream(brotliContent), DocumentCompression.BROTLI);
 
         mockMvc.perform(get("/document/" + documentId))
                 .andExpect(status().isOk())
@@ -251,7 +251,7 @@ class VaultViewDefaultIntegrationTest {
         );
 
         sqliteConnectionManager.insertDocument(vaultFileNumber, documentId.toString(),
-                new ByteArrayInputStream(new byte[]{1, 2, 3, 4}));
+                new ByteArrayInputStream(new byte[]{1, 2, 3, 4}), DocumentCompression.NONE);
 
         mockMvc.perform(delete("/document/" + documentId))
                 .andExpect(status().isOk());
@@ -296,7 +296,7 @@ class VaultViewDefaultIntegrationTest {
         );
 
         sqliteConnectionManager.insertDocument(vaultFileNumber, documentId.toString(),
-                new ByteArrayInputStream(new byte[]{1, 2, 3, 4}));
+                new ByteArrayInputStream(new byte[]{1, 2, 3, 4}), DocumentCompression.NONE);
 
         mockMvc.perform(
                         put("/document/" + documentId + "/recompress")
@@ -323,8 +323,6 @@ class VaultViewDefaultIntegrationTest {
                             .isEqualTo(DocumentType.PDF);
                     assertThat(databaseEntity.getStatus())
                             .isEqualTo(DocumentStatus.DOWNLOADED);
-                    assertThat(databaseEntity.getCompression())
-                            .isEqualTo(DocumentCompression.GZIP);
                     assertThat(databaseEntity.getChecksum())
                             .isEqualTo("ba8020bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad");
                     assertThat(databaseEntity.getFileSize())
@@ -356,7 +354,7 @@ class VaultViewDefaultIntegrationTest {
 
         final byte[] gzipContent = {31, -117, 8, 0, 0, 0, 0, 0, 0, -1, 99, 100, 98, 102, 1, 0, -51, -5, 60, -74, 4, 0, 0, 0};
         sqliteConnectionManager.insertDocument(vaultFileNumber, documentId.toString(),
-                new ByteArrayInputStream(gzipContent));
+                new ByteArrayInputStream(gzipContent), DocumentCompression.GZIP);
 
         mockMvc.perform(
                         put("/document/" + documentId + "/recompress")
@@ -382,8 +380,6 @@ class VaultViewDefaultIntegrationTest {
                             .isEqualTo(DocumentType.PDF);
                     assertThat(databaseEntity.getStatus())
                             .isEqualTo(DocumentStatus.DOWNLOADED);
-                    assertThat(databaseEntity.getCompression())
-                            .isEqualTo(DocumentCompression.BROTLI);
                     assertThat(databaseEntity.getChecksum())
                             .isEqualTo("ba8030bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad");
                     assertThat(databaseEntity.getFileSize())
@@ -415,7 +411,7 @@ class VaultViewDefaultIntegrationTest {
 
         final byte[] gzipContent = {31, -117, 8, 0, 0, 0, 0, 0, 0, -1, 99, 100, 98, 102, 1, 0, -51, -5, 60, -74, 4, 0, 0, 0};
         sqliteConnectionManager.insertDocument(vaultFileNumber, documentId.toString(),
-                new ByteArrayInputStream(gzipContent));
+                new ByteArrayInputStream(gzipContent), DocumentCompression.GZIP);
 
         mockMvc.perform(
                         put("/document/" + documentId + "/recompress")
@@ -441,8 +437,6 @@ class VaultViewDefaultIntegrationTest {
                             .isEqualTo(DocumentType.PDF);
                     assertThat(databaseEntity.getStatus())
                             .isEqualTo(DocumentStatus.DOWNLOADED);
-                    assertThat(databaseEntity.getCompression())
-                            .isEqualTo(DocumentCompression.NONE);
                     assertThat(databaseEntity.getChecksum())
                             .isEqualTo("ba8040bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad");
                     assertThat(databaseEntity.getFileSize())
@@ -455,6 +449,7 @@ class VaultViewDefaultIntegrationTest {
     @Test
     void testRecompressDocumentWhenDocumentIsInTheSameCompressionAsTarget() throws Exception {
         final UUID documentId = UUID.randomUUID();
+        final int vaultFileNumber = sqliteConnectionManager.assignVaultFileNumber(documentId.toString());
 
         documentEntityFactory.newDocumentEntity(
                 DocumentCreationContext.builder()
@@ -467,8 +462,13 @@ class VaultViewDefaultIntegrationTest {
                         .fileSize(123)
                         .source("test-source")
                         .sourceLocationId(Optional.empty())
+                        .vaultFile(vaultFileNumber)
                         .build()
         );
+
+        final byte[] gzipContent = {31, -117, 8, 0, 0, 0, 0, 0, 0, -1, 99, 100, 98, 102, 1, 0, -51, -5, 60, -74, 4, 0, 0, 0};
+        sqliteConnectionManager.insertDocument(vaultFileNumber, documentId.toString(),
+                new ByteArrayInputStream(gzipContent), DocumentCompression.GZIP);
 
         mockMvc.perform(
                         put("/document/" + documentId + "/recompress")
@@ -531,7 +531,7 @@ class VaultViewDefaultIntegrationTest {
         );
 
         sqliteConnectionManager.insertDocument(vaultFileNumber, documentId.toString(),
-                new ByteArrayInputStream(new byte[]{1, 2, 3, 4}));
+                new ByteArrayInputStream(new byte[]{1, 2, 3, 4}), DocumentCompression.NONE);
 
         mockMvc.perform(get("/document/" + documentId + "/exists"))
                 .andExpect(status().isOk())
@@ -611,7 +611,7 @@ class VaultViewDefaultIntegrationTest {
         );
 
         sqliteConnectionManager.insertDocument(vaultFileNumber, documentId.toString(),
-                new ByteArrayInputStream(new byte[]{1, 2, 3, 4}));
+                new ByteArrayInputStream(new byte[]{1, 2, 3, 4}), DocumentCompression.NONE);
 
         final MockMultipartFile mockMultipartFile = new MockMultipartFile("replacementFile", "dummy.pdf",
                 "application/pdf", new byte[]{4, 3, 2, 1});
@@ -638,8 +638,6 @@ class VaultViewDefaultIntegrationTest {
                             .isEqualTo(DocumentType.PDF);
                     assertThat(databaseEntity.getStatus())
                             .isEqualTo(DocumentStatus.DOWNLOADED);
-                    assertThat(databaseEntity.getCompression())
-                            .isEqualTo(DocumentCompression.NONE);
                     assertThat(databaseEntity.getChecksum())
                             .isEqualTo("ba7928bf8f01cfea414140de5dae2223b00361a396197a9cb420ff61f20019ad");
                     assertThat(databaseEntity.getFileSize())

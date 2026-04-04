@@ -124,8 +124,6 @@ class VaultProcessingIntegrationTest {
                             .isEqualTo("ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad");
                     assertThat(document.getFileSize())
                             .isEqualTo(444);
-                    assertThat(document.getCompression())
-                            .isEqualTo(DocumentCompression.NONE);
                     assertThat(document.getSource())
                             .isEqualTo("test-source");
                     assertThat(document.getBeacon())
@@ -201,8 +199,6 @@ class VaultProcessingIntegrationTest {
                             .isEqualTo("127816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad");
                     assertThat(document.getFileSize())
                             .isEqualTo(444);
-                    assertThat(document.getCompression())
-                            .isEqualTo(DocumentCompression.NONE);
                     assertThat(document.getSource())
                             .isEqualTo("test-source");
                     assertThat(document.getBeacon())
@@ -286,8 +282,6 @@ class VaultProcessingIntegrationTest {
                             .isEqualTo("ab7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad");
                     assertThat(document.getFileSize())
                             .isEqualTo(5);
-                    assertThat(document.getCompression())
-                            .isEqualTo(DocumentCompression.GZIP);
                     assertThat(document.getSource())
                             .isEqualTo("test-source");
                     assertThat(document.getVault())

@@ -36,7 +36,6 @@ public class DocumentDebugResponseFactory {
                 .vault(documentEntity.getVault())
                 .type(documentEntity.getType())
                 .status(documentEntity.getStatus())
-                .compression(documentEntity.getCompression())
                 .checksum(documentEntity.getChecksum())
                 .fileSize(documentEntity.getFileSize())
                 .downloadDate(documentEntity.getDownloadDate())

@@ -44,12 +44,7 @@ public class SilentCompressorCommand implements CommandLineRunner {
         documentEntityFactory.getDocumentEntitiesSync()
                 .parallel()
                 .filter(DocumentEntity::isArchived)
-                .filter(this::shouldCompress)
                 .forEach(documentEntity -> vaultClientService.recompressDocument(documentEntity,
                         silentCompressorConfigurationProperties.algorithm()));
-    }
-
-    private boolean shouldCompress(final DocumentEntity documentEntity) {
-        return documentEntity.getCompression() != silentCompressorConfigurationProperties.algorithm();
     }
 }

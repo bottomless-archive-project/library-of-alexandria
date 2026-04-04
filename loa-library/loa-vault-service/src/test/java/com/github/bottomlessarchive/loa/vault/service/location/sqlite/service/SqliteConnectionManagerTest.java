@@ -1,5 +1,6 @@
 package com.github.bottomlessarchive.loa.vault.service.location.sqlite.service;
 
+import com.github.bottomlessarchive.loa.compression.domain.DocumentCompression;
 import com.github.bottomlessarchive.loa.vault.service.location.sqlite.configuration.SqliteConfigurationProperties;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -47,7 +48,7 @@ class SqliteConnectionManagerTest {
         final byte[] content = {1, 2, 3, 4, 5};
         final int fileNumber = underTest.assignVaultFileNumber("doc-001");
 
-        underTest.insertDocument(fileNumber, "doc-001", new ByteArrayInputStream(content));
+        underTest.insertDocument(fileNumber, "doc-001", new ByteArrayInputStream(content), DocumentCompression.NONE);
 
         try (InputStream result = underTest.readDocument(fileNumber, "doc-001")) {
             assertThat(result.readAllBytes()).isEqualTo(content);
@@ -58,7 +59,7 @@ class SqliteConnectionManagerTest {
     void testDocumentExistsReturnsTrueWhenPresent() {
         final byte[] content = {1, 2, 3};
         final int fileNumber = underTest.assignVaultFileNumber("doc-exists");
-        underTest.insertDocument(fileNumber, "doc-exists", new ByteArrayInputStream(content));
+        underTest.insertDocument(fileNumber, "doc-exists", new ByteArrayInputStream(content), DocumentCompression.NONE);
 
         assertThat(underTest.documentExists(fileNumber, "doc-exists")).isTrue();
     }
@@ -72,7 +73,7 @@ class SqliteConnectionManagerTest {
     void testDeleteDocument() {
         final byte[] content = {1, 2, 3};
         final int fileNumber = underTest.assignVaultFileNumber("doc-delete");
-        underTest.insertDocument(fileNumber, "doc-delete", new ByteArrayInputStream(content));
+        underTest.insertDocument(fileNumber, "doc-delete", new ByteArrayInputStream(content), DocumentCompression.NONE);
 
         underTest.deleteDocument(fileNumber, "doc-delete");
 
@@ -117,9 +118,9 @@ class SqliteConnectionManagerTest {
         assertThat(fileC).isEqualTo(2);
 
         // Insert to file 1 after rotation still works
-        underTest.insertDocument(fileA, "doc-a", new ByteArrayInputStream(new byte[]{10, 20}));
-        underTest.insertDocument(fileB, "doc-b", new ByteArrayInputStream(new byte[]{30, 40}));
-        underTest.insertDocument(fileC, "doc-c", new ByteArrayInputStream(new byte[]{50, 60}));
+        underTest.insertDocument(fileA, "doc-a", new ByteArrayInputStream(new byte[]{10, 20}), DocumentCompression.NONE);
+        underTest.insertDocument(fileB, "doc-b", new ByteArrayInputStream(new byte[]{30, 40}), DocumentCompression.NONE);
+        underTest.insertDocument(fileC, "doc-c", new ByteArrayInputStream(new byte[]{50, 60}), DocumentCompression.NONE);
 
         assertThat(underTest.documentExists(1, "doc-a")).isTrue();
         assertThat(underTest.documentExists(1, "doc-b")).isTrue();
@@ -134,8 +135,8 @@ class SqliteConnectionManagerTest {
 
         final int fileA = underTest.assignVaultFileNumber("doc-a");
         final int fileB = underTest.assignVaultFileNumber("doc-b");
-        underTest.insertDocument(fileA, "doc-a", new ByteArrayInputStream(new byte[]{10, 20}));
-        underTest.insertDocument(fileB, "doc-b", new ByteArrayInputStream(new byte[]{30, 40}));
+        underTest.insertDocument(fileA, "doc-a", new ByteArrayInputStream(new byte[]{10, 20}), DocumentCompression.NONE);
+        underTest.insertDocument(fileB, "doc-b", new ByteArrayInputStream(new byte[]{30, 40}), DocumentCompression.NONE);
 
         // Rotation happened, now read from old file
         underTest.assignVaultFileNumber("doc-c");
@@ -149,7 +150,7 @@ class SqliteConnectionManagerTest {
     void testNewInstancePicksUpExistingState() {
         final byte[] content = {99, 88, 77};
         final int fileNumber = underTest.assignVaultFileNumber("doc-persist");
-        underTest.insertDocument(fileNumber, "doc-persist", new ByteArrayInputStream(content));
+        underTest.insertDocument(fileNumber, "doc-persist", new ByteArrayInputStream(content), DocumentCompression.NONE);
         underTest.close();
 
         final SqliteConnectionManager newManager = createManager(100000);

@@ -1,5 +1,6 @@
 package com.github.bottomlessarchive.loa.vault.service;
 
+import com.github.bottomlessarchive.loa.compression.domain.DocumentCompression;
 import com.github.bottomlessarchive.loa.compression.service.compressor.provider.CompressorServiceProvider;
 import com.github.bottomlessarchive.loa.document.service.DocumentManipulator;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentEntity;
@@ -35,7 +36,7 @@ public class VaultDocumentManager {
         log.info("Archiving document with id: {}.", documentArchivingContext.id());
 
         sqliteConnectionManager.insertDocument(documentEntity.getVaultFile(), documentArchivingContext.id().toString(),
-                documentContent);
+                documentContent, documentArchivingContext.compression());
     }
 
     /**
@@ -46,12 +47,14 @@ public class VaultDocumentManager {
      */
     public Resource readDocument(final DocumentEntity documentEntity) {
         try {
+            final DocumentCompression compression = sqliteConnectionManager.readCompression(
+                    documentEntity.getVaultFile(), documentEntity.getId().toString());
             final InputStream documentContentsInputStream = sqliteConnectionManager.readDocument(
                     documentEntity.getVaultFile(), documentEntity.getId().toString());
 
-            if (documentEntity.isCompressed()) {
+            if (compression != DocumentCompression.NONE) {
                 final InputStream decompressedInputStream = compressorServiceProvider.getCompressionService(
-                        documentEntity.getCompression()).decompress(documentContentsInputStream);
+                        compression).decompress(documentContentsInputStream);
 
                 return new InputStreamResource(decompressedInputStream);
             } else {
@@ -86,9 +89,10 @@ public class VaultDocumentManager {
         return sqliteConnectionManager.getAvailableSpace();
     }
 
-    public void replaceDocument(final DocumentEntity documentEntity, final InputStream documentContent) {
+    public void replaceDocument(final DocumentEntity documentEntity, final DocumentCompression compression,
+            final InputStream documentContent) {
         sqliteConnectionManager.deleteDocument(documentEntity.getVaultFile(), documentEntity.getId().toString());
         sqliteConnectionManager.insertDocument(documentEntity.getVaultFile(), documentEntity.getId().toString(),
-                documentContent);
+                documentContent, compression);
     }
 }

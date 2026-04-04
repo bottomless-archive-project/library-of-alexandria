@@ -88,8 +88,6 @@ class DocumentEntityFactoryTest {
                 .isEqualTo(200);
         assertThat(insertedDocumentDatabaseEntity.downloaderVersion())
                 .isEqualTo(5);
-        assertThat(insertedDocumentDatabaseEntity.compression())
-                .isEqualTo("GZIP");
         assertThat(insertedDocumentDatabaseEntity.source())
                 .isEqualTo("test-source");
         assertThat(insertedDocumentDatabaseEntity.sourceLocations().size())

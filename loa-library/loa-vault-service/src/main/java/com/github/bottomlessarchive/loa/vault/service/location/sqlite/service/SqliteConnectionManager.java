@@ -9,6 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import com.github.bottomlessarchive.loa.compression.domain.DocumentCompression;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -128,17 +130,20 @@ public class SqliteConnectionManager {
      * Inserts a document into the specified vault file. The file number must have been previously obtained via
      * {@link #assignVaultFileNumber(String)}.
      *
-     * @param fileNumber the vault file to write to
-     * @param docId      the document ID
-     * @param content    the document content
+     * @param fileNumber  the vault file to write to
+     * @param docId       the document ID
+     * @param content     the document content
+     * @param compression the compression used on the content
      */
-    public void insertDocument(final int fileNumber, final String docId, final InputStream content) {
+    public void insertDocument(final int fileNumber, final String docId, final InputStream content,
+            final DocumentCompression compression) {
         final Connection connection = getOrOpenWriteConnection(fileNumber);
 
         try (PreparedStatement stmt = connection.prepareStatement(
-                "INSERT INTO documents (id, content) VALUES (?, ?)")) {
+                "INSERT INTO documents (id, content, compression) VALUES (?, ?, ?)")) {
             stmt.setString(1, docId);
             stmt.setBytes(2, content.readAllBytes());
+            stmt.setString(3, compression.name());
             stmt.executeUpdate();
         } catch (final Exception e) {
             throw new StorageAccessException("Unable to insert document into SQLite vault!", e);
@@ -165,6 +170,40 @@ public class SqliteConnectionManager {
         }
 
         throw new StorageAccessException("Document not found in SQLite vault: " + docId);
+    }
+
+    public DocumentCompression readCompression(final int fileNumber, final String docId) {
+        final Connection connection = getReadConnection(fileNumber);
+
+        try (PreparedStatement stmt = connection.prepareStatement(
+                "SELECT compression FROM documents WHERE id = ?")) {
+            stmt.setString(1, docId);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return DocumentCompression.valueOf(rs.getString("compression"));
+                }
+            }
+        } catch (final SQLException e) {
+            throw new StorageAccessException("Unable to read compression from SQLite vault!", e);
+        }
+
+        throw new StorageAccessException("Document not found in SQLite vault: " + docId);
+    }
+
+    public void updateCompression(final int fileNumber, final String docId, final DocumentCompression compression) {
+        final Connection connection = getOrOpenWriteConnection(fileNumber);
+
+        try (PreparedStatement stmt = connection.prepareStatement(
+                "UPDATE documents SET compression = ? WHERE id = ?")) {
+            stmt.setString(1, compression.name());
+            stmt.setString(2, docId);
+            stmt.executeUpdate();
+        } catch (final SQLException e) {
+            throw new StorageAccessException("Unable to update compression in SQLite vault!", e);
+        }
+
+        lastWriteTime.put(fileNumber, Instant.now());
     }
 
     public boolean documentExists(final int fileNumber, final String docId) {
@@ -329,17 +368,32 @@ public class SqliteConnectionManager {
             stmt.execute("CREATE TABLE IF NOT EXISTS schema_version (version INTEGER NOT NULL)");
         }
 
+        int currentVersion = 0;
+
         try (var stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery("SELECT version FROM schema_version")) {
-            if (!rs.next()) {
-                try (var insertStmt = connection.createStatement()) {
-                    insertStmt.execute("INSERT INTO schema_version (version) VALUES (1)");
-                }
+            if (rs.next()) {
+                currentVersion = rs.getInt("version");
             }
         }
 
-        try (var stmt = connection.createStatement()) {
-            stmt.execute("CREATE TABLE IF NOT EXISTS documents (id TEXT PRIMARY KEY, content BLOB NOT NULL)");
+        if (currentVersion == 0) {
+            try (var stmt = connection.createStatement()) {
+                stmt.execute("CREATE TABLE IF NOT EXISTS documents (id TEXT PRIMARY KEY, content BLOB NOT NULL,"
+                        + " compression TEXT NOT NULL DEFAULT 'NONE')");
+            }
+
+            try (var insertStmt = connection.createStatement()) {
+                insertStmt.execute("INSERT INTO schema_version (version) VALUES (2)");
+            }
+        } else if (currentVersion == 1) {
+            try (var stmt = connection.createStatement()) {
+                stmt.execute("ALTER TABLE documents ADD COLUMN compression TEXT NOT NULL DEFAULT 'NONE'");
+            }
+
+            try (var stmt = connection.createStatement()) {
+                stmt.execute("UPDATE schema_version SET version = 2");
+            }
         }
     }
 

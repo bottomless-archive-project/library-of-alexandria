@@ -325,7 +325,6 @@ class VaultControllerTest {
         final DocumentEntity documentEntity = DocumentEntity.builder()
                 .id(UUID.fromString(TEST_DOCUMENT_ID))
                 .vault("my-vault")
-                .compression(DocumentCompression.GZIP)
                 .build();
         when(documentEntityFactory.getDocumentEntity(UUID.fromString(TEST_DOCUMENT_ID)))
                 .thenReturn(Optional.of(documentEntity));
@@ -343,7 +342,7 @@ class VaultControllerTest {
                 .andExpect(status().isOk());
 
         verify(vaultDocumentManager)
-                .replaceDocument(eq(documentEntity), any(InputStream.class));
+                .replaceDocument(eq(documentEntity), eq(DocumentCompression.NONE), any(InputStream.class));
         verify(documentManipulator)
                 .markDownloaded(UUID.fromString(TEST_DOCUMENT_ID));
     }

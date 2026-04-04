@@ -1,5 +1,6 @@
 package com.github.bottomlessarchive.loa.vault.view.controller;
 
+import com.github.bottomlessarchive.loa.compression.domain.DocumentCompression;
 import com.github.bottomlessarchive.loa.document.service.DocumentManipulator;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentEntity;
 import com.github.bottomlessarchive.loa.document.service.entity.factory.DocumentEntityFactory;
@@ -140,7 +141,8 @@ public class VaultController {
                     }
 
                     try {
-                        vaultDocumentManager.replaceDocument(documentEntity, replacementFile.getInputStream());
+                        vaultDocumentManager.replaceDocument(documentEntity, DocumentCompression.NONE,
+                                replacementFile.getInputStream());
                     } catch (IOException e) {
                         throw new InvalidRequestException("Failed to save document!", e);
                     }

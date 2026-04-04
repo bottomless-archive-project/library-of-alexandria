@@ -2,7 +2,6 @@ package com.github.bottomlessarchive.loa.vault.service;
 
 import com.github.bottomlessarchive.loa.compression.domain.DocumentCompression;
 import com.github.bottomlessarchive.loa.compression.service.file.FileCompressionService;
-import com.github.bottomlessarchive.loa.document.service.DocumentManipulator;
 import com.github.bottomlessarchive.loa.document.service.domain.DocumentEntity;
 import com.github.bottomlessarchive.loa.stage.service.StageLocationFactory;
 import com.github.bottomlessarchive.loa.stage.service.domain.StageLocation;
@@ -24,18 +23,20 @@ import java.util.UUID;
 public class RecompressorService {
 
     private final VaultDocumentManager vaultDocumentManager;
-    private final DocumentManipulator documentManipulator;
     private final SqliteConnectionManager sqliteConnectionManager;
     private final StageLocationFactory stageLocationFactory;
     private final FileCompressionService fileCompressionService;
 
     public void recompress(final DocumentEntity documentEntity, final DocumentCompression documentCompression) {
+        final DocumentCompression currentCompression = sqliteConnectionManager.readCompression(
+                documentEntity.getVaultFile(), documentEntity.getId().toString());
+
         if (log.isInfoEnabled()) {
             log.info("Migrating archived document {} from {} compression to {}.", documentEntity.getId(),
-                    documentEntity.getCompression(), documentCompression);
+                    currentCompression, documentCompression);
         }
 
-        if (documentEntity.getCompression().equals(documentCompression)) {
+        if (currentCompression.equals(documentCompression)) {
             return;
         }
 
@@ -56,7 +57,7 @@ public class RecompressorService {
                 vaultDocumentManager.removeDocument(documentEntity);
 
                 sqliteConnectionManager.insertDocument(documentEntity.getVaultFile(), documentEntity.getId().toString(),
-                        Files.newInputStream(compressedFilePath));
+                        Files.newInputStream(compressedFilePath), documentCompression);
 
                 // In case when the compression target is NONE, then the path for the original content and the new content is the same
                 // the file will be deleted by the originalContent's close call.
@@ -64,8 +65,6 @@ public class RecompressorService {
                     Files.delete(compressedFilePath);
                 }
             }
-
-            documentManipulator.updateCompression(documentEntity.getId(), documentCompression);
         } catch (final IOException e) {
             throw new StorageAccessException("Unable to load document " + documentEntity.getId() + "!", e);
         }

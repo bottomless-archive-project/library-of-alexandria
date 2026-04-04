@@ -60,10 +60,6 @@ public class DocumentRepository {
         documentDatabaseEntityMongoCollection.deleteOne(eq("_id", documentId));
     }
 
-    public void updateCompression(final UUID documentId, final String compression) {
-        documentDatabaseEntityMongoCollection.updateOne(eq("_id", documentId), set("compression", compression));
-    }
-
     /**
      * Update the status of the documents available in the repository to the provided value.
      *
@@ -81,12 +77,11 @@ public class DocumentRepository {
         documentDatabaseEntityMongoCollection.updateOne(eq("_id", documentId), set("fileSize", newFileSize));
     }
 
-    public void updateDocumentWhenMovedFromVault(final UUID documentId, final String vault, final String compression) {
+    public void updateDocumentWhenMovedFromVault(final UUID documentId, final String vault) {
         documentDatabaseEntityMongoCollection.updateOne(eq("_id", documentId),
                 combine(
                         unset("beacon"),
-                        set("vault", vault),
-                        set("compression", compression)
+                        set("vault", vault)
                 )
         );
     }
